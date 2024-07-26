@@ -28,20 +28,11 @@ public:
 
     DirectX::XMFLOAT3 GetMoveVec() const;
 
-    //void Move(float elapsedTime, float vx, float vz, float speed);
-
-    //void InputMove(float elapsedTime);
     bool InputMove(float elapsedTime);
 
-    //void Turn(float elapsedTime, float vx, float vz, float speed);
 
     void CollisionPlayerVsEnemies();
 
-    //void Jump(float speed);
-
-    //void UpdateVelocity(float elapsedTime);
-
-    //void InputJump();
     bool InputJump();
 
     void OnLanding() override;
@@ -70,6 +61,12 @@ public:
 
     void UpdateAttackState(float elapsedTime);
 
+    bool InputDodge();  //‰ñ”ð
+
+    void TransitionDodgeState();
+
+    void UpdateDodgeState(float elapsedTime);
+
     void TransitionDamageState();
 
     void UpdateDamageState(float elapsedTime);
@@ -81,6 +78,8 @@ public:
     void TransitionReviveState();
 
     void UpdateReviveState(float elapsedTime);
+
+
 
 private:
     ProjectileManager projectileManager;
@@ -99,7 +98,8 @@ private:
         Attack,
         Damage,
         Death,
-        Revive
+        Revive,
+        Dodge,
     };
 
 
@@ -142,7 +142,8 @@ private:
         Anim_Landing,
         Anim_Revive,
         Anim_Running,
-        Anim_Walking
+        Anim_Walking,
+        Anim_Dodge,
     };
 protected:
     void OnDamaged() override;

@@ -23,6 +23,7 @@ Player::Player()
 
     //model = new Model("Data/Model/Mr.Incredible/Mr.Incredible.mdl");
     model = new Model("Data/Model/Jammo/Jammo.mdl");
+    model->SetEnableRootMotion(true);
 
     //モデルが大きいのでスケーリング
     scale.x = scale.y = scale.z = 0.01f;
@@ -76,6 +77,9 @@ void Player::Update(float elapsedTime)
         break;
     case State::Revive:
         UpdateReviveState(elapsedTime);
+        break;
+    case State::Dodge:
+        UpdateDodgeState(elapsedTime);
         break;
     }
 
@@ -354,7 +358,6 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
 
     return vec;
 
-
 }
 
 void Player::Render(ID3D11DeviceContext* dc, Shader* shader)
@@ -440,6 +443,11 @@ void Player::UpdateIdleState(float elapsedTime)
         TransitionJumpState();
     }
 
+    if (InputDodge())
+    {
+        TransitionDodgeState();
+    }
+
     //弾丸入力処理
     InputProjectile();
 
@@ -516,12 +524,14 @@ void Player::UpdateLandState(float elapsedTime)
 
 bool Player::InputAttack()
 {
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_B)
+    Mouse& mouse = Input::Instance().GetMouse();
+
+    if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
     {
         return true;
     }
     return false;
+
 }
 
 void Player::TransitionAttackState()
@@ -546,6 +556,37 @@ void Player::UpdateAttackState(float elapsedTime)
     {
         CollisionNodeVsEnemies("mixamorig:LeftHand", leftHandRadius);
     }
+}
+
+bool Player::InputDodge()
+{
+    GamePad& gamepad = Input::Instance().GetGamePad();
+
+    if (gamepad.GetButtonDown() & GamePad::BTN_SPACE)
+    {
+        return true;
+    }
+    return false;
+}
+
+void Player::TransitionDodgeState()
+{
+    state = State::Attack;
+    model->PlayAnimation(Anim_Dodge, false, 0.1f);
+}
+
+void Player::UpdateDodgeState(float elapsedTime)
+{
+    if (InputAttack())
+    {
+        TransitionAttackState();
+    }
+
+    if (!model->IsPlayAnimation())
+    {
+        TransitionIdleState();
+    }
+
 }
 
 void Player::TransitionDamageState()

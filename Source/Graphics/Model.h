@@ -47,6 +47,8 @@ public:
 	//現在のアニメーション再生時間取得
 	float GetCurrentAnimationSeconds() const { return currentAnimationSeconds; }
 
+	void SetEnableRootMotion(bool enable) { enableRootMotion = enable; }
+
 private:
 	std::shared_ptr<ModelResource>	resource;
 	std::vector<Node>				nodes;
@@ -57,5 +59,7 @@ private:
 	bool animationEndFlag = false;
 	float animationBlendTime = 0.0f;
 	float animationBlendSeconds = 0.0f;
+
+	bool enableRootMotion = false;
 
 };

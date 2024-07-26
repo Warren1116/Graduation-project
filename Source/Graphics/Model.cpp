@@ -34,6 +34,8 @@ Model::Model(const char* filename)
 	// 行列計算
 	const DirectX::XMFLOAT4X4 transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	UpdateTransform(transform);
+
+	SetEnableRootMotion(true);
 }
 
 // 変換行列計算
@@ -81,10 +83,7 @@ void Model::UpdateAnimation(float elapsedTime)
 
 	//ブランド率の計算
 	float blendRate = 1.0f;
-	//animationBlendTime += elapsedTime;
-	//blendRate = animationBlendTime / animationBlendSeconds;
 
-	//先生の答え
 	if (animationBlendTime < animationBlendSeconds)
 	{
 		animationBlendTime += elapsedTime;
@@ -96,6 +95,7 @@ void Model::UpdateAnimation(float elapsedTime)
 		blendRate *= blendRate;
 	}
 
+
 	//指定のアニメーションデータを取得
 	const std::vector<ModelResource::Animation>& animations = resource->GetAnimations();
 	const ModelResource::Animation& animation = animations.at(currentAnimationIndex);
@@ -103,6 +103,10 @@ void Model::UpdateAnimation(float elapsedTime)
 	//アニメーションデータからキーフレームデータリストを取得
 	const std::vector<ModelResource::Keyframe>& keyframes = animation.keyframes;
 	int keyCount = static_cast<int>(keyframes.size());
+
+	//ルートモーションの移動量
+	DirectX::XMFLOAT3 rootMotionTranslation = { 0, 0, 0 };
+
 	for (int keyIndex = 0; keyIndex < keyCount -1; ++keyIndex)
 	{
 		//現在の時間がどのキーフレームの間にいるか判定する
@@ -149,22 +153,6 @@ void Model::UpdateAnimation(float elapsedTime)
 				else
 				{
 					//前のキーフレームと次のキーフレームの姿勢を補完
-					//DirectX::XMVECTOR Key0 = DirectX::XMLoadFloat4(&key0.rotate);
-					//DirectX::XMVECTOR Key1 = DirectX::XMLoadFloat4(&key1.rotate);
-					//DirectX::XMVECTOR Rotation = DirectX::XMQuaternionSlerp(Key0,Key1,rate);
-					//DirectX::XMStoreFloat4(&node.rotate, Rotation);
-
-					//Key0 = DirectX::XMLoadFloat3(&key0.translate);
-					//Key1 = DirectX::XMLoadFloat3(&key1.translate);
-					//DirectX::XMVECTOR Position = DirectX::XMVectorLerp(Key0, Key1, rate);
-					//DirectX::XMStoreFloat3(&node.translate, Position);
-
-					//Key0 = DirectX::XMLoadFloat3(&key0.scale);
-					//Key1 = DirectX::XMLoadFloat3(&key1.scale);
-					//DirectX::XMVECTOR Scale = DirectX::XMVectorLerp(Key0, Key1, rate);
-					//DirectX::XMStoreFloat3(&node.scale, Scale);
-
-					//先生の答え
 					DirectX::XMVECTOR S0 = DirectX::XMLoadFloat3(&key0.scale);
 					DirectX::XMVECTOR S1 = DirectX::XMLoadFloat3(&key1.scale);
 					DirectX::XMVECTOR R0 = DirectX::XMLoadFloat4(&key0.rotate);
@@ -181,24 +169,26 @@ void Model::UpdateAnimation(float elapsedTime)
 					DirectX::XMStoreFloat3(&node.translate, T);
 				}
 
+				if (node.name != nullptr && std::strcmp(node.name, "mixamorig:Hips") == 0)
+				{
+					rootMotionTranslation = DirectX::XMFLOAT3(node.translate.x, node.translate.y, node.translate.z);
+				}
+
 			}
 			break;
 		}
 
 	}
 
+	if (enableRootMotion)
+	{
+		DirectX::XMFLOAT4X4 rootMotionTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, rootMotionTranslation.x, rootMotionTranslation.y, rootMotionTranslation.z, 1 };
+		UpdateTransform(rootMotionTransform);
+	}
+
 	//時間経過
 	currentAnimationSeconds += elapsedTime;
 
-	////再生時間が終端時間を超えたら
-	//if (currentAnimationSeconds >= animation.secondsLength)
-	//{
-	//	animationEndFlag = true;
-	//	//再生時間を巻き戻す
-	//	currentAnimationSeconds -= animation.secondsLength;
-	//}
-
-	//先生の答え
 	//再生時間が終端時間を超えたら
 	if (currentAnimationSeconds >= animation.secondsLength)
 	{
@@ -215,6 +205,7 @@ void Model::UpdateAnimation(float elapsedTime)
 	}
 
 }
+
 
 void Model::PlayAnimation(int index, bool loop, float blendSeconds)
 {
