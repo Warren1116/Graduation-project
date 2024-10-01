@@ -51,9 +51,9 @@ public:
 
     void UpdateJumpState(float elapsedTime);
 
-    void TransitionLandState();
+    //void TransitionLandState();
 
-    void UpdateLandState(float elapsedTime);
+    //void UpdateLandState(float elapsedTime);
 
     bool InputAttack();
 
@@ -61,11 +61,11 @@ public:
 
     void UpdateAttackState(float elapsedTime);
 
-    bool InputDodge();  //回避
+    //bool InputDodge();  //回避
 
-    void TransitionDodgeState();
+    //void TransitionDodgeState();
 
-    void UpdateDodgeState(float elapsedTime);
+    //void UpdateDodgeState(float elapsedTime);
 
     void TransitionDamageState();
 
@@ -75,10 +75,20 @@ public:
 
     void UpdateDeathState(float elapsedTime);
 
-    void TransitionReviveState();
+    void TransitionClimbWallState();
 
-    void UpdateReviveState(float elapsedTime);
+    void UpdateClimbWallState(float elapsedTime);
 
+
+    //void TransitionReviveState();
+
+    //void UpdateReviveState(float elapsedTime);
+
+
+    //モーション更新
+    void UpdateMotion(float elapsedTime);
+
+    void PlayAttackAnimation();
 
 
 private:
@@ -100,6 +110,7 @@ private:
         Death,
         Revive,
         Dodge,
+        Climb,
     };
 
 
@@ -124,26 +135,45 @@ private:
 
     State   state = State::Idle;
 
-    float leftHandRadius = 0.4f;
+    float HandRadius = 0.4f;
 
     bool attackCollisionFlag = false;
+
+    int animationIndex = -1;
+
+    float animationSeconds = 0;
+
+    float oldAnimationSeconds = 0;
+
+    std::vector<Model::NodePose> nodePoses;
+
+    DirectX::XMFLOAT4X4	worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+
+    bool animationLoop = false;
+    bool bakeTranslationY = false;
+
+    //攻撃の回数
+    int attackCount = 0;
+    int attackLimit = 3;
+    float attackTimer = 0;
+
+    bool attacking = false;
+
 
     //アニメーション
     enum Animation
     {
-        Anim_Attack,
-        Anim_Death,
-        Anim_Falling,
-        Anim_GetHit1,
-        Anim_GetHit2,
         Anim_Idle,
-        Anim_Jump,
-        Anim_Jump_Flip,
-        Anim_Landing,
-        Anim_Revive,
-        Anim_Running,
         Anim_Walking,
-        Anim_Dodge,
+        Anim_Attack,
+        Anim_Attack2,
+        Anim_Kick,
+        Anim_Jump,
+        Anim_GetHit1,
+        Anim_Death,
+        Anim_Running,
+        Anim_Climb,
+
     };
 protected:
     void OnDamaged() override;

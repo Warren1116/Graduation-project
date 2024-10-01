@@ -45,24 +45,18 @@ void SceneGame::Initialize()
 		1000.0f
 	);
 
-	//エネミー初期化
-	for (int i = 0; i < 2; ++i)
-	{
-		EnemyManager& enemyManager = EnemyManager::Instance();
-#if 1
-		EnemySlime* slime = new EnemySlime();
-		slime->SetPosition(DirectX::XMFLOAT3(i*2.0f, 0, 5));
-		slime->SetTerritory(slime->GetPosition(), 10.0f);
-		enemyManager.Register(slime);
-#else
-		for (int i = 0; i < 50; ++i)
-		{
-			EnemySlime* slime = new EnemySlime();
-			slime->SetPosition(DirectX::XMFLOAT3(i * 2.0f, 0, 5));
-			enemyManager.Register(slime);
-		}
-#endif
-	}
+//	//エネミー初期化
+//	for (int i = 0; i < 2; ++i)
+//	{
+//		EnemyManager& enemyManager = EnemyManager::Instance();
+//#if 1
+//		EnemySlime* slime = new EnemySlime();
+//		slime->SetPosition(DirectX::XMFLOAT3(i*2.0f, 0, 5));
+//		slime->SetTerritory(slime->GetPosition(), 10.0f);
+//		enemyManager.Register(slime);
+//#endif
+//	}
+
 
 	//EnemyManager& enemyManager = EnemyManager::Instance();
 	//EnemySlime* slime = new EnemySlime();

@@ -38,9 +38,13 @@ public:
     //Å‘åŒ’Nó‘Ô‚ğæ“¾
     int GetMaxHealth() const { return maxHealth; }
 
+
+
+
 protected:
     //ˆÚ“®ˆ—
     //void Move(float elapsedTime, float vx, float vz, float speed);
+    void Move(float vx,float vy , float vz, float speed);
     void Move(float vx, float vz, float speed);
 
     void Turn(float elapsedTime, float vx, float vz, float speed);
@@ -67,6 +71,7 @@ protected:
     //€–S‚µ‚½‚ÉŒÄ‚Î‚ê‚é
     virtual void OnDead() {};
     void UpdateInvincibleTimer(float elapsedTime);
+
 
 protected:
     DirectX::XMFLOAT3       position = { 0,0,0 };
@@ -97,6 +102,7 @@ protected:
     float maxMoveSpeed = 5.0f;
     float moveVecX = 0.0f;
     float moveVecZ = 0.0f;
+    float moveVecY = 0.0f;
 
     float airControl = 0.3f;
 
@@ -106,6 +112,9 @@ protected:
 
     float attackRange = 1.5f;
 
+    bool hitWall = false;
+    float climbSpeed = 1.0f;
+    bool onClimb = false;
 
 };
 
