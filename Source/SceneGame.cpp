@@ -26,7 +26,7 @@ void SceneGame::Initialize()
 	stagemanager.Register(stageMoveFloor);
 
 	player = new Player();
-	cameraController = new CameraController;
+	//cameraController = new CameraController;
 	gauge = new Sprite();
 
 
@@ -45,17 +45,17 @@ void SceneGame::Initialize()
 		1000.0f
 	);
 
-//	//エネミー初期化
-//	for (int i = 0; i < 2; ++i)
-//	{
-//		EnemyManager& enemyManager = EnemyManager::Instance();
-//#if 1
-//		EnemySlime* slime = new EnemySlime();
-//		slime->SetPosition(DirectX::XMFLOAT3(i*2.0f, 0, 5));
-//		slime->SetTerritory(slime->GetPosition(), 10.0f);
-//		enemyManager.Register(slime);
-//#endif
-//	}
+	//エネミー初期化
+	for (int i = 0; i < 2; ++i)
+	{
+		EnemyManager& enemyManager = EnemyManager::Instance();
+#if 1
+		EnemySlime* slime = new EnemySlime();
+		slime->SetPosition(DirectX::XMFLOAT3(i*2.0f, 0, 5));
+		slime->SetTerritory(slime->GetPosition(), 10.0f);
+		enemyManager.Register(slime);
+#endif
+	}
 
 
 	//EnemyManager& enemyManager = EnemyManager::Instance();
@@ -77,11 +77,11 @@ void SceneGame::Finalize()
 		delete player;
 		player = nullptr;
 	}
-	if (cameraController != nullptr)
-	{
-		delete cameraController;
-		cameraController = nullptr;
-	}
+	//if (cameraController != nullptr)
+	//{
+	//	delete cameraController;
+	//	cameraController = nullptr;
+	//}
 
 	if (gauge != nullptr)
 	{
@@ -105,8 +105,8 @@ void SceneGame::Update(float elapsedTime)
 	DirectX::XMFLOAT3 target = player->GetPosition();
 	target.y += 0.5f;
 
-	cameraController->SetTarget(target);
-	cameraController->Update(elapsedTime);
+	CameraController::Instance().SetTarget(target);
+	CameraController::Instance().Update(elapsedTime);
 
 	//エネミー更新
 	EnemyManager::Instance().Update(elapsedTime);

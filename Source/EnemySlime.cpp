@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Mathf.h"
 #include "Collision.h"
+#include "CameraController.h"
 
 EnemySlime::EnemySlime()
 {
@@ -212,6 +213,7 @@ void EnemySlime::CollisionNodeVsPlayer(const char* nodeName, float nodeRadius)
                 //Y•ûŒü‚É‚à—Í‚ğ‚©‚¯‚é
                 vec.y = 5.0f;
 
+                CameraController::Instance().ShakeCamera(0.5f, 1.0f);
                 //‚Á”ò‚Î‚·
                 player.AddImpulse(vec);
 

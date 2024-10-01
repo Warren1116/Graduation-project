@@ -38,6 +38,7 @@ public:
 
     const DirectX::XMFLOAT3& GetRight() const { return right; }
 
+
 private:
     DirectX::XMFLOAT4X4 view;
     DirectX::XMFLOAT4X4 projection;
@@ -48,4 +49,5 @@ private:
     DirectX::XMFLOAT3 up;
     DirectX::XMFLOAT3 front;
     DirectX::XMFLOAT3 right;
+
 };

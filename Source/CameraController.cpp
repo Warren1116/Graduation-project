@@ -14,9 +14,31 @@ void CameraController::Update(float elapsedTime)
     //カメラの回転速度
     float speed = rollSpeed * elapsedTime;
 
-    //スティックの入力値に合わせてX軸とY軸を回転
-    angle.x += ay * speed;
-    angle.y += ax * speed;
+
+
+    //もしシェイクの時間が終わってないなら、シェイクを行う
+    if (shakeTime > 0.0f)
+    {
+        float shakeX = (rand() % 100 - 50) / 50.0f * shakeIntensity;
+        float shakeY = (rand() % 100 - 50) / 50.0f * shakeIntensity;
+
+        //カメラに応用
+        angle.x += shakeX;
+        angle.y += shakeY;
+
+        //シェイクの時間更新
+        shakeTime -= elapsedTime;
+
+        //シェイクの強さを減らす
+        shakeIntensity *= 0.9f;
+    }
+    else
+    {
+        //スティックの入力値に合わせてX軸とY軸を回転
+        angle.x += ay * speed;
+        angle.y += ax * speed;
+    }
+
 
     //カメラ回転を回転行列に変換
     DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z);
@@ -51,4 +73,10 @@ void CameraController::Update(float elapsedTime)
 
     //カメラの視点と注視点を設定
     Camera::Instance().SetLookAt(eye, target, DirectX::XMFLOAT3(0, 1, 0));
+}
+
+void CameraController::ShakeCamera(float intensity, float duration)
+{
+    shakeTime = duration;
+    shakeIntensity = intensity;
 }

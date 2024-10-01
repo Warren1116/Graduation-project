@@ -29,7 +29,7 @@ private:
 	Player* player = nullptr;
 	StageMain* stageMain = nullptr;
 
-	CameraController* cameraController = nullptr;
+	//CameraController* cameraController = nullptr;
 
 	void RenderEnemyGauge(
 		ID3D11DeviceContext* dc,

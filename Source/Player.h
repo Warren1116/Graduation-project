@@ -79,12 +79,6 @@ public:
 
     void UpdateClimbWallState(float elapsedTime);
 
-
-    //void TransitionReviveState();
-
-    //void UpdateReviveState(float elapsedTime);
-
-
     ////モーション更新
     //void UpdateMotion(float elapsedTime);
 

@@ -8,6 +8,7 @@
 #include "ProjectileStraight.h"
 #include "ProjectileHoming.h"
 #include "ProjectileManager.h"
+#include "CameraController.h"
 
 static Player* instance = nullptr;
 
@@ -70,9 +71,6 @@ void Player::Update(float elapsedTime)
     case State::Climb:
         UpdateClimbWallState(elapsedTime);
         break;
-        //case State::Revive:
-        //    UpdateReviveState(elapsedTime);
-        //    break;
         //case State::Dodge:
         //    UpdateDodgeState(elapsedTime);
         //    break;
@@ -396,7 +394,6 @@ void Player::DrawDebugPrimitive()
     {
         if (attackCount == 1)
         {
-
             Model::Node* leftHandBone = model->FindNode("mixamorig:LeftHand");
             debugRender->DrawSphere(DirectX::XMFLOAT3(
                 leftHandBone->worldTransform._41,
@@ -435,7 +432,7 @@ void Player::TransitionIdleState()
 {
     if (attacking)
     {
-        if (attackCount >= attackLimit || attackTimer > 90)
+        if (attackCount >= attackLimit || attackTimer > 120)
         {
             attackTimer = 0;
             attackCount = 0;
@@ -481,8 +478,13 @@ void Player::UpdateIdleState(float elapsedTime)
 
 void Player::TransitionMoveState()
 {
+    if (!attacking)
+    {
+        attackCount = 0;
+        attackTimer = 0;
+        attacking = false;
+    }
     state = State::Move;
-
     model->PlayAnimation(Anim_Running, true);
 
 
@@ -586,10 +588,6 @@ void Player::TransitionAttackState()
 
 void Player::UpdateAttackState(float elapsedTime)
 {
-    if (attacking)
-    {
-        attackTimer++;
-    }
     if (!model->IsPlayAnimation())
     {
         TransitionIdleState();
@@ -599,7 +597,7 @@ void Player::UpdateAttackState(float elapsedTime)
 
 
     float animationTime = model->GetCurrentAnimationSeconds();
-    attackCollisionFlag = animationTime >= 0.3f && animationTime <= 0.6f;
+    attackCollisionFlag = animationTime >= 0.3f && animationTime <= 1.0f;
 
     if (attackCollisionFlag)
     {
