@@ -321,7 +321,7 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
     DirectX::XMFLOAT3 vec;
     vec.x = (cameraRightX * ax) + (cameraFrontX * ay);
     vec.z = (cameraRightZ * ax) + (cameraFrontZ * ay);
-    if (onClimb)
+    if (hitWall && onClimb)
     {
         vec.y = (cameraRightY * ax) + (cameraFrontY * ay);
     }
@@ -369,7 +369,7 @@ void Player::DrawDebugGUI()
             ImGui::InputInt("attackCount", &attackCount);
             ImGui::InputFloat("attackTimer", &attackTimer);
 
-            if (onClimb)
+            if (hitWall)
             {
                 ImGui::Text("ON");
             }
@@ -490,7 +490,7 @@ void Player::TransitionMoveState()
 
 void Player::UpdateMoveState(float elapsedTime)
 {
-    if (onClimb)
+    if (hitWall && onClimb)
     {
         TransitionClimbWallState();
     }
@@ -562,10 +562,15 @@ bool Player::InputAttack()
     if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
     {
         attacking = true;
-        if (attackCount < attackLimit)
+        if (attackCount < attackLimit && attacking)
         {
             attackCount++;
             return true;
+        }
+        else
+        {
+            attackCount = 0;
+            attackTimer = 0;
         }
     }
     return false;
@@ -841,8 +846,11 @@ void Player::TransitionClimbWallState()
 
 void Player::UpdateClimbWallState(float elapsedTime)
 {
-
-
+    InputMove(elapsedTime);
+    if (!hitWall)
+    {
+        TransitionMoveState();
+    }
 }
 
 //void Player::TransitionReviveState()

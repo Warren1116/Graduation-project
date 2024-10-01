@@ -387,6 +387,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
         }
         else
         {
+            hitWall = false;
             onClimb = false;
             position.x += mx;
             position.z += mz;
