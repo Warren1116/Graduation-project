@@ -32,7 +32,7 @@ Player::Player()
 
     TransitionIdleState();
 
-    
+
 }
 
 //デストラクタ
@@ -55,9 +55,9 @@ void Player::Update(float elapsedTime)
     case State::Jump:
         UpdateJumpState(elapsedTime);
         break;
-        //case State::Land:
-        //    UpdateLandState(elapsedTime);
-        //    break;
+    case State::Land:
+        UpdateLandState(elapsedTime);
+        break;
     case State::Attack:
         UpdateAttackState(elapsedTime);
         break;
@@ -100,7 +100,7 @@ void Player::Update(float elapsedTime)
     //モデル行列更新
     model->UpdateTransform(transform);
 
-    UpdateMotion(elapsedTime);
+    //UpdateMotion(elapsedTime);
 
     UpdateInvincibleTimer(elapsedTime);
 
@@ -113,7 +113,7 @@ bool Player::InputMove(float elapsedTime)
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
     //移動処理
 
-    Move(moveVec.x,moveVec.y,moveVec.z, moveSpeed);
+    Move(moveVec.x, moveVec.y, moveVec.z, moveSpeed);
 
 
     Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
@@ -293,7 +293,7 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
     float cameraRightY = cameraRight.y;
     float cameraRightLength =
         sqrtf(cameraRightX * cameraRightX +
-            cameraRightY * cameraRightY + 
+            cameraRightY * cameraRightY +
             cameraRightZ * cameraRightZ);
 
     if (cameraRightLength > 0.0f)
@@ -426,7 +426,7 @@ void Player::DrawDebugPrimitive()
                 DirectX::XMFLOAT4(1, 0, 0, 1));
         }
 
-        
+
 
     }
 }
@@ -435,7 +435,7 @@ void Player::TransitionIdleState()
 {
     if (attacking)
     {
-        if (attackCount >= attackLimit ||  attackTimer > 90)
+        if (attackCount >= attackLimit || attackTimer > 90)
         {
             attackTimer = 0;
             attackCount = 0;
@@ -484,7 +484,7 @@ void Player::TransitionMoveState()
     state = State::Move;
 
     model->PlayAnimation(Anim_Running, true);
-    
+
 
 }
 
@@ -541,20 +541,20 @@ void Player::UpdateJumpState(float elapsedTime)
     InputProjectile();
 }
 
-//void Player::TransitionLandState()
-//{
-//    state = State::Land;
-//    model->PlayAnimation(Anim_Landing, false);
-//
-//}
+void Player::TransitionLandState()
+{
+    state = State::Land;
+    model->PlayAnimation(Anim_Landing, false);
 
-//void Player::UpdateLandState(float elapsedTime)
-//{
-//    if (!model->IsPlayAnimation())
-//    {
-//        TransitionIdleState();
-//    }
-//}
+}
+
+void Player::UpdateLandState(float elapsedTime)
+{
+    if (!model->IsPlayAnimation())
+    {
+        TransitionIdleState();
+    }
+}
 
 bool Player::InputAttack()
 {
@@ -581,7 +581,7 @@ void Player::TransitionAttackState()
 {
     state = State::Attack;
     PlayAttackAnimation();
-    
+
 }
 
 void Player::UpdateAttackState(float elapsedTime)
@@ -600,7 +600,7 @@ void Player::UpdateAttackState(float elapsedTime)
 
     float animationTime = model->GetCurrentAnimationSeconds();
     attackCollisionFlag = animationTime >= 0.3f && animationTime <= 0.6f;
-    
+
     if (attackCollisionFlag)
     {
         switch (attackCount)
@@ -870,17 +870,17 @@ void Player::UpdateClimbWallState(float elapsedTime)
 //    }
 //}
 
-void Player::UpdateMotion(float elapsedTime)
-{
-    GamePad& gamepad = Input::Instance().GetGamePad();
-    //  スペースボタンを押すと回避　（未完成）
-    if (gamepad.GetButtonDown() & GamePad::BTN_SPACE)
-    {
-        int index = model->GetAnimationIndex("Dodge");
-        model->PlayAnimation(index, false);
-    }
-    model->UpdateAnimation(elapsedTime);
-}
+//void Player::UpdateMotion(float elapsedTime)
+//{
+//    GamePad& gamepad = Input::Instance().GetGamePad();
+//    //  スペースボタンを押すと回避　（未完成）
+//    if (gamepad.GetButtonDown() & GamePad::BTN_SPACE)
+//    {
+//       /* int index = model->GetAnimationIndex("Dodge");
+//        model->PlayAnimation(index, false);*/
+//    }
+//    model->UpdateAnimation(elapsedTime);
+//}
 
 void Player::PlayAttackAnimation()
 {
@@ -922,15 +922,15 @@ void Player::OnLanding()
     jumpCount = 0;
 
     //下方向の速力が一定以上なら着地ステートへ
-    //if (velocity.y < gravity * 5.0f)
-    //{
-    //    TransitionLandState();
-    //}
+    if (velocity.y < gravity * 5.0f)
+    {
+        TransitionLandState();
+    }
 
-    //if (state != State::Death && state != State::Damage)
-    //{
-    //    TransitionLandState();
-    //}
+    if (state != State::Death && state != State::Damage)
+    {
+        TransitionLandState();
+    }
 
 }
 

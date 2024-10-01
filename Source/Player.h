@@ -51,9 +51,9 @@ public:
 
     void UpdateJumpState(float elapsedTime);
 
-    //void TransitionLandState();
+    void TransitionLandState();
 
-    //void UpdateLandState(float elapsedTime);
+    void UpdateLandState(float elapsedTime);
 
     bool InputAttack();
 
@@ -85,8 +85,8 @@ public:
     //void UpdateReviveState(float elapsedTime);
 
 
-    //モーション更新
-    void UpdateMotion(float elapsedTime);
+    ////モーション更新
+    //void UpdateMotion(float elapsedTime);
 
     void PlayAttackAnimation();
 
@@ -168,11 +168,12 @@ private:
         Anim_Attack,
         Anim_Attack2,
         Anim_Kick,
-        Anim_Jump,
         Anim_GetHit1,
         Anim_Death,
         Anim_Running,
         Anim_Climb,
+        Anim_Landing,
+        Anim_Jump,
 
     };
 protected:

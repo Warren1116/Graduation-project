@@ -1,18 +1,11 @@
 #include "ProjectileStraight.h"
 #include "StageManager.h"
 
-//ProjectileStraight::ProjectileStraight()
-//{
-//    model = new Model("Data/Model/SpikeBall/SpikeBall.mdl");
-//
-//    scale.x = scale.y = scale.z = 0.5f;
-//}
 
 ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(manager)
 {
-        model = new Model("Data/Model/Sword/Sword.mdl");
-        //scale.x = scale.y = scale.z = 0.5f;
-        scale.x = scale.y = scale.z = 3.0f;
+        model = new Model("Data/Model/SpiderWeb/SpiderWeb.mdl");
+        scale.x = scale.y = scale.z = 0.05f;
 }
 
 ProjectileStraight::~ProjectileStraight()
