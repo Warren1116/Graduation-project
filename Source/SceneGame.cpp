@@ -9,6 +9,7 @@
 #include "StageManager.h"
 #include "StageMain.h"
 #include "StageMoveFloor.h"
+#include "UI.h"
 
 // 初期化
 void SceneGame::Initialize()
@@ -29,6 +30,8 @@ void SceneGame::Initialize()
 	//cameraController = new CameraController;
 	gauge = new Sprite();
 
+
+	UI::Instance().Initialize();
 
 	//カメラ初期設定
 	Graphics& graphics = Graphics::Instance();
@@ -92,6 +95,8 @@ void SceneGame::Finalize()
 
 	//エネミー終了化
 	EnemyManager::Instance().Clear();
+
+	UI::Instance().Clear();
 }
 
 // 更新処理
@@ -113,6 +118,8 @@ void SceneGame::Update(float elapsedTime)
 
 	//EffectManager更新処理
 	EffectManager::Instance().Update(elapsedTime);
+
+	UI::Instance().Update(elapsedTime);
 }
 
 // 描画処理
@@ -198,7 +205,8 @@ void SceneGame::Render()
 
 	// 2Dスプライト描画
 	{
-		RenderEnemyGauge(dc, rc.view, rc.projection);
+		UI::Instance().RenderUI(dc,rc.view,rc.projection);
+		//RenderEnemyGauge(dc, rc.view, rc.projection);
 	}
 
 	// 2DデバッグGUI描画

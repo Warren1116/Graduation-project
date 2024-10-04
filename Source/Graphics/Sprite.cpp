@@ -358,3 +358,59 @@ void Sprite::Render(ID3D11DeviceContext *immediate_context,
 	}
 }
 
+void Sprite::Textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a)
+{
+	float sw = static_cast<float>(GetTextureWidth() / 16);
+	float sh = static_cast<float>(GetTextureHeight() / 16);
+	float carriage = 0;
+	for (const char c : s)
+	{
+		LONG sx = c % 0x0F;
+		Render(immediate_context,
+			x + carriage, y, w, h,
+			sw * (c & 0x0F), sh * (c >> 4), sw, sh,
+			0,
+			r, g, b, a);
+		carriage += w;
+	}
+
+}
+
+void Sprite::Timer(ID3D11DeviceContext* immediate_context, int nums, float x, float y, float w, float h, float r, float g, float b, float a)
+{
+	float sw = static_cast<float>(textureWidth) / 11.0f;
+	float sh = static_cast<float>(textureHeight);
+
+	int hundreds = nums / 100;
+	int tens = (nums / 10) % 10;
+	int ones = nums % 10;
+
+	float sx_hundreds = sw * (hundreds % 10);
+	float sy_hundreds = 0.0f;
+
+
+	float sx_tens = sw * (tens % 10);
+	float sy_tens = 0.0f;
+
+
+	float sx_ones = sw * (ones % 10);
+	float sy_ones = 0.0f;
+
+
+	Render(immediate_context,
+		x, y, w, h,
+		sx_hundreds, sy_hundreds, sw, sh,
+		0, r, g, b, a);
+
+	Render(immediate_context,
+		x + w, y, w, h,
+		sx_tens, sy_tens, sw, sh,
+		0, r, g, b, a);
+
+	Render(immediate_context,
+		x + 2 * w, y, w, h,
+		sx_ones, sy_ones, sw, sh,
+		0, r, g, b, a);
+
+}
+

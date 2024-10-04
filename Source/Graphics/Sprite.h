@@ -3,6 +3,9 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
+using namespace Microsoft::WRL;
+#include <string>
+
 
 // スプライト
 class Sprite
@@ -33,6 +36,14 @@ public:
 
 	// テクスチャ高さ取得
 	int GetTextureHeight() const { return textureHeight; }
+
+	// 文字の描画
+	void Textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a);
+
+	// タイマー
+	void Timer(ID3D11DeviceContext* immediate_context, int nums,
+		float x, float y, float w, float h, float r, float g, float b, float a);
+
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader;
