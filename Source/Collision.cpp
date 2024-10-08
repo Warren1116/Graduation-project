@@ -1,131 +1,146 @@
-ï»¿#include "Collision.h"
+#include "Collision.h"
 
-//çƒã¨çƒã®äº¤å·®åˆ¤å®š
-bool Collision::IntersectSphereVsSphere(
-    const DirectX::XMFLOAT3& positionA,
-    float radiusA, 
-    const DirectX::XMFLOAT3& positionB, 
-    float radiusB, 
-    DirectX::XMFLOAT3& outPositionB)
+bool Collision::IntersectSphereVsSphere2D(const DirectX::XMFLOAT2& positionA, float radiusA, const DirectX::XMFLOAT2& positionB, float radiusB)
 {
-    // Aâ†’Bã®å˜ä½ãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
-    DirectX::XMVECTOR PositionA = DirectX::XMLoadFloat3(&positionA);
-    DirectX::XMVECTOR PositionB = DirectX::XMLoadFloat3(&positionB);
-    DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PositionB, PositionA);
-    DirectX::XMVECTOR LengthSq = DirectX::XMVector3LengthSq(Vec); //Sqãªã‚‰é–‹æ–¹æ ¹ã¯æ®‹ã£ã¦ã„ã‚‹
+    float vx = positionB.x - positionA.x;
+    float vz = positionB.y - positionA.y;
+    float range = radiusA + radiusB;
+    float distXY = sqrtf(vx * vx + vz * vz);
+
+    if (distXY <= range)
+    {
+        return true;
+    }
+}
+
+bool Collision::IntersectPointVsRectXZ(const float pointPositionX, const float pointPositionZ, const float rectPositionX, const float rectPositionZ, float top, float bottom, float left, float right)
+{
+    if (rectPositionX + right > pointPositionX &&
+        rectPositionX - left < pointPositionX &&
+        rectPositionZ + top > pointPositionZ &&
+        rectPositionZ - bottom < pointPositionZ)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+// ‹…‚Æ‹…‚ÌŒğ·”»’è
+bool Collision::IntersectSphereVsSphere(const DirectX::XMFLOAT3& positionA, float radiusA, const DirectX::XMFLOAT3& positionB, float radiusB, DirectX::XMFLOAT3& outPositionB)
+{
+    // A¨B‚Ì’PˆÊƒxƒNƒgƒ‹‚ğZo
+    DirectX::XMVECTOR PositionA = { DirectX::XMLoadFloat3(&positionA) };
+    DirectX::XMVECTOR PositionB = { DirectX::XMLoadFloat3(&positionB) };
+    DirectX::XMVECTOR Vec = { DirectX::XMVectorSubtract(PositionB, PositionA) };
+    DirectX::XMVECTOR LengthSq = { DirectX::XMVector3Length(Vec) };
     float lengthSq;
     DirectX::XMStoreFloat(&lengthSq, LengthSq);
 
-    //è·é›¢åˆ¤å®š
-    float range = radiusA+radiusB;
-    if (lengthSq > range*range)      //ã ã‹ã‚‰rangeã‚‚2ä¹—ã™ã‚‹
+    // ‹——£”»’è
+    float range = radiusA + radiusB;
+    if (lengthSq > range * range)
     {
         return false;
     }
 
-    // AãŒBã‚’æŠ¼ã—å‡ºã™
+    // A‚ªB‚ğ‰Ÿ‚µo‚·
     Vec = DirectX::XMVector3Normalize(Vec);
     Vec = DirectX::XMVectorScale(Vec, range);
     PositionB = DirectX::XMVectorAdd(PositionA, Vec);
-    DirectX::XMStoreFloat3(&outPositionB,PositionB);
-    return true;
 
+    DirectX::XMStoreFloat3(&outPositionB, PositionB);
+
+    return true;
 }
 
 bool Collision::IntersectCylinderVsCylinder(const DirectX::XMFLOAT3& positionA, float radiusA, float heightA, const DirectX::XMFLOAT3& positionB, float radiusB, float heightB, DirectX::XMFLOAT3& outPositionB)
 {
-    //Aã®è¶³å…ƒãŒBã®é ­ã‚ˆã‚Šä¸Šãªã‚‰å½“ãŸã£ã¦ã„ãªã„
     if (positionA.y > positionB.y + heightB)
     {
         return false;
     }
 
-    //Aã®é ­ãŒBã®è¶³å…ƒã‚ˆã‚Šä¸‹ãªã‚‰å½“ãŸã£ã¦ã„ãªã„
     if (positionA.y + heightA < positionB.y)
     {
         return false;
     }
 
-    //XZå¹³é¢ã§ã®ç¯„å›²ãƒã‚§ãƒƒã‚¯
-    DirectX::XMVECTOR PositionA = DirectX::XMLoadFloat3(&positionA);
-    DirectX::XMVECTOR PositionB = DirectX::XMLoadFloat3(&positionB);
-    DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PositionB, PositionA);
-    DirectX::XMVECTOR LengthSq = DirectX::XMVector3LengthSq(Vec); //Sqãªã‚‰é–‹æ–¹æ ¹ã¯æ®‹ã£ã¦ã„ã‚‹
-    float lengthSq;
-    DirectX::XMStoreFloat(&lengthSq, LengthSq);
-
+    // XZ•½–Ê‚Å‚Ì”ÍˆÍƒ`ƒFƒbƒN
+    float vx = positionB.x - positionA.x;
+    float vz = positionB.z - positionA.z; 
     float range = radiusA + radiusB;
-    if (lengthSq > range * range)      //ã ã‹ã‚‰rangeã‚‚2ä¹—ã™ã‚‹
+    float distXZ = sqrtf(vx * vx + vz * vz);
+  
+    if (distXZ > range)
     {
         return false;
     }
 
-    //float vx = positionB.x - positionA.x;
-    //float vz = positionB.z - positionA.z;
-    //float range = radiusA + radiusB;
-    //float distXZ = sqrtf(vx * vx + vz * vz);
-    //if (distXZ > range)
-    //{
-    //    return false;
-    //}
+    // A‚ªB‚ğ‰Ÿ‚µo‚·
+    vx /= distXZ;
+    vz /= distXZ;
 
+    outPositionB.x = { positionA.x + (vx * range) };
+    outPositionB.y = { positionB.y };
+    outPositionB.z = { positionA.z + (vz * range) };
 
-    //AãŒBã‚’æŠ¼ã—å‡ºã™
-    Vec = DirectX::XMVector3Normalize(Vec);
-    Vec = DirectX::XMVectorScale(Vec, range);
-    PositionB = DirectX::XMVectorAdd(PositionA, Vec);
-    DirectX::XMStoreFloat3(&outPositionB, PositionB);
     return true;
-
-    //vx /= distXZ;
-    //vz /= distXZ;
-    //outPositionB.x = positionA.x + (vx * range);
-    //outPositionB.y = positionB.y;
-    //outPositionB.z = positionA.z + (vz * range);
-    //return true;
 }
 
 bool Collision::IntersectSphereVsCylinder(const DirectX::XMFLOAT3& spherePosition, float sphereRadius, const DirectX::XMFLOAT3& cylinderPosition, float cylinderRadius, float cylinderHeight, DirectX::XMFLOAT3& outCylinderPosition)
 {
-    if (spherePosition.y + sphereRadius < cylinderPosition.y) return false;
-    if (spherePosition.y - sphereRadius > cylinderPosition.y + cylinderHeight) return false;
+    if (spherePosition.y - sphereRadius > cylinderPosition.y + cylinderHeight)
+    {
+        return false;
+    }
 
+    if (spherePosition.y + sphereRadius < cylinderPosition.y)
+    {
+        return false;
+    }
 
+    // XZ•½–Ê‚Å‚Ì”ÍˆÍƒ`ƒFƒbƒN
     float vx = cylinderPosition.x - spherePosition.x;
     float vz = cylinderPosition.z - spherePosition.z;
-    float range = sphereRadius + cylinderRadius;
+    float range = cylinderRadius + sphereRadius;
     float distXZ = sqrtf(vx * vx + vz * vz);
-    if (distXZ > range)return false;
 
+    if (distXZ > range)
+    {
+        return false;
+    }
 
+    // A‚ªB‚ğ‰Ÿ‚µo‚·
     vx /= distXZ;
     vz /= distXZ;
 
-    outCylinderPosition.x = spherePosition.x + (vx * range);
-    outCylinderPosition.y = cylinderPosition.y;
-    outCylinderPosition.z = spherePosition.z + (vz * range);
+    outCylinderPosition.x = { spherePosition.x + (vx * range) };
+    outCylinderPosition.y = { cylinderPosition.y };
+    outCylinderPosition.z = { spherePosition.z + (vz * range) };
 
     return true;
 }
 
+// ƒŒƒCƒLƒƒƒXƒg
 bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const Model* model, HitResult& result)
-{
+{    
     DirectX::XMVECTOR WorldStart = DirectX::XMLoadFloat3(&start);
     DirectX::XMVECTOR WorldEnd = DirectX::XMLoadFloat3(&end);
     DirectX::XMVECTOR WorldRayVec = DirectX::XMVectorSubtract(WorldEnd, WorldStart);
     DirectX::XMVECTOR WorldRayLength = DirectX::XMVector3Length(WorldRayVec);
 
-    // ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã®ãƒ¬ã‚¤ã®é•·ã•
+    // ƒ[ƒ‹ƒh‹óŠÔ‚ÌƒŒƒC‚Ì’·‚³
     DirectX::XMStoreFloat(&result.distance, WorldRayLength);
 
     bool hit = false;
     const ModelResource* resource = model->GetResource();
     for (const ModelResource::Mesh& mesh : resource->GetMeshes())
     {
-        // ãƒ¡ãƒƒã‚·ãƒ¥ãƒãƒ¼ãƒ‰å–å¾—
+        // ƒƒbƒVƒ…ƒm[ƒhæ“¾
         const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
-        // ãƒ¬ã‚¤ã‚’ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã‹ã‚‰ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã¸å¤‰æ›
+        // ƒŒƒC‚ğƒ[ƒ‹ƒh‹óŠÔ‚©‚çƒ[ƒJƒ‹‹óŠÔ‚Ö•ÏŠ·
         DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
         DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
 
@@ -135,11 +150,11 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
         DirectX::XMVECTOR V = DirectX::XMVector3Normalize(SE);
         DirectX::XMVECTOR Length = DirectX::XMVector3Length(SE);
 
-        // ãƒ¬ã‚¤ã®é•·ã•
+        // ƒŒƒC‚Ì’·‚³
         float neart;
         DirectX::XMStoreFloat(&neart, Length);
 
-        // ä¸‰è§’å½¢ï¼ˆé¢ï¼‰ã¨ã®äº¤å·®åˆ¤å®š
+        // OŠpŒ`i–Êj‚Æ‚ÌŒğ·”»’è
         const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
         const std::vector<UINT> indices = mesh.indices;
 
@@ -152,7 +167,7 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
             {
                 UINT index = subset.startIndex + i;
 
-                // ä¸‰è§’å½¢ã®é ‚ç‚¹ã‚’æŠ½å‡º
+                // OŠpŒ`‚Ì’¸“_‚ğ’Šo
                 const ModelResource::Vertex& a = vertices.at(indices.at(index));
                 const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
                 const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
@@ -165,56 +180,55 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
                 DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
                 DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
 
-                // ä¸‰è§’å½¢ã®æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«ã‚’ç®—å‡º
-                DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB, BC);
-                N = DirectX::XMVector3Normalize(N);
+                // OŠpŒ`‚Ì–@üƒxƒNƒgƒ‹‚ğZo
+                DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB,BC);
 
-                // å†…ç©ã®çµæœãŒãƒ—ãƒ©ã‚¹ãªã‚‰ã°è£å‘ã
+                // “àÏ‚ÌŒ‹‰Ê‚ªƒvƒ‰ƒX‚È‚ç‚Î— Œü‚«
                 DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(V, N);
                 float d;
                 DirectX::XMStoreFloat(&d, Dot);
                 if (d >= 0) continue;
 
-                // ãƒ¬ã‚¤ã¨å¹³é¢ã®äº¤ç‚¹ã‚’ç®—å‡º
+                // ƒŒƒC‚Æ•½–Ê‚ÌŒğ“_‚ğZo
                 DirectX::XMVECTOR SA = DirectX::XMVectorSubtract(A, S);
                 DirectX::XMVECTOR X = DirectX::XMVectorDivide(DirectX::XMVector3Dot(SA, N), Dot);
                 float x;
                 DirectX::XMStoreFloat(&x, X);
+              
+                // Œğ“_‚Ü‚Å‚Ì‹——£‚ª¡‚Ü‚Å‚ÉŒvZ‚µ‚½Å‹ß‹——£‚æ‚è‘å‚«‚¢‚Æ‚«‚ÍƒXƒLƒbƒv
+                if (x < .0f || x > neart) continue; 
 
-                // äº¤ç‚¹ã¾ã§ã®è·é›¢ãŒä»Šã¾ã§ã«è¨ˆç®—ã—ãŸæœ€è¿‘è·é›¢ã‚ˆã‚Šå¤§ãã„ã¨ãã¯ã‚¹ã‚­ãƒƒãƒ—
-                if (x < .0f || x > neart) continue;
+                DirectX::XMVECTOR P = DirectX::XMVectorAdd(S, DirectX::XMVectorMultiply(V, X));
 
-                DirectX::XMVECTOR P = DirectX::XMVectorAdd(S, DirectX::XMVectorScale(V, x));
-
-                // äº¤ç‚¹ãŒä¸‰è§’å½¢ã®å†…å´ã«ã‚ã‚‹ã‹åˆ¤å®š
-                // ï¼‘ã¤ã‚
+                // Œğ“_‚ªOŠpŒ`‚Ì“à‘¤‚É‚ ‚é‚©”»’è
+                // ‚P‚Â‚ß
                 DirectX::XMVECTOR PA = DirectX::XMVectorSubtract(A, P);
                 DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(PA, AB);
                 DirectX::XMVECTOR Dot1 = DirectX::XMVector3Dot(N, Cross1);
                 float d1;
                 DirectX::XMStoreFloat(&d1, Dot1);
-                if (d1 < 0) continue;
+                if (d1 < 0.0f) continue;
 
-                // ï¼’ã¤ã‚
+                // ‚Q‚Â‚ß
                 DirectX::XMVECTOR PB = DirectX::XMVectorSubtract(B, P);
                 DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(PB, BC);
                 DirectX::XMVECTOR Dot2 = DirectX::XMVector3Dot(N, Cross2);
                 float d2;
                 DirectX::XMStoreFloat(&d2, Dot2);
-                if (d2 < 0) continue;
+                if (d2 < 0.0f) continue;
 
-                // ï¼“ã¤ã‚
+                // ‚R‚Â‚ß
                 DirectX::XMVECTOR PC = DirectX::XMVectorSubtract(C, P);
                 DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(PC, CA);
                 DirectX::XMVECTOR Dot3 = DirectX::XMVector3Dot(N, Cross3);
                 float d3;
                 DirectX::XMStoreFloat(&d3, Dot3);
-                if (d3 < 0) continue;
-
-                // æœ€è¿‘è·é›¢ã‚’æ›´æ–°
+                if (d3 < 0.0f) continue;
+    
+                // Å‹ß‹——£‚ğXV
                 neart = x;
-
-                // äº¤ç‚¹ã¨æ³•ç·šã‚’æ›´æ–°
+    
+                // Œğ“_‚Æ–@ü‚ğXV
                 HitPosition = P;
                 HitNormal = N;
                 materialIndex = subset.materialIndex;
@@ -223,7 +237,7 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
 
         if (materialIndex >= 0)
         {
-            // ãƒ­ãƒ¼ã‚«ãƒ«ç©ºé–“ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã¸ã¨å¤‰æ›
+            // ƒ[ƒJƒ‹‹óŠÔ‚©‚çƒ[ƒ‹ƒh‹óŠÔ‚Ö‚Æ•ÏŠ·
             DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(HitPosition,
                 WorldTransform);
             DirectX::XMVECTOR WorldCrossVec = DirectX::XMVectorSubtract(WorldPosition,
@@ -232,7 +246,7 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
             float distance;
             DirectX::XMStoreFloat(&distance, WorldCrossLength);
 
-            // ãƒ’ãƒƒãƒˆæƒ…å ±ä¿å­˜
+            // ƒqƒbƒgî•ñ•Û‘¶
             if (result.distance > distance)
             {
                 DirectX::XMVECTOR WorldNormal = DirectX::XMVector3TransformNormal(HitNormal,
@@ -247,7 +261,5 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
             }
         }
     }
-
     return hit;
-
 }

@@ -3,9 +3,7 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
-using namespace Microsoft::WRL;
 #include <string>
-
 
 // スプライト
 class Sprite
@@ -31,19 +29,34 @@ public:
 		float angle,
 		float r, float g, float b, float a) const;
 
+	void textout(ID3D11DeviceContext* immediate_context, std::string s,
+		float x, float y, float w, float h,
+		DirectX::XMFLOAT4 color);
+
+	// バッファ更新
+	void Update(
+		float dx, float dy,
+		float dw, float dh,
+		float sx, float sy,
+		float sw, float sh,
+		float angle,
+		float r, float g, float b, float a) const;
+
+
+	// シェーダーリソースビューの設定
+	void SetShaderResourceView(const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int texWidth, int texHeight);
+
+	// 頂点バッファの取得
+	const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return vertexBuffer; }
+
+	// シェーダーリソースビューの取得
+	const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() const { return shaderResourceView; }
+
 	// テクスチャ幅取得
 	int GetTextureWidth() const { return textureWidth; }
 
 	// テクスチャ高さ取得
 	int GetTextureHeight() const { return textureHeight; }
-
-	// 文字の描画
-	void Textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a);
-
-	// タイマー
-	void Timer(ID3D11DeviceContext* immediate_context, int nums,
-		float x, float y, float w, float h, float r, float g, float b, float a);
-
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader;

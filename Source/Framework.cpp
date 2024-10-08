@@ -3,13 +3,13 @@
 
 #include "Graphics/Graphics.h"
 #include "Input/Input.h"
-#include "SceneGame.h"
-#include "SceneTitle.h"
-#include "SceneManager.h"
 #include "Framework.h"
 #include "EffectManager.h"
+#include "SceneTitle.h"
+#include "SceneManager.h"
+#include "SceneGame.h"
 
-//static SceneGame sceneGame;
+
 
 // 垂直同期間隔設定
 static const int syncInterval = 1;
@@ -20,39 +20,57 @@ Framework::Framework(HWND hWnd)
 	, input(hWnd)
 	, graphics(hWnd)
 {
-	//EffectManager初期化
+	// エフェクトマネージャー初期化
 	EffectManager::Instance().Initialize();
 
-	//Scene初期化
-	//sceneGame.Initialize();
-	SceneManager::Instance().ChangeScene(new SceneTitle);
-	//SceneManager::Instance().ChangeScene(new SceneGame);
+	// シーン初期化
+	SceneManager::Instance().ChangeScene(new SceneGame);
+
+	cameraController = new CameraController();
 }
 
 // デストラクタ
 Framework::~Framework()
 {
-	//Scene終了化
-	//sceneGame.Finalize();
+	// シーン終了化
 	SceneManager::Instance().Clear();
-	//EffectManager終了化
+
+	// エフェクト終了化
 	EffectManager::Instance().Finalize();
+
+	if (cameraController != nullptr)
+	{
+		delete cameraController;
+		cameraController = nullptr;
+	}
 }
 
 // 更新処理
-void Framework::Update(float elapsedTime/*Elapsed seconds from last frame*/)
+void Framework::Update(float elapsedTime)
 {
 	// 入力更新処理
 	input.Update();
 
+	//if (cameraController->GetMoveCursorFlag())
+	//{
+	//	POINT point{ graphics.GetScreenWidth() / 2, graphics.GetScreenHeight() / 2 };
+	//	ClientToScreen(hWnd, &point);
+
+	//	//SetCursorPos((int)point.x, (int)point.y);
+	//	
+	//}
+
+	// カメラコントローラー更新処理
+	//cameraController->Update(elapsedTime);
 	// シーン更新処理
-	//sceneGame.Update(elapsedTime);
 	SceneManager::Instance().Update(elapsedTime);
 }
 
 // 描画処理
 void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 {
+	// 別スレッド中にデバイスコンテキストが使われていた場合に
+	// 同時アクセスしないように排他制御する
 	std::lock_guard<std::mutex> lock(graphics.GetMutex());
 
 	ID3D11DeviceContext* dc = graphics.GetDeviceContext();
@@ -61,7 +79,6 @@ void Framework::Render(float elapsedTime/*Elapsed seconds from last frame*/)
 	graphics.GetImGuiRenderer()->NewFrame();
 
 	// シーン描画処理
-	//sceneGame.Render();
 	SceneManager::Instance().Render();
 
 	// IMGUIデモウインドウ描画（IMGUI機能テスト用）
@@ -161,6 +178,9 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
 		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 		// Here we reset everything based on the new window dimensions.
 		timer.Start();
+		break;
+	case WM_MOUSEWHEEL:
+		Input::Instance().GetMouse().SetWheel(GET_WHEEL_DELTA_WPARAM(wParam));
 		break;
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);

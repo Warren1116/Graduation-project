@@ -1,30 +1,42 @@
 #pragma once
-#include <vector>
-#include "Projectile.h"
-#include <set>;
 
+#include <vector>
+#include <set>
+#include "Projectile.h"
+
+// ’eŠÛƒ}ƒl[ƒWƒƒ[
 class ProjectileManager
 {
 public:
-    ProjectileManager();
-    ~ProjectileManager();
+	ProjectileManager();
+	~ProjectileManager();
 
-    void Update(float elapsedTime);
+	// XVˆ—
+	void Update(float elapsedTime);
 
-    void Render(ID3D11DeviceContext* context, Shader* shader);
+	//// •`‰æˆ—
+	//void Render(const RenderContext& rc, ModelShader* shader);
 
-    void DrawDebugPrimitive();
-    //’eŠÛ“o˜^
-    void Register(Projectile* projectile);
-    //’eŠÛ‘Síœ
-    void Clear();
-    //’eŠÛ”æ“¾
-    int GetProjectileCount() const { return static_cast<int>(projectiles.size()); }
-    //’eŠÛæ“¾
-    Projectile* GetProjectile(int index) { return projectiles.at(index); }
+	// ƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu•`‰æ
+	void DrawDebugPrimitive();
 
-    void Remove(Projectile* projectile);
+	// ’eŠÛ“o˜^
+	void Register(Projectile* projectile);
+
+	// ’eŠÛ‘Síœ
+	void Clear();
+
+	// ’eŠÛíœ
+	void Remove(Projectile* projectile);
+
+	// ’eŠÛ”æ“¾
+	int GetProjectileCount() const { return static_cast<int>(projectiles.size()); }
+
+	// ’eŠÛŠ“¾
+	Projectile* GetProjectile(int index) { return projectiles.at(index); }
+
 private:
-    std::vector<Projectile*> projectiles;
-    std::set<Projectile*> removes;
+	std::vector<Projectile*> projectiles;
+	std::set<Projectile*>  removes;
 };
+

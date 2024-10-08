@@ -1,70 +1,83 @@
 #include "ProjectileStraight.h"
 #include "StageManager.h"
 
-
-ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(manager)
+// コンストラクタ
+ProjectileStraight::ProjectileStraight(ProjectileManager* manager)
+	:Projectile(manager)
 {
-        model = new Model("Data/Model/SpiderWeb/SpiderWeb.mdl");
-        scale.x = scale.y = scale.z = 0.05f;
+	// model = new Model("Data/Model/SpikeBall/SpikeBall.mdl");
+	model = new Model("Data/Model/Sword/Sword.mdl");
+
+	nohit = Audio::Instance().LoadAudioSource("Data/Audio/tyodan.wav");
+
+
+	// 表示サイズ
+	scale.x = scale.y = scale.z = 2.0f;
+	radius = 0.3f;
 }
 
+// デストラクタ
 ProjectileStraight::~ProjectileStraight()
 {
-    delete model;
+	delete model;
 }
 
+// 更新処理
 void ProjectileStraight::Update(float elapsedTime)
 {
-    lifeTimer -= elapsedTime;
-    if (lifeTimer <= 0.0f)
-    {
-        Destroy();
-    }
-    
+	// 移動
+	float speed = this->speed * elapsedTime;
+	position.x += speed * direction.x;
+	position.y += speed * direction.y;
+	position.z += speed * direction.z;
 
-    float speed = this->speed * elapsedTime;
+	// オブジェクト行列を更新
+	UpdateTransform();
 
-    float newX = position.x + direction.x * speed;
-    float newY = position.y + direction.y * speed;
-    float newZ = position.z + direction.z * speed;
+	// 寿命処理
+	lifeTimer -= elapsedTime;
+	if (lifeTimer <= 0.0f)
+	{
+		// 自分を削除
+		Destroy();
+	}
 
-    DirectX::XMFLOAT3 start = { position.x, position.y, position.z };
-    DirectX::XMFLOAT3 end = { newX, newY, newZ };
+	if (one)
+	{
+		
+		destroyEffect->Play(position);
+		Destroy();
+	}
 
-    HitResult hit;
-    if (StageManager::Instance().RayCast(start, end, hit))
-    {
-        DirectX::XMVECTOR ReflectVector = DirectX::XMVector3Reflect(DirectX::XMLoadFloat3(&direction), DirectX::XMLoadFloat3(&hit.normal));
-        DirectX::XMFLOAT3 reflectDirection;
-        DirectX::XMStoreFloat3(&reflectDirection, ReflectVector);
+	HitResult hit;
+	float mx = (speed * direction.x * 100) * elapsedTime;
+	float my = (speed * direction.y * 100) * elapsedTime;
+	float mz = (speed * direction.z * 100) * elapsedTime;
 
-        direction.x = reflectDirection.x;
-        direction.y = reflectDirection.y;
-        direction.z = reflectDirection.z;
+	// レイの開始位置と終点位置
+	DirectX::XMFLOAT3 start = { position.x, position.y, position.z };
+	DirectX::XMFLOAT3 end = { position.x + mx, position.y + my, position.z + mz };
+	if (StageManager::Instance().RayCast(start, end, hit))
+	{
+		one = true;
+		nohit->Stop();
+		nohit->Play(false);
+	}
 
-        position.x = hit.position.x;
-        position.y = hit.position.y;
-        position.z = hit.position.z;
-    }
-    else
-    {
-        position.x = newX;
-        position.y = newY;
-        position.z = newZ;
-    }
-
-
-    UpdateTransform();
-    model->UpdateTransform(transform);
+	// モデル行列更新
+	model->UpdateTransform(transform);
 }
 
-void ProjectileStraight::Render(ID3D11DeviceContext* dc, Shader* shader)
-{
-    shader->Draw(dc, model);
-}
+//// 描画処理
+//void ProjectileStraight::Render(const RenderContext& rc, ModelShader* shader)
+//{
+//	shader->Draw(rc, model);
+//}
 
+// 発射
 void ProjectileStraight::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position)
 {
-    this->direction = direction;
-    this->position = position;
+	this->direction = direction;
+	this->position = position;
+	
 }

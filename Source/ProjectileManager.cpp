@@ -1,74 +1,85 @@
 #include "ProjectileManager.h"
-#include "Projectile.h"
-#include "EnemyManager.h"
-#include "Collision.h"
-#include <ProjectileStraight.h>
+
+// コンストラクタ
 ProjectileManager::ProjectileManager()
 {
 }
 
+// デストラクタ
 ProjectileManager::~ProjectileManager()
 {
-    Clear();
+	Clear();
 }
 
+// 更新処理
 void ProjectileManager::Update(float elapsedTime)
 {
+	// 更新処理
+	for (Projectile* projectile : projectiles)
+	{
+		projectile->Update(elapsedTime);
+	}
 
-    for (Projectile* projectile : projectiles)
-    {
-        projectile->Update(elapsedTime);
+	// 破棄処理
+	// ※projectileの範囲for文中でerase()すると不具合が発生してしまうため、
+	// 更新処理が終わった後に破棄リストに積まれたオブジェクトを削除する。
+	for (Projectile* projectile : removes)
+	{
+		// std::vectorから要素を削除する場合は
+		// イテレーターで削除しなければならない
+		std::vector<Projectile*>::iterator it = std::find(projectiles.begin(),
+			projectiles.end(), projectile);
 
+		if (it != projectiles.end())
+		{
+			projectiles.erase(it);
+		}
 
-    }
-
-    for (Projectile* projectile : removes)
-    {
-        std::vector<Projectile*>::iterator it = std::find(projectiles.begin(),
-            projectiles.end(), projectile);
-        if (it != projectiles.end())
-        {
-            projectiles.erase(it);
-        }
-
-        delete projectile;
-    }
-
-    removes.clear();
+		// 弾丸の破棄処理
+		delete projectile;
+	}
+	// 破棄リストをクリア
+	removes.clear();
 }
 
-void ProjectileManager::Render(ID3D11DeviceContext* context, Shader* shader)
-{
-    for (Projectile* projectile : projectiles)
-    {
-        projectile->Render(context, shader);
-    }
-}
+//// 描画処理
+//void ProjectileManager::Render(const RenderContext& rc, ModelShader* shader)
+//{
+//	for (Projectile* projectile : projectiles)
+//	{
+//		projectile->Render(rc, shader);
+//	}
+//}
 
+// デバッグプリミティブ描画
 void ProjectileManager::DrawDebugPrimitive()
 {
-    for (Projectile* projectile : projectiles)
-    {
-        projectile->DrawDebugPrimitive();
-    }
+	for (Projectile* projectile : projectiles)
+	{
+		projectile->DrawDebugPrimitive();
+
+	}
 }
 
+// 弾丸登録
 void ProjectileManager::Register(Projectile* projectile)
 {
-    projectiles.emplace_back(projectile);
+	projectiles.emplace_back(projectile);
 }
 
+// 弾丸全削除
 void ProjectileManager::Clear()
 {
-    for (Projectile* projectile : projectiles)
-    {
-        delete projectile;
-    }
-    projectiles.clear();
+	for (Projectile* projectile : projectiles)
+	{
+		delete projectile;
+	}
+	projectiles.clear();
 }
 
-
-void ProjectileManager::Remove(Projectile* projectile)
+// 弾丸削除
+void  ProjectileManager::Remove(Projectile* projectile)
 {
-    removes.insert(projectile);
+	// 破棄リストに追加
+	removes.insert(projectile);
 }

@@ -28,6 +28,27 @@
     <Filter Include="Source\Audio">
       <UniqueIdentifier>{dfdec87c-66e2-424a-8126-477d89e5eb73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System">
+      <UniqueIdentifier>{760db5ab-3d3d-432a-b4e7-7b65168bf048}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Scene">
+      <UniqueIdentifier>{0d4e5000-5797-4c6d-83fb-7022d349e02d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Stage">
+      <UniqueIdentifier>{e6b7c72c-21dc-47f0-9a70-8e02815aae19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Character">
+      <UniqueIdentifier>{acf25cb0-757d-4fa0-bf97-68b101e2fa11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Object">
+      <UniqueIdentifier>{d932db93-3fed-4176-ab2c-d324d81e9a37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\AI">
+      <UniqueIdentifier>{629b0a7f-1d65-4237-8d5a-8c614c8062d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Graphics\Shader">
+      <UniqueIdentifier>{299213e9-1eed-4d6d-a2e6-9444c3762147}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -54,18 +75,6 @@
     <ClInclude Include="Source\Input\GamePad.h">
       <Filter>Source\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Framework.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\HighResolutionTimer.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Logger.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Misc.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\DebugRenderer.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
@@ -73,9 +82,6 @@
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Graphics\LambertShader.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Model.h">
@@ -96,9 +102,6 @@
     <ClInclude Include="Source\Graphics\LineRenderer.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneGame.h">
-      <Filter>Source</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\Sprite.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
@@ -114,80 +117,203 @@
     <ClInclude Include="Source\Input\Mouse.h">
       <Filter>Source\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Source\StageMain.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Character.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Player.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\CameraController.h">
+      <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Camera.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\CameraController.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Enemy.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyManager.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemySlime.h">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Collision.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Projectile.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileManager.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileStraight.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileHoming.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EffectManager.h">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Effect.h">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scene.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\EffectManager.h">
+      <Filter>Source\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneTitle.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Character.h">
+      <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneManager.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Enemy.h">
+      <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneLoading.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\EnemyManager.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Framework.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\HighResolutionTimer.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gun.h">
+      <Filter>Source\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Item.h">
+      <Filter>Source\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ItemManager.h">
+      <Filter>Source\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Logger.h">
+      <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Mathf.h">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Stage.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Misc.h">
+      <Filter>Source\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\StageManager.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Player.h">
+      <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\StageMoveFloor.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Projectile.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileManager.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileStraight.h">
+      <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\ResourceManager.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneGame.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneLoading.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneManager.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneTitle.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Stage.h">
+      <Filter>Source\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StageMain.h">
+      <Filter>Source\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StageManager.h">
+      <Filter>Source\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\LambertShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\PhongShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Light.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\LightManager.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Zombie.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RunZombie.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\WayPoint.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\UI.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\ActionBase.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ActionDerived.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentBase.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentDerived.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\NodeBase.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Object.h">
+      <Filter>Source\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PoisonZombie.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\SceneRenderer.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneTutorial.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SearchAlgorithm.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BehaviorData.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BehaviorTree.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\BaseRenderer.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="External\DirectXTex\DDSTextureLoader.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\DefaultSpriteShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\DepthStencil.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\FinalpassShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\ModelRenderer.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\PostprocessingRenderer.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\RenderTarget.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\ShadowmapCasterShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\ShadowmapRenderer.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\SkyboxShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StageTutorial.h">
+      <Filter>Source\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Texture.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TutorialZombie.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TitleZombie.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneClear.h">
+      <Filter>Source\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ItemAmmo.h">
+      <Filter>Source\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ItemKey.h">
+      <Filter>Source\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -209,15 +335,6 @@
     <ClCompile Include="Source\Input\GamePad.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Framework.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Logger.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Main.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
@@ -225,9 +342,6 @@
       <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\LambertShader.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Model.cpp">
@@ -241,9 +355,6 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\LineRenderer.cpp">
       <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SceneGame.cpp">
-      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Sprite.cpp">
       <Filter>Source\Graphics</Filter>
@@ -260,74 +371,188 @@
     <ClCompile Include="Source\Input\Mouse.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Source\StageMain.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Character.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Player.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Camera.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\CameraController.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemySlime.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Enemy.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Collision.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Projectile.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileStraight.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileHoming.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EffectManager.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\Effect.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SceneTitle.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\EffectManager.cpp">
+      <Filter>Source\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SceneManager.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Collision.cpp">
+      <Filter>Source\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SceneLoading.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Character.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Enemy.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyManager.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Framework.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Gun.cpp">
+      <Filter>Source\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Item.cpp">
+      <Filter>Source\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ItemManager.cpp">
+      <Filter>Source\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Logger.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main.cpp">
+      <Filter>Source\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\Mathf.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\System</Filter>
     </ClCompile>
-    <ClCompile Include="Source\StageManager.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Player.cpp">
+      <Filter>Source\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\StageMoveFloor.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Projectile.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileManager.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileStraight.cpp">
+      <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\ResourceManager.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneGame.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneLoading.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneManager.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneTitle.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StageMain.cpp">
+      <Filter>Source\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StageManager.cpp">
+      <Filter>Source\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\WayPoint.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\UI.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Graphics\Shader\LambertShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\PhongShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Light.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\LightManager.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Zombie.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RunZombie.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TutorialZombie.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\BaseRenderer.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\DefaultSpriteShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\DepthStencil.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\FinalpassShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JudgmentDerived.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ModelRenderer.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\NodeBase.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Object.cpp">
+      <Filter>Source\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PoisonZombie.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\RenderTarget.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\SceneRenderer.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneTutorial.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\ShadowmapCasterShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ShadowmapRenderer.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\SkyboxShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StageTutorial.cpp">
+      <Filter>Source\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Texture.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SearchAlgorithm.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BehaviorTree.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BehaviorData.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ActionDerived.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\TitleZombie.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneClear.cpp">
+      <Filter>Source\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ItemAmmo.cpp">
+      <Filter>Source\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ItemKey.cpp">
+      <Filter>Source\Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -346,10 +571,25 @@
     <None Include="HLSL\Sprite.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\ShadowmapCaster.hlsli">
+    <None Include="HLSL\Constants.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\ShadowmapFunctions.hlsli">
+    <None Include="HLSL\FilterFunctions.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\Finalpass.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\GaussianBlur.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\LuminanceExtraction.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\Phong.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\ShadowmapCaster.hlsli">
       <Filter>HLSL</Filter>
     </None>
     <None Include="HLSL\Skybox.hlsli">
@@ -385,6 +625,30 @@
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\SpritePS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\FinalpassPS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\FinalpassVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\GaussianBlurPS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\GaussianBlurVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\LuminanceExtractionPS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\LuminanceExtractionVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\PhongPS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\PhongVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\ShadowmapCasterVS.hlsl">

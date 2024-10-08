@@ -1,177 +1,210 @@
 #pragma once
+
 #include "Graphics/Shader.h"
 #include "Graphics/Model.h"
 #include "Character.h"
-#include "ProjectileManager.h"
 #include "Effect.h"
+#include "Audio/Audio.h"
+#include "Object.h"
+#include "Collision.h"
+#include "ProjectileStraight.h"
+#include "Graphics/Graphics.h"
+#include "EnemyManager.h"
+#include "CameraController.h"
+#include "ProjectileManager.h"
 
 
+
+
+// プレイヤー
 class Player : public Character
 {
 public:
+	Player(bool flag);
+	~Player();
 
-    static Player& Instance();
+	// 更新処理
+	void Update(float elapsedTime);
 
-    Player();
-    ~Player() override;
+	// 描画処理
+	void Render(const RenderContext& rc, ModelShader* shader);
 
+	// デバッグ用GUI描画
+	void DrawDebugGUI();
 
-    void Update(float elapsedTime);
+	// 移動入力処理
+	bool InputMove(float elapsedTime);
 
-    void Render(ID3D11DeviceContext* dc, Shader* shader);
+	// ジャンプ入力処理
+	bool InputJump();
 
-    void DrawDebugGUI();
+	void OnLanding() override;
 
-    //デバッグプリミティブ描画
-    void DrawDebugPrimitive();
+	// デバッグプリミティブ描画
+	void DrawDebugPrimitive();
 
+	void SetHaveKey(const bool& haveKey) { this->haveKey = haveKey; }
+	bool HaveKey() const { return haveKey; }
 
-    DirectX::XMFLOAT3 GetMoveVec() const;
+	void SetHaveAmmoNum(const int haveAmmoNum) { this->haveAmmoNum = haveAmmoNum; }
+	int GetHaveAmmoNum() const { return haveAmmoNum; }
 
-    bool InputMove(float elapsedTime);
+	bool NearStairs() const { return nearStairs; }
 
+	// インスタンス取得
+	static Player& Instance();
 
-    void CollisionPlayerVsEnemies();
+	Model* model = nullptr;
 
-    bool InputJump();
+	enum class State
+	{
+		Idle,
+		Move,
+		Jump,
+		Land,
+		Attack,
+		Damage,
+		Death,
+		Revive,
+		Dodge,
+		Climb,
+	};
 
-    void OnLanding() override;
 
-    void CollisionProjectileVsEnemies();
+	// ステート取得
+	const State& GetState() const { return state; }
+	const State& GetAttackState() const { return State::Attack; }
 
-    void TransitionIdleState();
+	std::unique_ptr<AudioSource> key = nullptr;
+	std::unique_ptr<AudioSource> ammo = nullptr;
 
-    void UpdateIdleState(float elapsedTime);
-
-    void TransitionMoveState();
-
-    void UpdateMoveState(float elapsedTime);
-
-    void TransitionJumpState();
-
-    void UpdateJumpState(float elapsedTime);
-
-    void TransitionLandState();
-
-    void UpdateLandState(float elapsedTime);
-
-    bool InputAttack();
-
-    void TransitionAttackState();
-
-    void UpdateAttackState(float elapsedTime);
-
-    //bool InputDodge();  //回避
-
-    //void TransitionDodgeState();
-
-    //void UpdateDodgeState(float elapsedTime);
-
-    void TransitionDamageState();
-
-    void UpdateDamageState(float elapsedTime);
-
-    void TransitionDeathState();
-
-    void UpdateDeathState(float elapsedTime);
-
-    void TransitionClimbWallState();
-
-    void UpdateClimbWallState(float elapsedTime);
-
-    ////モーション更新
-    //void UpdateMotion(float elapsedTime);
-
-    void PlayAttackAnimation();
-
-
-private:
-    ProjectileManager projectileManager;
-
-    void InputProjectile();
-
-    //ノードとエネミーの衝突処理
-    void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);
-
-    enum class State
-    {
-        Idle,
-        Move,
-        Jump,
-        Land,
-        Attack,
-        Damage,
-        Death,
-        Revive,
-        Dodge,
-        Climb,
-    };
-
-
-private:
-    Model* model = nullptr;
-
-    float turnSpeed = DirectX::XMConvertToRadians(720);
-
-    float moveSpeed = 5.0f;
-
-    float jumpSpeed = 20.0f;
-
-    //float gravity = -1.0f;
-
-    //DirectX::XMFLOAT3 velocity = { 0,0,0 };
-
-    int jumpCount = 0;
-
-    int jumpLimit = 2;
-
-    Effect* hitEffect = nullptr;
-
-    State   state = State::Idle;
-
-    float HandRadius = 0.4f;
-
-    bool attackCollisionFlag = false;
-
-    int animationIndex = -1;
-
-    float animationSeconds = 0;
-
-    float oldAnimationSeconds = 0;
-
-    std::vector<Model::NodePose> nodePoses;
-
-    DirectX::XMFLOAT4X4	worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-
-    bool animationLoop = false;
-    bool bakeTranslationY = false;
-
-    //攻撃の回数
-    int attackCount = 0;
-    int attackLimit = 3;
-    float attackTimer = 0;
-
-    bool attacking = false;
-
-
-    //アニメーション
-    enum Animation
-    {
-        Anim_Idle,
-        Anim_Walking,
-        Anim_Attack,
-        Anim_Attack2,
-        Anim_Kick,
-        Anim_GetHit1,
-        Anim_Death,
-        Anim_Running,
-        Anim_Climb,
-        Anim_Landing,
-        Anim_Jump,
-
-    };
 protected:
-    void OnDamaged() override;
-    void OnDead() override;
+
+	// 死亡したときに呼ばれる
+	void OnDamaged() override;
+
+	// 死亡したときに呼ばれる
+	void OnDead() override;
+
+private:
+	// プレイヤーとエネミーとの衝突処理
+	void CollisionPlayerVsEnemies();
+
+	// 待機ステートへ遷移
+	void TransitionIdleState();
+
+	// 待機ステート更新処理
+	void UpdateIdleState(float elapsedTime);
+
+	// 移動ステートへ遷移
+	void TransitionMoveState();
+
+	// 移動ステート更新処理
+	void UpdateMoveState(float elapsedTime);
+
+	void TransitionJumpState();
+
+	void UpdateJumpState(float elapsedTime);
+
+	void TransitionClimbWallState();
+
+	void UpdateClimbWallState(float elapsedTime);
+
+	// 攻撃入力処理
+	bool InputAttack();
+
+	// 攻撃ステートへ遷移
+	void TransitionAttackState();
+
+	// 攻撃ステート更新処理
+	void UpdateAttackState(float elapsedTime);
+
+	// リロードステートへ遷移
+	void TransitionReloadState();
+
+	// リロードステート更新処理
+	void UpdateReloadState(float elapsedTime);
+
+	// ダメージステートへ遷移
+	void TransitionDamageState();
+
+	// ダメージステート更新処理
+	void UpdateDamageState(float elapsedTime);
+
+	// 死亡ステートへ遷移
+	void TransitionDeathState();
+
+	// 死亡ステート更新処理
+	void UpdateDeathState(float elapsedTime);
+
+	void TransitionLandState();
+
+	void UpdateLandState(float elapsedTime);
+
+
+	// ノードとエネミーの衝突処理
+	void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);
+
+	void PlayAttackAnimation();
+
+private:
+	ProjectileManager projectileManager;
+
+	void InputProjectile();
+
+private:
+	//アニメーション
+	enum Animation
+	{
+		Anim_Idle,
+		Anim_Walking,
+		Anim_Attack,
+		Anim_Attack2,
+		Anim_Kick,
+		Anim_GetHit1,
+		Anim_Death,
+		Anim_Running,
+		Anim_Climb,
+		Anim_Landing,
+		Anim_Jump,
+
+	};
+
+private:
+	DirectX::XMFLOAT3 GetMoveVec() const;
+
+	float moveSpeed = 5.0f;
+	float turnSpeed = DirectX::XMConvertToRadians(10);
+	float jumpSpeed = 20.0f;
+	int jumpCount = 0;
+	int jumpLimit = 2;
+	int haveAmmoNum = 50;
+	Effect* hitEffect = nullptr;
+	Effect* blowEffect = nullptr;
+	std::unique_ptr<AudioSource> outOfBullets = nullptr;
+	std::unique_ptr<AudioSource> walk = nullptr;
+	
+	State state = State::Idle;
+	float leftHandRadius = 0.4f;
+	bool attackCollisionFlag = false;
+	float maxAngleX = DirectX::XMConvertToRadians(35);
+	float mixAngleX = DirectX::XMConvertToRadians(-35);
+	bool moveCursorFlag = true;
+	bool haveKey = false;
+	bool nearStairs = false;
+
+	Goal* goal;
+
+	std::vector<Model::NodePose> nodePoses;
+
+	float HandRadius = 0.4f;
+
+	//攻撃の回数
+	int attackCount = 0;
+	int attackLimit = 3;
+	float attackTimer = 0;
+
+	bool attacking = false;
 
 };
+

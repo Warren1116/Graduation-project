@@ -4,40 +4,50 @@
 #include "Enemy.h"
 #include <set>
 
+// エネミーマネージャー
 class EnemyManager
 {
 private:
-    EnemyManager() {}
-    ~EnemyManager() {}
+	EnemyManager() {}
+	~EnemyManager() {}
 
 public:
-    //唯一のインスタンス取得
-    static EnemyManager& Instance()
-    {
-        static EnemyManager instance;
-        return instance;
-    }
+	// 唯一のインスタンス取得
+	static EnemyManager& Instance()
+	{
+		static EnemyManager instance;
+		return instance;
+	}
 
-    void Update(float elapsedTime);
-    void Render(ID3D11DeviceContext* dc, Shader* shader);
+	// 更新処理
+	void Update(float elapsedTime);
 
-    //エネミー全削除
-    void Clear();
+	// エネミー登録
+	void Register(Enemy* enemy);
 
-    //エネミー登録
-    void Register(Enemy* enemy);
+	// エネミー全削除
+	void Clear();
 
-    void DrawDebugPrimitive();
+	// デバッグプリミティブ描画
+	void DrawDebugPrimitive();
 
+	void DrawDebugGUI();
 
-    //エネミー数取得
-    int GetEnemyCount() const { return static_cast<int>(enemies.size()); }
-    Enemy* GetEnemy(int index) { return enemies.at(index); }
+	// エネミー数取得
+	int GetEnemyCount() const { return static_cast<int>(enemies.size()); }
 
-    //エネミー削除    
-    void Remove(Enemy* enemy);
+	// エネミー取得
+	Enemy* GetEnemy(int index) { return enemies.at(index); }
+	
+	Model* GetEnemyModel(int index);
+
+	// エネミー削除
+	void Remove(Enemy* enemy);
+
 private:
-    std::vector<Enemy*> enemies;
-    void CollisionEnemyVsEnemies();
-    std::set<Enemy*>  removes;
+	// エネミー同士の衝突処理
+	void CollisionEnemyVsEnemies();
+	std::vector<Enemy*> enemies;
+	std::set<Enemy*> removes;
 };
+

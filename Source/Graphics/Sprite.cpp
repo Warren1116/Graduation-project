@@ -240,7 +240,7 @@ Sprite::Sprite(const char* filename)
 }
 
 // 描画実行
-void Sprite::Render(ID3D11DeviceContext *immediate_context,
+void Sprite::Render(ID3D11DeviceContext* immediate_context,
 	float dx, float dy,
 	float dw, float dh,
 	float sx, float sy,
@@ -304,8 +304,8 @@ void Sprite::Render(ID3D11DeviceContext *immediate_context,
 		// スクリーン座標系からNDC座標系へ変換する。
 		for (auto& p : positions)
 		{
-			p.x = 2.0f*p.x / screen_width - 1.0f;
-			p.y = 1.0f - 2.0f*p.y / screen_height;
+			p.x = 2.0f * p.x / screen_width - 1.0f;
+			p.y = 1.0f - 2.0f * p.y / screen_height;
 		}
 
 		// 頂点バッファの内容の編集を開始する。
@@ -347,8 +347,7 @@ void Sprite::Render(ID3D11DeviceContext *immediate_context,
 		immediate_context->VSSetShader(vertexShader.Get(), nullptr, 0);
 		immediate_context->PSSetShader(pixelShader.Get(), nullptr, 0);
 		immediate_context->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
-		immediate_context->OMSetDepthStencilState(depthStencilState.Get(), 0);
-
+		//immediate_context->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
 		immediate_context->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
 		immediate_context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
@@ -358,59 +357,118 @@ void Sprite::Render(ID3D11DeviceContext *immediate_context,
 	}
 }
 
-void Sprite::Textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, float r, float g, float b, float a)
+void Sprite::textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, DirectX::XMFLOAT4 color)
 {
-	float sw = static_cast<float>(GetTextureWidth() / 16);
-	float sh = static_cast<float>(GetTextureHeight() / 16);
+	float sw = static_cast<float>(textureWidth / 16);
+	float sh = static_cast<float>(textureHeight / 16);
 	float carriage = 0;
 	for (const char c : s)
 	{
-		LONG sx = c % 0x0F;
 		Render(immediate_context,
 			x + carriage, y, w, h,
-			sw * (c & 0x0F), sh * (c >> 4), sw, sh,
+			sw * (c & 0x0f), sh * (c >> 4), sw, sh,
 			0,
-			r, g, b, a);
+			color.x, color.y, color.z, color.w);
 		carriage += w;
+	}
+}
+
+void Sprite::Update(float dx, float dy, float dw, float dh, float sx, float sy, float sw, float sh, float angle, float r, float g, float b, float a) const
+{
+	ID3D11DeviceContext* immediate_context = Graphics::Instance().GetDeviceContext();
+
+	{
+		// 現在設定されているビューポートからスクリーンサイズを取得する。
+		D3D11_VIEWPORT viewport;
+		UINT numViewports = 1;
+		immediate_context->RSGetViewports(&numViewports, &viewport);
+		float screen_width = viewport.Width;
+		float screen_height = viewport.Height;
+
+		// スプライトを構成する４頂点のスクリーン座標を計算する
+		DirectX::XMFLOAT2 positions[] = {
+			DirectX::XMFLOAT2(dx,      dy),			// 左上
+			DirectX::XMFLOAT2(dx + dw, dy),			// 右上
+			DirectX::XMFLOAT2(dx,      dy + dh),	// 左下
+			DirectX::XMFLOAT2(dx + dw, dy + dh),	// 右下
+		};
+
+		// スプライトを構成する４頂点のテクスチャ座標を計算する
+		DirectX::XMFLOAT2 texcoords[] = {
+			DirectX::XMFLOAT2(sx,      sy),			// 左上
+			DirectX::XMFLOAT2(sx + sw, sy),			// 右上
+			DirectX::XMFLOAT2(sx,      sy + sh),	// 左下
+			DirectX::XMFLOAT2(sx + sw, sy + sh),	// 右下
+		};
+
+		// スプライトの中心で回転させるために４頂点の中心位置が
+		// 原点(0, 0)になるように一旦頂点を移動させる。
+		float mx = dx + dw * 0.5f;
+		float my = dy + dh * 0.5f;
+		for (auto& p : positions)
+		{
+			p.x -= mx;
+			p.y -= my;
+		}
+
+		// 頂点を回転させる
+		const float PI = 3.141592653589793f;
+		float theta = angle * (PI / 180.0f);	// 角度をラジアン(θ)に変換
+		float c = cosf(theta);
+		float s = sinf(theta);
+		for (auto& p : positions)
+		{
+			DirectX::XMFLOAT2 r = p;
+			p.x = c * r.x + -s * r.y;
+			p.y = s * r.x + c * r.y;
+		}
+
+		// 回転のために移動させた頂点を元の位置に戻す
+		for (auto& p : positions)
+		{
+			p.x += mx;
+			p.y += my;
+		}
+
+		// スクリーン座標系からNDC座標系へ変換する。
+		for (auto& p : positions)
+		{
+			p.x = 2.0f * p.x / screen_width - 1.0f;
+			p.y = 1.0f - 2.0f * p.y / screen_height;
+		}
+
+		// 頂点バッファの内容の編集を開始する。
+		D3D11_MAPPED_SUBRESOURCE mappedBuffer;
+		HRESULT hr = immediate_context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+		// pDataを編集することで頂点データの内容を書き換えることができる。
+		Vertex* v = static_cast<Vertex*>(mappedBuffer.pData);
+		for (int i = 0; i < 4; ++i)
+		{
+			v[i].position.x = positions[i].x;
+			v[i].position.y = positions[i].y;
+			v[i].position.z = 0.0f;
+
+			v[i].color.x = r;
+			v[i].color.y = g;
+			v[i].color.z = b;
+			v[i].color.w = a;
+
+			v[i].texcoord.x = texcoords[i].x / textureWidth;
+			v[i].texcoord.y = texcoords[i].y / textureHeight;
+		}
+
+		// 頂点バッファの内容の編集を終了する。
+		immediate_context->Unmap(vertexBuffer.Get(), 0);
 	}
 
 }
 
-void Sprite::Timer(ID3D11DeviceContext* immediate_context, int nums, float x, float y, float w, float h, float r, float g, float b, float a)
+void Sprite::SetShaderResourceView(const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int texWidth, int texHeight)
 {
-	float sw = static_cast<float>(textureWidth) / 11.0f;
-	float sh = static_cast<float>(textureHeight);
-
-	int hundreds = nums / 100;
-	int tens = (nums / 10) % 10;
-	int ones = nums % 10;
-
-	float sx_hundreds = sw * (hundreds % 10);
-	float sy_hundreds = 0.0f;
-
-
-	float sx_tens = sw * (tens % 10);
-	float sy_tens = 0.0f;
-
-
-	float sx_ones = sw * (ones % 10);
-	float sy_ones = 0.0f;
-
-
-	Render(immediate_context,
-		x, y, w, h,
-		sx_hundreds, sy_hundreds, sw, sh,
-		0, r, g, b, a);
-
-	Render(immediate_context,
-		x + w, y, w, h,
-		sx_tens, sy_tens, sw, sh,
-		0, r, g, b, a);
-
-	Render(immediate_context,
-		x + 2 * w, y, w, h,
-		sx_ones, sy_ones, sw, sh,
-		0, r, g, b, a);
-
+	shaderResourceView = srv;
+	textureWidth = texWidth;
+	textureHeight = texHeight;
 }
 

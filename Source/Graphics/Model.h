@@ -15,10 +15,10 @@ public:
 	struct Node
 	{
 		const char*			name;
-		Node*				parent;
-		DirectX::XMFLOAT3	scale;
-		DirectX::XMFLOAT4	rotate;
-		DirectX::XMFLOAT3	translate;
+		Node*				parent = nullptr;
+		DirectX::XMFLOAT3	scale = { 1, 1, 1 };
+		DirectX::XMFLOAT4	rotate = { 0, 0, 0, 1 };
+		DirectX::XMFLOAT3	translate = { 0, 0, 0 };
 		DirectX::XMFLOAT4X4	localTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 		DirectX::XMFLOAT4X4	globalTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 		DirectX::XMFLOAT4X4	worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
@@ -55,7 +55,8 @@ public:
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	occlusionMap;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	metalnessRoughnessMap;
 
-
+		template<class Archive>
+		void serialize(Archive& archive);
 	};
 
 	struct Vertex
@@ -67,7 +68,8 @@ public:
 		DirectX::XMFLOAT4		boneWeight = { 1, 0, 0, 0 };
 		DirectX::XMUINT4		boneIndex = { 0, 0, 0, 0 };
 
-
+		template<class Archive>
+		void serialize(Archive& archive);
 	};
 
 	struct Bone
@@ -76,6 +78,8 @@ public:
 		DirectX::XMFLOAT4X4		offsetTransform;
 		Node* node = nullptr;
 
+		template<class Archive>
+		void serialize(Archive& archive);
 	};
 
 	struct Mesh
@@ -90,6 +94,8 @@ public:
 		Microsoft::WRL::ComPtr<ID3D11Buffer>	vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>	indexBuffer;
 
+		template<class Archive>
+		void serialize(Archive& archive);
 	};
 
 	struct VectorKeyframe
@@ -130,8 +136,22 @@ public:
 		DirectX::XMFLOAT3	scale = { 1, 1, 1 };
 	};
 
+
+
 	// 行列計算
 	void UpdateTransform(const DirectX::XMFLOAT4X4& transform);
+
+	// アニメーション更新処理
+	void UpdateAnimation(float elapsedTime);
+
+	// アニメーション再生
+	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
+
+	// アニメーション再生中か
+	bool IsPlayAnimation() const;
+
+	// メッシュデータ取得
+	const std::vector<Mesh>& GetMeshes() const { return meshes; }
 
 	// ノードリスト取得
 	const std::vector<Node>& GetNodes() const { return nodes; }
@@ -140,22 +160,7 @@ public:
 	// リソース取得
 	const ModelResource* GetResource() const { return resource.get(); }
 
-	void UpdateAnimation(float elapsedTime);
-
-	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
-
-	bool IsPlayAnimation() const;
-
-	// アニメーションデータ取得
-	const std::vector<Animation>& GetAnimations() const { return animations; }
-
-	// アニメーションインデックス取得
-	int GetAnimationIndex(const char* name) const;
-
-	// ノードインデックス取得
-	int GetNodeIndex(const char* name) const;
-
-	//ノード検索
+	// ノード検索
 	Node* FindNode(const char* name);
 
 	//現在のアニメーション再生時間取得
@@ -171,21 +176,16 @@ public:
 	// ノードポーズ取得
 	void GetNodePoses(std::vector<NodePose>& nodePoses) const;
 
-
-
 private:
 	std::shared_ptr<ModelResource>	resource;
 	std::vector<Node>				nodes;
-	std::vector<Animation>	animations;
+	std::vector<Mesh>	        	meshes;
+	std::vector<Material>	        materials;
 
 	int currentAnimationIndex = -1;
 	float currentAnimationSeconds = 0.0f;
 	bool animationLoopFlag = false;
-	bool animotionFirstFlag = false;
 	bool animationEndFlag = false;
 	float animationBlendTime = 0.0f;
 	float animationBlendSeconds = 0.0f;
-	int rootMotionNodeIndex = -1;
-
-
 };

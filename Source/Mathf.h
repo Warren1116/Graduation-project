@@ -1,9 +1,12 @@
 #pragma once
-//•‚“®¬”Zp
+
+// •‚“®¬”Zp
 class Mathf
 {
 public:
-    static float Lerp(float a, float b, float t);
+	// üŒ`•âŠ®
+	static float Lerp(float a, float b, float t);
 
-    static float RandomRange(float min, float max);
- };
+	// w’è”ÍˆÍ‚ğƒ‰ƒ“ƒ_ƒ€’l‚ğŒvZ‚·‚é
+	static float RandomRange(float min, float max);
+};

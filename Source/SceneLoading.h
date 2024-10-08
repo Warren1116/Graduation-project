@@ -7,22 +7,28 @@
 class SceneLoading : public Scene
 {
 public:
+	SceneLoading(Scene* nextScene) : nextScene(nextScene) {}
+	~SceneLoading() override {}
 
-    SceneLoading(Scene* nextScene) : nextScene(nextScene){}
-    ~SceneLoading() override{}
+	// ‰Šú‰»
+	void Initialize() override;
 
-    void Initialize()override;
+	// I—¹‰»
+	void Finalize() override;
 
-    void Finalize()override;
+	// XVˆ—
+	void Update(float elapsedTime) override;
 
-    void Update(float elapsedTime)override;
-
-    void Render() override;
+	// •`‰æˆ—
+	void Render() override;
 private:
-    static void LoadingThread(SceneLoading* scene);
+	static void LoadingThread(SceneLoading* scene);
+
 private:
-    Sprite* sprite = nullptr;
-    float angle = 0.0f;
-    Scene* nextScene = nullptr;
-    std::thread* thread = nullptr;
+	Sprite* sprite = nullptr;
+	Scene* nextScene = nullptr;
+	std::thread* thread = nullptr;
+	float angle = 0.0f;
+	int loadTimer = 0;
 };
+

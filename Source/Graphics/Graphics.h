@@ -9,6 +9,22 @@
 #include "Graphics/ImGuiRenderer.h"
 #include <mutex>
 
+enum class ModelShaderId
+{
+	Phong,
+	ShadowmapCaster,
+	Max
+};
+
+enum class SpriteShaderId
+{
+	Default,
+	Finalpass,
+	Skybox,
+	Max
+};
+
+
 // グラフィックス
 class Graphics
 {
@@ -35,7 +51,10 @@ public:
 	ID3D11DepthStencilView* GetDepthStencilView() const { return depthStencilView.Get(); }
 
 	// シェーダー取得
-	Shader* GetShader() const { return shader.get(); }
+	ModelShader* GetShader(ModelShaderId id) const { return modelShaders[static_cast<int>(id)].get(); }
+
+	// スプライトシェーダー取得
+	SpriteShader* GetShader(SpriteShaderId id) const { return spriteShaders[static_cast<int>(id)].get(); }
 
 	// スクリーン幅取得
 	float GetScreenWidth() const { return screenWidth; }
@@ -52,7 +71,9 @@ public:
 	// ImGuiレンダラ取得
 	ImGuiRenderer* GetImGuiRenderer() const { return imguiRenderer.get(); }
 
+	// ミューテックス取得
 	std::mutex& GetMutex() { return mutex; }
+
 private:
 	static Graphics*								instance;
 
@@ -63,13 +84,15 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D>			depthStencilBuffer;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	depthStencilView;
 
-	std::unique_ptr<Shader>							shader;
+	std::unique_ptr<ModelShader>					modelShaders[static_cast<int>(ModelShaderId::Max)];
+	std::unique_ptr<SpriteShader>					spriteShaders[static_cast<int>(SpriteShaderId::Max)];
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
 	std::unique_ptr<ImGuiRenderer>					imguiRenderer;
 
 	float	screenWidth;
 	float	screenHeight;
+
 	std::mutex mutex;
 };
 

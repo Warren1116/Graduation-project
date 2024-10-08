@@ -40,6 +40,9 @@ public:
 	// マウスカーソルY座標取得
 	int GetPositionY() const { return positionY[0]; }
 
+	void SetPositionX(int *positionX) { positionX[0] = *positionX; }
+	void SetPositionY(int *positionY) { positionY[0] = *positionY; }
+
 	// 前回のマウスカーソルX座標取得
 	int GetOldPositionX() const { return positionX[1]; }
 

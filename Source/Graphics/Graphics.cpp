@@ -1,6 +1,14 @@
 #include "Misc.h"
-#include "Graphics/LambertShader.h"
+//#include "Graphics/Shader/LambertShader.h"
+#include "Graphics\Shader\PhongShader.h"
 #include "Graphics/Graphics.h"
+#include "Graphics\Shader\ShadowmapCasterShader.h"
+
+#include "Graphics\Shader\DefaultSpriteShader.h"
+//#include "Graphics/Shader/GaussianBlurShader.h"
+//#include "Graphics/Shader/LuminanceExtractionShader.h"
+#include "Graphics/Shader/FinalpassShader.h"
+#include "Graphics/Shader/SkyboxShader.h"
 
 Graphics* Graphics::instance = nullptr;
 
@@ -128,9 +136,18 @@ Graphics::Graphics(HWND hWnd)
 		immediateContext->RSSetViewports(1, &viewport);
 	}
 
-	// シェーダー
+	// モデルシェーダー
 	{
-		shader = std::make_unique<LambertShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
+		modelShaders[static_cast<int>(ModelShaderId::ShadowmapCaster)] = std::make_unique<ShadowmapCasterShader>(device.Get());
+
+	}
+
+	// スプライトシェーダー
+	{
+		spriteShaders[static_cast<int>(SpriteShaderId::Default)] = std::make_unique<DefaultSpriteShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::Finalpass)] = std::make_unique<FinalpassShader>(device.Get());
+		spriteShaders[static_cast<int>(SpriteShaderId::Skybox)] = std::make_unique<SkyboxShader>(device.Get());
 	}
 
 	// レンダラ
