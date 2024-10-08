@@ -130,12 +130,14 @@
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h" />
-    <ClInclude Include="Source\Graphics\LambertShader.h" />
+    <ClInclude Include="Source\Graphics\Light.h" />
     <ClInclude Include="Source\Graphics\LineRenderer.h" />
     <ClInclude Include="Source\Graphics\Model.h" />
     <ClInclude Include="Source\Graphics\ModelResource.h" />
     <ClInclude Include="Source\Graphics\RenderContext.h" />
     <ClInclude Include="Source\Graphics\Shader.h" />
+    <ClInclude Include="Source\Graphics\Shader\DefaultSpriteShader.h" />
+    <ClInclude Include="Source\Graphics\Shader\LambertShader.h" />
     <ClInclude Include="Source\Graphics\Sprite.h" />
     <ClInclude Include="Source\HighResolutionTimer.h" />
     <ClInclude Include="Source\Input\GamePad.h" />
@@ -182,10 +184,12 @@
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp" />
-    <ClCompile Include="Source\Graphics\LambertShader.cpp" />
+    <ClCompile Include="Source\Graphics\Light.cpp" />
     <ClCompile Include="Source\Graphics\LineRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\ModelResource.cpp" />
+    <ClCompile Include="Source\Graphics\Shader\DefaultSpriteShader.cpp" />
+    <ClCompile Include="Source\Graphics\Shader\LambertShader.cpp" />
     <ClCompile Include="Source\Graphics\Sprite.cpp" />
     <ClCompile Include="Source\Input\GamePad.cpp" />
     <ClCompile Include="Source\Input\Input.cpp" />
@@ -211,6 +215,7 @@
     <None Include="HLSL\Debug.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\Lambert.hlsli" />
+    <None Include="HLSL\Light.hlsli" />
     <None Include="HLSL\Line.hlsli" />
     <None Include="HLSL\Sprite.hlsli" />
   </ItemGroup>

@@ -1,5 +1,5 @@
 #include "Misc.h"
-#include "Graphics/LambertShader.h"
+#include "Graphics/Shader/LambertShader.h"
 
 LambertShader::LambertShader(ID3D11Device* device)
 {

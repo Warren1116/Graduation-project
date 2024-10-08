@@ -28,6 +28,9 @@
     <Filter Include="Source\Audio">
       <UniqueIdentifier>{dfdec87c-66e2-424a-8126-477d89e5eb73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Graphics\Shader">
+      <UniqueIdentifier>{45f960b2-9eab-4ad4-8009-d11fee2ab34d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -73,9 +76,6 @@
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Graphics\LambertShader.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Model.h">
@@ -186,6 +186,15 @@
     <ClInclude Include="Source\ResourceManager.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\Light.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\DefaultSpriteShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\LambertShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -222,9 +231,6 @@
       <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\LambertShader.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Model.cpp">
@@ -323,6 +329,15 @@
     <ClCompile Include="Source\ResourceManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\Light.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\DefaultSpriteShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\LambertShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Debug.hlsli">
@@ -338,6 +353,9 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="HLSL\Sprite.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\Light.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>

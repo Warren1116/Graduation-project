@@ -4,7 +4,6 @@
 
 void CameraController::Update(float elapsedTime)
 {
-
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
 

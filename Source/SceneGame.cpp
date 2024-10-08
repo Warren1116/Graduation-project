@@ -169,7 +169,7 @@ void SceneGame::Render()
 		player->Render(dc, shader);
 
 		//エネミー描画
-		EnemyManager::Instance().Render(dc,shader);
+		EnemyManager::Instance().Render(dc, shader);
 
 		shader->End(dc);
 
@@ -205,6 +205,7 @@ void SceneGame::Render()
 	{
 		player->DrawDebugGUI();
 	}
+
 }
 
 //エネミーHPゲージ描画
