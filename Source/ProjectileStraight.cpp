@@ -1,26 +1,43 @@
 #include "ProjectileStraight.h"
 #include "StageManager.h"
+#include "SceneGame.h"
 
 
+// コンストラクタ
 ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(manager)
 {
-        model = new Model("Data/Model/SpiderWeb/SpiderWeb.mdl");
-        scale.x = scale.y = scale.z = 0.05f;
+	model = new Model("Data/Model/SpiderWeb/SpiderWeb.mdl");
+
+	nohit = Audio::Instance().LoadAudioSource("Data/Audio/tyodan.wav");
+
+
+	// 表示サイズ
+	scale.x = scale.y = scale.z = 0.05f;
+	radius = 0.3f;
 }
 
+// デストラクタ
 ProjectileStraight::~ProjectileStraight()
 {
-    delete model;
+	delete model;
 }
 
+// 更新処理
 void ProjectileStraight::Update(float elapsedTime)
 {
     lifeTimer -= elapsedTime;
     if (lifeTimer <= 0.0f)
     {
+        SceneGame& sceneGame = SceneGame::Instance();
+
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        {
+            sceneGame.shadowmapRenderer->UnregisterRenderModel(model);
+            sceneGame.sceneRenderer->UnregisterRenderModel(model);
+        }
         Destroy();
     }
-    
+
 
     float speed = this->speed * elapsedTime;
 
@@ -56,15 +73,19 @@ void ProjectileStraight::Update(float elapsedTime)
 
     UpdateTransform();
     model->UpdateTransform(transform);
+
 }
 
-void ProjectileStraight::Render(ID3D11DeviceContext* dc, Shader* shader)
-{
-    shader->Draw(dc, model);
-}
+// 描画処理
+//void ProjectileStraight::Render(const RenderContext& rc, ModelShader* shader)
+//{
+//	shader->Draw(rc, model);
+//}
 
+// 発射
 void ProjectileStraight::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position)
 {
-    this->direction = direction;
-    this->position = position;
+	this->direction = direction;
+	this->position = position;
+	
 }

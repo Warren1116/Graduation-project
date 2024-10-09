@@ -11,19 +11,17 @@ VS_OUT main(
 	uint4  boneIndices : BONES
 )
 {
-        boneWeights /= dot(boneWeights, float4(1, 1, 1, 1));
+    boneWeights /= dot(boneWeights, float4(1, 1, 1, 1));
+
 	float3 p = { 0, 0, 0 };
 	float3 n = { 0, 0, 0 };
 	for (int i = 0; i < 4; i++)
 	{
 		p += (boneWeights[i] * mul(position, boneTransforms[boneIndices[i]])).xyz;
 		n += (boneWeights[i] * mul(float4(normal.xyz, 0), boneTransforms[boneIndices[i]])).xyz;
+	}
 
-    }
-
-	
 	VS_OUT vout;
-	
 	vout.position = mul(float4(p, 1.0f), viewProjection);
 
 	float3 N = normalize(n);

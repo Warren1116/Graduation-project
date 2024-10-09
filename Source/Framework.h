@@ -5,6 +5,7 @@
 #include "Audio/Audio.h"
 #include "Graphics/Graphics.h"
 #include "Input/input.h"
+#include "CameraController.h"
 
 class Framework
 {
@@ -28,5 +29,6 @@ private:
 	Audio					audio;
 	Graphics				graphics;
 	Input					input;
+	CameraController* cameraController = nullptr;
 };
 

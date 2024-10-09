@@ -128,6 +128,9 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 
 	// 円柱メッシュ作成
 	CreateCylinderMesh(device, 1.0f, 1.0f, 0.0f, 1.0f, 16, 1);
+
+	// 四角柱メッシュ作成
+	CreateSquareMesh(device);
 }
 
 // 描画開始
@@ -197,6 +200,46 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 		context->Draw(cylinderVertexCount, 0);
 	}
 	cylinders.clear();
+
+	// 四角柱描画
+	context->IASetVertexBuffers(0, 1, squareVertexBuffer.GetAddressOf(), &stride, &offset);
+	for (const Square& square : squares)
+	{
+		// ワールドプロジェクション行列
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(square.scale.x, square.scale.y, square.scale.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(square.position.x, square.position.y, square.position.z);
+		DirectX::XMMATRIX W = S * T;
+		DirectX::XMMATRIX WVP = W * VP;
+
+		// 定数バッファ更新
+		CbMesh cbMesh;
+		cbMesh.color = square.color;
+		DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
+
+		context->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+		context->Draw(squareVertexCount, 0);
+	}
+	squares.clear();
+
+	// 矢印描画
+	context->IASetVertexBuffers(0, 1, arrowVertexBuffer.GetAddressOf(), &stride, &offset);
+	for (const Arrow& arrow : arrows)
+	{
+		// ワールドプロジェクション行列
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(arrow.radius, arrow.radius, arrow.radius);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(arrow.position.x, arrow.position.y, arrow.position.z);
+		DirectX::XMMATRIX W = S * T;
+		DirectX::XMMATRIX WVP = W * VP;
+
+		// 定数バッファ更新
+		CbMesh cbMesh;
+		cbMesh.color = arrow.color;
+		DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
+
+		context->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+		context->Draw(squareVertexCount, 0);
+	}
+	arrows.clear();
 }
 
 // 球描画
@@ -218,6 +261,26 @@ void DebugRenderer::DrawCylinder(const DirectX::XMFLOAT3& position, float radius
 	cylinder.height = height;
 	cylinder.color = color;
 	cylinders.emplace_back(cylinder);
+}
+
+// 四角柱描画
+void DebugRenderer::DrawSquare(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT4& color)
+{
+	Square square;
+	square.position = position;
+	square.scale = scale;
+	square.color = color;
+	squares.push_back(square);
+}
+
+void DebugRenderer::DrawArrow(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
+{
+	Arrow arrow;
+	arrow.position = position;
+	arrow.radius = radius;
+	arrow.height = height;
+	arrow.color = color;
+	arrows.emplace_back(arrow);
 }
 
 // 球メッシュ作成
@@ -363,4 +426,75 @@ void DebugRenderer::CreateCylinderMesh(ID3D11Device* device, float radius1, floa
 		HRESULT hr = device->CreateBuffer(&desc, &subresourceData, cylinderVertexBuffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
+}
+
+// 四角柱メッシュ作成
+void DebugRenderer::CreateSquareMesh(ID3D11Device* device)
+{
+	squareVertexCount = 24;
+	std::unique_ptr<DirectX::XMFLOAT3[]> vertices = std::make_unique<DirectX::XMFLOAT3[]>(squareVertexCount);
+
+	DirectX::XMFLOAT3* p = vertices.get();
+
+	uint32_t face = 0;
+
+	face = 0;
+	vertices[face * 4 + 0] = { -0.5f, +0.5f, +0.5f };
+	vertices[face * 4 + 1] = { +0.5f, +0.5f, +0.5f };
+	vertices[face * 4 + 2] = { -0.5f, +0.5f, -0.5f };
+	vertices[face * 4 + 3] = { +0.5f, +0.5f, -0.5f };
+
+	face += 1;
+	vertices[face * 4 + 0] = { -0.5f, -0.5f, +0.5f };
+	vertices[face * 4 + 1] = { +0.5f, -0.5f, +0.5f };
+	vertices[face * 4 + 2] = { -0.5f, -0.5f, -0.5f };
+	vertices[face * 4 + 3] = { +0.5f, -0.5f, -0.5f };
+
+	face += 1;
+	vertices[face * 4 + 0] = { -0.5f, +0.5f, -0.5f };
+	vertices[face * 4 + 1] = { +0.5f, +0.5f, -0.5f };
+	vertices[face * 4 + 2] = { -0.5f, -0.5f, -0.5f };
+	vertices[face * 4 + 3] = { +0.5f, -0.5f, -0.5f };
+
+	face += 1;
+	vertices[face * 4 + 0] = { -0.5f, +0.5f, +0.5f };
+	vertices[face * 4 + 1] = { +0.5f, +0.5f, +0.5f };
+	vertices[face * 4 + 2] = { -0.5f, -0.5f, +0.5f };
+	vertices[face * 4 + 3] = { +0.5f, -0.5f, +0.5f };
+
+	face += 1;
+	vertices[face * 4 + 0] = { +0.5f, +0.5f, -0.5f };
+	vertices[face * 4 + 1] = { +0.5f, +0.5f, +0.5f };
+	vertices[face * 4 + 2] = { +0.5f, -0.5f, -0.5f };
+	vertices[face * 4 + 3] = { +0.5f, -0.5f, +0.5f };
+
+	face += 1;
+	vertices[face * 4 + 0] = { -0.5f, +0.5f, -0.5f };
+	vertices[face * 4 + 1] = { -0.5f, +0.5f, +0.5f };
+	vertices[face * 4 + 2] = { -0.5f, -0.5f, -0.5f };
+	vertices[face * 4 + 3] = { -0.5f, -0.5f, +0.5f };
+
+	// 頂点バッファ
+	{
+		D3D11_BUFFER_DESC desc{};
+		D3D11_SUBRESOURCE_DATA subresourceData{};
+
+		desc.ByteWidth = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * squareVertexCount);
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		desc.CPUAccessFlags = 0;
+		desc.MiscFlags = 0;
+		desc.StructureByteStride = 0;
+		subresourceData.pSysMem = vertices.get();
+		subresourceData.SysMemPitch = 0;
+		subresourceData.SysMemSlicePitch = 0;
+
+		HRESULT hr = device->CreateBuffer(&desc, &subresourceData, squareVertexBuffer.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
+}
+
+// 矢印メッシュ作成
+void DebugRenderer::CreateArrowMesh(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
+{
 }

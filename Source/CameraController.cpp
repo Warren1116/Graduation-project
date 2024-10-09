@@ -1,6 +1,11 @@
 #include "CameraController.h"
 #include "Camera.h"
 #include "Input/Input.h"
+#include "Player.h"
+#include <imgui.h>
+#include"PoisonZombie.h"
+#include "EnemyManager.h"
+
 
 void CameraController::Update(float elapsedTime)
 {
@@ -12,7 +17,6 @@ void CameraController::Update(float elapsedTime)
 
     //カメラの回転速度
     float speed = rollSpeed * elapsedTime;
-
 
 
     //もしシェイクの時間が終わってないなら、シェイクを行う
@@ -40,7 +44,7 @@ void CameraController::Update(float elapsedTime)
 
 
     //カメラ回転を回転行列に変換
-    DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x,angle.y,angle.z);
+    DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
 
     //回転行列から前方向ベクトルを取り出す
     DirectX::XMVECTOR Front = Transform.r[2];
@@ -74,8 +78,10 @@ void CameraController::Update(float elapsedTime)
     Camera::Instance().SetLookAt(eye, target, DirectX::XMFLOAT3(0, 1, 0));
 }
 
+
 void CameraController::ShakeCamera(float intensity, float duration)
 {
-    shakeTime = duration;
-    shakeIntensity = intensity;
+	shakeTime = duration;
+	shakeIntensity = intensity;
+
 }

@@ -4,15 +4,15 @@
 #include <wrl.h>
 #include "Graphics/Shader.h"
 
-class LambertShader : public Shader
+class LambertShader : public ModelShader
 {
 public:
 	LambertShader(ID3D11Device* device);
 	~LambertShader() override {}
 
-	void Begin(ID3D11DeviceContext* dc, const RenderContext& rc) override;
-	void Draw(ID3D11DeviceContext* dc, const Model* model) override;
-	void End(ID3D11DeviceContext* dc) override;
+	void Begin(const RenderContext& rc) override;
+	//void Draw(const RenderContext& rc, const Model* model) override;
+	void End(const RenderContext& rc) override;
 
 private:
 	static const int MaxBones = 128;
@@ -21,6 +21,10 @@ private:
 	{
 		DirectX::XMFLOAT4X4	viewProjection;
 		DirectX::XMFLOAT4	lightDirection;
+		DirectX::XMFLOAT4   ambientLightColor;  //ä¬ã´åıêF
+
+		DirectionalLightData directionalLightData;
+
 	};
 
 	struct CbMesh

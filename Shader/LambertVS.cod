@@ -7,8 +7,12 @@
 // cbuffer CbScene
 // {
 //
-//   row_major float4x4 viewProjection; // Offset:    0 Size:    64
-//   float4 lightDirection;             // Offset:   64 Size:    16
+//   float4 viewPosition;               // Offset:    0 Size:    16 [unused]
+//   row_major float4x4 viewProjection; // Offset:   16 Size:    64
+//   float4 lightDirection;             // Offset:   80 Size:    16
+//   row_major float4x4 projection;     // Offset:   96 Size:    64 [unused]
+//   row_major float4x4 inverseView;    // Offset:  160 Size:    64 [unused]
+//   row_major float4x4 inverseProjection;// Offset:  224 Size:    64 [unused]
 //
 // }
 //
@@ -68,7 +72,7 @@ dcl_immediateConstantBuffer { { 1.000000, 0, 0, 0},
                               { 0, -1, 0, 0},
                               { 0, 0, -1, 0},
                               { 0, 0, 0, -1} }
-dcl_constantbuffer CB0[5], immediateIndexed
+dcl_constantbuffer CB0[6], immediateIndexed
 dcl_constantbuffer CB1[512], dynamicIndexed
 dcl_constantbuffer CB2[1], immediateIndexed
 dcl_input v0.xyzw
@@ -99,13 +103,13 @@ itof r0.xyzw, l(1, 1, 1, 1)
 dp4 r0.x, v5.xyzw, r0.xyzw
 div r0.xyzw, v5.xyzw, r0.xxxx  // r0.x <- boneWeights.x; r0.y <- boneWeights.y; r0.z <- boneWeights.z; r0.w <- boneWeights.w
 
-#line 15
+#line 16
 itof r1.xyz, l(0, 0, 0, 0)  // r1.x <- p.x; r1.y <- p.y; r1.z <- p.z
 
-#line 16
+#line 17
 itof r2.xyz, l(0, 0, 0, 0)  // r2.x <- n.x; r2.y <- n.y; r2.z <- n.z
 
-#line 17
+#line 18
 mov r1.w, l(0)  // r1.w <- i
 mov r3.xyz, r2.xyzx  // r3.x <- n.x; r3.y <- n.y; r3.z <- n.z
 mov r4.x, r1.x  // r4.x <- p.x
@@ -116,7 +120,7 @@ loop
   ilt r3.w, r2.w, l(4)
   breakc_z r3.w
 
-#line 19
+#line 20
   dp4 r3.w, r0.xyzw, icb[r2.w + 0].xyzw
   and r5.xyzw, v6.xyzw, icb[r2.w + 4].xyzw
   or r5.xy, r5.ywyy, r5.xzxx
@@ -132,7 +136,7 @@ loop
   mul r5.xyz, r3.wwww, r5.xyzx
   add r4.xyz, r5.xyzx, r4.xyzx
 
-#line 20
+#line 21
   dp4 r3.w, r0.xyzw, icb[r2.w + 0].xyzw
   itof r4.w, l(0)
   and r5.xyzw, v6.xyzw, icb[r2.w + 4].xyzw
@@ -153,46 +157,46 @@ loop
   iadd r2.w, r2.w, l(1)
 endloop 
 
-#line 27
-mul r0.xyzw, r4.xxxx, cb0[0].xyzw
-mul r1.xyzw, r4.yyyy, cb0[1].xyzw
+#line 25
+mul r0.xyzw, r4.xxxx, cb0[1].xyzw
+mul r1.xyzw, r4.yyyy, cb0[2].xyzw
 add r0.xyzw, r0.xyzw, r1.xyzw
-mul r1.xyzw, r4.zzzz, cb0[2].xyzw
+mul r1.xyzw, r4.zzzz, cb0[3].xyzw
 add r0.xyzw, r0.xyzw, r1.xyzw
-mul r1.xyzw, cb0[3].xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
+mul r1.xyzw, cb0[4].xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
 add r0.xyzw, r0.xyzw, r1.xyzw  // r0.x <- vout.position.x; r0.y <- vout.position.y; r0.z <- vout.position.z; r0.w <- vout.position.w
 
-#line 29
+#line 27
 dp3 r1.x, r3.xyzx, r3.xyzx
 rsq r1.x, r1.x
 mul r1.xyz, r1.xxxx, r3.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
 
-#line 30
-mov r2.xyz, -cb0[4].xyzx
+#line 28
+mov r2.xyz, -cb0[5].xyzx
 dp3 r1.w, r2.xyzx, r2.xyzx
 rsq r1.w, r1.w
 mul r2.xyz, r1.wwww, r2.xyzx  // r2.x <- L.x; r2.y <- L.y; r2.z <- L.z
 
-#line 31
+#line 29
 dp3 r1.x, r2.xyzx, r1.xyzx  // r1.x <- d
 
-#line 32
+#line 30
 itof r1.y, l(0)
 max r1.x, r1.x, r1.y
 mul r1.x, r1.x, l(0.500000)
 add r1.x, r1.x, l(0.500000)  // r1.x <- power
 
-#line 33
+#line 31
 mul r1.yzw, v4.xxyz, cb2[0].xxyz
 mul r1.xyz, r1.xxxx, r1.yzwy  // r1.x <- vout.color.x; r1.y <- vout.color.y; r1.z <- vout.color.z
 
-#line 34
+#line 32
 mul r1.w, v4.w, cb2[0].w  // r1.w <- vout.color.w
 
-#line 35
+#line 33
 mov r2.xy, v3.xyxx  // r2.x <- vout.texcoord.x; r2.y <- vout.texcoord.y
 
-#line 37
+#line 35
 mov o0.xyzw, r0.xyzw
 mov o2.xyz, r1.xyzx
 mov o2.w, r1.w

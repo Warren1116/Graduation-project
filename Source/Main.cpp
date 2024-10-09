@@ -10,7 +10,7 @@ const LONG SCREEN_HEIGHT = 720;
 
 LRESULT CALLBACK fnWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	Framework *f = reinterpret_cast<Framework*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+	Framework* f = reinterpret_cast<Framework*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 	return f ? f->HandleMessage(hwnd, msg, wparam, lparam) : DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
@@ -19,8 +19,6 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	//_CrtSetBreakAlloc(237);
-	//_CrtSetBreakAlloc(15881);
-	
 #endif
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -37,6 +35,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	wcex.hIconSm = 0;
 	RegisterClassEx(&wcex);
 
+	//Å@Windowóp
 	RECT rc = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 	HWND hWnd = CreateWindow(_T("Game"), _T(""), WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
@@ -45,4 +44,20 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	Framework f(hWnd);
 	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));
 	return f.Run();
+
+	////FullScreenóp
+	//HMONITOR hPrimaryMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+	//MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+	//GetMonitorInfo(hPrimaryMonitor, &monitorInfo);
+	//RECT rc = monitorInfo.rcMonitor;
+
+	//LONG screenWidth = rc.right - rc.left;
+	//LONG screenHeight = rc.bottom - rc.top;
+
+	//HWND hWnd = CreateWindow(_T("Game"), _T(""), WS_POPUP | WS_VISIBLE, rc.left, rc.top, screenWidth, screenHeight, NULL, NULL, instance, NULL);
+	//ShowWindow(hWnd, cmd_show);
+
+	//Framework f(hWnd);
+	//SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));
+	//return f.Run();
 }

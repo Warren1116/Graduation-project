@@ -7,8 +7,16 @@ struct VS_OUT
 
 cbuffer CbScene : register(b0)
 {
+    //ÉJÉÅÉâèÓïÒ
+    float4 viewPosition;
 	row_major float4x4	viewProjection;
 	float4				lightDirection;
+    
+    row_major float4x4 projection;
+    row_major float4x4 inverseView;
+    row_major float4x4 inverseProjection;
+
+
 };
 
 #define MAX_BONES 128
@@ -21,3 +29,16 @@ cbuffer CbSubset : register(b2)
 {
 	float4				materialColor;
 };
+
+
+cbuffer CBFog : register(b3)
+{
+    float3 fogColor;
+	
+    float fogDensity;
+    float fogHeightFalloff;
+    float fogCutoffDistance;
+    float groundLevel;
+
+    float dummy;
+}
