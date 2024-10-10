@@ -1,12 +1,16 @@
 #include "ProjectileStraight.h"
 #include "StageManager.h"
 #include "SceneGame.h"
+#include "ProjectileWall.h"
 
+ProjectileStraight* ProjectileStraight::instance = nullptr;
 
 // コンストラクタ
 ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(manager)
 {
-	model = new Model("Data/Model/SpiderWeb/SpiderWeb.mdl");
+    instance = this;
+	model = std::make_unique<Model>("Data/Model/SpiderWeb/SpiderWeb.mdl");
+
 
 	nohit = Audio::Instance().LoadAudioSource("Data/Audio/tyodan.wav");
 
@@ -14,12 +18,15 @@ ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(
 	// 表示サイズ
 	scale.x = scale.y = scale.z = 0.05f;
 	radius = 0.3f;
+
+
+
 }
 
 // デストラクタ
 ProjectileStraight::~ProjectileStraight()
 {
-	delete model;
+
 }
 
 // 更新処理
@@ -29,11 +36,10 @@ void ProjectileStraight::Update(float elapsedTime)
     if (lifeTimer <= 0.0f)
     {
         SceneGame& sceneGame = SceneGame::Instance();
-
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
-            sceneGame.shadowmapRenderer->UnregisterRenderModel(model);
-            sceneGame.sceneRenderer->UnregisterRenderModel(model);
+            sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
+            sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
         }
         Destroy();
     }
@@ -51,17 +57,27 @@ void ProjectileStraight::Update(float elapsedTime)
     HitResult hit;
     if (StageManager::Instance().RayCast(start, end, hit))
     {
-        DirectX::XMVECTOR ReflectVector = DirectX::XMVector3Reflect(DirectX::XMLoadFloat3(&direction), DirectX::XMLoadFloat3(&hit.normal));
-        DirectX::XMFLOAT3 reflectDirection;
-        DirectX::XMStoreFloat3(&reflectDirection, ReflectVector);
-
-        direction.x = reflectDirection.x;
-        direction.y = reflectDirection.y;
-        direction.z = reflectDirection.z;
+        // 反射弾
+        //DirectX::XMVECTOR ReflectVector = DirectX::XMVector3Reflect(DirectX::XMLoadFloat3(&direction), DirectX::XMLoadFloat3(&hit.normal));
+        //DirectX::XMFLOAT3 reflectDirection;
+        //DirectX::XMStoreFloat3(&reflectDirection, ReflectVector);
+        //direction.x = reflectDirection.x;
+        //direction.y = reflectDirection.y;
+        //direction.z = reflectDirection.z;
 
         position.x = hit.position.x;
         position.y = hit.position.y;
         position.z = hit.position.z;
+
+        SceneGame& sceneGame = SceneGame::Instance();
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        {
+            sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
+            sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
+        }
+
+
+
     }
     else
     {
@@ -89,3 +105,4 @@ void ProjectileStraight::Launch(const DirectX::XMFLOAT3& direction, const Direct
 	this->position = position;
 	
 }
+

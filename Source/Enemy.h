@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Graphics/Shader.h"
 #include "Character.h"
 

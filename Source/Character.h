@@ -117,7 +117,7 @@ protected:
 	bool isGround = false;
 	int health = 5;
 	int maxHealth = 5;
-	float stepOffset = 0.1f;
+	float stepOffset = 1.5f;
 	float invincibleTimer = 0.0f;
 	float friction = 0.7f;
 	float acceleration = 1.0f;

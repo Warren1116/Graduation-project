@@ -9,15 +9,11 @@
 #include "SceneClear.h"
 #include "SceneTitle.h"
 #include "System.h"
-#include "SearchAlgorithm.h"
 #include "Graphics\LightManager.h"
 #include "SceneManager.h"
 #include "SceneLoading.h"
 #include "ProjectileStraight.h"
 #include "ProjectileManager.h"
-#include "PoisonZombie.h"
-#include "ItemKey.h"
-#include "ItemAmmo.h"
 
 SceneGame* SceneGame::instance = nullptr;
 
@@ -125,14 +121,15 @@ void SceneGame::Initialize()
 
         for (Model* model : list)
         {
-            shadowmapRenderer->RegisterRenderModel(model);
-            sceneRenderer->RegisterRenderModel(model);
-            const ModelResource* resource = model->GetResource();
-            for (const ModelResource::Material& material : resource->GetMaterials())
-            {
-                ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
-                mat.shaderId = static_cast<int>(ModelShaderId::Phong);
-            }
+            RegisterRenderModel(model);
+            //shadowmapRenderer->RegisterRenderModel(model);
+            //sceneRenderer->RegisterRenderModel(model);
+            //const ModelResource* resource = model->GetResource();
+            //for (const ModelResource::Material& material : resource->GetMaterials())
+            //{
+            //    ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
+            //    mat.shaderId = static_cast<int>(ModelShaderId::Phong);
+            //}
         }
     }
 
@@ -456,6 +453,18 @@ void SceneGame::RenderEnemyGauge(ID3D11DeviceContext* dc,
             static_cast<float>(gauge->GetTextureWidth()), static_cast<float>(gauge->GetTextureHeight()),
             0,
             1, 0, 0, 1);
+    }
+}
+
+void SceneGame::RegisterRenderModel(Model* model)
+{
+    shadowmapRenderer->RegisterRenderModel(model);
+    sceneRenderer->RegisterRenderModel(model);
+    const ModelResource* resource = model->GetResource();
+    for (const ModelResource::Material& material : resource->GetMaterials())
+    {
+        ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
+        mat.shaderId = static_cast<int>(ModelShaderId::Phong);
     }
 }
 

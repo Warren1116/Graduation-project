@@ -34,17 +34,18 @@ public:
 	// スケール取得
 	const DirectX::XMFLOAT3& GetScale()  const { return scale; }
 
-	Model* GetModel() const { return model; }
+	Model* GetModel() const { return model.get(); }
 
 	// 半径取得
 	float GetRadius() const { return radius; }
+	
 
 protected:
 	// 行列更新処理
 	void UpdateTransform();
 
 protected:
-	Model* model = nullptr;
+	std::unique_ptr<Model> model;
 	std::unique_ptr<Effect> destroyEffect = nullptr;
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT3 direction = { 0, 0, 1 };

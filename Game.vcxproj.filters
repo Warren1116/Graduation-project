@@ -315,6 +315,15 @@
     <ClInclude Include="Source\ItemKey.h">
       <Filter>Source\Object</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ProjectileWall.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyPeople.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Telegram.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -553,6 +562,15 @@
     </ClCompile>
     <ClCompile Include="Source\ItemKey.cpp">
       <Filter>Source\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileWall.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyPeople.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StateBase.cpp">
+      <Filter>Source\System\AI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -10,15 +10,10 @@
 #include "StageManager.h"
 #include "ProjectileStraight.h"
 #include "SceneGame.h"
+#include "ProjectileWall.h"
 
 
-static Player* instance = nullptr;
-
-// インスタンス取得
-Player& Player::Instance()
-{
-	return *instance;
-}
+Player* Player::instance = nullptr;
 
 // コンストラクタ
 Player::Player(bool flag)
@@ -365,6 +360,7 @@ void Player::InputProjectile()
 		pos.z = position.z;
 
 		ProjectileStraight* projectile = new ProjectileStraight(&projectileManager);
+
 		projectile->Launch(dir, pos);
 		//projectileManager.Register(projectile);
 
@@ -372,14 +368,8 @@ void Player::InputProjectile()
 
 		if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
 		{
-			sceneGame.shadowmapRenderer->RegisterRenderModel(projectile->GetModel());
-			sceneGame.sceneRenderer->RegisterRenderModel(projectile->GetModel());
-			const ModelResource* resource = model->GetResource();
-			for (const ModelResource::Material& material : resource->GetMaterials())
-			{
-				ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
-				mat.shaderId = static_cast<int>(ModelShaderId::Phong);
-			}
+			sceneGame.RegisterRenderModel(projectile->GetModel());
+
 		}
 
 		
@@ -596,11 +586,12 @@ void Player::TransitionClimbWallState()
 
 void Player::UpdateClimbWallState(float elapsedTime)
 {
-	InputMove(elapsedTime);
 	if (!hitWall)
 	{
+		//model->PlayAnimation(Anim_ClimbUpWall, false);
 		TransitionMoveState();
 	}
+	InputMove(elapsedTime);
 
 }
 
@@ -803,7 +794,7 @@ void Player::Render(const RenderContext& rc, ModelShader* shader)
 {
 	//projectileManager.Render(rc, shader);
 
-	goal->Render(rc, shader);
+	//goal->Render(rc, shader);
 }
 
 // デバッグ用GUI描画

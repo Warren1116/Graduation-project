@@ -237,6 +237,7 @@ void Model::SetNodePoses(const std::vector<NodePose>& nodePoses)
 	}
 }
 
+
 void Model::GetNodePoses(std::vector<NodePose>& nodePoses) const
 {
 	if (nodePoses.size() != nodes.size())

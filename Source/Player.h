@@ -22,6 +22,7 @@ class Player : public Character
 public:
 	Player(bool flag);
 	~Player();
+	static Player& Instance() { return *instance; }
 
 	// 更新処理
 	void Update(float elapsedTime);
@@ -51,8 +52,8 @@ public:
 
 	bool NearStairs() const { return nearStairs; }
 
-	// インスタンス取得
-	static Player& Instance();
+	ProjectileManager GetProjectileManager() { return projectileManager; }
+
 
 	Model* model = nullptr;
 
@@ -108,14 +109,17 @@ private:
 	// 移動ステート更新処理
 	void UpdateMoveState(float elapsedTime);
 
+	// ジャンプステートへ遷移
 	void TransitionJumpState();
 
+	// ジャンプステート更新処理
 	void UpdateJumpState(float elapsedTime);
 
+	// クランプステートへ遷移
 	void TransitionClimbWallState();
 
+	// クランプステート更新処理
 	void UpdateClimbWallState(float elapsedTime);
-
 
 	// 攻撃ステートへ遷移
 	void TransitionAttackState();
@@ -153,6 +157,8 @@ private:
 	void PlayAttackAnimation();
 
 private:
+	static Player* instance;
+
 	ProjectileManager projectileManager;
 
 	void InputProjectile();
@@ -172,6 +178,8 @@ private:
 		Anim_Climb,
 		Anim_Landing,
 		Anim_Jump,
+		Anim_ClimbUpWall,
+
 
 	};
 

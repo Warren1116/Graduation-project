@@ -46,6 +46,8 @@ public:
 		const DirectX::XMFLOAT4X4& view,
 		const DirectX::XMFLOAT4X4& projection);
 
+	void RegisterRenderModel(Model* model);
+
 	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
 	std::unique_ptr<SceneRenderer>			sceneRenderer;
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
