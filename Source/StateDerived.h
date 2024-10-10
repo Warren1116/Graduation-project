@@ -1,116 +1,134 @@
 #pragma once
-#include "PoisonZombie.h"
+#include "StateBase.h"
 
-
-// 徘徊ステートオブジェクト
+// TODO 02_02 徘徊ステートオブジェクト
 class WanderState : public State
 {
 public:
-	// コンストラクタ
-	WanderState(PoisonZombie* enemy) :State(enemy) {};
-	// デストラクタ
-	~WanderState() {}
-	// ステートに入った時のメソッド
-	void Enter()override;
-	// ステートで実行するメソッド
-	void Execute(float elapsedTime)override;
-	// ステートから出ていくときのメソッド
-	void Exit()override;
+    //  コンストラクタ
+    WanderState(EnemyPeople* enemy) : State(enemy) {};
+    //  デストラクタ
+    ~WanderState() {}
+    //  ステートに入った時のメソッド
+    void Enter()override;
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime)override;
+    //ステートから出ていくときのメソッド
+    void Exit()override;
 };
 
-// 待機ステートオブジェクト
 class IdleState : public State
 {
 public:
-	// コンストラクタ
-	IdleState(PoisonZombie* enemy) :State(enemy) {};
-	// デストラクタ
-	~IdleState() {}
-	// ステートに入った時のメソッド
-	void Enter()override;
-	// ステートで実行するメソッド
-	void Execute(float elapsedTime)override;
-	// ステートから出ていくときのメソッド
-	void Exit()override;
+    //  コンストラクタ
+    IdleState(EnemyPeople* enemy) : State(enemy) {};
+    //  デストラクタ
+    ~IdleState() {}
+    //  ステートに入った時のメソッド
+    void Enter()override;
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime)override;
+    //ステートから出ていくときのメソッド
+    void Exit()override;
 };
 
-// 追跡ステートオブジェクト
 class PursuitState : public State
 {
 public:
-	// コンストラクタ
-	PursuitState(PoisonZombie* enemy) :State(enemy) {};
-	// デストラクタ
-	~PursuitState() {}
-	// ステートに入った時のメソッド
-	void Enter()override;
-	// ステートで実行するメソッド
-	void Execute(float elapsedTime)override;
-	// ステートから出ていくときのメソッド
-	void Exit()override;
+    //  コンストラクタ
+    PursuitState(EnemyPeople* enemy) : State(enemy) {};
+    //  デストラクタ
+    ~PursuitState() {}
+    //  ステートに入った時のメソッド
+    void Enter()override;
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime)override;
+    //ステートから出ていくときのメソッド
+    void Exit()override;
 };
 
-// 攻撃待機ステートオブジェクト
-class AttackIdleState : public State
+class AttackState : public State
 {
 public:
-	// コンストラクタ
-	AttackIdleState(PoisonZombie* enemy) :State(enemy) {};
-	// デストラクタ
-	~AttackIdleState() {}
-	// ステートに入った時のメソッド
-	void Enter()override;
-	// ステートで実行するメソッド
-	void Execute(float elapsedTime)override;
-	// ステートから出ていくときのメソッド
-	void Exit()override;
+    //  コンストラクタ
+    AttackState(EnemyPeople* enemy) : State(enemy) {};
+    //  デストラクタ
+    ~AttackState() {}
+    //  ステートに入った時のメソッド
+    void Enter()override;
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime)override;
+    //ステートから出ていくときのメソッド
+    void Exit()override;
 };
 
-
-// 毒攻撃ステート
-class GunState : public State
+class SearchState : public HierarchicalState
 {
 public:
-	// コンストラクタ
-	GunState(PoisonZombie* enemy) : State(enemy) {};
-	// デストラクタ
-	~GunState() {}
-	// ステートに入った時のメソッド
-	void Enter()override;
-	// ステートで実行するときのメソッド
-	void Execute(float elapsedTime) override;
-	// ステートから出ていくときのメソッド
-	void Exit()override;
+    SearchState(EnemyPeople* enemy) : HierarchicalState(enemy) {}
+    //  デストラクタ
+    ~SearchState();
+    //  ステートに入った時のメソッド
+    void Enter();
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime);
+    //ステートから出ていくときのメソッド
+    void Exit();
 };
 
-// 手刀攻撃ステート
-class HandState : public State
+class BattleState : public HierarchicalState
 {
 public:
-	// コンストラクタ
-	HandState(PoisonZombie* enemy) : State(enemy) {};
-	// デストラクタ
-	~HandState() {}
-	// ステートに入った時のメソッド
-	void Enter()override;
-	// ステートで実行するときのメソッド
-	void Execute(float elapsedTime) override;
-	// ステートから出ていくときのメソッド
-	void Exit()override;
+    BattleState(EnemyPeople* enemy) : HierarchicalState(enemy) {}
+    //  デストラクタ
+    ~BattleState();
+    //  ステートに入った時のメソッド
+    void Enter();
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime);
+    //ステートから出ていくときのメソッド
+    void Exit();
 };
 
-// ジャンプ攻撃ステート
-class JumpState : public State
+// TODO_05_03 メタAIからメッセージを受信したときに呼ばれるステートを追加
+class RecieveState : public HierarchicalState
 {
 public:
-	// コンストラクタ
-	JumpState(PoisonZombie* enemy) : State(enemy) {};
-	// デストラクタ
-	~JumpState() {}
-	// ステートに入った時のメソッド
-	void Enter()override;
-	// ステートで実行するときのメソッド
-	void Execute(float elapsedTime) override;
-	// ステートから出ていくときのメソッド
-	void Exit()override;
+    RecieveState(EnemyPeople* enemy) : HierarchicalState(enemy) {}
+    ~RecieveState();
+    // 全て継承先で実装させる必要があるため純粋仮想関数で実装
+    // ステートに入ったときのメソッド
+    void Enter();
+    // ステートで実行するのメソッド
+    void Execute(float elapsedTime);
+    // ステートから出ていくときのメソッド
+    void Exit();
+};
+
+// TODO_05_03 他のエネミーから呼ばれたときのステートを追加
+class CalledState : public State
+{
+public:
+    CalledState(EnemyPeople* enemy) :State(enemy) {};
+    ~CalledState() {}
+    // ステートに入ったときのメソッド
+    void Enter() override;
+    // ステートで実行するのメソッド
+    void Execute(float elapsedTime) override;
+    // ステートから出ていくときのメソッド
+    void Exit() override;
+};
+
+//  待機ステートオブジェクト
+class StandbyState : public State
+{
+public:
+    StandbyState(EnemyPeople* enemy) : State(enemy) {};
+    ~StandbyState() {}
+    // ステートに入ったときのメソッド
+    void Enter() override;
+    // ステートで実行するのメソッド
+    void Execute(float elapsedTime) override;
+    // ステートから出ていくときのメソッド
+    void Exit() override;
 };

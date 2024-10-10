@@ -247,7 +247,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 
 		//レイの開始位置と終点位置
 		DirectX::XMFLOAT3 start = { position.x,position.y + stepOffset ,position.z };
-		DirectX::XMFLOAT3 end = { position.x + mx, position.y + stepOffset, position.z + mz };
+		DirectX::XMFLOAT3 end = { position.x + mx - 0.5f, position.y + stepOffset, position.z + mz  - 0.5f};
 
 		//レイキャストによる壁判定
 		HitResult hit;

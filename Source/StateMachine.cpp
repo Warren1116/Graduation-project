@@ -2,52 +2,72 @@
 
 StateMachine::~StateMachine()
 {
-	for (State* state : statePool)
-	{
-		delete state;
-	}
-	statePool.clear();
+    //  登録したステートを削除する
+    for (State* state : statePool)
+    {
+        delete state;
+    }
+    statePool.clear();
 }
-// 更新処理
+
 void StateMachine::Update(float elapsedTime)
 {
-	currentState->Execute(elapsedTime);
+    currentState->Execute(elapsedTime);
 }
-// ステートセット
-void StateMachine::SetState(int setState)
+
+void StateMachine::SetState(int newState)
 {
-	currentState = statePool.at(setState);
-	currentState->Enter();
+    currentState = statePool.at(newState);
+
+    currentState->Enter();
 }
-// ステート変更
+
 void StateMachine::ChangeState(int newState)
 {
-	// TODO 02_02 ステートの切り替え。
-	// 現在のステートのExit関数を実行、新しいステートをセット、新しいステートのEnter関数を呼び出す。
-	currentState->Exit();
-	currentState = statePool.at(newState);
-	currentState->Enter();
+    if (newState >= 0 && newState < statePool.size())
+    {
+        if (currentState != nullptr)
+        {
+            if (currentState->GetSubState() != nullptr)
+            {
+                currentState->GetSubState()->Exit();
+            }
+            currentState->Exit();
+        }
+        currentState = statePool.at(newState);
+        currentState->Enter();
+    }
+}
 
-}
-// ステート登録
-void StateMachine::RegisterState(State* state)
-{
-	// 親ステート登録
-	statePool.emplace_back(state);
-}
-// ステート番号取得
+
 int StateMachine::GetStateIndex()
 {
-	int i = 0;
-	for (State* state : statePool)
-	{
-		if (state == currentState)
-		{
-			// i番号目のステートをリターン
-			return i;
-		}
-		++i;
-	}
-	// ステートが見つからなかった時
-	return -1;
+    int i = 0;
+    for (State* state : statePool)
+    {
+        if (state == currentState)
+        {
+            //  i番号目のステートをリターン
+            return i;
+        }
+        ++i;
+    }
+    //  ステートが見つからなかった時
+    return -1;
 }
+
+void StateMachine::RegisterState(HierarchicalState* state)
+{
+    statePool.emplace_back(state);
+}
+
+void StateMachine::ChangeSubState(int newState)
+{
+    currentState->ChangeSubState(newState);
+}
+
+void StateMachine::RegisterSubState(int index, State* subState)
+{
+    statePool.at(index)->RegisterSubState(subState);
+}
+

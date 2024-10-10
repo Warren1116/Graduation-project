@@ -137,7 +137,7 @@ void ItemKey::CollisionItemVsCrossHair()
 		{
 			Player& player = Player::Instance();
 			player.SetHaveKey(true);
-			player.key->Play(false);
+			//player.key->Play(false);
 
 			// ƒAƒCƒeƒ€”jŠü
 			okDestroy = true;

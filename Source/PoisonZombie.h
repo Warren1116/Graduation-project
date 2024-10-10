@@ -81,7 +81,7 @@ public:
 
 	void SetHealth(int setHealth) { health = setHealth; }
 
-	float PlayerToBoss() override;
+	//float PlayerToBoss() override;
 
 protected:
 	void OnDead();
@@ -116,7 +116,7 @@ public:
 	float GetGunFlg() { return gunflg; }
 
 	void SetAttackFlg(bool flg) { attackFlag = flg; }
-	float GetAttackFlg() { return attackFlag; }
+	//float GetAttackFlg() { return attackFlag; }
 
 	void SetAttackCollisionFlg(float min, float max, float animationTime) 
 	{

@@ -19,6 +19,8 @@
 #include "Renderer/ShadowmapRenderer.h"
 #include "Renderer/SceneRenderer.h"
 #include "Renderer/PostprocessingRenderer.h"
+#include "MetaAI.h"
+
 
 static bool Scenelock = false;
 
@@ -28,6 +30,7 @@ class SceneGame : public Scene
 public:
 	SceneGame() {}
 	~SceneGame() override {}
+	static SceneGame& Instance() { return *instance; }
 
 	// 初期化
 	void Initialize() override;
@@ -45,19 +48,24 @@ public:
 		const DirectX::XMFLOAT4X4& view,
 		const DirectX::XMFLOAT4X4& projection);
 
+	void RegisterRenderModel(Model* model);
+	void UnregisterRenderModel(Model* model);
+
+	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
+	std::unique_ptr<SceneRenderer>			sceneRenderer;
+	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 	
-	
-	static SceneGame& Instance()
-	{
-		static SceneGame instance;
-		return instance;
-	}
+	//static SceneGame& Instance()
+	//{
+	//	static SceneGame instance;
+	//	return instance;
+	//}
 
 private:
 	std::unique_ptr<Player> player;
 	Item* item = nullptr;
 	ItemManager& itemManager = ItemManager::Instance();
-	std::unique_ptr<Gun> gun;
+
 	std::unique_ptr<Sprite> gauge;
 	std::unique_ptr<Sprite> crossHair;
 	std::unique_ptr<Sprite> ammo;
@@ -67,6 +75,7 @@ private:
 	std::unique_ptr<Sprite> text2;
 	std::unique_ptr<AudioSource> bgm = nullptr;
 	std::unique_ptr<AudioSource> heri = nullptr;
+
 	//std::unique_ptr<CameraController> cameraController;
 	float a = 0;
 	float deadAlpha = 0;
@@ -74,11 +83,11 @@ private:
 	int clearTimer = 0;
 
 private:
-
-	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
-	std::unique_ptr<SceneRenderer>			sceneRenderer;
-	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
-
+	static SceneGame* instance;
 	Light* spotLights[3];
 	std::unique_ptr<Sprite>		renderSplite;
+
+	//MetaAIオブジェクト追加
+	Meta* meta = nullptr;
+
 };

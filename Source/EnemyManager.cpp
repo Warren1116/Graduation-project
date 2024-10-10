@@ -62,7 +62,16 @@ void EnemyManager::DrawDebugPrimitive()
 
 void EnemyManager::DrawDebugGUI()
 {
-	
+	ImGui::SetNextWindowPos(ImVec2(980, 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+	if (ImGui::Begin("Enemy", nullptr, ImGuiWindowFlags_None))
+	{
+		for (Enemy* enemy : enemies) {
+			// エネミー情報表示
+			enemy->DrawDebugGUI();
+		}
+	}
+	ImGui::End();
 }
 
 
@@ -87,6 +96,16 @@ void EnemyManager::Remove(Enemy* enemy)
 {
 	// 破棄リストに追加
 	removes.insert(enemy);
+}
+
+Enemy* EnemyManager::GetEnemyFromId(int id)
+{
+	for (Enemy* enemy : enemies)
+	{
+		if (enemy->GetId() == id)
+			return enemy;
+	}
+	return nullptr;
 }
 
 // エネミー同士の衝突処理

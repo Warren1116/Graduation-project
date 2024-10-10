@@ -11,10 +11,15 @@ public:
 	ProjectileManager();
 	~ProjectileManager();
 
+	static ProjectileManager& Instance()
+	{
+		static ProjectileManager instance;
+		return instance;
+	}
 	// 更新処理
 	void Update(float elapsedTime);
 
-	//// 描画処理
+	////// 描画処理
 	//void Render(const RenderContext& rc, ModelShader* shader);
 
 	// デバッグプリミティブ描画

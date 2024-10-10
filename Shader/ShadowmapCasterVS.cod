@@ -59,7 +59,7 @@ dcl_input v0.xyzw
 dcl_input v5.xyzw
 dcl_input v6.xyzw
 dcl_output_siv o0.xyzw, position
-dcl_temps 5
+dcl_temps 6
 //
 // Initial variable locations:
 //   v0.x <- position.x; v0.y <- position.y; v0.z <- position.z; v0.w <- position.w; 
@@ -72,42 +72,47 @@ dcl_temps 5
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
 #line 13 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ShadowmapCasterVS.hlsl"
-itof r0.xyz, l(0, 0, 0, 0)  // r0.x <- p.x; r0.y <- p.y; r0.z <- p.z
+itof r0.xyzw, l(1, 1, 1, 1)
+dp4 r0.x, v5.xyzw, r0.xyzw
+div r0.xyzw, v5.xyzw, r0.xxxx  // r0.x <- boneWeights.x; r0.y <- boneWeights.y; r0.z <- boneWeights.z; r0.w <- boneWeights.w
 
-#line 14
-mov r0.w, l(0)  // r0.w <- i
-mov r1.xyz, r0.xyzx  // r1.x <- p.x; r1.y <- p.y; r1.z <- p.z
-mov r1.w, r0.w  // r1.w <- i
-loop 
-  ilt r2.x, r1.w, l(4)
-  breakc_z r2.x
+#line 15
+itof r1.xyz, l(0, 0, 0, 0)  // r1.x <- p.x; r1.y <- p.y; r1.z <- p.z
 
 #line 16
-  dp4 r2.x, v5.xyzw, icb[r1.w + 0].xyzw
-  dp4 r2.y, v6.xyzw, icb[r1.w + 0].xyzw
-  ftou r2.y, r2.y
-  imul null, r2.y, r2.y, l(4)
-  mul r3.xyz, v0.xxxx, cb1[r2.y + 0].xyzx
-  mul r4.xyz, v0.yyyy, cb1[r2.y + 1].xyzx
-  add r3.xyz, r3.xyzx, r4.xyzx
-  mul r4.xyz, v0.zzzz, cb1[r2.y + 2].xyzx
-  add r3.xyz, r3.xyzx, r4.xyzx
-  mul r2.yzw, v0.wwww, cb1[r2.y + 3].xxyz
-  add r2.yzw, r2.yyzw, r3.xxyz
-  mul r2.xyz, r2.yzwy, r2.xxxx
-  add r1.xyz, r1.xyzx, r2.xyzx
-
-#line 17
-  iadd r1.w, r1.w, l(1)
-endloop 
+mov r1.w, l(0)  // r1.w <- i
+mov r2.xyz, r1.xyzx  // r2.x <- p.x; r2.y <- p.y; r2.z <- p.z
+mov r2.w, r1.w  // r2.w <- i
+loop 
+  ilt r3.x, r2.w, l(4)
+  breakc_z r3.x
 
 #line 18
-mul r0.xyzw, r1.xxxx, cb0[0].xyzw
-mul r2.xyzw, r1.yyyy, cb0[1].xyzw
-add r0.xyzw, r0.xyzw, r2.xyzw
-mul r1.xyzw, r1.zzzz, cb0[2].xyzw
+  dp4 r3.x, r0.xyzw, icb[r2.w + 0].xyzw
+  dp4 r3.y, v6.xyzw, icb[r2.w + 0].xyzw
+  ftou r3.y, r3.y
+  imul null, r3.y, r3.y, l(4)
+  mul r4.xyz, v0.xxxx, cb1[r3.y + 0].xyzx
+  mul r5.xyz, v0.yyyy, cb1[r3.y + 1].xyzx
+  add r4.xyz, r4.xyzx, r5.xyzx
+  mul r5.xyz, v0.zzzz, cb1[r3.y + 2].xyzx
+  add r4.xyz, r4.xyzx, r5.xyzx
+  mul r3.yzw, v0.wwww, cb1[r3.y + 3].xxyz
+  add r3.yzw, r3.yyzw, r4.xxyz
+  mul r3.xyz, r3.yzwy, r3.xxxx
+  add r2.xyz, r2.xyzx, r3.xyzx
+
+#line 20
+  iadd r2.w, r2.w, l(1)
+endloop 
+
+#line 21
+mul r0.xyzw, r2.xxxx, cb0[0].xyzw
+mul r1.xyzw, r2.yyyy, cb0[1].xyzw
+add r0.xyzw, r0.xyzw, r1.xyzw
+mul r1.xyzw, r2.zzzz, cb0[2].xyzw
 add r0.xyzw, r0.xyzw, r1.xyzw
 mul r1.xyzw, cb0[3].xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
 add o0.xyzw, r0.xyzw, r1.xyzw
 ret 
-// Approximately 30 instruction slots used
+// Approximately 33 instruction slots used

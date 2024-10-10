@@ -1,13 +1,13 @@
 #pragma once
 
-class PoisonZombie;
+class EnemyBlueSlime;
 
 // é¿çsîªíË
 class JudgmentBase
 {
 public:
-	JudgmentBase(PoisonZombie* enemy) :owner(enemy) {}
+	JudgmentBase(EnemyBlueSlime* enemy) :owner(enemy) {}
 	virtual bool Judgment() = 0;
 protected:
-	PoisonZombie* owner;
+	EnemyBlueSlime* owner;
 };

@@ -22,6 +22,7 @@ class Player : public Character
 public:
 	Player(bool flag);
 	~Player();
+	static Player& Instance() { return *instance; }
 
 	// 更新処理
 	void Update(float elapsedTime);
@@ -51,8 +52,8 @@ public:
 
 	bool NearStairs() const { return nearStairs; }
 
-	// インスタンス取得
-	static Player& Instance();
+	ProjectileManager GetProjectileManager() { return projectileManager; }
+
 
 	Model* model = nullptr;
 
@@ -68,6 +69,7 @@ public:
 		Revive,
 		Dodge,
 		Climb,
+		Swing,
 	};
 
 
@@ -75,8 +77,8 @@ public:
 	const State& GetState() const { return state; }
 	const State& GetAttackState() const { return State::Attack; }
 
-	std::unique_ptr<AudioSource> key = nullptr;
-	std::unique_ptr<AudioSource> ammo = nullptr;
+	//std::unique_ptr<AudioSource> null = nullptr;
+
 
 protected:
 
@@ -87,8 +89,13 @@ protected:
 	void OnDead() override;
 
 private:
+	// 攻撃入力処理
+	bool InputAttack();
 	// プレイヤーとエネミーとの衝突処理
 	void CollisionPlayerVsEnemies();
+
+	void CollisionProjectileVsEnemies();
+
 
 	// 待機ステートへ遷移
 	void TransitionIdleState();
@@ -102,28 +109,23 @@ private:
 	// 移動ステート更新処理
 	void UpdateMoveState(float elapsedTime);
 
+	// ジャンプステートへ遷移
 	void TransitionJumpState();
 
+	// ジャンプステート更新処理
 	void UpdateJumpState(float elapsedTime);
 
+	// クランプステートへ遷移
 	void TransitionClimbWallState();
 
+	// クランプステート更新処理
 	void UpdateClimbWallState(float elapsedTime);
-
-	// 攻撃入力処理
-	bool InputAttack();
 
 	// 攻撃ステートへ遷移
 	void TransitionAttackState();
 
 	// 攻撃ステート更新処理
 	void UpdateAttackState(float elapsedTime);
-
-	// リロードステートへ遷移
-	void TransitionReloadState();
-
-	// リロードステート更新処理
-	void UpdateReloadState(float elapsedTime);
 
 	// ダメージステートへ遷移
 	void TransitionDamageState();
@@ -137,10 +139,17 @@ private:
 	// 死亡ステート更新処理
 	void UpdateDeathState(float elapsedTime);
 
+	// 着地ステートへ遷移 
 	void TransitionLandState();
 
+	// 着地ステート更新処理
 	void UpdateLandState(float elapsedTime);
 
+	// Swingテートへ遷移
+	void TransitionSwingState();
+
+	// Swingステート更新処理
+	void UpdateSwingState(float elapsedTime);
 
 	// ノードとエネミーの衝突処理
 	void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);
@@ -148,6 +157,8 @@ private:
 	void PlayAttackAnimation();
 
 private:
+	static Player* instance;
+
 	ProjectileManager projectileManager;
 
 	void InputProjectile();
@@ -167,6 +178,8 @@ private:
 		Anim_Climb,
 		Anim_Landing,
 		Anim_Jump,
+		Anim_ClimbUpWall,
+
 
 	};
 

@@ -5,7 +5,7 @@ LightManager::LightManager()
 {
 	// 空テクスチャを読み込んでおく
 	// mipmapの作成についてお伝えする
-	skyTexture = std::make_unique<Texture>("Data/Texture/incskies_045_16k.png");
+	skyTexture = std::make_unique<Texture>("Data/Texture/incskies_046_16k.jpg");
 }
 
 LightManager::~LightManager()

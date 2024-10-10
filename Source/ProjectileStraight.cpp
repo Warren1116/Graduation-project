@@ -1,74 +1,99 @@
 #include "ProjectileStraight.h"
 #include "StageManager.h"
+#include "SceneGame.h"
+#include "ProjectileWall.h"
+
+ProjectileStraight* ProjectileStraight::instance = nullptr;
 
 // コンストラクタ
-ProjectileStraight::ProjectileStraight(ProjectileManager* manager)
-	:Projectile(manager)
+ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(manager)
 {
-	// model = new Model("Data/Model/SpikeBall/SpikeBall.mdl");
-	model = new Model("Data/Model/Sword/Sword.mdl");
+    instance = this;
+	model = std::make_unique<Model>("Data/Model/SpiderWeb/SpiderWeb.mdl");
+
 
 	nohit = Audio::Instance().LoadAudioSource("Data/Audio/tyodan.wav");
 
 
 	// 表示サイズ
-	scale.x = scale.y = scale.z = 2.0f;
+	scale.x = scale.y = scale.z = 0.05f;
 	radius = 0.3f;
+
+
+
 }
 
 // デストラクタ
 ProjectileStraight::~ProjectileStraight()
 {
-	delete model;
+
 }
 
 // 更新処理
 void ProjectileStraight::Update(float elapsedTime)
 {
-	// 移動
-	float speed = this->speed * elapsedTime;
-	position.x += speed * direction.x;
-	position.y += speed * direction.y;
-	position.z += speed * direction.z;
+    lifeTimer -= elapsedTime;
+    if (lifeTimer <= 0.0f)
+    {
+        SceneGame& sceneGame = SceneGame::Instance();
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        {
+            sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
+            sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
+        }
+        Destroy();
+    }
 
-	// オブジェクト行列を更新
-	UpdateTransform();
 
-	// 寿命処理
-	lifeTimer -= elapsedTime;
-	if (lifeTimer <= 0.0f)
-	{
-		// 自分を削除
-		Destroy();
-	}
+    float speed = this->speed * elapsedTime;
 
-	if (one)
-	{
-		
-		destroyEffect->Play(position);
-		Destroy();
-	}
+    float newX = position.x + direction.x * speed;
+    float newY = position.y + direction.y * speed;
+    float newZ = position.z + direction.z * speed;
 
-	HitResult hit;
-	float mx = (speed * direction.x * 100) * elapsedTime;
-	float my = (speed * direction.y * 100) * elapsedTime;
-	float mz = (speed * direction.z * 100) * elapsedTime;
+    DirectX::XMFLOAT3 start = { position.x, position.y, position.z };
+    DirectX::XMFLOAT3 end = { newX, newY, newZ };
 
-	// レイの開始位置と終点位置
-	DirectX::XMFLOAT3 start = { position.x, position.y, position.z };
-	DirectX::XMFLOAT3 end = { position.x + mx, position.y + my, position.z + mz };
-	if (StageManager::Instance().RayCast(start, end, hit))
-	{
-		one = true;
-		nohit->Stop();
-		nohit->Play(false);
-	}
+    HitResult hit;
+    if (StageManager::Instance().RayCast(start, end, hit))
+    {
+        // 反射弾
+        //DirectX::XMVECTOR ReflectVector = DirectX::XMVector3Reflect(DirectX::XMLoadFloat3(&direction), DirectX::XMLoadFloat3(&hit.normal));
+        //DirectX::XMFLOAT3 reflectDirection;
+        //DirectX::XMStoreFloat3(&reflectDirection, ReflectVector);
+        //direction.x = reflectDirection.x;
+        //direction.y = reflectDirection.y;
+        //direction.z = reflectDirection.z;
 
-	// モデル行列更新
-	model->UpdateTransform(transform);
+        position.x = hit.position.x;
+        position.y = hit.position.y;
+        position.z = hit.position.z;
+
+        Destroy();
+        SceneGame& sceneGame = SceneGame::Instance();
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        {
+            sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
+            sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
+        }
+
+
+
+    }
+    else
+    {
+        position.x = newX;
+        position.y = newY;
+        position.z = newZ;
+    }
+
+
+    UpdateTransform();
+    model->UpdateTransform(transform);
+
 }
 
-//// 描画処理
+// 描画処理
 //void ProjectileStraight::Render(const RenderContext& rc, ModelShader* shader)
 //{
 //	shader->Draw(rc, model);
@@ -81,3 +106,4 @@ void ProjectileStraight::Launch(const DirectX::XMFLOAT3& direction, const Direct
 	this->position = position;
 	
 }
+

@@ -9,19 +9,19 @@
 #include "SceneClear.h"
 #include "SceneTitle.h"
 #include "System.h"
-#include "SearchAlgorithm.h"
 #include "Graphics\LightManager.h"
 #include "SceneManager.h"
 #include "SceneLoading.h"
 #include "ProjectileStraight.h"
 #include "ProjectileManager.h"
-#include "PoisonZombie.h"
-#include "ItemKey.h"
-#include "ItemAmmo.h"
+#include "EnemyPeople.h"
+
+SceneGame* SceneGame::instance = nullptr;
 
 // 初期化
 void SceneGame::Initialize()
 {
+    instance = this;
     Graphics& graphics = Graphics::Instance();
 
     //	各種レンダラー生成
@@ -55,10 +55,22 @@ void SceneGame::Initialize()
     else
         player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(45), 0));
-    gun = std::make_unique<Gun>();
 
     // エネミー初期化
     EnemyManager& enemyManager = EnemyManager::Instance();
+    ProjectileManager& projectileManager = ProjectileManager::Instance();
+
+    // スライム（ステートマシン用）
+    EnemyPeople* slime = new EnemyPeople();
+    slime->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
+    slime->SetTerritory(slime->GetPosition(), 10.0f);
+    enemyManager.Register(slime);
+
+    //	TODO_05_01通信相手用に１匹増やす
+    EnemyPeople* slime2 = new EnemyPeople();
+    slime2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
+    slime2->SetTerritory(slime2->GetPosition(), 10.0f);
+    enemyManager.Register(slime2);
 
     //switch (stageMain->GetStageNum())
     //{
@@ -70,7 +82,6 @@ void SceneGame::Initialize()
     //        zombies[i] = new Zombie();
     //        enemyManager.Register(zombies[i]);
     //    }
-
     //    zombies[0]->SetPosition(DirectX::XMFLOAT3(15.0f, 0.0f, 4.0f));
     //    zombies[1]->SetPosition(DirectX::XMFLOAT3(22.0f, 0.0f, 4.0f));
     //    zombies[2]->SetPosition(DirectX::XMFLOAT3(30.0f, 0.0f, 4.0f));
@@ -82,12 +93,10 @@ void SceneGame::Initialize()
     //    zombies[8]->SetPosition(DirectX::XMFLOAT3(20.0f, 0.0f, 15.0f));
     //    zombies[9]->SetPosition(DirectX::XMFLOAT3(25.0f, 0.0f, 15.0f));
     //    zombies[10]->SetPosition(DirectX::XMFLOAT3(35.0f, 0.0f, 15.0f));
-
     //    for (int i = 0; i < 11; ++i)
     //    {
     //        zombies[i]->AddStart(zombies[i]);
     //    }
-
     //    ItemKey* items[3];
     //    for (int i = 0; i < 3; ++i)
     //    {
@@ -98,56 +107,8 @@ void SceneGame::Initialize()
     //    items[0]->SetPosition(DirectX::XMFLOAT3(15.0f, 0.0f, 15.0f));
     //    items[1]->SetPosition(DirectX::XMFLOAT3(44.0f, 0.0f, 4.0f));
     //    items[2]->SetPosition(DirectX::XMFLOAT3(3.0f, 0.0f, 13.5f));
-
     //    break;
     //}
-
-    //case 1:
-    //{
-    //    PoisonZombie* poisonZombie = new PoisonZombie();
-    //    poisonZombie->SetPosition(DirectX::XMFLOAT3(30.0f, 0.0f, 1.5f));
-    //    enemyManager.Register(poisonZombie);
-
-    //    Zombie* zombies[10];
-    //    for (int i = 0; i < 10; ++i)
-    //    {
-    //        zombies[i] = new Zombie();
-    //        enemyManager.Register(zombies[i]);
-    //    }
-
-    //    zombies[0]->SetPosition(DirectX::XMFLOAT3(38.0f, 0.0f, 26.0f));
-    //    zombies[1]->SetPosition(DirectX::XMFLOAT3(20.0f, 0.0f, 25.0f));
-    //    zombies[2]->SetPosition(DirectX::XMFLOAT3(6.0f, 0.0f, 25.0f));
-    //    zombies[3]->SetPosition(DirectX::XMFLOAT3(8.0f, 0.0f, 18.0f));
-    //    zombies[4]->SetPosition(DirectX::XMFLOAT3(25.0f, 0.0f, 9.0f));
-    //    zombies[5]->SetPosition(DirectX::XMFLOAT3(34.0f, 0.0f, 9.0f));
-    //    zombies[6]->SetPosition(DirectX::XMFLOAT3(49.0f, 0.0f, 13.5f));
-    //    zombies[7]->SetPosition(DirectX::XMFLOAT3(15.0f, 0.0f, 15.0f));
-    //    zombies[8]->SetPosition(DirectX::XMFLOAT3(36.0f, 0.0f, 1.5f));
-    //    zombies[9]->SetPosition(DirectX::XMFLOAT3(33.0f, 0.0f, 1.5f));
-
-    //    for (int i = 0; i < 10; ++i)
-    //    {
-    //        zombies[i]->AddStart(zombies[i]);
-    //    }
-
-    //    ItemKey* items[3];
-    //    for (int i = 0; i < 3; ++i)
-    //    {
-    //        items[i] = new ItemKey();
-    //        items[i]->SetAngle({ DirectX::XMConvertToRadians(90), DirectX::XMConvertToRadians(90), DirectX::XMConvertToRadians(90) });
-    //        itemManager.Register(items[i]);
-    //    }
-    //    items[0]->SetPosition(DirectX::XMFLOAT3(33.0f, 0.0f, 3.0f));
-    //    items[1]->SetPosition(DirectX::XMFLOAT3(8.0f, 0.0f, 18.0f));
-    //    items[2]->SetPosition(DirectX::XMFLOAT3(38.0f, 0.0f, 26.0f));
-    //    break;
-    //}
-    //case 2:
-    //{
-    //    break;
-    //}
-
     //for (int i = 0; i < 3; ++i)
     //{
     //    spotLights[i] = new Light(LightType::Spot);
@@ -169,54 +130,21 @@ void SceneGame::Initialize()
         {
             player->model,
             stageMain->GetModel(),
-            //gun->GetModel(),
-            //enemyManager.GetEnemy(0)->GetModel(),
-            //enemyManager.GetEnemy(1)->GetModel(),
-            //enemyManager.GetEnemy(2)->GetModel(),
-            //enemyManager.GetEnemy(3)->GetModel(),
-            //enemyManager.GetEnemy(4)->GetModel(),
-            //enemyManager.GetEnemy(5)->GetModel(),
-            //enemyManager.GetEnemy(6)->GetModel(),
-            //enemyManager.GetEnemy(7)->GetModel(),
-            //enemyManager.GetEnemy(8)->GetModel(),
-            //enemyManager.GetEnemy(9)->GetModel(),
-            //enemyManager.GetEnemy(10)->GetModel(),
-            //itemManager.GetItem(0)->GetModel(),
-            //itemManager.GetItem(1)->GetModel(),
-            //itemManager.GetItem(2)->GetModel(),
+            slime->GetModel(),
+            slime2->GetModel(),
         };
 
         for (Model* model : list)
         {
-            shadowmapRenderer->RegisterRenderModel(model);
-            sceneRenderer->RegisterRenderModel(model);
-            const ModelResource* resource = model->GetResource();
-            for (const ModelResource::Material& material : resource->GetMaterials())
-            {
-                ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
-                mat.shaderId = static_cast<int>(ModelShaderId::Phong);
-            }
-        }
-    }
-    else
-    {
-        Model* list[] =
-        {
-            player->model,
-            stageMain->GetModel(),
-            gun->GetModel(),
-        };
-
-        for (Model* model : list)
-        {
-            shadowmapRenderer->RegisterRenderModel(model);
-            sceneRenderer->RegisterRenderModel(model);
-            const ModelResource* resource = model->GetResource();
-            for (const ModelResource::Material& material : resource->GetMaterials())
-            {
-                ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
-                mat.shaderId = static_cast<int>(ModelShaderId::Phong);
-            }
+            RegisterRenderModel(model);
+            //shadowmapRenderer->RegisterRenderModel(model);
+            //sceneRenderer->RegisterRenderModel(model);
+            //const ModelResource* resource = model->GetResource();
+            //for (const ModelResource::Material& material : resource->GetMaterials())
+            //{
+            //    ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
+            //    mat.shaderId = static_cast<int>(ModelShaderId::Phong);
+            //}
         }
     }
 
@@ -257,6 +185,8 @@ void SceneGame::Initialize()
         LightManager::Instance().Register(light);
     }
 
+    meta = new Meta(player.get(), &enemyManager);
+
     bgm = Audio::Instance().LoadAudioSource("Data/Audio/zombie.wav");
     heri = Audio::Instance().LoadAudioSource("Data/Audio/heri1.wav");
     bgm->Play(true);
@@ -275,6 +205,7 @@ void SceneGame::Finalize()
 
     LightManager::Instance().Clear();
 
+    instance = nullptr;
 
     shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
@@ -310,9 +241,6 @@ void SceneGame::Update(float elapsedTime)
     //if (player->GetHealth() <= 0)  deadAlpha += 0.015f;
     //if (deadAlpha >= 1.5f)  SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
 
-
-    // 銃更新処理
-    gun->Update(elapsedTime);
 
     // エネミー更新処理
     EnemyManager::Instance().Update(elapsedTime);
@@ -423,7 +351,7 @@ void SceneGame::Render()
     // 2DデバッグGUI描画
     {
          player->DrawDebugGUI();
-         //EnemyManager::Instance().DrawDebugGUI();
+         EnemyManager::Instance().DrawDebugGUI();
 
          //StageManager::Instance().GetStage(0)->DrawDebugGUI();
     }
@@ -543,6 +471,25 @@ void SceneGame::RenderEnemyGauge(ID3D11DeviceContext* dc,
             0,
             1, 0, 0, 1);
     }
+}
+
+void SceneGame::RegisterRenderModel(Model* model)
+{
+    shadowmapRenderer->RegisterRenderModel(model);
+    sceneRenderer->RegisterRenderModel(model);
+    const ModelResource* resource = model->GetResource();
+    for (const ModelResource::Material& material : resource->GetMaterials())
+    {
+        ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
+        mat.shaderId = static_cast<int>(ModelShaderId::Phong);
+    }
+}
+
+void SceneGame::UnregisterRenderModel(Model* model)
+{
+    shadowmapRenderer->UnregisterRenderModel(model);
+    sceneRenderer->UnregisterRenderModel(model);
+
 }
 
 

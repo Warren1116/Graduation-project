@@ -9,8 +9,8 @@
 #include "EnemyManager.h"
 #include "Camera.h"
 #include "Graphics\LightManager.h"
-#include "TutorialZombie.h"
-#include "TitleZombie.h"
+//#include "TutorialZombie.h"
+//#include "TitleZombie.h"
 #include "StageMain.h"
 
 // 初期化
@@ -25,14 +25,14 @@ void SceneTitle::Initialize()
 	// カメラコントローラー初期化
 	cameraController = std::make_unique<CameraController>();
 
-	// エネミー初期化
-	EnemyManager& enemyManager = EnemyManager::Instance();
-	for (int i = 0; i < 2; ++i)
-	{
-		TitleZombie* zombie = new TitleZombie();
-		zombie->SetPosition(DirectX::XMFLOAT3(i * 3.0f, 0, 5.0f));
-		enemyManager.Register(zombie);
-	}
+	//// エネミー初期化
+	//EnemyManager& enemyManager = EnemyManager::Instance();
+	//for (int i = 0; i < 2; ++i)
+	//{
+	//	TitleZombie* zombie = new TitleZombie();
+	//	zombie->SetPosition(DirectX::XMFLOAT3(i * 3.0f, 0, 5.0f));
+	//	enemyManager.Register(zombie);
+	//}
 
 	//	各種レンダラー生成
 	{

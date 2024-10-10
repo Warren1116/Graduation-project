@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include "BaseRenderer.h"
 #include "Graphics/Model.h"
 
@@ -20,5 +21,6 @@ public:
 	void ClearRenderModel();
 
 protected:
-	std::vector<Model*>	renderModels; // 描画モデルリスト
+	//std::vector<Model*>	renderModels; // 描画モデルリスト
+	std::unordered_set<Model*> renderModels;
 };

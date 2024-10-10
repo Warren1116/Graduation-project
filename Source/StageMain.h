@@ -50,7 +50,7 @@ public:
 
 	Model* GetModel() { return model; }
 
-	void SetEnemyObject(int index);
+	//void SetEnemyObject(int index);
 
 private:
 	// s—ñXV

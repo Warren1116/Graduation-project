@@ -128,7 +128,7 @@ void ItemAmmo::CollisionItemVsCrossHair()
 		{
 			Player& player = Player::Instance();
 			player.SetHaveAmmoNum(player.GetHaveAmmoNum() + 7);
-			player.ammo->Play(false);
+			//player.ammo->Play(false);
 
 			// ƒAƒCƒeƒ€”jŠü
 			okDestroy = true;

@@ -12,7 +12,8 @@
 
 
 // 垂直同期間隔設定
-static const int syncInterval = 1;
+//static const int syncInterval = 1;
+static const int syncInterval = 0;
 
 // コンストラクタ
 Framework::Framework(HWND hWnd)
@@ -135,10 +136,11 @@ int Framework::Run()
 			timer.Tick();
 			CalculateFrameStats();
 
-			float elapsedTime = syncInterval == 0
-				? timer.TimeInterval()
-				: syncInterval / 60.0f
-				;
+			//float elapsedTime = syncInterval == 0
+				//? timer.TimeInterval()
+				//: syncInterval / 60.0f
+				//;
+			float elapsedTime = timer.TimeInterval();
 			Update(elapsedTime);
 			Render(elapsedTime);
 		}

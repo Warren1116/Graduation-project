@@ -44,10 +44,17 @@ public:
 	// エネミー削除
 	void Remove(Enemy* enemy);
 
+	// 付与したIDからエネミーを取得
+	Enemy* GetEnemyFromId(int id);
+
 private:
 	// エネミー同士の衝突処理
 	void CollisionEnemyVsEnemies();
 	std::vector<Enemy*> enemies;
 	std::set<Enemy*> removes;
+
+public:
+	int identity = 0;	// 付与するIDの値(この値にMetaAI::Identity::Enemyを加算して付与する)
+
 };
 

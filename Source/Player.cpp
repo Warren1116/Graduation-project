@@ -8,14 +8,12 @@
 #include "Collision.h"
 #include "StageMain.h"
 #include "StageManager.h"
+#include "ProjectileStraight.h"
+#include "SceneGame.h"
+#include "ProjectileWall.h"
 
-static Player* instance = nullptr;
 
-// インスタンス取得
-Player& Player::Instance()
-{
-	return *instance;
-}
+Player* Player::instance = nullptr;
 
 // コンストラクタ
 Player::Player(bool flag)
@@ -39,8 +37,8 @@ Player::Player(bool flag)
 
 	outOfBullets = Audio::Instance().LoadAudioSource("Data/Audio/Tamagire.wav");
 	walk = Audio::Instance().LoadAudioSource("Data/Audio/walk.wav");
-	key = Audio::Instance().LoadAudioSource("Data/Audio/keypick.wav");
-	ammo = Audio::Instance().LoadAudioSource("Data/Audio/ammopick.wav");
+	//key = Audio::Instance().LoadAudioSource("Data/Audio/keypick.wav");
+
 
 	// 待機ステートへ遷移
 	TransitionIdleState();
@@ -123,6 +121,9 @@ void Player::Update(float elapsedTime)
 		break;
 	}
 	
+	//弾丸更新処理
+	projectileManager.Update(elapsedTime);
+
 	// 速度処理更新
 	UpdateVelocity(elapsedTime);
 
@@ -131,7 +132,7 @@ void Player::Update(float elapsedTime)
 
 	// プレイヤーとエネミーとの衝突処理
 	CollisionPlayerVsEnemies();
-
+	CollisionProjectileVsEnemies();
 	// オブジェクト行列を更新
 	UpdateTransform();
 
@@ -244,8 +245,8 @@ void Player::CollisionPlayerVsEnemies()
 				enemy->ApplyDamage(1, 0.0f);
 				DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
 				enemyPos.y += enemy->GetHeight();
-				if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
-				else blowEffect->Play({ enemyPos.x, enemyPos.y -= enemy->GetHeight() * 0.5f, enemyPos.z });
+				//if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
+				//else blowEffect->Play({ enemyPos.x, enemyPos.y -= enemy->GetHeight() * 0.5f, enemyPos.z });
 			}
 			else
 			{
@@ -313,8 +314,8 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
 					{
 						DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
 						enemyPos.y += enemy->GetHeight() * 0.5f;
-						if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
-						else blowEffect->Play(enemyPos);
+						//if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
+						//else blowEffect->Play(enemyPos);
 					}
 				}
 			}
@@ -359,11 +360,86 @@ void Player::InputProjectile()
 		pos.z = position.z;
 
 		ProjectileStraight* projectile = new ProjectileStraight(&projectileManager);
+
 		projectile->Launch(dir, pos);
 		//projectileManager.Register(projectile);
+
+		SceneGame& sceneGame = SceneGame::Instance();
+
+		if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+		{
+			sceneGame.RegisterRenderModel(projectile->GetModel());
+
+		}
+
+		
 	}
 
 }
+
+void Player::CollisionProjectileVsEnemies()
+{
+	EnemyManager& enemyManager = EnemyManager::Instance();
+
+	//すべての弾丸とすべての敵を総当たりで衝突処理
+	int projectileCount = projectileManager.GetProjectileCount();
+	int enemyCount = enemyManager.GetEnemyCount();
+	for (int i = 0; i < projectileCount; ++i)
+	{
+		Projectile* projectile = projectileManager.GetProjectile(i);
+
+		for (int j = 0; j < enemyCount; ++j)
+		{
+			Enemy* enemy = enemyManager.GetEnemy(j);
+
+			//衝突処理
+			DirectX::XMFLOAT3 outPosition;
+			if (Collision::IntersectSphereVsCylinder(
+				projectile->GetPosition(),
+				projectile->GetRadius(),
+				enemy->GetPosition(),
+				enemy->GetRadius(),
+				enemy->GetHeight(),
+				outPosition))
+			{
+				//ダメージを与える
+				if (enemy->ApplyDamage(1, 1.0f))
+				{
+					//吹き飛ばす
+					{
+						DirectX::XMFLOAT3 impulse;
+						const float power = 10.0f;
+						const DirectX::XMFLOAT3& e = enemy->GetPosition();
+						const DirectX::XMFLOAT3& p = projectile->GetPosition();
+
+						float vx = e.x - p.x;
+						float vz = e.z - p.z;
+						float lengthXZ = sqrtf(vx * vx + vz * vz);
+						vx /= lengthXZ;
+						vz /= lengthXZ;
+
+						impulse.x = vx * power;
+						impulse.y = power * 0.5f;
+						impulse.z = vz * power;
+						enemy->AddImpulse(impulse);
+					}
+
+					//エフェクト生成
+					{
+						DirectX::XMFLOAT3 e = enemy->GetPosition();
+						e.y += enemy->GetHeight() * 0.5f;
+						//hitEffect->Play(e);
+					}
+					//弾丸破棄
+					projectile->Destroy();
+					SceneGame::Instance().UnregisterRenderModel(projectile->GetModel());
+				}
+			}
+		}
+	}
+
+}
+
 
 // 攻撃入力処理
 bool Player::InputAttack()
@@ -511,11 +587,12 @@ void Player::TransitionClimbWallState()
 
 void Player::UpdateClimbWallState(float elapsedTime)
 {
-	InputMove(elapsedTime);
 	if (!hitWall)
 	{
+		//model->PlayAnimation(Anim_ClimbUpWall, false);
 		TransitionMoveState();
 	}
+	InputMove(elapsedTime);
 
 }
 
@@ -655,7 +732,7 @@ bool Player::InputJump()
 {
 	// ボタン入力でジャンプ（ジャンプ回数制限付き）
 	GamePad& gamePad = Input::Instance().GetGamePad();
-	if (gamePad.GetButtonDown() & GamePad::BTN_A)
+	if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
 	{
 		if (jumpCount < jumpLimit)
 		{
@@ -701,12 +778,24 @@ void Player::UpdateLandState(float elapsedTime)
 	}
 }
 
+void Player::TransitionSwingState()
+{
+	state = State::Swing;
+
+}
+
+void Player::UpdateSwingState(float elapsedTime)
+{
+}
+
 
 
 // 描画処理
 void Player::Render(const RenderContext& rc, ModelShader* shader)
 {
-	goal->Render(rc, shader);
+	//projectileManager.Render(rc, shader);
+
+	//goal->Render(rc, shader);
 }
 
 // デバッグ用GUI描画
