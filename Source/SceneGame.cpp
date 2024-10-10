@@ -14,6 +14,7 @@
 #include "SceneLoading.h"
 #include "ProjectileStraight.h"
 #include "ProjectileManager.h"
+#include "EnemyPeople.h"
 
 SceneGame* SceneGame::instance = nullptr;
 
@@ -58,6 +59,18 @@ void SceneGame::Initialize()
     // エネミー初期化
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
+
+    // スライム（ステートマシン用）
+    EnemyPeople* slime = new EnemyPeople();
+    slime->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
+    slime->SetTerritory(slime->GetPosition(), 10.0f);
+    enemyManager.Register(slime);
+
+    //	TODO_05_01通信相手用に１匹増やす
+    EnemyPeople* slime2 = new EnemyPeople();
+    slime2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
+    slime2->SetTerritory(slime2->GetPosition(), 10.0f);
+    enemyManager.Register(slime2);
 
     //switch (stageMain->GetStageNum())
     //{
@@ -117,6 +130,8 @@ void SceneGame::Initialize()
         {
             player->model,
             stageMain->GetModel(),
+            slime->GetModel(),
+            slime2->GetModel(),
         };
 
         for (Model* model : list)
@@ -169,6 +184,8 @@ void SceneGame::Initialize()
         light->SetPosition({ 0,3,0 });
         LightManager::Instance().Register(light);
     }
+
+    meta = new Meta(player.get(), &enemyManager);
 
     bgm = Audio::Instance().LoadAudioSource("Data/Audio/zombie.wav");
     heri = Audio::Instance().LoadAudioSource("Data/Audio/heri1.wav");
@@ -334,7 +351,7 @@ void SceneGame::Render()
     // 2DデバッグGUI描画
     {
          player->DrawDebugGUI();
-         //EnemyManager::Instance().DrawDebugGUI();
+         EnemyManager::Instance().DrawDebugGUI();
 
          //StageManager::Instance().GetStage(0)->DrawDebugGUI();
     }
@@ -466,6 +483,13 @@ void SceneGame::RegisterRenderModel(Model* model)
         ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
         mat.shaderId = static_cast<int>(ModelShaderId::Phong);
     }
+}
+
+void SceneGame::UnregisterRenderModel(Model* model)
+{
+    shadowmapRenderer->UnregisterRenderModel(model);
+    sceneRenderer->UnregisterRenderModel(model);
+
 }
 
 

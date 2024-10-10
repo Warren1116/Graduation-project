@@ -120,8 +120,6 @@ protected:
 	//TODO 02_01 他クラスからenum class Stateにアクセスできるように修飾子を変更
 	//private:
 public:
-#ifdef USESTATEMACHINE3
-
 	enum class State
 	{
 		Search,
@@ -150,20 +148,12 @@ public:
 		Called,
 	};
 
-#endif // USESTATEMACHINE3
 	float				stateTimer = 0.0f;
-
 
 
 private:
 	Model* model = nullptr;
-#ifdef USESTATEMACHINE2
-	State				state = State::Wander;
-#endif // USESTATEMACHINE2
-
-#ifdef USESTATEMACHINE3
 	State				state = State::Search;
-#endif // USESTATEMACHINE2
 
 	DirectX::XMFLOAT3	targetPosition = { 0.0f,0.0f,0.0f };
 	DirectX::XMFLOAT3	territoryOrigin = { 0.0f,0.0f,0.0f };
@@ -173,6 +163,7 @@ private:
 
 	float				searchRange = 5.0f;
 	float				attackRange = 1.5f;
+
 	//2週目追加
 	StateMachine* stateMachine = nullptr;
 };

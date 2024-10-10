@@ -5,7 +5,7 @@ class ActionBase;
 class JudgmentBase;
 class NodeBase;
 class BehaviorData;
-class PoisonZombie;
+class EnemyBlueSlime;
 
 // ビヘイビアツリー
 class BehaviorTree
@@ -22,8 +22,8 @@ public:
 	};
 
 public:
-	BehaviorTree() :root(nullptr) , owner(nullptr) {}
-	BehaviorTree(PoisonZombie* enemy) :root(nullptr) , owner(enemy){}
+	BehaviorTree() :root(nullptr), owner(nullptr) {}
+	BehaviorTree(EnemyBlueSlime* enemy) :root(nullptr), owner(enemy) {}
 	~BehaviorTree();
 
 	// 実行ノードを推論する
@@ -36,12 +36,12 @@ public:
 	void AddNode(std::string parentName, std::string entryName, int priority, SelectRule selectRule, JudgmentBase* judgment, ActionBase* action);
 
 	// 実行
-	NodeBase* Run(NodeBase* actionNode, BehaviorData* data,float elapsedTime);
+	NodeBase* Run(NodeBase* actionNode, BehaviorData* data, float elapsedTime);
 private:
 	// ノード全削除
 	void NodeAllClear(NodeBase* delNode);
 private:
 	// ルートノード
 	NodeBase* root;
-	PoisonZombie* owner;
+	EnemyBlueSlime* owner;
 };

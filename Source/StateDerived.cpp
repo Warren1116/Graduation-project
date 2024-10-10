@@ -1,20 +1,18 @@
 #include "StateDerived.h"
 #include "Player.h"
 #include "Mathf.h"
+#include "MetaAI.h"
 
-// TODO 02_03 Stateを基底クラスとして各種Stateクラスを用意する。
+// Stateを基底クラスとして各種Stateクラスを用意する。
 // Wanderはサンプルとしてすでに記述済み
 // 各種Enter関数の内容は各Transition○○State関数を参考に
 // 各種Execute関数の内容は各Update○○State関数を参考に
 
-//-------------//
-// WanderState //
-//-------------//
 // 徘徊ステートに入った時のメソッド
 void WanderState::Enter()
 {
 	owner->SetRandomTargetPosition();
-	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Walk), true);
+	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::WalkFWD), true);
 }
 
 // 徘徊ステートで実行するメソッド
@@ -32,8 +30,8 @@ void WanderState::Execute(float elapsedTime)
 	if (distSq < radius * radius)
 	{
 		// 待機ステートへ遷移
-		// ChangeStateクラスでStateを切り替える
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::Idle));
+		// ChangeStateクラスで二層目のStateを切り替える
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Search::Idle));
 	}
 	// 目的地点へ移動
 	owner->MoveToTarget(elapsedTime, 0.5f);
@@ -41,8 +39,8 @@ void WanderState::Execute(float elapsedTime)
 	if (owner->SearchPlayer())
 	{
 		// 見つかったら追跡ステートへ遷移
-		// ChangeStateクラスでStateを切り替える
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::Pursuit));
+		// ChangeStateクラスで一層目のStateを切り替える
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Battle));
 	}
 
 }
@@ -50,62 +48,61 @@ void WanderState::Execute(float elapsedTime)
 // 徘徊ステートから出ていくときのメソッド
 void WanderState::Exit()
 {
-
+	//書かなくてよい
 }
 
-//-----------//
-// IdleState //
-//-----------//
+
 // 待機ステートに入った時のメソッド
 void IdleState::Enter()
 {
+	// 各種Enter関数の内容は各Transition○○State関数を参考に
+	// タイマーをランダム設定
 	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::IdleNormal), true);
-
-	// タイマーをランダムで設定
 	owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
 }
 
 // 待機ステートで実行するメソッド
 void IdleState::Execute(float elapsedTime)
 {
-	float stateTimer = owner->GetStateTimer();
-	stateTimer -= elapsedTime;
-	owner->SetStateTimer(stateTimer);
+	// 各種Execute関数の内容は各Update○○State関数を参考に
+	// タイマー処理
+	owner->SetStateTimer(owner->GetStateTimer() - elapsedTime);
 
-	// 待機時間が経過したら徘徊ステートへ遷移
-	if (owner->GetStateTimer() <= 0.0f)
-	{
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::Wander));
-	}
+	// 待機時間が経過したとき徘徊ステートへ遷移
+	if (owner->GetStateTimer() < 0.0f)
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Search::Wander));
 
-	// プレイヤーが見つかったら追跡ステートへ遷移
+	// プレイヤーが見つかったとき追跡ステートへ遷移
 	if (owner->SearchPlayer())
-	{
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::Pursuit));
-	}
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Battle));
 }
 
 // 待機ステートから出ていくときのメソッド
 void IdleState::Exit()
 {
-
+	//書かなくてよい
 }
 
-//--------------//
-// PursuitState //
-//--------------//
+
 // 追跡ステートに入った時のメソッド
 void PursuitState::Enter()
 {
-	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Walk), true);
-
-	// 数秒間追跡するタイマーをランダム設定
+	// 各種Enter関数の内容は各Transition○○State関数を参考に
+	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::WalkFWD), true);
 	owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
+
+	// TODO 05_06 敵を発見したんで仲間を呼ぶ
+	// エネミーからメタAIへ MsgCallHelp を送信する。
+	Meta::Instance().SendMessaging(
+		owner->GetId(),
+		static_cast<int>(Meta::Identity::Meta),
+		MESSAGE_TYPE::MsgCallHelp);
 }
 
 // 追跡ステートで実行するメソッド
 void PursuitState::Execute(float elapsedTime)
 {
+	// 各種Execute関数の内容は各Update○○State関数を参考に
 	// 目標地点をプレイヤー位置に設定
 	owner->SetTargetPosition(Player::Instance().GetPosition());
 
@@ -113,15 +110,11 @@ void PursuitState::Execute(float elapsedTime)
 	owner->MoveToTarget(elapsedTime, 1.0);
 
 	// タイマー処理
-	float stateTimer = owner->GetStateTimer();
-	stateTimer -= elapsedTime;
-	owner->SetStateTimer(stateTimer);
+	owner->SetStateTimer(owner->GetStateTimer() - elapsedTime);
 
 	// 追跡時間が経過したとき待機ステートへ遷移
 	if (owner->GetStateTimer() < 0.0f)
-	{
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::Idle));
-	}
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Search));
 
 	float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
 	float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
@@ -129,121 +122,216 @@ void PursuitState::Execute(float elapsedTime)
 	float dist = sqrtf(vx * vx + vy * vy + vz * vz);
 
 	// 攻撃範囲に入ったとき攻撃ステートへ遷移
-	if (dist < owner->GetAttackRange())
+	if (owner->GetAttackRange() > dist)
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Attack));
+}
+
+// 追跡ステートから出ていくときのメソッド
+void PursuitState::Exit()
+{
+	//書かなくてよい
+}
+
+// 攻撃ステートに入った時のメソッド
+void AttackState::Enter()
+{
+	// 攻撃権がなければ
+	if (!owner->GetAttackFlg())
 	{
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::HandAttack));
+		// 攻撃権をメタAIから求める
+		// エネミーからメタAIへ MsgAskAttackRight を送信する
+		Meta::Instance().SendMessaging(
+			owner->GetId(),
+			static_cast<int>(Meta::Identity::Meta),
+			MESSAGE_TYPE::MsgAskAttackRight);
+	}
+	// 攻撃権があればモーション再生開始
+	if (owner->GetAttackFlg())
+	{
+		owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Attack01), false);
 	}
 }
 
-// 追跡メソッドから出ていくときのメソッド
-void PursuitState::Exit()
+// 攻撃ステートで実行するメソッド
+void AttackState::Execute(float elapsedTime)
 {
-	
+	// 攻撃権があるとき
+	if (owner->GetAttackFlg())
+	{
+		// 攻撃モーションが終わっていれば追跡へ遷移
+		if (!owner->GetModel()->IsPlayAnimation())
+		{
+			owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Standby));
+		}
+	}
+	else
+	{
+		// 攻撃権がないときステート変更
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Standby));
+	}
 }
 
-//AttackIdle
-//戦闘待機ステートに入った時のメソッド
-//
-void AttackIdleState::Enter()
+// 攻撃ステートから出ていくときのメソッド
+void AttackState::Exit()
 {
-	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackIdle), false);
+	if (owner->GetAttackFlg())
+	{
+		// TODO 05_07 攻撃が終わったとき攻撃権の放棄
+		// 攻撃フラグをfalseに設定
+		// エネミーからメタAIへ MsgChangeAttackRight を送信する
+		owner->SetAttackFlg(false);
+		Meta::Instance().SendMessaging(
+			owner->GetId(),
+			static_cast<int>(Meta::Identity::Meta),
+			MESSAGE_TYPE::MsgChangeAttackRight);
+	}
+}
 
+// デストラクタ
+SearchState::~SearchState()
+{
+	for (State* state : subStatePool)
+	{
+		delete state;
+	}
+	subStatePool.clear();
+}
+
+// サーチステートに入った時のメソッド
+void SearchState::Enter()
+{
+	SetSubState(static_cast<int>(EnemyPeople::Search::Idle));
+}
+
+// サーチステートで実行するメソッド
+void SearchState::Execute(float elapsedTime)
+{
+	subState->Execute(elapsedTime);
+}
+
+// サーチステートから出ていくときのメソッド
+void SearchState::Exit()
+{
+
+}
+
+BattleState::~BattleState()
+{
+	for (State* state : subStatePool)
+	{
+		delete state;
+	}
+	subStatePool.clear();
+}
+
+void BattleState::Enter()
+{
+	SetSubState(static_cast<int>(EnemyPeople::Search::Wander));
+}
+
+void BattleState::Execute(float elapsedTime)
+{
+	subState->Execute(elapsedTime);
+}
+
+void BattleState::Exit()
+{
+}
+
+// TODO 05_03 メタAIからメッセージを受信したときに呼ばれるステートを追加
+// デストラクタ
+RecieveState::~RecieveState()
+{
+	for (State* state : subStatePool)
+	{
+		delete state;
+	}
+	subStatePool.clear();
+}
+
+// データ受信したときのステート
+void RecieveState::Enter()
+{
+	// 初期ステートを設定
+	SetSubState(static_cast<int>(EnemyPeople::Recieve::Called));
+}
+
+// サーチステートで実行するメソッド
+void RecieveState::Execute(float elapsedTime)
+{
+	// 子ステート実行
+	subState->Execute(elapsedTime);
+	// 
+	if (owner->SearchPlayer())
+	{
+		// Battleステートへ遷移
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Battle));
+	}
+}
+
+// サーチステートから出ていくときのメソッド
+void RecieveState::Exit()
+{
+}
+
+// TODO 05_03 他のエネミーから呼ばれたときのステートを追加
+void CalledState::Enter()
+{
+	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::WalkBWD), true);
+	owner->SetStateTimer(5.0f);
+}
+
+// コールドステートで実行するメソッド
+void CalledState::Execute(float elapsedTime)
+{
+	// タイマー処理
+	float timer = owner->GetStateTimer();
+	timer -= elapsedTime;
+	owner->SetStateTimer(timer);
+	if (timer < 0.0f)
+	{
+		// 徘徊ステートへ遷移
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Search));
+	}
+	// 対象をプレイヤー地点に設定
+	owner->SetTargetPosition(Player::Instance().GetPosition());
+	owner->MoveToTarget(elapsedTime, 1.0f);
+}
+
+// コールドステートから出ていくときのメソッド
+void CalledState::Exit()
+{
+}
+
+// 戦闘待機ステートに入った時のメソッド
+void StandbyState::Enter()
+{
+	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::IdleBattle), false);
 }
 
 // 戦闘待機ステートで実行するメソッド
-void AttackIdleState::Execute(float elapsedTime)
+void StandbyState::Execute(float elapsedTime)
 {
-	// 離れ過ぎたら追跡ステート
-
-	// 一定範囲内なら毒攻撃
-	// 更に近ければジャンプ攻撃か追跡ステート
+	// 攻撃権があるとき
+	if (owner->GetAttackFlg())
+	{
+		// 攻撃権があるときステート変更
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Attack));
+	}
+	// 目標地点をプレイヤー位置に設定
+	owner->SetTargetPosition(Player::Instance().GetPosition());
+	float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
+	float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
+	float vz = owner->GetTargetPosition().z - owner->GetPosition().z;
+	float dist = sqrtf(vx * vx + vy * vy + vz * vz);
+	if (dist > owner->GetAttackRange())
+	{
+		// 攻撃範囲から出たら追跡ステートへ遷移
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Pursuit));
+	}
 }
 
 // 戦闘待機ステートから出ていくときのメソッド
-void AttackIdleState::Exit()
+void StandbyState::Exit()
 {
 }
-
-
-//
-// 毒攻撃に入った時のメソッド 
-//
-void GunState::Enter()
-{
-	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GunAttack), false);
-
-}
-
-// 毒攻撃ステートで実行するメソッド
-void GunState::Execute(float elapsedTime)
-{
-	// モーションが終了したとき追跡ステートへ移行
-	if (!owner->GetModel()->IsPlayAnimation())
-	{
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::AttackIdle));
-
-	}
-}
-
-// 毒攻撃から出ていくときのメソッド
-void GunState::Exit()
-{
-	
-}
-
-//
-// 手刀攻撃に入った時のメソッド
-//
-void HandState::Enter()
-{
-	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackIdle), false);
-
-}
-
-// 手刀攻撃ステートで実行するメソッド
-void HandState::Execute(float elapsedTime)
-{
-	// モーションが終了したとき追跡ステートへ移行
-	if (!owner->GetModel()->IsPlayAnimation())
-	{
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::AttackIdle));
-
-	}
-}
-
-// 手刀攻撃から出ていくときのメソッド
-void HandState::Exit()
-{
-}
-
-//
-// ジャンプ攻撃ステートに入った時のメソッド
-//
-void JumpState::Enter()
-{
-	owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::JumpAttack), false);
-}
-
-// ジャンプ攻撃で実行するメソッド
-void JumpState::Execute(float elapsedTime)
-{
-	// 目標地点をプレイヤー位置に設定
-	owner->SetTargetPosition(Player::Instance().GetPosition());
-
-	// 目的地点へ移動
-	owner->MoveToTarget(elapsedTime, 1.0);
-
-
-	// モーションが終了したとき追跡ステートへ移行
-	if (!owner->GetModel()->IsPlayAnimation())
-	{
-		owner->GetStateMachin()->ChangeState(static_cast<int>(PoisonZombie::State::AttackIdle));
-
-	}
-}
-
-// ジャンプ攻撃から出ていくときのメソッド
-void JumpState::Exit()
-{
-}
-

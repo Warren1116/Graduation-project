@@ -159,6 +159,7 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		//SearchAlgorithm::Instance().SearchRender(dc, rc.view, rc.projection, stage);
 
 		Player::Instance().DrawDebugPrimitive();
+		EnemyManager::Instance().DrawDebugPrimitive();
 		
 	}
 

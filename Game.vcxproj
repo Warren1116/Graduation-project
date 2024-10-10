@@ -131,6 +131,7 @@
     <ClInclude Include="Source\Effect.h" />
     <ClInclude Include="Source\EffectManager.h" />
     <ClInclude Include="Source\Enemy.h" />
+    <ClInclude Include="Source\EnemyBlueSlime.h" />
     <ClInclude Include="Source\EnemyManager.h" />
     <ClInclude Include="Source\EnemyPeople.h" />
     <ClInclude Include="Source\Framework.h" />
@@ -168,11 +169,11 @@
     <ClInclude Include="Source\JudgmentDerived.h" />
     <ClInclude Include="Source\Logger.h" />
     <ClInclude Include="Source\Mathf.h" />
+    <ClInclude Include="Source\MetaAI.h" />
     <ClInclude Include="Source\Misc.h" />
     <ClInclude Include="Source\NodeBase.h" />
     <ClInclude Include="Source\Object.h" />
     <ClInclude Include="Source\Player.h" />
-    <ClInclude Include="Source\PoisonZombie.h" />
     <ClInclude Include="Source\Projectile.h" />
     <ClInclude Include="Source\ProjectileManager.h" />
     <ClInclude Include="Source\ProjectileStraight.h" />
@@ -196,6 +197,8 @@
     <ClInclude Include="Source\StageMain.h" />
     <ClInclude Include="Source\StageManager.h" />
     <ClInclude Include="Source\StageTutorial.h" />
+    <ClInclude Include="Source\StateDerived.h" />
+    <ClInclude Include="Source\StateMachine.h" />
     <ClInclude Include="Source\TitleZombie.h" />
     <ClInclude Include="Source\TutorialZombie.h" />
     <ClInclude Include="Source\WayPoint.h" />
@@ -221,6 +224,7 @@
     <ClCompile Include="Source\Effect.cpp" />
     <ClCompile Include="Source\EffectManager.cpp" />
     <ClCompile Include="Source\Enemy.cpp" />
+    <ClCompile Include="Source\EnemyBlueSlime.cpp" />
     <ClCompile Include="Source\EnemyManager.cpp" />
     <ClCompile Include="Source\EnemyPeople.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
@@ -254,10 +258,10 @@
     <ClCompile Include="Source\Logger.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Mathf.cpp" />
+    <ClCompile Include="Source\MetaAI.cpp" />
     <ClCompile Include="Source\NodeBase.cpp" />
     <ClCompile Include="Source\Object.cpp" />
     <ClCompile Include="Source\Player.cpp" />
-    <ClCompile Include="Source\PoisonZombie.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\ProjectileManager.cpp" />
     <ClCompile Include="Source\ProjectileStraight.cpp" />
@@ -280,6 +284,8 @@
     <ClCompile Include="Source\StageManager.cpp" />
     <ClCompile Include="Source\StageTutorial.cpp" />
     <ClCompile Include="Source\StateBase.cpp" />
+    <ClCompile Include="Source\StateDerived.cpp" />
+    <ClCompile Include="Source\StateMachine.cpp" />
     <ClCompile Include="Source\TitleZombie.cpp" />
     <ClCompile Include="Source\TutorialZombie.cpp" />
     <ClCompile Include="Source\WayPoint.cpp" />

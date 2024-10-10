@@ -225,26 +225,11 @@
     <ClInclude Include="Source\WayPoint.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ActionBase.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActionDerived.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentBase.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentDerived.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\NodeBase.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Object.h">
       <Filter>Source\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PoisonZombie.h">
-      <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\SceneRenderer.h">
       <Filter>Source\Scene</Filter>
@@ -322,6 +307,30 @@
       <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Telegram.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StateDerived.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MetaAI.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyBlueSlime.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentBase.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\JudgmentDerived.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ActionBase.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ActionDerived.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StateMachine.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -497,9 +506,6 @@
     <ClCompile Include="Source\Graphics\Shader\FinalpassShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Source\JudgmentDerived.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Renderer\ModelRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
@@ -508,9 +514,6 @@
     </ClCompile>
     <ClCompile Include="Source\Object.cpp">
       <Filter>Source\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PoisonZombie.cpp">
-      <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp">
       <Filter>Source\Graphics</Filter>
@@ -548,9 +551,6 @@
     <ClCompile Include="Source\BehaviorData.cpp">
       <Filter>Source\System\AI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ActionDerived.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\TitleZombie.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
@@ -570,6 +570,24 @@
       <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\StateBase.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StateDerived.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MetaAI.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyBlueSlime.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\JudgmentDerived.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ActionDerived.cpp">
+      <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StateMachine.cpp">
       <Filter>Source\System\AI</Filter>
     </ClCompile>
   </ItemGroup>

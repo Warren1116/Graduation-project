@@ -10,7 +10,7 @@ public:
 
     void Update(float elapsedTime) override;
 
-    void Render(ID3D11DeviceContext* dc, Shader* shader)override;
+    //void Render(ID3D11DeviceContext* dc, Shader* shader)override;
 
     //“ê’£‚èİ’è
     void SetTerritory(const DirectX::XMFLOAT3& origin, float range);

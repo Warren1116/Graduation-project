@@ -19,6 +19,8 @@
 #include "Renderer/ShadowmapRenderer.h"
 #include "Renderer/SceneRenderer.h"
 #include "Renderer/PostprocessingRenderer.h"
+#include "MetaAI.h"
+
 
 static bool Scenelock = false;
 
@@ -47,6 +49,7 @@ public:
 		const DirectX::XMFLOAT4X4& projection);
 
 	void RegisterRenderModel(Model* model);
+	void UnregisterRenderModel(Model* model);
 
 	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
 	std::unique_ptr<SceneRenderer>			sceneRenderer;
@@ -81,8 +84,10 @@ private:
 
 private:
 	static SceneGame* instance;
-
-
 	Light* spotLights[3];
 	std::unique_ptr<Sprite>		renderSplite;
+
+	//MetaAIオブジェクト追加
+	Meta* meta = nullptr;
+
 };

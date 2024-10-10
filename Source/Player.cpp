@@ -132,7 +132,7 @@ void Player::Update(float elapsedTime)
 
 	// プレイヤーとエネミーとの衝突処理
 	CollisionPlayerVsEnemies();
-
+	CollisionProjectileVsEnemies();
 	// オブジェクト行列を更新
 	UpdateTransform();
 
@@ -245,8 +245,8 @@ void Player::CollisionPlayerVsEnemies()
 				enemy->ApplyDamage(1, 0.0f);
 				DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
 				enemyPos.y += enemy->GetHeight();
-				if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
-				else blowEffect->Play({ enemyPos.x, enemyPos.y -= enemy->GetHeight() * 0.5f, enemyPos.z });
+				//if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
+				//else blowEffect->Play({ enemyPos.x, enemyPos.y -= enemy->GetHeight() * 0.5f, enemyPos.z });
 			}
 			else
 			{
@@ -314,8 +314,8 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
 					{
 						DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
 						enemyPos.y += enemy->GetHeight() * 0.5f;
-						if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
-						else blowEffect->Play(enemyPos);
+						//if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
+						//else blowEffect->Play(enemyPos);
 					}
 				}
 			}
@@ -432,6 +432,7 @@ void Player::CollisionProjectileVsEnemies()
 					}
 					//弾丸破棄
 					projectile->Destroy();
+					SceneGame::Instance().UnregisterRenderModel(projectile->GetModel());
 				}
 			}
 		}

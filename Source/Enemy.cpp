@@ -21,3 +21,8 @@ void Enemy::DrawDebugPrimitive()
 	debugRenderer->DrawCylinder
 	(position, radius, height, DirectX::XMFLOAT4(0, 0, 0, 1));
 }
+
+bool Enemy::OnMessage(const Telegram& msg)
+{
+	return false;
+}

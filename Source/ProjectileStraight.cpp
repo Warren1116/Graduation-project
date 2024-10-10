@@ -69,6 +69,7 @@ void ProjectileStraight::Update(float elapsedTime)
         position.y = hit.position.y;
         position.z = hit.position.z;
 
+        Destroy();
         SceneGame& sceneGame = SceneGame::Instance();
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {

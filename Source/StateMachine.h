@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "StateBase.h"
+#define USESTATEMACHINE3
 class State;
 class HierarchicalState;
 
@@ -19,6 +20,9 @@ public:
     void ChangeState(int newState);
     //  現在のステート番号取得
     int GetStateIndex();
+
+#ifdef USESTATEMACHINE3
+
     //  ステート登録
     void RegisterState(HierarchicalState* state);
     //  2層目ステート変更
@@ -27,10 +31,17 @@ public:
     void RegisterSubState(int index, State* subState);
     HierarchicalState* GetState() { return currentState; }
 
+#endif // USESTATEMACHINE3
+
 private:
+
+#ifdef USESTATEMACHINE3
+
     //  現在のステート
     HierarchicalState* currentState = nullptr;
     //  各ステートを保持する配列
     std::vector<HierarchicalState*> statePool;
+
+#endif // USESTATEMACHINE3
 
 };
