@@ -823,47 +823,61 @@ void Player::UpdateLandState(float elapsedTime)
 void Player::TransitionSwingState()
 {
     state = State::Swing;
-    DirectX::XMFLOAT3 moveVec = GetMoveVec();
-    DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&moveVec);
+    DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+    DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+    forwardVec = DirectX::XMVector3Normalize(forwardVec);
+    upVec = DirectX::XMVector3Normalize(upVec);
 
-    DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+    forwardVec = DirectX::XMVectorScale(forwardVec, 10.0f);
+    upVec = DirectX::XMVectorScale(upVec, 5.0f);
 
     DirectX::XMVECTOR swingDirection = DirectX::XMVectorAdd(forwardVec, upVec);
 
-    swingDirection = DirectX::XMVector3Normalize(swingDirection);
-
     DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position); 
-    SwingPoint = DirectX::XMVectorAdd(SwingPoint, DirectX::XMVectorScale(swingDirection, 10.0f));
+    SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingDirection);
 
     DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
+
 
 }
 
 void Player::UpdateSwingState(float elapsedTime)
 {
+    //　スイングのベクトル
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
     DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
     DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
 
     float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
+    const float ropeLength = 8.0f; 
 
-    const float ropeLength = 3.0f;
+    DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
 
-    float springConstant = 12.0f;
-    float elasticForce = -(springConstant * (currentLength - ropeLength));
-    float dampingFactor = 0.95f;
+    // 仮の重力をセット
+    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -3.0f, 0.0f, 0.0f);
 
-    DirectX::XMVECTOR forceDirection = DirectX::XMVector3Normalize(displacement);
-    DirectX::XMVECTOR force = DirectX::XMVectorScale(forceDirection, elasticForce);
+    // もしロープの長さが設定の長さより大きたら、修正
+    if (currentLength > ropeLength)
+    {
+        float correctionFactor = (currentLength - ropeLength) * 0.5f;
+        DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
+        // 修正した位置を更新
+        Q = DirectX::XMVectorAdd(Q, correction);
+    }
 
+    // velocityに重力を入れる
     DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(force, elapsedTime));
-    velocityVec = DirectX::XMVectorScale(velocityVec, dampingFactor);
+    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
 
-    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(velocityVec, elapsedTime));
+
+    DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection) , ropeDirection));
+
+    // 位置更新
+    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
     DirectX::XMStoreFloat3(&position, newPosition);
 
-    DirectX::XMStoreFloat3(&velocity, velocityVec);
+    // 速力更新
+    DirectX::XMStoreFloat3(&velocity, tangentVelocity);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)

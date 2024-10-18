@@ -187,9 +187,9 @@ void SceneGame::Initialize()
 
     meta = new Meta(player.get(), &enemyManager);
 
-    bgm = Audio::Instance().LoadAudioSource("Data/Audio/zombie.wav");
-    heri = Audio::Instance().LoadAudioSource("Data/Audio/heri1.wav");
-    bgm->Play(true);
+    //bgm = Audio::Instance().LoadAudioSource("Data/Audio/zombie.wav");
+    //heri = Audio::Instance().LoadAudioSource("Data/Audio/heri1.wav");
+    //bgm->Play(true);
 }
 
 // I—¹‰»

@@ -162,9 +162,6 @@ private:
 	{
 		Anim_Idle,
 		Anim_Walking,
-		Anim_Attack,
-		Anim_Attack2,
-		Anim_Kick,
 		Anim_GetHit1,
 		Anim_Death,
 		Anim_Running,
@@ -174,6 +171,9 @@ private:
 		Anim_ClimbUpWall,
 		Anim_ClimbDown,
 		Anim_HoldInWall,
+		Anim_Attack,
+		Anim_Attack2,
+		Anim_Kick,
 
 	};
 
