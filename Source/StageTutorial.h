@@ -22,16 +22,16 @@ public:
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
 	DirectX::XMFLOAT3 GetPosition() const { return position; }
 
-	// ウェイポイントのインデックスからポジションを取得
-	DirectX::XMFLOAT3 GetIndexWayPoint(int index) override { return DirectX::XMFLOAT3(0, 0, 0); }
+	//// ウェイポイントのインデックスからポジションを取得
+	//DirectX::XMFLOAT3 GetIndexWayPoint(int index) override { return DirectX::XMFLOAT3(0, 0, 0); }
 
-	// 指定座標から一番近いウェイポイントのインデックスを取得
-	int NearWayPointIndex(DirectX::XMFLOAT3 target) override { return 0; }
+	//// 指定座標から一番近いウェイポイントのインデックスを取得
+	//int NearWayPointIndex(DirectX::XMFLOAT3 target) override { return 0; }
 
-	// 接続先ポイントを設定
-	void DestinationPointSet(int index) override {}
+	//// 接続先ポイントを設定
+	//void DestinationPointSet(int index) override {}
 
-	void DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection) override {}
+	//void DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection) override {}
 
 private:
 	// 行列更新

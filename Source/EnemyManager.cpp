@@ -1,6 +1,7 @@
 #include "EnemyManager.h"
 #include "Collision.h"
 #include<imgui.h>
+#include "MetaAI.h"
 
 // 更新処理
 void EnemyManager::Update(float elapsedTime)
@@ -39,6 +40,8 @@ void EnemyManager::Update(float elapsedTime)
 // エネミー登録
 void EnemyManager::Register(Enemy* enemy)
 {
+	enemy->SetId(identity + static_cast<int>(Meta::Identity::Enemy));
+	identity++;
 	enemies.emplace_back(enemy);
 }
 

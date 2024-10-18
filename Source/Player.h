@@ -5,15 +5,12 @@
 #include "Character.h"
 #include "Effect.h"
 #include "Audio/Audio.h"
-#include "Object.h"
 #include "Collision.h"
 #include "ProjectileStraight.h"
 #include "Graphics/Graphics.h"
 #include "EnemyManager.h"
 #include "CameraController.h"
 #include "ProjectileManager.h"
-
-
 
 
 // プレイヤー
@@ -26,9 +23,6 @@ public:
 
 	// 更新処理
 	void Update(float elapsedTime);
-
-	// 描画処理
-	void Render(const RenderContext& rc, ModelShader* shader);
 
 	// デバッグ用GUI描画
 	void DrawDebugGUI();
@@ -44,13 +38,13 @@ public:
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive();
 
-	void SetHaveKey(const bool& haveKey) { this->haveKey = haveKey; }
-	bool HaveKey() const { return haveKey; }
+	//void SetHaveKey(const bool& haveKey) { this->haveKey = haveKey; }
+	//bool HaveKey() const { return haveKey; }
 
-	void SetHaveAmmoNum(const int haveAmmoNum) { this->haveAmmoNum = haveAmmoNum; }
-	int GetHaveAmmoNum() const { return haveAmmoNum; }
+	//void SetHaveAmmoNum(const int haveAmmoNum) { this->haveAmmoNum = haveAmmoNum; }
+	//int GetHaveAmmoNum() const { return haveAmmoNum; }
 
-	bool NearStairs() const { return nearStairs; }
+	//bool NearStairs() const { return nearStairs; }
 
 	ProjectileManager GetProjectileManager() { return projectileManager; }
 
@@ -95,7 +89,6 @@ private:
 	void CollisionPlayerVsEnemies();
 
 	void CollisionProjectileVsEnemies();
-
 
 	// 待機ステートへ遷移
 	void TransitionIdleState();
@@ -179,7 +172,8 @@ private:
 		Anim_Landing,
 		Anim_Jump,
 		Anim_ClimbUpWall,
-
+		Anim_ClimbDown,
+		Anim_HoldInWall,
 
 	};
 
@@ -187,11 +181,13 @@ private:
 	DirectX::XMFLOAT3 GetMoveVec() const;
 
 	float moveSpeed = 5.0f;
+
+	float climbSpeed = 5.0f;
 	float turnSpeed = DirectX::XMConvertToRadians(10);
 	float jumpSpeed = 20.0f;
 	int jumpCount = 0;
-	int jumpLimit = 2;
-	int haveAmmoNum = 50;
+	int jumpLimit = 1;
+	//int haveAmmoNum = 50;
 	Effect* hitEffect = nullptr;
 	Effect* blowEffect = nullptr;
 	std::unique_ptr<AudioSource> outOfBullets = nullptr;
@@ -202,11 +198,7 @@ private:
 	bool attackCollisionFlag = false;
 	float maxAngleX = DirectX::XMConvertToRadians(35);
 	float mixAngleX = DirectX::XMConvertToRadians(-35);
-	bool moveCursorFlag = true;
-	bool haveKey = false;
-	bool nearStairs = false;
 
-	Goal* goal;
 
 	std::vector<Model::NodePose> nodePoses;
 
@@ -218,6 +210,12 @@ private:
 	float attackTimer = 0;
 
 	bool attacking = false;
+
+	float swingTime = 0.0f;
+	float swingAngle = 0.0f;
+
+	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
+
 
 };
 

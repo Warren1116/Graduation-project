@@ -2,17 +2,11 @@
 
 #include "Player.h"
 #include "Zombie.h"
-#include "Gun.h"
 #include "CameraController.h"
 #include "EnemyManager.h"
-#include "Item.h"
-#include "ItemKey.h"
-#include "ItemAmmo.h"
-#include "ItemManager.h"
 #include "Scene.h"
 #include "Graphics/Sprite.h"
 #include "Audio/Audio.h"
-#include "Object.h"
 #include "Graphics/RenderTarget.h"
 #include "Graphics/DepthStencil.h"
 #include "Graphics/Light.h"
@@ -63,8 +57,6 @@ public:
 
 private:
 	std::unique_ptr<Player> player;
-	Item* item = nullptr;
-	ItemManager& itemManager = ItemManager::Instance();
 
 	std::unique_ptr<Sprite> gauge;
 	std::unique_ptr<Sprite> crossHair;

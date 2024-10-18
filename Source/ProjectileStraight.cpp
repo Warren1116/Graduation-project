@@ -76,9 +76,6 @@ void ProjectileStraight::Update(float elapsedTime)
             sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
             sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
         }
-
-
-
     }
     else
     {

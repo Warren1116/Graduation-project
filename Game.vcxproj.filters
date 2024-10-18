@@ -40,9 +40,6 @@
     <Filter Include="Source\Character">
       <UniqueIdentifier>{acf25cb0-757d-4fa0-bf97-68b101e2fa11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Object">
-      <UniqueIdentifier>{d932db93-3fed-4176-ab2c-d324d81e9a37}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\System\AI">
       <UniqueIdentifier>{629b0a7f-1d65-4237-8d5a-8c614c8062d6}</UniqueIdentifier>
     </Filter>
@@ -147,15 +144,6 @@
     <ClInclude Include="Source\HighResolutionTimer.h">
       <Filter>Source\System</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Gun.h">
-      <Filter>Source\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Item.h">
-      <Filter>Source\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ItemManager.h">
-      <Filter>Source\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Logger.h">
       <Filter>Source\System</Filter>
     </ClInclude>
@@ -228,9 +216,6 @@
     <ClInclude Include="Source\NodeBase.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Object.h">
-      <Filter>Source\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Renderer\SceneRenderer.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
@@ -294,20 +279,11 @@
     <ClInclude Include="Source\SceneClear.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\ItemAmmo.h">
-      <Filter>Source\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ItemKey.h">
-      <Filter>Source\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Source\ProjectileWall.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\EnemyPeople.h">
       <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Graphics\Telegram.h">
-      <Filter>Source\System\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\StateDerived.h">
       <Filter>Source\System\AI</Filter>
@@ -331,6 +307,9 @@
       <Filter>Source\System\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\StateMachine.h">
+      <Filter>Source\System\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Telegram.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -415,15 +394,6 @@
     </ClCompile>
     <ClCompile Include="Source\Framework.cpp">
       <Filter>Source\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Gun.cpp">
-      <Filter>Source\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Item.cpp">
-      <Filter>Source\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ItemManager.cpp">
-      <Filter>Source\Object</Filter>
     </ClCompile>
     <ClCompile Include="Source\Logger.cpp">
       <Filter>Source\System</Filter>
@@ -512,9 +482,6 @@
     <ClCompile Include="Source\NodeBase.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Object.cpp">
-      <Filter>Source\Object</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
@@ -556,12 +523,6 @@
     </ClCompile>
     <ClCompile Include="Source\SceneClear.cpp">
       <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ItemAmmo.cpp">
-      <Filter>Source\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ItemKey.cpp">
-      <Filter>Source\Object</Filter>
     </ClCompile>
     <ClCompile Include="Source\ProjectileWall.cpp">
       <Filter>Source\Character</Filter>

@@ -149,6 +149,8 @@ void AttackState::Enter()
 	if (owner->GetAttackFlg())
 	{
 		owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Attack01), false);
+		Player::Instance().ApplyDamage(1, 1.0f);
+		CameraController::Instance().ShakeCamera(0.1f,0.3f);
 	}
 }
 

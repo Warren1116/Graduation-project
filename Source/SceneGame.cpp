@@ -60,17 +60,17 @@ void SceneGame::Initialize()
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
-    // スライム（ステートマシン用）
-    EnemyPeople* slime = new EnemyPeople();
-    slime->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
-    slime->SetTerritory(slime->GetPosition(), 10.0f);
-    enemyManager.Register(slime);
+    //// スライム（ステートマシン用）
+    //EnemyPeople* slime = new EnemyPeople();
+    //slime->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
+    //slime->SetTerritory(slime->GetPosition(), 10.0f);
+    //enemyManager.Register(slime);
 
-    //	TODO_05_01通信相手用に１匹増やす
-    EnemyPeople* slime2 = new EnemyPeople();
-    slime2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
-    slime2->SetTerritory(slime2->GetPosition(), 10.0f);
-    enemyManager.Register(slime2);
+    ////	TODO_05_01通信相手用に１匹増やす
+    //EnemyPeople* slime2 = new EnemyPeople();
+    //slime2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
+    //slime2->SetTerritory(slime2->GetPosition(), 10.0f);
+    //enemyManager.Register(slime2);
 
     //switch (stageMain->GetStageNum())
     //{
@@ -130,8 +130,8 @@ void SceneGame::Initialize()
         {
             player->model,
             stageMain->GetModel(),
-            slime->GetModel(),
-            slime2->GetModel(),
+            //slime->GetModel(),
+            //slime2->GetModel(),
         };
 
         for (Model* model : list)
@@ -178,7 +178,7 @@ void SceneGame::Initialize()
     // 平行光源を追加
     {
         Light* light = new Light(LightType::Directional);
-        light->SetDirection({ 1, -1, -1 });
+        light->SetDirection({ -0.5, -1, -1 });
         if (stageMain->GetStageNum() == 0 || stageMain->GetStageNum() == 1) light->SetColor({ 1,1,1,1 });
         else light->SetColor({ 1,0.4f,0.4f,1 });
         light->SetPosition({ 0,3,0 });
@@ -197,8 +197,6 @@ void SceneGame::Finalize()
 {
     // エネミー終了化
     EnemyManager::Instance().Clear();
-
-    ItemManager::Instance().Clear();
 
     // ステージ終了化
     StageManager::Instance().Clear();
@@ -245,7 +243,6 @@ void SceneGame::Update(float elapsedTime)
     // エネミー更新処理
     EnemyManager::Instance().Update(elapsedTime);
 
-    ItemManager::Instance().Update(elapsedTime);
 
     //int enemyCount = EnemyManager::Instance().GetEnemyCount();
     //for (int i = 0; i < enemyCount; ++i)
@@ -261,7 +258,6 @@ void SceneGame::Update(float elapsedTime)
     //for (int i = 0; i < itemManager.GetItemCount(); ++i)
     //{
     //    Item* tem = itemManager.GetItem(i);
-
     //    if (!tem->OkDestroy()) continue;
     //    {
     //        LightManager::Instance().Remove(spotLights[i]);

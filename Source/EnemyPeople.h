@@ -81,7 +81,7 @@ public:
 	//ステートマシン取得
 	StateMachine* GetStateMachine() { return stateMachine; }
 	//モデル取得
-	Model* GetModel() { return model; }
+	Model* GetModel() { return model.get(); }
 
 	//	5週目　
 	//TODO 05_02 メッセージ受信関数を追加
@@ -152,7 +152,7 @@ public:
 
 
 private:
-	Model* model = nullptr;
+	std::unique_ptr<Model> model;
 	State				state = State::Search;
 
 	DirectX::XMFLOAT3	targetPosition = { 0.0f,0.0f,0.0f };

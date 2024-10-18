@@ -18,9 +18,6 @@ public:
 	// 更新処理
 	void Update(float elapsedTime) override;
 
-	//// 描画処理
-	//void Render(const RenderContext& rc, ModelShader* shader) override;
-
 	// レイキャスト
 	bool RayCast(const DirectX::XMFLOAT3& start,
 		const DirectX::XMFLOAT3& end,
@@ -34,13 +31,7 @@ public:
 
 	int NearWayPointIndex(DirectX::XMFLOAT3 target);
 	
-	void DestinationPointSet(int index);
-
-	void SetObstacle(int index);
-
-	void DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection) override;
-
-	void DrawDebugGUI() override;
+	//void DrawDebugGUI() override;
 
 	// インスタンス取得
 	static StageMain& Instance();
@@ -48,7 +39,7 @@ public:
 	static int GetStageNum();
 	static void SetStageNum(int num);
 
-	Model* GetModel() { return model; }
+	Model* GetModel() { return model.get(); }
 
 	//void SetEnemyObject(int index);
 
@@ -64,7 +55,7 @@ private:
 	}
 
 private:
-	Model* model = nullptr;
+	std::unique_ptr<Model> model;
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 0.01f, 0.01f, 0.01f };

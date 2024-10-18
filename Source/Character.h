@@ -80,6 +80,7 @@ protected:
 	// ù‰ñˆ—
 	void Turn(float elapsedTime, float vx, float vz, float speed);
 
+
 	// ƒWƒƒƒ“ƒvˆ—
 	void Jump(float speed);
 
@@ -98,6 +99,8 @@ protected:
 	// €–S‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
 	virtual void OnDead() {}
 
+	void CheckHaveWall();
+
 protected:
 
 protected:
@@ -109,6 +112,9 @@ protected:
 		0,1,0,0,
 		0,0,1,0,
 		0,0,0,1,
+	};
+	DirectX::XMFLOAT4X4 rotation = {
+
 	};
 	float radius = 1.2f;
 	float height = 1.9f;
@@ -134,8 +140,8 @@ protected:
 	bool isAlive = true;
 
 	bool hitWall = false;
-	float climbSpeed = 1.0f;
 	bool onClimb = false;
+	bool CanClimb = false;
 
 
 };

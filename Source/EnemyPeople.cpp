@@ -5,14 +5,13 @@
 #include "StateDerived.h"
 #include "SceneGame.h"
 
-//#define NORMAL
-//#define USESTATEMACHINE2
+
 #define USESTATEMACHINE3
 
 // コンストラクタ
 EnemyPeople::EnemyPeople()
 {
-	model = new Model("Data/Model/Slime/Slime.mdl");
+	model = std::make_unique<Model>("Data/Model/Slime/Slime.mdl");
 
 	// モデルが大きいのでスケーリング
 	scale.x = scale.y = scale.z = 0.01f;
@@ -20,7 +19,7 @@ EnemyPeople::EnemyPeople()
 	radius = 0.5f;
 	height = 1.0f;
 
-	//	TODO 03_06 StateMachineを生成し、階層型ステートマシンに対応するように登録ステートを変更していく。
+	// StateMachineを生成し、階層型ステートマシンに対応するように登録ステートを変更していく。
 	stateMachine = new StateMachine();
 
 	stateMachine->RegisterState(new SearchState(this));
@@ -31,18 +30,18 @@ EnemyPeople::EnemyPeople()
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Battle), new PursuitState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Battle), new AttackState(this));
 
-	// TODO 05_04 ステートマシンにメッセージを受信したときの一層目のステートを追加登録
+	// ステートマシンにメッセージを受信したときの一層目のステートを追加登録
 	stateMachine->RegisterState(new RecieveState(this));
 
-	// TODO 05_04 ステートマシンにメッセージを受信したときのサブステートを追加登録
+	// ステートマシンにメッセージを受信したときのサブステートを追加登録
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Recieve), new CalledState(this));
 
-	// TODO 05_04 戦闘中攻撃権の持っていない状態での待機ステートを追加登録
+	// 戦闘中攻撃権の持っていない状態での待機ステートを追加登録
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Battle), new StandbyState(this));
 
 	stateMachine->SetState(static_cast<int>(State::Search));
 
-	// TODO 05_04 ステートマシンにメッセージを受信したときの１層目のステートを追加登録
+	// ステートマシンにメッセージを受信したときの１層目のステートを追加登録
 	stateMachine->RegisterState(new RecieveState(this));
 
 	// 各親ステートにサブステートを登録(WanderState以外の2層目のステートも同様の方法で各自追加してください。)
@@ -51,10 +50,10 @@ EnemyPeople::EnemyPeople()
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Battle), new PursuitState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Battle), new AttackState(this));
 
-	//// TODO 05_04 ステートマシンにメッセージを受信したときのサブステートを追加登録
+	// ステートマシンにメッセージを受信したときのサブステートを追加登録
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Recieve), new CalledState(this));
 
-	// TODO 05_04 戦闘中攻撃権の持っていない状態での待機ステートを追加登録
+	// 戦闘中攻撃権の持っていない状態での待機ステートを追加登録
 	stateMachine->RegisterSubState(static_cast<int>(EnemyPeople::State::Battle), new StandbyState(this));
 
 	// ステートをセット
@@ -65,7 +64,6 @@ EnemyPeople::EnemyPeople()
 // デストラクタ
 EnemyPeople::~EnemyPeople()
 {
-	delete model;
 	delete stateMachine;
 }
 
@@ -93,7 +91,7 @@ void EnemyPeople::OnDead()
 {
 	// 死亡
 	Destroy();
-	SceneGame::Instance().UnregisterRenderModel(model);
+	SceneGame::Instance().UnregisterRenderModel(model.get());
 }
 
 
@@ -113,8 +111,6 @@ void EnemyPeople::DrawDebugPrimitive()
 	// 索敵範囲をデバッグ円柱描画
 	debugRenderer->DrawCylinder(position, searchRange, 1.0f, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
 }
-
-
 
 // 縄張り設定
 void EnemyPeople::SetTerritory(const DirectX::XMFLOAT3& origin, float range)
@@ -153,13 +149,13 @@ bool EnemyPeople::OnMessage(const Telegram& telegram)
 	{
 	case MESSAGE_TYPE::MsgCallHelp:
 		if (!SearchPlayer())
-		{	// TODO_05_05 プレイヤーを見つけていないときに一層目ステートをReceiveに変更する
+		{	// プレイヤーを見つけていないときに一層目ステートをReceiveに変更する
 			stateMachine->ChangeState(static_cast<int>(EnemyPeople::State::Recieve));
 		}
 		return true;
 		//	メタAIから攻撃権を与えられたとき
 	case MESSAGE_TYPE::MsgGiveAttackRight:
-		// TODO_05_05 攻撃フラグをtrueに設定
+		// 攻撃フラグをtrueに設定
 		SetAttackFlg(true);
 		return true;
 	}
@@ -169,7 +165,6 @@ bool EnemyPeople::OnMessage(const Telegram& telegram)
 
 bool EnemyPeople::SearchPlayer()
 {
-
 	// プレイヤーとの高低差を考慮して3Dで距離判定をする
 	const DirectX::XMFLOAT3& playerPosition = Player::Instance().GetPosition();
 	float vx = playerPosition.x - position.x;
