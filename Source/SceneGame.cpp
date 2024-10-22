@@ -60,17 +60,17 @@ void SceneGame::Initialize()
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
-    //// スライム（ステートマシン用）
-    //EnemyPeople* slime = new EnemyPeople();
-    //slime->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
-    //slime->SetTerritory(slime->GetPosition(), 10.0f);
-    //enemyManager.Register(slime);
+    // スライム（ステートマシン用）
+    EnemyPeople* people = new EnemyPeople();
+    people->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, 0.0f));
+    people->SetTerritory(people->GetPosition(), 10.0f);
+    enemyManager.Register(people);
 
-    ////	TODO_05_01通信相手用に１匹増やす
-    //EnemyPeople* slime2 = new EnemyPeople();
-    //slime2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
-    //slime2->SetTerritory(slime2->GetPosition(), 10.0f);
-    //enemyManager.Register(slime2);
+    //	TODO_05_01通信相手用に１匹増やす
+    EnemyPeople* people2 = new EnemyPeople();
+    people2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
+    people2->SetTerritory(people2->GetPosition(), 10.0f);
+    enemyManager.Register(people2);
 
     //switch (stageMain->GetStageNum())
     //{
@@ -130,8 +130,8 @@ void SceneGame::Initialize()
         {
             player->model,
             stageMain->GetModel(),
-            //slime->GetModel(),
-            //slime2->GetModel(),
+            people->GetModel(),
+            people2->GetModel(),
         };
 
         for (Model* model : list)
@@ -187,6 +187,7 @@ void SceneGame::Initialize()
 
     meta = new Meta(player.get(), &enemyManager);
 
+
     //bgm = Audio::Instance().LoadAudioSource("Data/Audio/zombie.wav");
     //heri = Audio::Instance().LoadAudioSource("Data/Audio/heri1.wav");
     //bgm->Play(true);
@@ -203,6 +204,7 @@ void SceneGame::Finalize()
 
     LightManager::Instance().Clear();
 
+    EffectManager::Instance().Finalize();
     instance = nullptr;
 
     shadowmapRenderer->ClearRenderModel();

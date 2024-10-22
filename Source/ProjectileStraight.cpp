@@ -9,10 +9,10 @@ ProjectileStraight* ProjectileStraight::instance = nullptr;
 ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(manager)
 {
     instance = this;
-	model = std::make_unique<Model>("Data/Model/SpiderWeb/SpiderWeb.mdl");
+	model = std::make_unique<Model>("Data/Model/SpiderWeb/spiderweb.mdl");
 
 
-	nohit = Audio::Instance().LoadAudioSource("Data/Audio/tyodan.wav");
+	//nohit = Audio::Instance().LoadAudioSource("Data/Audio/tyodan.wav");
 
 
 	// 表示サイズ

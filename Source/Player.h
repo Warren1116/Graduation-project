@@ -174,7 +174,9 @@ private:
 		Anim_Attack,
 		Anim_Attack2,
 		Anim_Kick,
-
+		Anim_StartSwing,
+		Anim_Swinging,
+		Anim_Swinging2,
 	};
 
 private:
@@ -187,9 +189,8 @@ private:
 	float jumpSpeed = 20.0f;
 	int jumpCount = 0;
 	int jumpLimit = 1;
-	//int haveAmmoNum = 50;
 	Effect* hitEffect = nullptr;
-	Effect* blowEffect = nullptr;
+
 	std::unique_ptr<AudioSource> outOfBullets = nullptr;
 	std::unique_ptr<AudioSource> walk = nullptr;
 	
@@ -215,7 +216,7 @@ private:
 	float swingAngle = 0.0f;
 
 	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
-
-
+	bool onSwing = false;
+	float angularVelocity;
 };
 

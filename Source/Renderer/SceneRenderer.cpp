@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "EnemyManager.h"
 #include "Input/Input.h"
+#include "EffectManager.h"
 
 SceneRenderer::SceneRenderer(UINT width, UINT height)
 {
@@ -73,6 +74,7 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 
 		// シャドウマップの情報をセット
 		rc.shadowMapData = shadowMapData;
+
 	}
 
 	// 空を描画
@@ -136,7 +138,12 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 				shader->DrawSubset(rc, subset);
 			}
 		}
+
+		EffectManager::Instance().Render(rc.view, rc.projection);
+
 	}
+
+
 	//	シェーダーがあれば終了処理
 	if (shader)
 		shader->End(rc);
