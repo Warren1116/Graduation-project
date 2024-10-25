@@ -225,7 +225,7 @@ private:
 	LockonState			lockonState = LockonState::NotLocked;
 	float				lockonTargetChangeTime = 0;
 	float				lockonTargetChangeTimeMax = 8;
-	Character* lockonCharacter = nullptr;
+	Character*			lockonEnemy = nullptr;
 	DirectX::XMFLOAT3	lockDirection;
 
 

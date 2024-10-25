@@ -16,8 +16,6 @@
 #include "MetaAI.h"
 
 
-static bool lockOnEnemy = false;
-
 // ƒQ[ƒ€ƒV[ƒ“
 class SceneGame : public Scene
 {

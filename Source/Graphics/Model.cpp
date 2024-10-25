@@ -2,12 +2,16 @@
 #include "Graphics/Model.h"
 #include "ResourceManager.h"
 
+#include "../tinygltf-release/tiny_gltf.h"
+
+
 // コンストラクタ
 Model::Model(const char* filename)
 {
 	// リソース読み込み
 	/*resource = std::make_shared<ModelResource>();
 	resource->Load(Graphics::Instance().GetDevice(), filename);*/
+
 
 	resource = ResourceManager::Instance().LoadModelResource(filename);
 

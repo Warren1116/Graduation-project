@@ -282,7 +282,7 @@
     <ClInclude Include="Source\ProjectileWall.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\EnemyPeople.h">
+    <ClInclude Include="Source\EnemyThief.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\StateDerived.h">
@@ -320,6 +320,9 @@
     </ClInclude>
     <ClInclude Include="Source\CharacterManager.h">
       <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\gltf_Model.h">
+      <Filter>Source\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -536,7 +539,7 @@
     <ClCompile Include="Source\ProjectileWall.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\EnemyPeople.cpp">
+    <ClCompile Include="Source\EnemyThief.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\StateBase.cpp">
@@ -565,6 +568,9 @@
     </ClCompile>
     <ClCompile Include="Source\CharacterManager.cpp">
       <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\gltf_Model.cpp">
+      <Filter>Source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

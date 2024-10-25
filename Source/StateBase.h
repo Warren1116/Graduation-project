@@ -1,13 +1,13 @@
 #pragma once
-#include "EnemyPeople.h"
+#include "EnemyThief.h"
 
-class EnemyPeople;
+class EnemyThief;
 
 class State
 {
 public:
     // コンストラクタ
-    State(EnemyPeople* enemy) : owner(enemy) {}
+    State(EnemyThief* enemy) : owner(enemy) {}
     virtual ~State() {}
     //全て継承先で実装させる必要があるため純粋仮想関数で実装
     //ステートに入った時のメソッド
@@ -19,7 +19,7 @@ public:
 
 
 protected:
-    EnemyPeople* owner;
+    EnemyThief* owner;
 };
 
 //  1層目のステートクラスの作成(StateBase.cppに関数定義をする)
@@ -27,7 +27,7 @@ protected:
 class HierarchicalState : public State
 {
 public:
-    HierarchicalState(EnemyPeople* enemy) : State(enemy) {}
+    HierarchicalState(EnemyThief* enemy) : State(enemy) {}
     virtual ~HierarchicalState() {}
     //  全て継承先で実装させる必要があるため純粋仮想関数で実装
     //  ステートに入った時のメソッド

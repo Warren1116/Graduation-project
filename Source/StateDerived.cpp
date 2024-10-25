@@ -31,7 +31,7 @@ void WanderState::Execute(float elapsedTime)
 	{
 		// 待機ステートへ遷移
 		// ChangeStateクラスで二層目のStateを切り替える
-		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Search::Idle));
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Search::Idle));
 	}
 	// 目的地点へ移動
 	owner->MoveToTarget(elapsedTime, 0.5f);
@@ -40,7 +40,7 @@ void WanderState::Execute(float elapsedTime)
 	{
 		// 見つかったら追跡ステートへ遷移
 		// ChangeStateクラスで一層目のStateを切り替える
-		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Battle));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
 	}
 
 }
@@ -70,11 +70,11 @@ void IdleState::Execute(float elapsedTime)
 
 	// 待機時間が経過したとき徘徊ステートへ遷移
 	if (owner->GetStateTimer() < 0.0f)
-		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Search::Wander));
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Search::Wander));
 
 	// プレイヤーが見つかったとき追跡ステートへ遷移
 	if (owner->SearchPlayer())
-		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Battle));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
 }
 
 // 待機ステートから出ていくときのメソッド
@@ -114,7 +114,7 @@ void PursuitState::Execute(float elapsedTime)
 
 	// 追跡時間が経過したとき待機ステートへ遷移
 	if (owner->GetStateTimer() < 0.0f)
-		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Search));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Search));
 
 	float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
 	float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
@@ -123,7 +123,7 @@ void PursuitState::Execute(float elapsedTime)
 
 	// 攻撃範囲に入ったとき攻撃ステートへ遷移
 	if (owner->GetAttackRange() > dist)
-		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Attack));
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
 }
 
 // 追跡ステートから出ていくときのメソッド
@@ -163,13 +163,13 @@ void AttackState::Execute(float elapsedTime)
 		// 攻撃モーションが終わっていれば追跡へ遷移
 		if (!owner->GetModel()->IsPlayAnimation())
 		{
-			owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Standby));
+			owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Standby));
 		}
 	}
 	else
 	{
 		// 攻撃権がないときステート変更
-		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Standby));
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Standby));
 	}
 }
 
@@ -202,7 +202,7 @@ SearchState::~SearchState()
 // サーチステートに入った時のメソッド
 void SearchState::Enter()
 {
-	SetSubState(static_cast<int>(EnemyPeople::Search::Idle));
+	SetSubState(static_cast<int>(EnemyThief::Search::Idle));
 }
 
 // サーチステートで実行するメソッド
@@ -228,7 +228,7 @@ BattleState::~BattleState()
 
 void BattleState::Enter()
 {
-	SetSubState(static_cast<int>(EnemyPeople::Search::Wander));
+	SetSubState(static_cast<int>(EnemyThief::Search::Wander));
 }
 
 void BattleState::Execute(float elapsedTime)
@@ -255,7 +255,7 @@ RecieveState::~RecieveState()
 void RecieveState::Enter()
 {
 	// 初期ステートを設定
-	SetSubState(static_cast<int>(EnemyPeople::Recieve::Called));
+	SetSubState(static_cast<int>(EnemyThief::Recieve::Called));
 }
 
 // サーチステートで実行するメソッド
@@ -267,7 +267,7 @@ void RecieveState::Execute(float elapsedTime)
 	if (owner->SearchPlayer())
 	{
 		// Battleステートへ遷移
-		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Battle));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
 	}
 }
 
@@ -293,7 +293,7 @@ void CalledState::Execute(float elapsedTime)
 	if (timer < 0.0f)
 	{
 		// 徘徊ステートへ遷移
-		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyPeople::State::Search));
+		owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Search));
 	}
 	// 対象をプレイヤー地点に設定
 	owner->SetTargetPosition(Player::Instance().GetPosition());
@@ -318,7 +318,7 @@ void StandbyState::Execute(float elapsedTime)
 	if (owner->GetAttackFlg())
 	{
 		// 攻撃権があるときステート変更
-		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Attack));
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
 	}
 	// 目標地点をプレイヤー位置に設定
 	owner->SetTargetPosition(Player::Instance().GetPosition());
@@ -329,7 +329,7 @@ void StandbyState::Execute(float elapsedTime)
 	if (dist > owner->GetAttackRange())
 	{
 		// 攻撃範囲から出たら追跡ステートへ遷移
-		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyPeople::Battle::Pursuit));
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Pursuit));
 	}
 }
 
@@ -337,3 +337,4 @@ void StandbyState::Execute(float elapsedTime)
 void StandbyState::Exit()
 {
 }
+

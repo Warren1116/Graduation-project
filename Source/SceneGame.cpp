@@ -14,7 +14,7 @@
 #include "SceneLoading.h"
 #include "ProjectileStraight.h"
 #include "ProjectileManager.h"
-#include "EnemyPeople.h"
+#include "EnemyThief.h"
 #include "CharacterManager.h"
 #include "Messenger.h"
 
@@ -76,13 +76,13 @@ void SceneGame::Initialize()
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
     // スライム（ステートマシン用）
-    EnemyPeople* people = new EnemyPeople();
+    EnemyThief* people = new EnemyThief();
     people->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, 0.0f));
     people->SetTerritory(people->GetPosition(), 10.0f);
     enemyManager.Register(people);
 
     //	TODO_05_01通信相手用に１匹増やす
-    EnemyPeople* people2 = new EnemyPeople();
+    EnemyThief* people2 = new EnemyThief();
     people2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
     people2->SetTerritory(people2->GetPosition(), 10.0f);
     enemyManager.Register(people2);

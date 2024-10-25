@@ -1,6 +1,6 @@
 //#pragma once
 //#include "Graphics/Model.h"
-//#include "EnemyPeople.h"
+//#include "EnemyThief.h"
 //
 //class BehaviorTree;
 //class BehaviorData;

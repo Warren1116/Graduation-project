@@ -1,12 +1,12 @@
 #pragma once
 #include "StateBase.h"
 
-// TODO 02_02 徘徊ステートオブジェクト
+// 徘徊ステートオブジェクト
 class WanderState : public State
 {
 public:
     //  コンストラクタ
-    WanderState(EnemyPeople* enemy) : State(enemy) {};
+    WanderState(EnemyThief* enemy) : State(enemy) {};
     //  デストラクタ
     ~WanderState() {}
     //  ステートに入った時のメソッド
@@ -21,7 +21,7 @@ class IdleState : public State
 {
 public:
     //  コンストラクタ
-    IdleState(EnemyPeople* enemy) : State(enemy) {};
+    IdleState(EnemyThief* enemy) : State(enemy) {};
     //  デストラクタ
     ~IdleState() {}
     //  ステートに入った時のメソッド
@@ -36,7 +36,7 @@ class PursuitState : public State
 {
 public:
     //  コンストラクタ
-    PursuitState(EnemyPeople* enemy) : State(enemy) {};
+    PursuitState(EnemyThief* enemy) : State(enemy) {};
     //  デストラクタ
     ~PursuitState() {}
     //  ステートに入った時のメソッド
@@ -51,7 +51,7 @@ class AttackState : public State
 {
 public:
     //  コンストラクタ
-    AttackState(EnemyPeople* enemy) : State(enemy) {};
+    AttackState(EnemyThief* enemy) : State(enemy) {};
     //  デストラクタ
     ~AttackState() {}
     //  ステートに入った時のメソッド
@@ -65,7 +65,7 @@ public:
 class SearchState : public HierarchicalState
 {
 public:
-    SearchState(EnemyPeople* enemy) : HierarchicalState(enemy) {}
+    SearchState(EnemyThief* enemy) : HierarchicalState(enemy) {}
     //  デストラクタ
     ~SearchState();
     //  ステートに入った時のメソッド
@@ -79,7 +79,7 @@ public:
 class BattleState : public HierarchicalState
 {
 public:
-    BattleState(EnemyPeople* enemy) : HierarchicalState(enemy) {}
+    BattleState(EnemyThief* enemy) : HierarchicalState(enemy) {}
     //  デストラクタ
     ~BattleState();
     //  ステートに入った時のメソッド
@@ -90,11 +90,11 @@ public:
     void Exit();
 };
 
-// TODO_05_03 メタAIからメッセージを受信したときに呼ばれるステートを追加
+// メタAIからメッセージを受信したときに呼ばれるステートを追加
 class RecieveState : public HierarchicalState
 {
 public:
-    RecieveState(EnemyPeople* enemy) : HierarchicalState(enemy) {}
+    RecieveState(EnemyThief* enemy) : HierarchicalState(enemy) {}
     ~RecieveState();
     // 全て継承先で実装させる必要があるため純粋仮想関数で実装
     // ステートに入ったときのメソッド
@@ -105,11 +105,11 @@ public:
     void Exit();
 };
 
-// TODO_05_03 他のエネミーから呼ばれたときのステートを追加
+// 他のエネミーから呼ばれたときのステートを追加
 class CalledState : public State
 {
 public:
-    CalledState(EnemyPeople* enemy) :State(enemy) {};
+    CalledState(EnemyThief* enemy) :State(enemy) {};
     ~CalledState() {}
     // ステートに入ったときのメソッド
     void Enter() override;
@@ -123,7 +123,7 @@ public:
 class StandbyState : public State
 {
 public:
-    StandbyState(EnemyPeople* enemy) : State(enemy) {};
+    StandbyState(EnemyThief* enemy) : State(enemy) {};
     ~StandbyState() {}
     // ステートに入ったときのメソッド
     void Enter() override;
@@ -132,3 +132,4 @@ public:
     // ステートから出ていくときのメソッド
     void Exit() override;
 };
+

@@ -232,7 +232,7 @@ void CameraController::MotionCamera(float elapsedTime)
                 newPosition.z += (motionData[i + 1].position.z - motionData[i].position.z) * value;
                 newTarget = motionData[i].target;
                 newTarget.x += (motionData[i + 1].target.x - motionData[i].target.x) * value;
-                newTarget.y += (motionData[i + 1].target.y - motionData[i].target.y) * value;
+                newTarget.y += (motionData[i + 1].target.y - motionData[i].target.y) * value * 0.5f;
                 newTarget.z += (motionData[i + 1].target.z - motionData[i].target.z) * value;
                 position = newPosition;
                 target = newTarget;
@@ -278,7 +278,6 @@ void CameraController::OnFreeMode(void* data)
 
 void CameraController::OnLockonMode(void* data)
 {
-
     MessageData::CAMERACHANGELOCKONMODEDATA* p = static_cast<MessageData::CAMERACHANGELOCKONMODEDATA*>(data);
     if (this->mode != Mode::LockonCamera)
         sideValue = CalcSide(p->start, p->target);
