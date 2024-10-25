@@ -16,7 +16,7 @@
 #include "MetaAI.h"
 
 
-static bool Scenelock = false;
+static bool lockOnEnemy = false;
 
 // ÉQÅ[ÉÄÉVÅ[Éì
 class SceneGame : public Scene
@@ -68,7 +68,8 @@ private:
 	std::unique_ptr<AudioSource> bgm = nullptr;
 	std::unique_ptr<AudioSource> heri = nullptr;
 
-	//std::unique_ptr<CameraController> cameraController;
+	std::unique_ptr<CameraController> cameraController;
+
 	float a = 0;
 	float deadAlpha = 0;
 	float clearAlpha = 0;

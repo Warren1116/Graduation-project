@@ -75,11 +75,14 @@ void Character::UpdateInvincibleTimer(float elapsedTime)
     }
 }
 
-void Character::CheckHaveWall()
+void Character::CheckHaveWall(float elapsedTime)
 {
+    float mx = velocity.x ;
+    float mz = velocity.z ;
+
     //レイの開始位置と終点位置
-    DirectX::XMFLOAT3 start = { position.x,position.y + 1.0f,position.z };
-    DirectX::XMFLOAT3 end = { position.x + 2.0f, position.y + 1.0f, position.z + 2.0f };
+    DirectX::XMFLOAT3 start = { position.x,position.y + 0.5f,position.z };
+    DirectX::XMFLOAT3 end = { position.x + mx, position.y + 0.5f, position.z + mz };
 
     //レイキャストによる壁判定
     HitResult hit;
@@ -368,110 +371,33 @@ void Character::Turn(float elapsedTime, float vx, float vz, float speed)
 {
     speed += elapsedTime;
 
-    // 進行ベクトルがゼロベクトルの場合は処理する必要なし
     if (vx == 0.0f && vz == 0.0f) return;
 
-    //if (!onClimb)
+    float vl = sqrtf(vx * vx + vz * vz);
+    vx /= vl;
+    vz /= vl;
+
+    float frontX = sinf(angle.y);
+    float frontZ = cosf(angle.y);
+
+    float frontL = sqrtf(frontX * frontX + frontZ * frontZ);
+    frontX /= frontL;
+    frontZ /= frontL;
+
+    float dot = (frontX * vx) + (frontZ * vz);
+    float rot = 1.0f - dot;
+    if (rot > speed) rot = speed;
+
+    float cross = (frontZ * vx) - (frontX * vz);
+
+    if (cross <= 0.0f)
     {
-        // 進行ベクトルを単位ベクトル化
-        float vl = sqrtf(vx * vx + vz * vz);
-        vx /= vl;
-        vz /= vl;
-
-        // 自身の回転値から前方向を求める
-        float frontX = sinf(angle.y);
-        float frontZ = cosf(angle.y);
-        float frontL =
-            sqrtf(frontX * frontX + frontZ * frontZ);
-
-        frontX /= frontL;
-        frontZ /= frontL;
-
-        // 回転角を求めるため、２つの単位ベクトルの内積を計算する
-        float dot = (frontX * vx) + (frontZ * vz);
-
-        // 内積値は-1.0～1.0で表現されており、２つの単位ベクトルの角度が
-        // 小さいほど1.0に近づくという性質を利用して回転速度を調整する
-        float rot = 1.0f - dot;
-        if (rot > speed) rot = speed;
-
-        // 左右判定を行うために２つの単位ベクトルの外積を計算する
-        float cross = (frontZ * vx) - (frontX * vz);
-
-        // 2Dの外積値が正の場合か負の場合かによって左右判定を行える
-        // 左右判定を行うことによって左右回転を選択する
-        if (cross <= 0.0f)
-        {
-            angle.y -= rot;
-        }
-        else
-        {
-            angle.y += rot;
-        }
+        angle.y -= rot * 0.5f;  
     }
-    //else
-    //{
-    //    //レイの開始位置は足元より少し上
-    //    DirectX::XMFLOAT3 start = { position.x,position.y,position.z };
-    //    //レイの終点位置は移動後の位置
-    //    DirectX::XMFLOAT3 end = { position.x + 1.0f,position.y,position.z + 1.0f };
-
-    //    HitResult hit;
-    //    if (StageManager::Instance().RayCast(start, end, hit))
-    //    {
-    //        transform =
-    //        {
-    //            1,0,0,0,
-    //            hit.normal.x,hit.normal.y,hit.normal.z,0,
-    //            0,1,0,0,
-    //            0,0,0,1
-    //        };
-    //    }
-    //    //Y軸が法線ベクトル方向に向くオイラー角回転を算出する
-    //    float ax = atan2f(hit.normal.z, hit.normal.y);
-    //    float az = -atan2f(hit.normal.x, hit.normal.y);
-
-    //    //線形補完で滑らかに回転する
-    //    float time = 0.2f;
-    //    angle.x = Mathf::Lerp(angle.x, ax, time);
-    //    angle.z = Mathf::Lerp(angle.z, az, time);
-    //    // 進行ベクトルを単位ベクトル化
-    //    float vl = sqrtf(vx * vx + vz * vz);
-    //    vx /= vl;
-    //    vz /= vl;
-
-    //    // 自身の回転値から前方向を求める
-    //    float frontX = sinf(angle.y);
-    //    float frontZ = cosf(angle.y);
-    //    float frontL =
-    //        sqrtf(frontX * frontX + frontZ * frontZ);
-
-    //    frontX /= frontL;
-    //    frontZ /= frontL;
-
-    //    // 回転角を求めるため、２つの単位ベクトルの内積を計算する
-    //    float dot = (frontX * vx) + (frontZ * vz);
-
-    //    // 内積値は-1.0～1.0で表現されており、２つの単位ベクトルの角度が
-    //    // 小さいほど1.0に近づくという性質を利用して回転速度を調整する
-    //    float rot = 1.0f - dot;
-    //    if (rot > speed) rot = speed;
-
-    //    // 左右判定を行うために２つの単位ベクトルの外積を計算する
-    //    float cross = (frontZ * vx) - (frontX * vz);
-
-    //    // 2Dの外積値が正の場合か負の場合かによって左右判定を行える
-    //    // 左右判定を行うことによって左右回転を選択する
-    //    if (cross <= 0.0f)
-    //    {
-    //        angle.x -= rot;
-    //    }
-    //    else
-    //    {
-    //        angle.x += rot;
-    //    }
-    //}
-
+    else
+    {
+        angle.y += rot * 0.5f;
+    }
 
 }
 

@@ -312,6 +312,15 @@
     <ClInclude Include="Source\Telegram.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Messenger.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MessageData.h">
+      <Filter>Source\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CharacterManager.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -550,6 +559,12 @@
     </ClCompile>
     <ClCompile Include="Source\StateMachine.cpp">
       <Filter>Source\System\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messenger.cpp">
+      <Filter>Source\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CharacterManager.cpp">
+      <Filter>Source\Character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

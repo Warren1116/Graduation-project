@@ -115,16 +115,13 @@ private:
 protected:
 	void OnDead();
 
-	// TODO 01 必要なステートをenum classで準備しなさい。
-	// （Wanderのみ記述済み）
-	//TODO 02_01 他クラスからenum class Stateにアクセスできるように修飾子を変更
-	//private:
+
 public:
 	enum class State
 	{
 		Search,
 		Battle,
-		//	TODO 05_02 MetaAIからメッセージを受信したときのステートを追加
+		// MetaAIからメッセージを受信したときのステートを追加
 		Recieve,
 	};
 
@@ -138,11 +135,11 @@ public:
 	{
 		Pursuit,
 		Attack,
-		//TODO 05_02 戦闘中に攻撃権を持っていないときの処理を追加
+		// 戦闘中に攻撃権を持っていないときの処理を追加
 		Standby,
 	};
 
-	//TODO 05_02 MetaAIを経由して他のエネミーから呼ばれたときの処理
+	//TODO を経由して他のエネミーから呼ばれたときの処理
 	enum class Recieve
 	{
 		Called,
@@ -164,6 +161,5 @@ private:
 	float				searchRange = 5.0f;
 	float				attackRange = 1.5f;
 
-	//2週目追加
 	StateMachine* stateMachine = nullptr;
 };

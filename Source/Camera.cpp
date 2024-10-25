@@ -47,3 +47,5 @@ void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ
 	//this->nearZ = nearZ;
 	//this->farZ = farZ;
 }
+
+

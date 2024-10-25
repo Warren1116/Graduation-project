@@ -15,6 +15,9 @@
 #include "ProjectileStraight.h"
 #include "ProjectileManager.h"
 #include "EnemyPeople.h"
+#include "CharacterManager.h"
+#include "Messenger.h"
+
 
 SceneGame* SceneGame::instance = nullptr;
 
@@ -23,6 +26,20 @@ void SceneGame::Initialize()
 {
     instance = this;
     Graphics& graphics = Graphics::Instance();
+    // カメラ初期設定
+    Camera& camera = Camera::Instance();
+    camera.SetLookAt(
+        DirectX::XMFLOAT3(0, 10, -10),
+        DirectX::XMFLOAT3(0, 0, 0),
+        DirectX::XMFLOAT3(0, 1, 0)
+    );
+    camera.SetPerspectiveFov(
+        DirectX::XMConvertToRadians(45),
+        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+        0.1f,
+        1000.0f
+    );
+
 
     //	各種レンダラー生成
     {
@@ -50,10 +67,8 @@ void SceneGame::Initialize()
     stageManager.Register(stageMain);
 
 
-    if (stageMain->GetStageNum() == 2)
-        player = std::make_unique<Player>(false);
-    else
-        player = std::make_unique<Player>(true);
+    //　プレイヤー生成
+    player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(45), 0));
 
     // エネミー初期化
@@ -71,6 +86,8 @@ void SceneGame::Initialize()
     people2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
     people2->SetTerritory(people2->GetPosition(), 10.0f);
     enemyManager.Register(people2);
+
+
 
     //switch (stageMain->GetStageNum())
     //{
@@ -148,22 +165,20 @@ void SceneGame::Initialize()
         }
     }
 
-    // カメラ初期設定
-    Camera& camera = Camera::Instance();
-    camera.SetLookAt(
-        DirectX::XMFLOAT3(0, 10, -10),
-        DirectX::XMFLOAT3(0, 0, 0),
-        DirectX::XMFLOAT3(0, 1, 0)
-    );
-    camera.SetPerspectiveFov(
-        DirectX::XMConvertToRadians(45),
-        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-        0.1f,
-        1000.0f
-    );
+    // キャラクター生成処理
+    CharacterManager& characterManager = CharacterManager::Instance();
+    {
+        // プレイヤー
+        characterManager.Register(player.get());
 
-    //// カメラコントローラー初期化
-    //cameraController = std::make_unique<CameraController>();
+        // カメラコントローラー初期化
+        cameraController = std::make_unique<CameraController>();
+       
+        // エネミー初期化
+        characterManager.Register(people);
+        characterManager.Register(people2);
+
+    }
 
     ammo = std::make_unique<Sprite>("Data/Sprite/ammo.png");
     dead = std::make_unique<Sprite>("Data/Sprite/youdead.png");
@@ -209,6 +224,9 @@ void SceneGame::Finalize()
 
     shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
+
+    
+
 }
 
 // 更新処理
@@ -218,22 +236,16 @@ void SceneGame::Update(float elapsedTime)
 
     // カメラコントローラー更新処理
     Camera& camera = Camera::Instance();
+    cameraController->Update(elapsedTime);
 
     // ステージ更新処理
     StageManager::Instance().Update(elapsedTime);
 
-    //DirectX::XMVECTOR V = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&player->GetFront()), 27.08f);
-    //DirectX::XMFLOAT3 v;
-    //DirectX::XMStoreFloat3(&v, V);
+    //DirectX::XMFLOAT3 target = player->GetPosition();
+    //target.y += 0.5f;
+    //CameraController::Instance().SetTarget(target);
+    //CameraController::Instance().Update(elapsedTime);
 
-    DirectX::XMFLOAT3 target = player->GetPosition();
-    target.y += 0.5f;
-    CameraController::Instance().SetTarget(target);
-    CameraController::Instance().Update(elapsedTime);
-
-
-    //cameraController->SetTarget(target);
-    //cameraController->Update(elapsedTime);
 
     // プレイヤー更新処理
     player->Update(elapsedTime);
@@ -244,29 +256,6 @@ void SceneGame::Update(float elapsedTime)
 
     // エネミー更新処理
     EnemyManager::Instance().Update(elapsedTime);
-
-
-    //int enemyCount = EnemyManager::Instance().GetEnemyCount();
-    //for (int i = 0; i < enemyCount; ++i)
-    //{
-    //    Enemy* enemy = EnemyManager::Instance().GetEnemy(i);
-    //    if (!enemy->GetAlive())
-    //    {
-    //        sceneRenderer->UnregisterRenderModel(enemy->GetModel());
-    //        shadowmapRenderer->UnregisterRenderModel(enemy->GetModel());
-    //    }
-    //}
-
-    //for (int i = 0; i < itemManager.GetItemCount(); ++i)
-    //{
-    //    Item* tem = itemManager.GetItem(i);
-    //    if (!tem->OkDestroy()) continue;
-    //    {
-    //        LightManager::Instance().Remove(spotLights[i]);
-    //        sceneRenderer->UnregisterRenderModel(tem->GetModel());
-    //        shadowmapRenderer->UnregisterRenderModel(tem->GetModel());
-    //    }
-    //}
 
     // エフェクト更新処理
     EffectManager::Instance().Update(elapsedTime);
@@ -348,10 +337,10 @@ void SceneGame::Render()
 
     // 2DデバッグGUI描画
     {
-         player->DrawDebugGUI();
-         EnemyManager::Instance().DrawDebugGUI();
+        player->DrawDebugGUI();
+        EnemyManager::Instance().DrawDebugGUI();
 
-         //StageManager::Instance().GetStage(0)->DrawDebugGUI();
+        //StageManager::Instance().GetStage(0)->DrawDebugGUI();
     }
 
 
@@ -359,14 +348,14 @@ void SceneGame::Render()
 
     // デバッグ情報の表示
     {
-         ImGui::Separator();
-         LightManager::Instance().DrawDebugGUI();
-         ImGui::Separator();
-         shadowmapRenderer->DrawDebugGUI();
-         ImGui::Separator();
-         sceneRenderer->DrawDebugGUI();
-         ImGui::Separator();
-         postprocessingRenderer->DrawDebugGUI();
+        ImGui::Separator();
+        LightManager::Instance().DrawDebugGUI();
+        ImGui::Separator();
+        shadowmapRenderer->DrawDebugGUI();
+        ImGui::Separator();
+        sceneRenderer->DrawDebugGUI();
+        ImGui::Separator();
+        postprocessingRenderer->DrawDebugGUI();
 
     }
 

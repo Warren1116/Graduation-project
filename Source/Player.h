@@ -38,16 +38,7 @@ public:
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive();
 
-	//void SetHaveKey(const bool& haveKey) { this->haveKey = haveKey; }
-	//bool HaveKey() const { return haveKey; }
-
-	//void SetHaveAmmoNum(const int haveAmmoNum) { this->haveAmmoNum = haveAmmoNum; }
-	//int GetHaveAmmoNum() const { return haveAmmoNum; }
-
-	//bool NearStairs() const { return nearStairs; }
-
 	ProjectileManager GetProjectileManager() { return projectileManager; }
-
 
 	Model* model = nullptr;
 
@@ -149,6 +140,10 @@ private:
 
 	void PlayAttackAnimation();
 
+	// カメラステートの更新
+	void UpdateCameraState(float elapsedTime);
+
+
 private:
 	static Player* instance;
 
@@ -179,13 +174,20 @@ private:
 		Anim_Swinging2,
 	};
 
+	// ロックオンステート
+	enum class LockonState
+	{
+		NotLocked,
+		Locked,
+	};
+
 private:
 	DirectX::XMFLOAT3 GetMoveVec() const;
 
 	float moveSpeed = 5.0f;
 
 	float climbSpeed = 5.0f;
-	float turnSpeed = DirectX::XMConvertToRadians(10);
+	float turnSpeed = DirectX::XMConvertToRadians(720);
 	float jumpSpeed = 20.0f;
 	int jumpCount = 0;
 	int jumpLimit = 1;
@@ -218,5 +220,14 @@ private:
 	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
 	bool onSwing = false;
 	float angularVelocity;
+
+
+	LockonState			lockonState = LockonState::NotLocked;
+	float				lockonTargetChangeTime = 0;
+	float				lockonTargetChangeTimeMax = 8;
+	Character* lockonCharacter = nullptr;
+	DirectX::XMFLOAT3	lockDirection;
+
+
 };
 

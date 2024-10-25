@@ -9,6 +9,16 @@ class Character
 public:
 	Character() {};
 	virtual ~Character() {};
+	// 更新処理
+	virtual void Update(float elapsedTime) = 0;
+	// 描画処理
+	//virtual void Render(ID3D11DeviceContext* dc, Shader* shader) = 0;
+	// デバッグ用GUI描画
+	virtual	void DrawDebugGUI() {}
+
+	// デバッグプリミティブ描画
+	virtual	void DrawDebugPrimitive() {}
+
 	// 行列更新処理
 	void UpdateTransform();
 
@@ -99,7 +109,7 @@ protected:
 	// 死亡したときに呼ばれる
 	virtual void OnDead() {}
 
-	void CheckHaveWall();
+	void CheckHaveWall(float elapsedTime);
 
 protected:
 

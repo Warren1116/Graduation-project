@@ -1,6 +1,5 @@
 #include <imgui.h>
 #include "Player.h"
-//#include "Gun.h"
 #include "Input/Input.h"
 #include "Camera.h"
 #include "Graphics/Graphics.h"
@@ -11,6 +10,7 @@
 #include "ProjectileStraight.h"
 #include "SceneGame.h"
 #include "ProjectileWall.h"
+#include "CharacterManager.h"
 
 
 Player* Player::instance = nullptr;
@@ -57,6 +57,8 @@ Player::~Player()
 // 更新処理
 void Player::Update(float elapsedTime)
 {
+    UpdateCameraState(elapsedTime);
+
     // ステート毎の処理
     switch (state)
     {
@@ -88,37 +90,6 @@ void Player::Update(float elapsedTime)
         UpdateSwingState(elapsedTime);
         break;
     }
-
-
-    //Mouse& mouse = Input::Instance().GetMouse();
-
-    //float ax = 0;
-    //float ay = 0;
-
-    //ax = (mouse.GetPositionX() - mouse.GetOldPositionX());
-    //ay = (mouse.GetPositionY() - mouse.GetOldPositionY());
-
-    //// カメラの回転速度
-    //float speed = 0.1f * elapsedTime;
-
-    //if (!onClimb)
-    //{
-    //    // スティックの入力値に合わせてX軸とY軸を回転
-    //    angle.x += ay * speed;
-    //    angle.y += ax * speed;
-
-    //    if (angle.x > maxAngleX) angle.x = maxAngleX;
-    //    if (angle.x < mixAngleX) angle.x = mixAngleX;
-
-    //}
-    //else
-    //{
-    //    angle.x += ay * speed;
-    //}
-
-    int stage = StageMain::GetStageNum();
-
-
     //弾丸更新処理
     projectileManager.Update(elapsedTime);
 
@@ -144,6 +115,20 @@ void Player::Update(float elapsedTime)
 // 移動入力処理
 bool Player::InputMove(float elapsedTime)
 {
+    // カメラ方向とスティックの入力値によって進行方向を計算する
+    Camera& camera = Camera::Instance();
+    DirectX::XMFLOAT3 cameraRight = camera.GetRight();
+    DirectX::XMFLOAT3 cameraFront = camera.GetFront();
+    if (lockonState != LockonState::NotLocked)
+    {
+        //	ロックオン中は敵への向きで考える
+        cameraFront = lockDirection;
+        DirectX::XMVECTOR	z = DirectX::XMLoadFloat3(&lockDirection);
+        DirectX::XMVECTOR	y = DirectX::XMVectorSet(0, 1, 0, 0);
+        DirectX::XMVECTOR	x = DirectX::XMVector3Cross(y, z);
+        DirectX::XMStoreFloat3(&cameraRight, x);
+    }
+
     //進行ベクトル取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
     //移動処理
@@ -151,7 +136,15 @@ bool Player::InputMove(float elapsedTime)
     Move(moveVec.x, moveVec.y, moveVec.z, moveSpeed);
     if (!onClimb)
     {
-        Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+        if (lockonState != LockonState::NotLocked)
+        {
+            //	ロックオン処理中はロックオン対象に向ける
+            Turn(elapsedTime, cameraFront.x, cameraFront.z, turnSpeed);
+        }
+        else
+        {
+            Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+        }
     }
 
 
@@ -214,6 +207,14 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
     }
     else
     {
+        DirectX::XMFLOAT3 start = { position.x,position.y ,position.z };
+        //レイの終点位置は移動後の位置
+        DirectX::XMFLOAT3 end = { position.x + velocity.x ,position.y ,position.z + velocity.z};
+
+        HitResult hit;
+        if (StageManager::Instance().RayCast(start, end, hit))
+
+
         vec.x = ax * cameraRightX;
         vec.y = ay * cameraUpY * 3.0f;
         vec.z = ax * cameraRightZ;
@@ -354,6 +355,181 @@ void Player::PlayAttackAnimation()
     }
 
 }
+
+void Player::UpdateCameraState(float elapsedTime)
+{
+    LockonState oldLockonState = lockonState;
+    Character* oldLockonCharacter = lockonCharacter;
+    lockonState = LockonState::NotLocked;
+    lockonCharacter = nullptr;
+
+    switch (state)
+    {
+    case	State::Idle:
+    case	State::Move:
+    case	State::Jump:
+    case	State::Land:
+    case	State::Attack:
+    case	State::Damage:
+    {
+        // ロックオンモード
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        //if (gamePad.GetButtonDown() & GamePad::BTN_TAB)
+        if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_TAB)
+        {
+            DirectX::XMVECTOR p, t, v;
+            switch (oldLockonState)
+            {
+            case	LockonState::NotLocked:
+            {
+                // 一番近い距離のキャラクターを検索
+                float	length1, length2;
+                CharacterManager& manager = CharacterManager::Instance();
+                for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
+                {
+                    Character* character = manager.GetCharacter(ii);
+                    if (character == this)
+                        continue;
+
+                    if (lockonState != LockonState::NotLocked)
+                    {
+                        p = DirectX::XMLoadFloat3(&position);
+                        t = DirectX::XMLoadFloat3(&lockonCharacter->GetPosition());
+                        v = DirectX::XMVectorSubtract(t, p);
+                        DirectX::XMStoreFloat(&length2, DirectX::XMVector3LengthSq(v));
+                        p = DirectX::XMLoadFloat3(&position);
+                        t = DirectX::XMLoadFloat3(&character->GetPosition());
+                        v = DirectX::XMVectorSubtract(t, p);
+                        DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(v));
+                        if (length1 < length2)
+                        {
+                            lockonCharacter = character;
+                            DirectX::XMStoreFloat3(&lockDirection, DirectX::XMVector3Normalize(v));
+                        }
+                    }
+                    else
+                    {
+                        p = DirectX::XMLoadFloat3(&position);
+                        t = DirectX::XMLoadFloat3(&character->GetPosition());
+                        v = DirectX::XMVectorSubtract(t, p);
+                        DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(v));
+
+                        lockonCharacter = character;
+                        DirectX::XMStoreFloat3(&lockDirection, DirectX::XMVector3Normalize(v));
+                        lockonState = LockonState::Locked;
+                    }
+                }
+                break;
+            }
+            case	LockonState::Locked:
+            {
+                // ロックオン対象が存在しているかチェックして
+                // 対象がいればロックオンを継続させる
+                CharacterManager& manager = CharacterManager::Instance();
+                for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
+                {
+                    Character* character = manager.GetCharacter(ii);
+                    if (character == oldLockonCharacter)
+                    {
+                        lockonCharacter = character;
+                        lockonState = LockonState::Locked;
+                        p = DirectX::XMLoadFloat3(&position);
+                        t = DirectX::XMLoadFloat3(&character->GetPosition());
+                        v = DirectX::XMVectorSubtract(t, p);
+
+                        lockonCharacter = character;
+                        DirectX::XMStoreFloat3(&lockDirection, DirectX::XMVector3Normalize(v));
+                        break;
+                    }
+                }
+                // 右スティックでロックオン対象を変更する処理
+                GamePad& gamePad = Input::Instance().GetGamePad();
+                float ax = gamePad.GetAxisRX();	// 水平のみ
+                // 垂直方向は使わないでおく
+                lockonTargetChangeTime -= 60.0f * elapsedTime;
+                if (lockonCharacter &&
+                    lockonTargetChangeTime <= 0 &&
+                    ax * ax > 0.3f)
+                {
+                    lockonTargetChangeTime = lockonTargetChangeTimeMax;
+                    // ロックオン対象と自分自身の位置からベクトルを算出
+                    float dx = oldLockonCharacter->GetPosition().x - position.x;
+                    float dz = oldLockonCharacter->GetPosition().z - position.z;
+                    float l = sqrtf(dx * dx + dz * dz);
+                    dx /= l;
+                    dz /= l;
+                    // 外積を用いて左右判定を行い、角度的に最も近い対象にロックオンを変える
+                    float angleMax = FLT_MAX;
+                    for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
+                    {
+                        Character* character = manager.GetCharacter(ii);
+                        if (character == this || character == oldLockonCharacter)
+                            continue;
+                        float ddx = character->GetPosition().x - position.x;
+                        float ddz = character->GetPosition().z - position.z;
+                        float ll = sqrtf(ddx * ddx + ddz * ddz);
+                        ddx /= ll;
+                        ddz /= ll;
+                        float cross = dx * ddz - dz * ddx;
+                        if (ax > 0 && cross < 0)
+                        {
+                            cross = abs(cross);
+                            if (cross < angleMax)
+                            {
+                                angleMax = cross;
+                                lockonCharacter = character;
+                            }
+                        }
+                        else if (ax < 0 && cross > 0)
+                        {
+                            if (cross < angleMax)
+                            {
+                                angleMax = cross;
+                                lockonCharacter = character;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            }
+            if (lockonState == LockonState::Locked)
+            {
+                MessageData::CAMERACHANGELOCKONMODEDATA	p = { position, lockonCharacter->GetPosition() };
+                Messenger::Instance().SendData(MessageData::CAMERACHANGELOCKONMODE, &p);
+                break;
+            }
+        }
+        MessageData::CAMERACHANGEFREEMODEDATA	p = { position };
+        Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
+        break;
+    }
+    case	State::Death:
+    {
+        // 死亡時はそれっぽいカメラアングルで死亡
+        // 例えばコレを必殺技などで上手く利用できればかっこいいカメラ演出が作れますね
+        MessageData::CAMERACHANGEMOTIONMODEDATA	p;
+        float vx = sinf(angle.y) * 6;
+        float vz = cosf(angle.y) * 6;
+        p.data.push_back({ 0, {position.x + vx, position.y + 3, position.z + vz }, position });
+        p.data.push_back({ 90, {position.x + vx, position.y + 15, position.z + vz }, position });
+        Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
+        break;
+    }
+    case	State::Revive:
+    {
+        MessageData::CAMERACHANGEMOTIONMODEDATA	p;
+        float vx = sinf(angle.y + DirectX::XM_PIDIV2) * 10;
+        float vz = cosf(angle.y + DirectX::XM_PIDIV2) * 10;
+        p.data.push_back({ 0, {position.x + vx, position.y + 5, position.z + vz }, position });
+        p.data.push_back({ 30, {position.x + vx, position.y + 4, position.z + vz }, position });
+        Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
+        break;
+    }
+    }
+
+}
+
 
 void Player::InputProjectile()
 {
@@ -584,7 +760,9 @@ void Player::UpdateMoveState(float elapsedTime)
 void Player::TransitionJumpState()
 {
     state = State::Jump;
+
     model->PlayAnimation(Anim_Jump, false);
+
 }
 
 void Player::UpdateJumpState(float elapsedTime)
@@ -854,7 +1032,7 @@ void Player::TransitionSwingState()
 
     DirectX::XMVECTOR swingDirection = DirectX::XMVectorAdd(forwardVec, upVec);
 
-    DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position); 
+    DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
     SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingDirection);
 
     DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
@@ -864,114 +1042,54 @@ void Player::TransitionSwingState()
 
 void Player::UpdateSwingState(float elapsedTime)
 {
-    ////　スイングのベクトル
-    //if (!model->IsPlayAnimation())
-    //{
-    //    model->PlayAnimation(Anim_Swinging2,true);
-    //}
-    //DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
-    //DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
-    //DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
-
-    //float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
-    //const float ropeLength = 8.0f; 
-
-    //DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
-
-    //// 仮の重力をセット
-    //DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -3.0f, 0.0f, 0.0f);
-
-    //// もしロープの長さが設定の長さより大きたら、修正
-    //if (currentLength > ropeLength)
-    //{
-    //    float correctionFactor = (currentLength - ropeLength) * 0.5f;
-    //    DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-    //    // 修正した位置を更新
-    //    Q = DirectX::XMVectorAdd(Q, correction);
-    //}
-
-    //// velocityに重力を入れる
-    //DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-    //velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
-
-
-    //DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection) , ropeDirection));
-
-    //// 位置更新
-    //DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
-    //DirectX::XMStoreFloat3(&position, newPosition);
-
-    //// 速力更新
-    //DirectX::XMStoreFloat3(&velocity, tangentVelocity);
-
-    //GamePad& gamePad = Input::Instance().GetGamePad();
-    //if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
-    //{
-    //    TransitionSwingState();
-    //    //TransitionIdleState();
-    //    //velocity = { 0.0f, 0.0f, 0.0f };
-    //}
-
-
-    // スイングのアニメーションを再生
+    //　スイングのベクトル
     if (!model->IsPlayAnimation())
     {
         model->PlayAnimation(Anim_Swinging2, true);
     }
+    DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
+    DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
+    DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
 
-    // スイングポイントとプレイヤー位置のベクトル
-    DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);  // スイングの原点（固定点）
-    DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);    // 現在のプレイヤーの位置
-    DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);  // プレイヤーからスイング点へのベクトル
-
-    // 現在のスイングの長さ
     float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
-    const float ropeLength = 8.0f;  // ロープの長さ
+    const float ropeLength = 8.0f;
 
-    // ロープ方向の正規化
     DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
 
-    // 仮の重力を設定
-    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -3.0f, 0.0f, 0.0f);
+    // 仮の重力をセット
+    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -9.0f, 0.0f, 0.0f);
 
-    // ロープの長さが超過した場合、修正
+    // もしロープの長さが設定の長さより大きたら、修正
     if (currentLength > ropeLength)
     {
         float correctionFactor = (currentLength - ropeLength) * 0.5f;
         DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-        Q = DirectX::XMVectorAdd(Q, correction);  // 修正されたプレイヤー位置
+        // 修正した位置を更新
+        Q = DirectX::XMVectorAdd(Q, correction);
     }
 
-    // 現在の角度を計算 (z軸ではなくx軸とy軸を使う)
-    float angle = atan2f(DirectX::XMVectorGetX(displacement), DirectX::XMVectorGetZ(displacement));
+    // velocityに重力を入れる
+    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
 
-    // 振り子の加速度（角加速度）を計算
-    float angularAcceleration = -9.8f / ropeLength * sinf(angle);
 
-    // 角速度を更新し、減衰を適用
-    angularVelocity += angularAcceleration * elapsedTime;
-    angularVelocity *= 0.99f;  // 減衰係数で速度を減少させる
+    DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
 
-    // 新しい角度を計算
-    angle += angularVelocity * elapsedTime;
-
-    // 新しい位置を計算 (x軸とz軸で振り子運動を行う)
-    float newX = sinf(angle) * ropeLength;
-    float newZ = cosf(angle) * ropeLength;
-
-    // スイングポイント基準でプレイヤー位置を更新
-    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(P, DirectX::XMVectorSet(newX, 0.0f, newZ, 0.0f));
+    // 位置更新
+    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
     DirectX::XMStoreFloat3(&position, newPosition);
 
-    // プレイヤーの速さを直接更新しない、これで瞬間移動を防ぐ
-    DirectX::XMStoreFloat3(&velocity, DirectX::XMVectorZero());
+    // 速力更新
+    DirectX::XMStoreFloat3(&velocity, tangentVelocity);
 
-    // 入力検知
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
     {
-        TransitionSwingState();
+        //TransitionSwingState();
+        TransitionIdleState();
+        velocity = { 0.0f, 0.0f, 0.0f };
     }
+
 }
 
 
@@ -1010,19 +1128,33 @@ void Player::DrawDebugGUI()
             {
                 ImGui::Text("Is Hit Wall");
             }
-            else ImGui::Text("OFF");
+            else ImGui::Text("Not Hiting Wall");
 
             if (onClimb)
             {
                 ImGui::Text("On Climb");
             }
-            else ImGui::Text("OFF");
+            else ImGui::Text("Not On Climb");
 
             if (CanClimb)
             {
-                ImGui::Text("Can Climb");
+                ImGui::Text("Can Climb Up");
             }
-            else ImGui::Text("Can't Climb");
+            else ImGui::Text("Can't Climb Up");
+
+            std::string str = "";
+            switch (lockonState)
+            {
+            case LockonState::NotLocked:
+                str = "FreeCamera";
+                break;
+            case LockonState::Locked:
+                str = "LockOnCamera";
+                break;
+            }
+            ImGui::Text(u8"State　%s", str.c_str());
+
+
         }
 
     }

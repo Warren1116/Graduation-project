@@ -27,13 +27,14 @@ bool Collision::IntersectPointVsRectXZ(const float pointPositionX, const float p
 }
 
 // 球と球の交差判定
-bool Collision::IntersectSphereVsSphere(const DirectX::XMFLOAT3& positionA, float radiusA, const DirectX::XMFLOAT3& positionB, float radiusB, DirectX::XMFLOAT3& outPositionB)
+bool Collision::IntersectSphereVsSphere(const DirectX::XMFLOAT3& positionA, float radiusA, const DirectX::XMFLOAT3& positionB, float radiusB, DirectX::XMFLOAT3& outPositionA,
+    DirectX::XMFLOAT3& outPositionB)
 {
-    // A→Bの単位ベクトルを算出
-    DirectX::XMVECTOR PositionA = { DirectX::XMLoadFloat3(&positionA) };
-    DirectX::XMVECTOR PositionB = { DirectX::XMLoadFloat3(&positionB) };
-    DirectX::XMVECTOR Vec = { DirectX::XMVectorSubtract(PositionB, PositionA) };
-    DirectX::XMVECTOR LengthSq = { DirectX::XMVector3Length(Vec) };
+    // B→Aの単位ベクトルを算出
+    DirectX::XMVECTOR PositionA = DirectX::XMLoadFloat3(&positionA);
+    DirectX::XMVECTOR PositionB = DirectX::XMLoadFloat3(&positionB);
+    DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(PositionB, PositionA);
+    DirectX::XMVECTOR LengthSq = DirectX::XMVector3LengthSq(Vec);
     float lengthSq;
     DirectX::XMStoreFloat(&lengthSq, LengthSq);
 
@@ -44,13 +45,13 @@ bool Collision::IntersectSphereVsSphere(const DirectX::XMFLOAT3& positionA, floa
         return false;
     }
 
-    // AがBを押し出す
     Vec = DirectX::XMVector3Normalize(Vec);
-    Vec = DirectX::XMVectorScale(Vec, range);
-    PositionB = DirectX::XMVectorAdd(PositionA, Vec);
-
+    // 当たり判定に質量等を付与して重み判定を行うと重さを表現しやすい
+    Vec = DirectX::XMVectorScale(Vec, (range - lengthSq) * 0.5f);
+    PositionA = DirectX::XMVectorSubtract(PositionA, Vec);
+    PositionB = DirectX::XMVectorAdd(PositionB, Vec);
+    DirectX::XMStoreFloat3(&outPositionA, PositionA);
     DirectX::XMStoreFloat3(&outPositionB, PositionB);
-
     return true;
 }
 

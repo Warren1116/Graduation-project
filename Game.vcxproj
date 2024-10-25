@@ -127,6 +127,7 @@
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\CameraController.h" />
     <ClInclude Include="Source\Character.h" />
+    <ClInclude Include="Source\CharacterManager.h" />
     <ClInclude Include="Source\Collision.h" />
     <ClInclude Include="Source\Effect.h" />
     <ClInclude Include="Source\EffectManager.h" />
@@ -163,6 +164,8 @@
     <ClInclude Include="Source\JudgmentDerived.h" />
     <ClInclude Include="Source\Logger.h" />
     <ClInclude Include="Source\Mathf.h" />
+    <ClInclude Include="Source\MessageData.h" />
+    <ClInclude Include="Source\Messenger.h" />
     <ClInclude Include="Source\MetaAI.h" />
     <ClInclude Include="Source\Misc.h" />
     <ClInclude Include="Source\NodeBase.h" />
@@ -214,6 +217,7 @@
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\CameraController.cpp" />
     <ClCompile Include="Source\Character.cpp" />
+    <ClCompile Include="Source\CharacterManager.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\Effect.cpp" />
     <ClCompile Include="Source\EffectManager.cpp" />
@@ -247,6 +251,7 @@
     <ClCompile Include="Source\Logger.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Mathf.cpp" />
+    <ClCompile Include="Source\Messenger.cpp" />
     <ClCompile Include="Source\MetaAI.cpp" />
     <ClCompile Include="Source\NodeBase.cpp" />
     <ClCompile Include="Source\Player.cpp" />
