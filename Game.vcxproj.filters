@@ -321,9 +321,6 @@
     <ClInclude Include="Source\CharacterManager.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\gltf_Model.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -568,9 +565,6 @@
     </ClCompile>
     <ClCompile Include="Source\CharacterManager.cpp">
       <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\gltf_Model.cpp">
-      <Filter>Source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

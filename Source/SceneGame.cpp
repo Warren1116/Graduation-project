@@ -81,12 +81,11 @@ void SceneGame::Initialize()
     people->SetTerritory(people->GetPosition(), 10.0f);
     enemyManager.Register(people);
 
-    //	TODO_05_01’ÊM‘ŠŽè—p‚É‚P•C‘‚â‚·
+    //	’ÊM‘ŠŽè—p‚É‚P•C‘‚â‚·
     EnemyThief* people2 = new EnemyThief();
     people2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
     people2->SetTerritory(people2->GetPosition(), 10.0f);
     enemyManager.Register(people2);
-
 
 
     //switch (stageMain->GetStageNum())
@@ -145,7 +144,7 @@ void SceneGame::Initialize()
     {
         Model* list[] =
         {
-            player->model,
+            player->model.get(),
             stageMain->GetModel(),
             people->GetModel(),
             people2->GetModel(),
@@ -224,7 +223,6 @@ void SceneGame::Finalize()
 
     shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
-
     
 
 }

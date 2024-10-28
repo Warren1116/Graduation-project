@@ -152,6 +152,7 @@ protected:
 	bool hitWall = false;
 	bool onClimb = false;
 	bool CanClimb = false;
+	bool onSwing = false;
 
 
 };

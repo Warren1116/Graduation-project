@@ -40,7 +40,7 @@ public:
 
 	ProjectileManager GetProjectileManager() { return projectileManager; }
 
-	Model* model = nullptr;
+	std::unique_ptr<Model> model = nullptr;
 
 	enum class State
 	{
@@ -214,19 +214,20 @@ private:
 
 	bool attacking = false;
 
-	float swingTime = 0.0f;
-	float swingAngle = 0.0f;
-
-	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
-	bool onSwing = false;
-	float angularVelocity;
-
 
 	LockonState			lockonState = LockonState::NotLocked;
 	float				lockonTargetChangeTime = 0;
 	float				lockonTargetChangeTimeMax = 8;
 	Character*			lockonEnemy = nullptr;
 	DirectX::XMFLOAT3	lockDirection;
+
+private:
+	//Ž…—p
+	float swingTime = 0.0f;
+	float swingAngle = 0.0f;
+	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
+	float angularVelocity;
+	std::unique_ptr<Sprite> Web;
 
 
 };

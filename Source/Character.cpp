@@ -200,7 +200,7 @@ void Character::UpdateHorizontalVelocity(float elapsedFrame)
 
     // XZ•½–Ê‚Ì‘¬—Í‚ðŒ¸‘¬‚·‚é
     float length = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
-    if (length > 0.0f)
+    if (!onSwing && length > 0.0f)
     {
         // –€ŽC—Í
         float friction = this->friction * elapsedFrame;

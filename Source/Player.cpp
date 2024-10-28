@@ -21,7 +21,7 @@ Player::Player(bool flag)
     instance = this;
 
     // モデル読み込み
-    model = new Model("Data/Model/Spider-man/spider-man.mdl");
+    model = std::make_unique<Model>("Data/Model/Spider-man/spider-man.mdl");
     model->GetNodePoses(nodePoses);
 
     radius = 0.5f;
@@ -33,6 +33,8 @@ Player::Player(bool flag)
     }
 
     scale.x = scale.y = scale.z = 0.01f;
+
+    Web = std::make_unique<Sprite>();
 
 
     //outOfBullets = Audio::Instance().LoadAudioSource("Data/Audio/Tamagire.wav");
@@ -50,7 +52,6 @@ Player::~Player()
 {
     delete hitEffect;
 
-    delete model;
 }
 
 // 更新処理
@@ -483,7 +484,6 @@ void Player::UpdateCameraState(float elapsedTime)
             else
             {
                 // もし敵を全部倒したらFreeCameraに戻る
-                tabPressed = false;
                 lockonState = LockonState::NotLocked;
                 MessageData::CAMERACHANGEFREEMODEDATA p = { position };
                 Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
@@ -644,6 +644,7 @@ bool Player::InputAttack()
 void Player::TransitionIdleState()
 {
     state = State::Idle;
+    onSwing = false;
     if (onClimb)
     {
         model->PlayAnimation(Anim_HoldInWall, true);
@@ -1030,54 +1031,53 @@ void Player::TransitionSwingState()
 
 void Player::UpdateSwingState(float elapsedTime)
 {
-    //　スイングのベクトル
     if (!model->IsPlayAnimation())
     {
         model->PlayAnimation(Anim_Swinging2, true);
     }
+
+    //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
     DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
     DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
-
     float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
-    const float ropeLength = 8.0f;
 
+    //糸の長さ
+    const float ropeLength = 10.0f; 
+    //糸の向き
     DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
+    //仮の重力
+    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -10.0f, 0.0f, 0.0f); 
 
-    // 仮の重力をセット
-    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -9.0f, 0.0f, 0.0f);
-
-    // もしロープの長さが設定の長さより大きたら、修正
+    //糸の修正
     if (currentLength > ropeLength)
     {
         float correctionFactor = (currentLength - ropeLength) * 0.5f;
         DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-        // 修正した位置を更新
         Q = DirectX::XMVectorAdd(Q, correction);
     }
 
-    // velocityに重力を入れる
+    //速力更新
     DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
     velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
 
+    //仮の空気阻力系数
+    const float dragCoefficient = 0.005f; 
+    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
 
     DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
 
-    // 位置更新
+    //
     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
     DirectX::XMStoreFloat3(&position, newPosition);
-
-    // 速力更新
     DirectX::XMStoreFloat3(&velocity, tangentVelocity);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
     {
-        //TransitionSwingState();
         TransitionIdleState();
-        velocity = { 0.0f, 0.0f, 0.0f };
+        //velocity = { 0.0f, 0.0f, 0.0f }; 
     }
-
 }
 
 
@@ -1107,6 +1107,8 @@ void Player::DrawDebugGUI()
             ImGui::InputFloat3("Scale", &scale.x);
 
             ImGui::InputFloat3("velocity", &velocity.x);
+            float l = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
+            ImGui::InputFloat("v", &l);
 
             ImGui::SliderInt("PlayerHP", &health, 0.0f, 10.f);
             ImGui::InputInt("attackCount", &attackCount);
