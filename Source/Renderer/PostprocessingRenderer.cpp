@@ -70,7 +70,6 @@ void	PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
 		rc.finalpassData.colorMap = sceneData.color.Get();
 		rc.finalpassData.depthMap = sceneData.depth.Get();
 		rc.colorGradingData = colorGradingData;
-		rc.fogData = fogData;
 
 		shader->Draw(rc, renderSprite.get());
 
@@ -108,23 +107,6 @@ void	PostprocessingRenderer::DrawDebugGUI()
 			ImGui::SliderFloat("saturation", &colorGradingData.saturation, 0.0f, 2.0f);
 			ImGui::SliderFloat("brightness", &colorGradingData.brightness, 0.0f, 2.0f);
 			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("Fog"))
-		{
-			auto fogs = fogData;
-			ImGui::ColorEdit3("fog_color", &fogs.fogColor.x);
-			ImGui::SliderFloat("fog_density", &fogs.fogDensity, +0.0f, +0.05f, "%.6f");
-			ImGui::SliderFloat("fog_height_falloff", &fogs.fogHeightFalloff, +0.00001f, +1.0f, "%.4f");
-			ImGui::SliderFloat("fog_cutoff_distance", &fogs.fogCutoffDistance, +0.0f, +1000.0f, "%.4f");
-			ImGui::SliderFloat("ground_level", &fogs.groundLevel, -100.0f, +100.0f, "%.4f");
-			//ImGui::SliderFloat("mie_scattering_coef", &fogs.mieScatteringCoef, +0.0f, +1.0f, "%.4f");
-			//ImGui::SliderFloat("time_scale", &fogs.timeScale, +0.0f, +1.0f, "%.4f");
-			//ImGui::SliderFloat("noise_scale", &fogs.noiseScale, +0.0f, +1.0f, "%.4f");
-
-			fogData = fogs;
-			ImGui::TreePop();
-
 		}
 
 		ImGui::TreePop();

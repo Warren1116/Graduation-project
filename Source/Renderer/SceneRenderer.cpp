@@ -22,12 +22,15 @@ SceneRenderer::SceneRenderer(UINT width, UINT height)
 
 	// ライトデバッグフラグ
 	drawDebugPrimitive = false;
+
+
 }
 
 void SceneRenderer::Render(ID3D11DeviceContext* dc)
 {
 	Graphics& graphics = Graphics::Instance();
 	Camera& camera = Camera::Instance();
+	
 
 	// 現在設定されているバッファを退避
 	CacheRenderTargets(dc);

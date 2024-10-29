@@ -3,6 +3,8 @@
 #include "Graphics/Model.h"
 #include "Projectile.h"
 #include "Audio/Audio.h"
+#include "ProjectileWall.h"
+#include "BrokenProjectileManager.h"
 
 // íºêiíeä€
 class ProjectileStraight : public Projectile
@@ -24,11 +26,11 @@ public:
 	
 
 private:
+
 	float speed = 10.0f;
 	float lifeTimer = 3.0f;
 	bool one = false;
 	static ProjectileStraight* instance;
-
 
 
 	std::unique_ptr<AudioSource> nohit = nullptr;

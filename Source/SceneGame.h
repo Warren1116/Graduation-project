@@ -15,7 +15,6 @@
 #include "Renderer/PostprocessingRenderer.h"
 #include "MetaAI.h"
 
-
 // ゲームシーン
 class SceneGame : public Scene
 {
@@ -80,5 +79,7 @@ private:
 
 	//MetaAIオブジェクト追加
 	Meta* meta = nullptr;
+
+
 
 };

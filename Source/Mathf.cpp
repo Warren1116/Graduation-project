@@ -20,5 +20,5 @@ float Mathf::RandomRange(float min, float max)
 	float randomPosition = static_cast<float>(range(random));
 
 	return randomPosition;
-
+	
 }

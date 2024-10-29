@@ -5,13 +5,14 @@
 
 // 前方宣言
 class ProjectileManager;
+class BrokenProjectileManager;
 
 // 弾丸
 class Projectile
 {
 public:
 	Projectile(ProjectileManager* manager);
-	//Projectile() {}
+	Projectile(BrokenProjectileManager* broken_manager);
 	virtual ~Projectile() {}
 
 	// 更新処理
@@ -39,6 +40,8 @@ public:
 	// 半径取得
 	float GetRadius() const { return radius; }
 	
+	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
+	void SetDirection(const DirectX::XMFLOAT3& direction) { this->direction = direction; }
 
 protected:
 	// 行列更新処理
@@ -54,5 +57,6 @@ protected:
 	{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	float radius = 0.166f;
 	ProjectileManager* manager = nullptr;
+	BrokenProjectileManager* broken_manager = nullptr;
 };
 

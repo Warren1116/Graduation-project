@@ -2,11 +2,13 @@
 #include "SceneGame.h"
 #include "ProjectileStraight.h"
 
-ProjectileWall::ProjectileWall(ProjectileManager* manager) : Projectile(manager)
+ProjectileWall::ProjectileWall(BrokenProjectileManager* manager) : Projectile(manager)
 {
     model = std::make_unique<Model>("Data/Model/SpiderWeb/WallWeb.mdl");
-    scale.x = scale.y = scale.z = 0.05f;
+    scale.x = scale.y = scale.z = 0.1f;
 }
+
+
 
 ProjectileWall::~ProjectileWall()
 {
@@ -14,10 +16,13 @@ ProjectileWall::~ProjectileWall()
 
 void ProjectileWall::Update(float elapsedTime)
 {
-    position = ProjectileStraight::Instance().GetPosition();
-    direction = ProjectileStraight::Instance().GetDirection();
-
-
+    lifeTimer -= elapsedTime;
+    if (lifeTimer <= 0)
+    {
+        SceneGame& sceneGame = SceneGame::Instance();
+        sceneGame.UnregisterRenderModel(model.get());
+        Destroy();
+    }
     UpdateTransform();
     model->UpdateTransform(transform);
 }

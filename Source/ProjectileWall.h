@@ -8,8 +8,14 @@
 class ProjectileWall : public Projectile
 {
 public:
-	ProjectileWall(ProjectileManager* manager);
+	ProjectileWall(BrokenProjectileManager* manager);
 	~ProjectileWall() override;
+
+	//static ProjectileWall& Instance()
+	//{
+	//	static ProjectileWall instance;
+	//	return instance;
+	//}
 
 	// çXêVèàóù
 	void Update(float elapsedTime) override;
@@ -19,7 +25,6 @@ public:
 
 private:
 	float lifeTimer = 3.0f;
-	bool one = false;
 
 
 	std::unique_ptr<AudioSource> nohit = nullptr;

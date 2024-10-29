@@ -9,4 +9,7 @@ public:
 
 	// 指定範囲をランダム値を計算する
 	static float RandomRange(float min, float max);
+
+
+
 };

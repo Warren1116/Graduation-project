@@ -27,6 +27,8 @@ public:
 	// 矢印描画
 	void DrawArrow(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
 
+
+
 private:
 	// 球メッシュ作成
 	void CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks);
@@ -39,6 +41,7 @@ private:
 
 	// 矢印メッシュ作成
 	void CreateArrowMesh(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
+
 
 private:
 	struct CbMesh

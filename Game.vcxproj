@@ -124,6 +124,7 @@
     <ClInclude Include="Source\Audio\AudioSource.h" />
     <ClInclude Include="Source\BehaviorData.h" />
     <ClInclude Include="Source\BehaviorTree.h" />
+    <ClInclude Include="Source\BrokenProjectileManager.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\CameraController.h" />
     <ClInclude Include="Source\Character.h" />
@@ -132,12 +133,12 @@
     <ClInclude Include="Source\Effect.h" />
     <ClInclude Include="Source\EffectManager.h" />
     <ClInclude Include="Source\Enemy.h" />
-    <ClInclude Include="Source\EnemyBlueSlime.h" />
     <ClInclude Include="Source\EnemyManager.h" />
     <ClInclude Include="Source\EnemyThief.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\DepthStencil.h" />
+    <ClInclude Include="Source\Graphics\geometric_primitive.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h" />
     <ClInclude Include="Source\Graphics\Light.h" />
@@ -168,7 +169,6 @@
     <ClInclude Include="Source\Messenger.h" />
     <ClInclude Include="Source\MetaAI.h" />
     <ClInclude Include="Source\Misc.h" />
-    <ClInclude Include="Source\NodeBase.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Projectile.h" />
     <ClInclude Include="Source\ProjectileManager.h" />
@@ -180,7 +180,6 @@
     <ClInclude Include="Source\Renderer\SceneRenderer.h" />
     <ClInclude Include="Source\Renderer\ShadowmapRenderer.h" />
     <ClInclude Include="Source\ResourceManager.h" />
-    <ClInclude Include="Source\RunZombie.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneClear.h" />
     <ClInclude Include="Source\SceneGame.h" />
@@ -199,7 +198,6 @@
     <ClInclude Include="Source\TitleZombie.h" />
     <ClInclude Include="Source\TutorialZombie.h" />
     <ClInclude Include="Source\WayPoint.h" />
-    <ClInclude Include="Source\Zombie.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />
@@ -214,6 +212,7 @@
     <ClCompile Include="Source\Audio\AudioSource.cpp" />
     <ClCompile Include="Source\BehaviorData.cpp" />
     <ClCompile Include="Source\BehaviorTree.cpp" />
+    <ClCompile Include="Source\BrokenProjectileManager.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\CameraController.cpp" />
     <ClCompile Include="Source\Character.cpp" />
@@ -222,12 +221,12 @@
     <ClCompile Include="Source\Effect.cpp" />
     <ClCompile Include="Source\EffectManager.cpp" />
     <ClCompile Include="Source\Enemy.cpp" />
-    <ClCompile Include="Source\EnemyBlueSlime.cpp" />
     <ClCompile Include="Source\EnemyManager.cpp" />
     <ClCompile Include="Source\EnemyThief.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\DepthStencil.cpp" />
+    <ClCompile Include="Source\Graphics\geometric_primitive.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Light.cpp" />
@@ -236,6 +235,7 @@
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\ModelResource.cpp" />
     <ClCompile Include="Source\Graphics\RenderTarget.cpp" />
+    <ClCompile Include="Source\Graphics\Shader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\DefaultSpriteShader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\FinalpassShader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\LambertShader.cpp" />
@@ -253,7 +253,6 @@
     <ClCompile Include="Source\Mathf.cpp" />
     <ClCompile Include="Source\Messenger.cpp" />
     <ClCompile Include="Source\MetaAI.cpp" />
-    <ClCompile Include="Source\NodeBase.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\ProjectileManager.cpp" />
@@ -265,7 +264,6 @@
     <ClCompile Include="Source\Renderer\SceneRenderer.cpp" />
     <ClCompile Include="Source\Renderer\ShadowmapRenderer.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
-    <ClCompile Include="Source\RunZombie.cpp" />
     <ClCompile Include="Source\SceneClear.cpp" />
     <ClCompile Include="Source\SceneGame.cpp" />
     <ClCompile Include="Source\SceneLoading.cpp" />
@@ -282,7 +280,6 @@
     <ClCompile Include="Source\TitleZombie.cpp" />
     <ClCompile Include="Source\TutorialZombie.cpp" />
     <ClCompile Include="Source\WayPoint.cpp" />
-    <ClCompile Include="Source\Zombie.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Constants.hlsli" />
@@ -290,6 +287,7 @@
     <None Include="HLSL\FilterFunctions.hlsli" />
     <None Include="HLSL\Finalpass.hlsli" />
     <None Include="HLSL\GaussianBlur.hlsli" />
+    <None Include="HLSL\geometric_primitive.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\Lambert.hlsli" />
     <None Include="HLSL\Line.hlsli" />
@@ -337,6 +335,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\GaussianBlurVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\geometric_primitive_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\geometric_primitive_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

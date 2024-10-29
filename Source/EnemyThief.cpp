@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "StateDerived.h"
 #include "SceneGame.h"
+#include "MessageData.h"
 
 
 #define USESTATEMACHINE3

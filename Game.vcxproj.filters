@@ -204,17 +204,8 @@
     <ClInclude Include="Source\Graphics\LightManager.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Zombie.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\RunZombie.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\WayPoint.h">
       <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\NodeBase.h">
-      <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\Renderer\SceneRenderer.h">
       <Filter>Source\Scene</Filter>
@@ -291,9 +282,6 @@
     <ClInclude Include="Source\MetaAI.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\EnemyBlueSlime.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\JudgmentBase.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
@@ -319,6 +307,12 @@
       <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\CharacterManager.h">
+      <Filter>Source\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\geometric_primitive.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BrokenProjectileManager.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
   </ItemGroup>
@@ -461,12 +455,6 @@
     <ClCompile Include="Source\Graphics\LightManager.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Zombie.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\RunZombie.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\TutorialZombie.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
@@ -487,9 +475,6 @@
     </ClCompile>
     <ClCompile Include="Source\Renderer\ModelRenderer.cpp">
       <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\NodeBase.cpp">
-      <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp">
       <Filter>Source\Graphics</Filter>
@@ -548,9 +533,6 @@
     <ClCompile Include="Source\MetaAI.cpp">
       <Filter>Source\System\AI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\EnemyBlueSlime.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\JudgmentDerived.cpp">
       <Filter>Source\System\AI</Filter>
     </ClCompile>
@@ -564,6 +546,15 @@
       <Filter>Source\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\CharacterManager.cpp">
+      <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\geometric_primitive.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BrokenProjectileManager.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
   </ItemGroup>
@@ -606,6 +597,9 @@
     </None>
     <None Include="HLSL\Skybox.hlsli">
       <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\geometric_primitive.hlsli">
+      <Filter>Source\Graphics\Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -671,6 +665,12 @@
     </FxCompile>
     <FxCompile Include="HLSL\SkyboxVS.hlsl">
       <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\geometric_primitive_ps.hlsl">
+      <Filter>Source\Graphics\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\geometric_primitive_vs.hlsl">
+      <Filter>Source\Graphics\Shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

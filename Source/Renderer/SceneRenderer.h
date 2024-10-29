@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer/ModelRenderer.h"
+#include "Graphics/geometric_primitive.h"
 
 // シーンレンダラー
 class SceneRenderer : public ModelRenderer
@@ -40,4 +41,6 @@ private:
 	int								timer;				//時間経過
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>		depthStencilState;
+
+
 };

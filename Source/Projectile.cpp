@@ -1,5 +1,6 @@
 #include "Projectile.h"
 #include "ProjectileManager.h"
+#include "BrokenProjectileManager.h"
 #include "Player.h"
 #include "Graphics/Graphics.h"
 #include "SceneGame.h"
@@ -8,8 +9,15 @@
 Projectile::Projectile(ProjectileManager* manager)
 	: manager(manager)
 {
-	destroyEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
+	//destroyEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
 	manager->Register(this);
+}
+
+Projectile::Projectile(BrokenProjectileManager* broken_manager)
+	: broken_manager(broken_manager)
+{
+	//destroyEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
+	broken_manager->Register(this);
 }
 
 // デバッグプリミティブ描画
@@ -71,6 +79,12 @@ void Projectile::UpdateTransform()
 // 破棄
 void Projectile::Destroy()
 {
-	
-	manager->Remove(this);
+	if (manager != nullptr)
+	{
+		manager->Remove(this);
+	}
+	if (broken_manager != nullptr)
+	{
+		broken_manager->Remove(this);
+	}
 }

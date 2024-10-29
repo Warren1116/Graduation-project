@@ -69,13 +69,19 @@ void ProjectileStraight::Update(float elapsedTime)
         position.y = hit.position.y;
         position.z = hit.position.z;
 
-        Destroy();
         SceneGame& sceneGame = SceneGame::Instance();
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
-            sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
-            sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
+            sceneGame.UnregisterRenderModel(model.get());
+
+
+            ProjectileWall* WallWeb = new ProjectileWall(&Player::Instance().GetBrokenProjectileManager());
+            WallWeb->SetPosition(hit.position);
+            WallWeb->SetDirection({hit.normal});
+            sceneGame.RegisterRenderModel(WallWeb->GetModel());
+
         }
+        Destroy();
     }
     else
     {

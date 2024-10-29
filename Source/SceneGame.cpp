@@ -18,6 +18,7 @@
 #include "CharacterManager.h"
 #include "Messenger.h"
 
+#include "Graphics/geometric_primitive.h"
 
 SceneGame* SceneGame::instance = nullptr;
 
@@ -86,6 +87,7 @@ void SceneGame::Initialize()
     people2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
     people2->SetTerritory(people2->GetPosition(), 10.0f);
     enemyManager.Register(people2);
+
 
 
     //switch (stageMain->GetStageNum())
@@ -340,8 +342,6 @@ void SceneGame::Render()
 
         //StageManager::Instance().GetStage(0)->DrawDebugGUI();
     }
-
-
 
 
     // デバッグ情報の表示

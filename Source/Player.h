@@ -11,6 +11,9 @@
 #include "EnemyManager.h"
 #include "CameraController.h"
 #include "ProjectileManager.h"
+#include "Graphics/geometric_primitive.h"
+#include "BrokenProjectileManager.h"
+#include <memory.h>
 
 
 // プレイヤー
@@ -38,7 +41,9 @@ public:
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive();
 
-	ProjectileManager GetProjectileManager() { return projectileManager; }
+	ProjectileManager& GetProjectileManager() { return projectileManager; }
+	BrokenProjectileManager& GetBrokenProjectileManager() { return brokenprojectileManager; }
+
 
 	std::unique_ptr<Model> model = nullptr;
 
@@ -144,10 +149,12 @@ private:
 	void UpdateCameraState(float elapsedTime);
 
 
+
 private:
 	static Player* instance;
 
 	ProjectileManager projectileManager;
+	BrokenProjectileManager brokenprojectileManager;
 
 	void InputProjectile();
 
@@ -191,7 +198,7 @@ private:
 	float jumpSpeed = 20.0f;
 	int jumpCount = 0;
 	int jumpLimit = 1;
-	Effect* hitEffect = nullptr;
+	std::unique_ptr<Effect> hitEffect = nullptr;
 
 	std::unique_ptr<AudioSource> outOfBullets = nullptr;
 	std::unique_ptr<AudioSource> walk = nullptr;
@@ -227,7 +234,7 @@ private:
 	float swingAngle = 0.0f;
 	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
 	float angularVelocity;
-	std::unique_ptr<Sprite> Web;
+	std::unique_ptr<Model> SwingWeb;
 
 
 };

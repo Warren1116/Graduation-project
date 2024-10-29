@@ -158,7 +158,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
             slopeRate = 1.0f - (hit.normal.y / (normalLengthXZ + hit.normal.y));
 
         }
-        else /*if (!onClimb)*/
+        else if (!onClimb)
         {
             //‹ó’†‚É•‚‚¢‚Ä‚¢‚é
             position.y += my;

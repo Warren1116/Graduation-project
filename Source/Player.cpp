@@ -23,6 +23,7 @@ Player::Player(bool flag)
     // モデル読み込み
     model = std::make_unique<Model>("Data/Model/Spider-man/spider-man.mdl");
     model->GetNodePoses(nodePoses);
+    //SwingWeb = std::make_unique<Model>("Data/Model/SpiderWeb/SwingWeb.mdl");
 
     radius = 0.5f;
 
@@ -34,14 +35,11 @@ Player::Player(bool flag)
 
     scale.x = scale.y = scale.z = 0.01f;
 
-    Web = std::make_unique<Sprite>();
-
-
     //outOfBullets = Audio::Instance().LoadAudioSource("Data/Audio/Tamagire.wav");
     //walk = Audio::Instance().LoadAudioSource("Data/Audio/walk.wav");
     //key = Audio::Instance().LoadAudioSource("Data/Audio/keypick.wav");
     angularVelocity = 0;
-    hitEffect = new Effect("Data/Effect/Hit.efk");
+    hitEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
 
     // 待機ステートへ遷移
     TransitionIdleState();
@@ -50,14 +48,13 @@ Player::Player(bool flag)
 // デストラクタ
 Player::~Player()
 {
-    delete hitEffect;
 
 }
 
 // 更新処理
 void Player::Update(float elapsedTime)
 {
-    UpdateCameraState(elapsedTime);
+
 
     // ステート毎の処理
     switch (state)
@@ -90,8 +87,12 @@ void Player::Update(float elapsedTime)
         UpdateSwingState(elapsedTime);
         break;
     }
+
+    UpdateCameraState(elapsedTime);
+
     //弾丸更新処理
     projectileManager.Update(elapsedTime);
+    brokenprojectileManager.Update(elapsedTime);
 
     // 速度処理更新
     UpdateVelocity(elapsedTime);
@@ -146,8 +147,6 @@ bool Player::InputMove(float elapsedTime)
             Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
         }
     }
-
-
 
     return moveVec.x != 0 || moveVec.y != 0 || moveVec.z != 0;
 }
@@ -215,7 +214,7 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
         if (StageManager::Instance().RayCast(start, end, hit))
 
 
-            vec.x = ax * cameraRightX;
+        vec.x = ax * cameraRightX;
         vec.y = ay * cameraUpY * 3.0f;
         vec.z = ax * cameraRightZ;
     }
@@ -391,7 +390,7 @@ void Player::UpdateCameraState(float elapsedTime)
                     for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
                     {
                         Character* character = manager.GetCharacter(ii);
-                        if (character == this || character->GetHealth() == 0) // Skip defeated characters
+                        if (character == this || character->GetHealth() == 0)
                             continue;
 
                         if (lockonState != LockonState::NotLocked)
@@ -481,7 +480,7 @@ void Player::UpdateCameraState(float elapsedTime)
                 MessageData::CAMERACHANGELOCKONMODEDATA p = { position, lockonEnemy->GetPosition() };
                 Messenger::Instance().SendData(MessageData::CAMERACHANGELOCKONMODE, &p);
             }
-            else
+            else 
             {
                 // もし敵を全部倒したらFreeCameraに戻る
                 lockonState = LockonState::NotLocked;
@@ -518,6 +517,7 @@ void Player::UpdateCameraState(float elapsedTime)
 }
 
 
+
 void Player::InputProjectile()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -536,9 +536,7 @@ void Player::InputProjectile()
         pos.z = position.z;
 
         ProjectileStraight* projectile = new ProjectileStraight(&projectileManager);
-
         projectile->Launch(dir, pos);
-        //projectileManager.Register(projectile);
 
         SceneGame& sceneGame = SceneGame::Instance();
 
@@ -684,10 +682,6 @@ void Player::UpdateIdleState(float elapsedTime)
         TransitionJumpState();
     }
 
-    //if (InputDodge())
-    //{
-    //    TransitionDodgeState();
-    //}
 
     if (!onClimb)
     {
@@ -719,7 +713,6 @@ void Player::TransitionMoveState()
 // 移動ステート更新処理
 void Player::UpdateMoveState(float elapsedTime)
 {
-    //CheckHaveWall();
     if (hitWall && onClimb)
     {
         TransitionClimbWallState();
@@ -731,7 +724,7 @@ void Player::UpdateMoveState(float elapsedTime)
     }
 
     //ジャンプ入力処理
-    if (InputJump())
+    if (!hitWall && InputJump())
     {
         TransitionJumpState();
     }
@@ -756,7 +749,6 @@ void Player::TransitionJumpState()
 
 void Player::UpdateJumpState(float elapsedTime)
 {
-
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
     {
@@ -771,14 +763,6 @@ void Player::UpdateJumpState(float elapsedTime)
     }
 
 
-    //if (InputJump())
-    //{
-    //    model->PlayAnimation(Anim_Jump_Flip, false);
-    //}
-    //if (!model->IsPlayAnimation())
-    //{
-    //    model->PlayAnimation(Anim_Falling, false);
-    //}
     InputProjectile();
 
 }
@@ -791,9 +775,9 @@ void Player::TransitionClimbWallState()
 
 void Player::UpdateClimbWallState(float elapsedTime)
 {
-    //CheckHaveWall();
+    //　クライミング中Spaceキー押せば元の状態に戻る
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE && onClimb)
+    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
     {
         onClimb = false;
     }
@@ -803,12 +787,12 @@ void Player::UpdateClimbWallState(float elapsedTime)
         TransitionIdleState();
     }
 
-    if (!hitWall)
-    {
-        //model->PlayAnimation(Anim_ClimbUpWall, false);
-        TransitionMoveState();
-    }
-    InputMove(elapsedTime);
+
+    //if (!hitWall)
+    //{
+    //    //model->PlayAnimation(Anim_ClimbUpWall, false);
+    //    TransitionMoveState();
+    //}
 
 }
 
@@ -896,7 +880,8 @@ void Player::UpdateDeathState(float elapsedTime)
 
 // デバッグプリミティブ描画
 void Player::DrawDebugPrimitive()
-{
+{ 
+
     DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
     //衝突判定用のデバッグ球を描画
     //debugRender->DrawSphere(position, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
@@ -1027,6 +1012,7 @@ void Player::TransitionSwingState()
     DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
     onSwing = true;
 
+
 }
 
 void Player::UpdateSwingState(float elapsedTime)
@@ -1067,7 +1053,7 @@ void Player::UpdateSwingState(float elapsedTime)
 
     DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
 
-    //
+    //位置更新
     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
     DirectX::XMStoreFloat3(&position, newPosition);
     DirectX::XMStoreFloat3(&velocity, tangentVelocity);
