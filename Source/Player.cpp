@@ -359,6 +359,28 @@ void Player::UpdateCameraState(float elapsedTime)
 {
     static bool tabPressed = false;
 
+    CharacterManager& manager = CharacterManager::Instance();
+
+    int enemyCount = 0;
+    for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
+    {
+        Character* character = manager.GetCharacter(ii);
+        if (character != this && character->GetHealth() > 0)
+        {
+            enemyCount++;
+            break;
+        }
+    }
+    if (enemyCount == 0)
+    {
+        lockonState = LockonState::NotLocked;
+        lockonEnemy = nullptr;
+
+        MessageData::CAMERACHANGEFREEMODEDATA p = { position };
+        Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
+        return; 
+    }
+
     switch (state)
     {
     case State::Idle:
