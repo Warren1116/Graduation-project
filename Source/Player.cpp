@@ -213,7 +213,6 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
         HitResult hit;
         if (StageManager::Instance().RayCast(start, end, hit))
 
-
         vec.x = ax * cameraRightX;
         vec.y = ay * cameraUpY * 3.0f;
         vec.z = ax * cameraRightZ;
@@ -371,6 +370,7 @@ void Player::UpdateCameraState(float elapsedTime)
             break;
         }
     }
+
     if (enemyCount == 0)
     {
         lockonState = LockonState::NotLocked;
@@ -784,6 +784,11 @@ void Player::UpdateJumpState(float elapsedTime)
         TransitionIdleState();
     }
 
+    if (onClimb)
+    {
+        onClimb = false;
+    }
+
 
     InputProjectile();
 
@@ -798,24 +803,16 @@ void Player::TransitionClimbWallState()
 void Player::UpdateClimbWallState(float elapsedTime)
 {
     //　クライミング中Spaceキー押せば元の状態に戻る
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
+    if (InputJump())
     {
-        onClimb = false;
+        TransitionJumpState();
     }
 
     if (!InputMove(elapsedTime))
     {
         TransitionIdleState();
     }
-
-
-    //if (!hitWall)
-    //{
-    //    //model->PlayAnimation(Anim_ClimbUpWall, false);
-    //    TransitionMoveState();
-    //}
-
+    InputMove(elapsedTime);
 }
 
 // 攻撃ステートへ遷移
