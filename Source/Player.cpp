@@ -86,6 +86,9 @@ void Player::Update(float elapsedTime)
     case State::Swing:
         UpdateSwingState(elapsedTime);
         break;
+    case State::Shot:
+        UpdateShotingState(elapsedTime);
+        break;
     }
 
     UpdateCameraState(elapsedTime);
@@ -120,33 +123,34 @@ bool Player::InputMove(float elapsedTime)
     Camera& camera = Camera::Instance();
     DirectX::XMFLOAT3 cameraRight = camera.GetRight();
     DirectX::XMFLOAT3 cameraFront = camera.GetFront();
-    if (lockonState != LockonState::NotLocked)
-    {
-        //	ロックオン中は敵への向きで考える
-        cameraFront = lockDirection;
-        DirectX::XMVECTOR	z = DirectX::XMLoadFloat3(&lockDirection);
-        DirectX::XMVECTOR	y = DirectX::XMVectorSet(0, 1, 0, 0);
-        DirectX::XMVECTOR	x = DirectX::XMVector3Cross(y, z);
-        DirectX::XMStoreFloat3(&cameraRight, x);
-    }
+    //if (lockonState != LockonState::NotLocked)
+    //{
+    //    //	ロックオン中は敵への向きで考える
+    //    cameraFront = lockDirection;
+    //    DirectX::XMVECTOR	z = DirectX::XMLoadFloat3(&lockDirection);
+    //    DirectX::XMVECTOR	y = DirectX::XMVectorSet(0, 1, 0, 0);
+    //    DirectX::XMVECTOR	x = DirectX::XMVector3Cross(y, z);
+    //    DirectX::XMStoreFloat3(&cameraRight, x);
+    //}
 
     //進行ベクトル取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
     //移動処理
 
     Move(moveVec.x, moveVec.y, moveVec.z, moveSpeed);
-    if (!onClimb)
-    {
-        if (lockonState != LockonState::NotLocked)
-        {
-            //	ロックオン処理中はロックオン対象に向ける
-            Turn(elapsedTime, cameraFront.x, cameraFront.z, turnSpeed);
-        }
-        else
-        {
-            Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-        }
-    }
+    Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+    //if (!onClimb)
+    //{
+    //    if (lockonState != LockonState::NotLocked)
+    //    {
+    //        //	ロックオン処理中はロックオン対象に向ける
+    //        Turn(elapsedTime, cameraFront.x, cameraFront.z, turnSpeed);
+    //    }
+    //    else
+    //    {
+    //      Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+    //    }
+    //}
 
     return moveVec.x != 0 || moveVec.y != 0 || moveVec.z != 0;
 }
@@ -193,7 +197,7 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
     float cameraUpY = cameraUp.y;
 
     DirectX::XMFLOAT3 vec;
-    if (!onClimb)
+    //if (!onClimb)
     {
         // スティックの水平入力値をカメラ右方向に反映し、
         // スティックの垂直入力値をカメラ前方向に反映し、
@@ -201,22 +205,20 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
         vec.x = (ax * cameraRightX) + (ay * cameraFrontX);
         vec.z = (ax * cameraRightZ) + (ay * cameraFrontZ);
         // Y軸には移動しない
-        vec.y = 0;
-
-    }
-    else
-    {
-        DirectX::XMFLOAT3 start = { position.x,position.y ,position.z };
-        //レイの終点位置は移動後の位置
-        DirectX::XMFLOAT3 end = { position.x + velocity.x ,position.y ,position.z + velocity.z };
-
-        HitResult hit;
-        if (StageManager::Instance().RayCast(start, end, hit))
-
-        vec.x = ax * cameraRightX;
+        //vec.y = 0;
         vec.y = ay * cameraUpY * 3.0f;
-        vec.z = ax * cameraRightZ;
     }
+    //else
+    //{
+    //    DirectX::XMFLOAT3 start = { position.x,position.y ,position.z };
+    //    //レイの終点位置は移動後の位置
+    //    DirectX::XMFLOAT3 end = { position.x + velocity.x ,position.y ,position.z + velocity.z };
+    //    HitResult hit;
+    //    if (StageManager::Instance().RayCast(start, end, hit))
+    //    vec.x = ax * cameraRightX;
+    //    vec.y = ay * cameraUpY * 3.0f;
+    //    vec.z = ax * cameraRightZ;
+    //}
 
     return vec;
 }
@@ -538,24 +540,41 @@ void Player::UpdateCameraState(float elapsedTime)
     }
 }
 
+void Player::TransitionShotingState()
+{
+    state = State::Shot;
+    model->PlayAnimation(Anim_Shoting, false);
+}
+
+void Player::UpdateShotingState(float elapsedTime)
+{
+    if (!model->IsPlayAnimation())
+    {
+        TransitionIdleState();
+    }
+}
 
 
-void Player::InputProjectile()
+
+bool Player::InputProjectile()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-
     //直進弾丸発射
     if (gamePad.GetButtonDown() & GamePad::BTN_X)
     {
+        Model::Node* RightHandPos = model->FindNode("mixamorig:RightHand");
 
         DirectX::XMFLOAT3 dir;
         dir.x = sinf(angle.y);
         dir.y = 0;
         dir.z = cosf(angle.y);
         DirectX::XMFLOAT3 pos;
-        pos.x = position.x;
-        pos.y = position.y + height * 0.5f;
-        pos.z = position.z;
+        pos.x = RightHandPos->worldTransform._41;
+        pos.y = RightHandPos->worldTransform._42;
+        pos.z = RightHandPos->worldTransform._43;
+        //pos.x = position.x;
+        //pos.y = position.y + height * 0.5f;
+        //pos.z = position.z;
 
         ProjectileStraight* projectile = new ProjectileStraight(&projectileManager);
         projectile->Launch(dir, pos);
@@ -568,9 +587,9 @@ void Player::InputProjectile()
 
         }
 
-
+        return true;
     }
-
+    return false;
 }
 
 void Player::CollisionProjectileVsEnemies()
@@ -708,7 +727,10 @@ void Player::UpdateIdleState(float elapsedTime)
     if (!onClimb)
     {
         //弾丸入力処理
-        InputProjectile();
+        if (InputProjectile())
+        {
+            TransitionShotingState();
+        }
 
         //攻撃入力処理
         if (InputAttack())
@@ -752,7 +774,10 @@ void Player::UpdateMoveState(float elapsedTime)
     }
 
     //弾丸入力処理
-    InputProjectile();
+    if (InputProjectile())
+    {
+        TransitionShotingState();
+    }
 
     //攻撃入力処理
     if (InputAttack())
@@ -789,8 +814,10 @@ void Player::UpdateJumpState(float elapsedTime)
         onClimb = false;
     }
 
-
-    InputProjectile();
+    if (InputProjectile())
+    {
+        TransitionShotingState();
+    }
 
 }
 
@@ -832,7 +859,10 @@ void Player::UpdateAttackState(float elapsedTime)
         TransitionIdleState();
     }
 
-    InputProjectile();
+    if (InputProjectile())
+    {
+        TransitionShotingState();
+    }
 
 
     float animationTime = model->GetCurrentAnimationSeconds();

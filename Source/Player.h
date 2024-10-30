@@ -60,6 +60,7 @@ public:
 		Dodge,
 		Climb,
 		Swing,
+		Shot,
 	};
 
 
@@ -148,6 +149,10 @@ private:
 	// カメラステートの更新
 	void UpdateCameraState(float elapsedTime);
 
+	void TransitionShotingState();
+
+	void UpdateShotingState(float elapsedTime);
+
 
 
 private:
@@ -156,7 +161,7 @@ private:
 	ProjectileManager projectileManager;
 	BrokenProjectileManager brokenprojectileManager;
 
-	void InputProjectile();
+	bool InputProjectile();
 
 private:
 	//アニメーション
@@ -179,6 +184,7 @@ private:
 		Anim_StartSwing,
 		Anim_Swinging,
 		Anim_Swinging2,
+		Anim_Shoting,
 	};
 
 	// ロックオンステート
@@ -235,7 +241,7 @@ private:
 	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
 	float angularVelocity;
 	std::unique_ptr<Model> SwingWeb;
-
+	float shotingTimer = 0.0f;
 
 };
 
