@@ -294,6 +294,7 @@
     <None Include="HLSL\LuminanceExtraction.hlsli" />
     <None Include="HLSL\Phong.hlsli" />
     <None Include="HLSL\ShadowmapCaster.hlsli" />
+    <None Include="HLSL\ShadowmapFunctions.hlsli" />
     <None Include="HLSL\Skybox.hlsli" />
     <None Include="HLSL\Sprite.hlsli" />
   </ItemGroup>

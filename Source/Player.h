@@ -36,7 +36,7 @@ public:
 	// ジャンプ入力処理
 	bool InputJump();
 
-	void OnLanding() override;
+	
 
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive();
@@ -78,6 +78,8 @@ protected:
 
 	// 死亡したときに呼ばれる
 	void OnDead() override;
+
+	void OnLanding() override;
 
 private:
 	// 攻撃入力処理

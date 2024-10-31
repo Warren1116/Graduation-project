@@ -135,7 +135,7 @@ protected:
 	int maxHealth = 5;
 	float stepOffset = 1.5f;
 	float invincibleTimer = 0.0f;
-	float friction = 0.7f;
+	float friction = 0.5f;
 	float acceleration = 1.0f;
 	float maxMoveSpeed = 5.0f;
 	float moveVecX = 0.0f;

@@ -12,6 +12,7 @@
 
 enum class ModelShaderId
 {
+	Lambert,
 	Phong,
 	ShadowmapCaster,
 	Max

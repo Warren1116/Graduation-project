@@ -47,10 +47,18 @@ private:
 		DirectX::XMFLOAT3	dummy2;
 	};
 
+	struct CbShadowMap
+	{
+		DirectX::XMFLOAT4X4	lightViewProjection;	//	ライトビュープロジェクション行列
+		DirectX::XMFLOAT3	shadowColor;			//	影の色
+		float				shadowBias;				//	深度比較用のオフセット値
+	};
+
 
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			sceneConstantBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			meshConstantBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer>			subsetConstantBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer>			shadowMapConstantBuffer;
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>		vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader>		pixelShader;
@@ -61,4 +69,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>	depthStencilState;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState>		samplerState;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState>		shadowMapSamplerState;
 };

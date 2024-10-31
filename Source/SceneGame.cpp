@@ -467,6 +467,7 @@ void SceneGame::RegisterRenderModel(Model* model)
     {
         ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
         mat.shaderId = static_cast<int>(ModelShaderId::Phong);
+        //mat.shaderId = static_cast<int>(ModelShaderId::Lambert);
     }
 }
 

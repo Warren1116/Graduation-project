@@ -196,6 +196,52 @@ void LambertShader::Begin(const RenderContext& rc)
 	rc.deviceContext->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
 }
 
+void LambertShader::SetBuffers(const RenderContext& rc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh)
+{
+	// メッシュ用定数バッファ更新
+	CbMesh cbMesh;
+	::memset(&cbMesh, 0, sizeof(cbMesh));
+	if (mesh.nodeIndices.size() > 0)
+	{
+		for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
+		{
+			DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+			DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+			DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
+			DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
+		}
+	}
+	else
+	{
+		cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
+	}
+	rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+
+	UINT stride = sizeof(ModelResource::Vertex);
+	UINT offset = 0;
+	rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+	rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+}
+
+void LambertShader::DrawSubset(const RenderContext& rc, const ModelResource::Subset& subset)
+{
+	CbSubset cbSubset;
+	cbSubset.materialColor = subset.material->color;
+	rc.deviceContext->UpdateSubresource(subsetConstantBuffer.Get(), 0, 0, &cbSubset, 0, 0);
+	ID3D11ShaderResourceView* srvs[] =
+	{
+		subset.material->diffuse_map.Get(),
+		subset.material->normal_map.Get(),
+	};
+	rc.deviceContext->PSSetShaderResources(0, ARRAYSIZE(srvs), srvs);
+
+	rc.deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+	rc.deviceContext->DrawIndexed(subset.indexCount, subset.startIndex, 0);
+
+}
+
 //// 描画
 //void LambertShader::Draw(const RenderContext& rc, const Model* model)
 //{

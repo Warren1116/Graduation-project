@@ -149,6 +149,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
             if (!isGround)
             {
                 OnLanding();
+
             }
             isGround = true;
             velocity.y = 0.0f;
@@ -232,7 +233,7 @@ void Character::UpdateHorizontalVelocity(float elapsedFrame)
     if (length <= maxMoveSpeed)
     {
         // 移動ベクトルがゼロベクトルでないなら加速する
-        float moveVecLength = sqrtf(moveVecX * moveVecX + moveVecY * moveVecY + moveVecZ * moveVecZ);
+        float moveVecLength = sqrtf(moveVecX * moveVecX + moveVecZ * moveVecZ);
         if (moveVecLength > 0.0f)
         {
             // 加速力
@@ -319,7 +320,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
             {
                 hitWall = true;
                 GamePad& gamePad = Input::Instance().GetGamePad();
-                if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
+                if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
                 {
                     onClimb = true;
                     position.x = collectPosition.x + 0.7f;
