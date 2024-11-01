@@ -14,7 +14,7 @@ public:
 	void SetBuffers(const RenderContext& rc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh) override;
 	void DrawSubset(const RenderContext& rc, const ModelResource::Subset& subset) override;
 
-	//void Draw(const RenderContext& rc, const Model* model) override;
+	void Draw(const RenderContext& rc, const Model* model) override;
 	void End(const RenderContext& rc) override;
 
 private:
@@ -49,9 +49,10 @@ private:
 
 	struct CbShadowMap
 	{
-		DirectX::XMFLOAT4X4	lightViewProjection;	//	ライトビュープロジェクション行列
+		DirectX::XMFLOAT4X4	lightViewProjection[ShadowmapCount];	//	ライトビュープロジェクション行列
+		DirectX::XMFLOAT4	shadowBias;				//	深度比較用のオフセット値
 		DirectX::XMFLOAT3	shadowColor;			//	影の色
-		float				shadowBias;				//	深度比較用のオフセット値
+		float				dummy;
 	};
 
 

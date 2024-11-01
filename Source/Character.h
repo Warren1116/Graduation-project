@@ -154,6 +154,7 @@ protected:
 	bool CanClimb = false;
 	bool onSwing = false;
 
-
+	float lastPositionY = 0.0f;  
+	const float landingThreshold = 1.0f;
 };
 

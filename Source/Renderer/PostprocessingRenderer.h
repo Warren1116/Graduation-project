@@ -19,7 +19,7 @@ public:
 	~PostprocessingRenderer();
 
 	//	•`‰æ
-	void	Render(ID3D11DeviceContext* dc) override;
+	void PostprocessingRenderer::Render(ID3D11DeviceContext* dc)override;
 
 	// RenderTarget‚ÌShaderResourceView‚ðŽæ“¾
 	const SRVHandleList GetRenderTargetShaderResourceViews() const override;

@@ -53,7 +53,6 @@ public:
 	Light* GetShadowmapLight() const { return shadowmapLight; }
 	void SetShadowmapLight(Light* light) { shadowmapLight = light; }
 
-
 private:
 	std::vector<Light*>			lights;
 	DirectX::XMFLOAT4			ambientColor	= {0.2f, 0.2f, 0.2f, 1.0f};

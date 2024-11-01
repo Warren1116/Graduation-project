@@ -22,6 +22,7 @@
 
 SceneGame* SceneGame::instance = nullptr;
 
+
 // 初期化
 void SceneGame::Initialize()
 {
@@ -42,6 +43,7 @@ void SceneGame::Initialize()
     );
 
 
+
     //	各種レンダラー生成
     {
         UINT width = static_cast<UINT>(graphics.GetScreenWidth());
@@ -60,6 +62,7 @@ void SceneGame::Initialize()
         postprocessingRenderer->SetSceneData({ list[0], depth, width, height });
 
     }
+
 
     // ステージ初期化
     StageManager& stageManager = StageManager::Instance();
@@ -193,12 +196,13 @@ void SceneGame::Initialize()
 
     // 平行光源を追加
     {
-        Light* light = new Light(LightType::Directional);
-        light->SetDirection({ -0.5, -1, -1 });
-        if (stageMain->GetStageNum() == 0 || stageMain->GetStageNum() == 1) light->SetColor({ 1,1,1,1 });
-        else light->SetColor({ 1,0.4f,0.4f,1 });
-        light->SetPosition({ 0,3,0 });
-        LightManager::Instance().Register(light);
+
+        mainDirectionalLight = new Light(LightType::Directional);
+        mainDirectionalLight->SetDirection({ -0.5, -1, -1 });
+        mainDirectionalLight->SetColor({ 1,1,1,1 });
+        mainDirectionalLight->SetPosition({ 0,3,0 });
+        LightManager::Instance().Register(mainDirectionalLight);
+
     }
 
     meta = new Meta(player.get(), &enemyManager);
@@ -226,6 +230,7 @@ void SceneGame::Finalize()
     shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
     
+    mainDirectionalLight = nullptr;
 
 }
 
@@ -278,26 +283,29 @@ void SceneGame::Render()
 
 
 
-    // シャドウマップの描画
-    shadowmapRenderer->Render(dc);
-
-    // シーンの描画
-    sceneRenderer->SetShadowmapData(shadowmapRenderer->GetShadowMapData());
-    sceneRenderer->Render(dc);
-
-    postprocessingRenderer->Render(dc);
-
     // 描画処理
     RenderContext rc;
     rc.deviceContext = dc;
+
+    // シャドウマップの描画
+    shadowmapRenderer->Render(rc.deviceContext);
+
+    // シーンの描画
+    sceneRenderer->SetShadowmapData(shadowmapRenderer->GetShadowMapData());
+    sceneRenderer->Render(rc.deviceContext);
+
+    postprocessingRenderer->Render(rc.deviceContext);
+
     LightManager::Instance().PushRenderContext(rc);
 
     // カメラパラメータ設定
     Camera& camera = Camera::Instance();
+    rc.viewPosition.x = camera.GetEye().x;
+    rc.viewPosition.y = camera.GetEye().y;
+    rc.viewPosition.z = camera.GetEye().z;
+    rc.viewPosition.w = 1;
     rc.view = camera.GetView();
     rc.projection = camera.GetProjection();
-
-
 
 
     //2Dスプライト描画

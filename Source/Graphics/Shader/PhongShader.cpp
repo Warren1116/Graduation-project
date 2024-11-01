@@ -195,53 +195,68 @@ void PhongShader::Begin(const RenderContext& rc)
     rc.deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
     rc.deviceContext->IASetInputLayout(inputLayout.Get());
 
-    ID3D11Buffer* constantBuffers[] =
+    ID3D11Buffer* constantBuffer[] =
     {
-       sceneConstantBuffer.Get(),
+        sceneConstantBuffer.Get(),
         meshConstantBuffer.Get(),
         subsetConstantBuffer.Get(),
         shadowMapConstantBuffer.Get()
     };
-    rc.deviceContext->VSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
-    rc.deviceContext->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
+    rc.deviceContext->VSSetConstantBuffers(0, ARRAYSIZE(constantBuffer), constantBuffer);
+    rc.deviceContext->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffer), constantBuffer);
 
-    const float blend_factor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    const float blend_factor[4] = { 1.0f,1.0f,1.0f,1.0f };
     rc.deviceContext->OMSetBlendState(blendState.Get(), blend_factor, 0xFFFFFFFF);
     rc.deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     rc.deviceContext->RSSetState(rasterizerState.Get());
-    //rc.deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+
     ID3D11SamplerState* samplerStates[] =
     {
         samplerState.Get(),
         shadowMapSamplerState.Get()
     };
+    //rc.deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
     rc.deviceContext->PSSetSamplers(0, ARRAYSIZE(samplerStates), samplerStates);
 
-    // シーン用定数バッファ更新
+    //シーン用定数バッファ更新
     CbScene cbScene;
-
     DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.view);
     DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.projection);
     DirectX::XMStoreFloat4x4(&cbScene.viewProjection, V * P);
+
+    cbScene.ambientLightColor = rc.ambientLightColor;
     cbScene.viewPosition = rc.viewPosition;
     cbScene.directionalLightData = rc.directionalLightData;
-    cbScene.ambientLightColor = rc.ambientLightColor;
-    memcpy_s(cbScene.spotLightData, sizeof(cbScene.spotLightData),
-        rc.spotLightData, min(sizeof(cbScene.spotLightData), sizeof(rc.spotLightData)));
-    cbScene.spotLightCount = rc.spotLightCount;
 
     rc.deviceContext->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
 
     // シャドウマップ用定数バッファ更新
     CbShadowMap cbShadowMap;
     cbShadowMap.shadowColor = rc.shadowMapData.shadowColor;
-    cbShadowMap.shadowBias = rc.shadowMapData.shadowBias;
-    cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection;
+    //cbShadowMap.shadowBias = rc.shadowMapData.shadowBias;
+    //cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection;
+    //cbShadowMap.shadowBias = rc.shadowMapData.shadowBias[0];
+    //cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection[0];
 
-    rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
-    //	シャドウマップ設定
-    rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap);
+    //for (int i = 0; i < ShadowmapCount; ++i)
+    //{
+    //    //	バイアスの処理が4枚以上は考慮していないのでアサートで止めておく
+    //    assert(ShadowmapCount <= 4);  //本来はstatic_assertの使用が望ましい
+    //    (&cbShadowMap.shadowBias.x)[i] = rc.shadowMapData.shadowBias[i];
+    //    cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
+    //}
 
+    //rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
+    //シャドウマップ設定
+
+    //rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap);
+    //rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap[0]);
+    //ID3D11ShaderResourceView* srvs[ShadowmapCount];
+    //for (int i = 0; i < ShadowmapCount; ++i)
+    //{
+    //    srvs[i] = rc.shadowMapData.shadowMap[i];
+    //}
+    //rc.deviceContext->PSSetShaderResources(2, ShadowmapCount, srvs);
 
 }
 
@@ -295,55 +310,55 @@ void PhongShader::DrawSubset(const RenderContext& rc, const ModelResource::Subse
     rc.deviceContext->DrawIndexed(subset.indexCount, subset.startIndex, 0);
 }
 
-//void PhongShader::Draw(const RenderContext& rc, const Model* model)
-//{
-//    const ModelResource* resource = model->GetResource();
-//    const std::vector<Model::Node>& nodes = model->GetNodes();
-//
-//    for (const ModelResource::Mesh& mesh : resource->GetMeshes())
-//    {
-//        // メッシュ用定数バッファ更新
-//        CbMesh cbMesh;
-//        ::memset(&cbMesh, 0, sizeof(cbMesh));
-//        if (mesh.nodeIndices.size() > 0)
-//        {
-//            for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
-//            {
-//                DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
-//                DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-//                DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-//                DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
-//            }
-//        }
-//        else
-//        {
-//            cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
-//        }
-//        rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
-//
-//        UINT stride = sizeof(ModelResource::Vertex);
-//        UINT offset = 0;
-//        rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-//        rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-//        rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//        for (const ModelResource::Subset& subset : mesh.subsets)
-//        {
-//            CbSubset cbSubset;
-//            cbSubset.materialColor = subset.material->color;
-//            rc.deviceContext->UpdateSubresource(subsetConstantBuffer.Get(), 0, 0, &cbSubset, 0, 0);
-//
-//            ID3D11ShaderResourceView* srvs[] =
-//            {
-//                subset.material->diffuse_map.Get(),
-//                subset.material->normal_map.Get(),
-//            };
-//            rc.deviceContext->PSSetShaderResources(0, ARRAYSIZE(srvs), srvs);
-//
-//            rc.deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
-//            rc.deviceContext->DrawIndexed(subset.indexCount, subset.startIndex, 0);
-//        }
-//    }
-//}
+void PhongShader::Draw(const RenderContext& rc, const Model* model)
+{
+    const ModelResource* resource = model->GetResource();
+    const std::vector<Model::Node>& nodes = model->GetNodes();
+
+    for (const ModelResource::Mesh& mesh : resource->GetMeshes())
+    {
+        CbMesh cbMesh;
+        ::memset(&cbMesh, 0, sizeof(cbMesh));
+        if (mesh.nodeIndices.size() > 0)
+        {
+            for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
+            {
+                DirectX::XMMATRIX worldTransform =
+                    DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+                DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+                DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
+                DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
+            }
+        }
+        else
+        {
+            cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
+        }
+        rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+
+        UINT stride = sizeof(ModelResource::Vertex);
+        UINT offset = 0;
+        rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+        rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+        rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        for (const ModelResource::Subset& subset : mesh.subsets)
+        {
+            CbSubset cbSubset;
+            cbSubset.materialColor = subset.material->color;
+            rc.deviceContext->UpdateSubresource(subsetConstantBuffer.Get(), 0, 0, &cbSubset, 0, 0);
+            //rc.deviceContext->PSSetShaderResources(0, 1, subset.material->diffuse_map.GetAddressOf());
+            ID3D11ShaderResourceView* srvs[] =
+            {
+                subset.material->diffuse_map.Get(),
+                subset.material->normal_map.Get(),
+            };
+            rc.deviceContext->PSSetShaderResources(0, ARRAYSIZE(srvs), srvs);
+
+            rc.deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+            rc.deviceContext->DrawIndexed(subset.indexCount, subset.startIndex, 0);
+        }
+    }
+}
 
 
 void PhongShader::End(const RenderContext& rc)

@@ -13,7 +13,7 @@ public:
 	void Begin(const RenderContext& rc) override;
 	void SetBuffers(const RenderContext& rc, const std::vector<Model::Node>& nodes, const ModelResource::Mesh& mesh) override;
 	void DrawSubset(const RenderContext& rc, const ModelResource::Subset& subset) override;
-	//void Draw(const RenderContext& rc, const Model* model)override;
+	void Draw(const RenderContext& rc, const Model* model)override;
 	void End(const RenderContext& rc) override;
 
 private:

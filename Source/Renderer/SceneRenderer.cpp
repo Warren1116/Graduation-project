@@ -8,6 +8,10 @@
 #include "EnemyManager.h"
 #include "Input/Input.h"
 #include "EffectManager.h"
+#include "SceneGame.h"
+
+//シャドウマップのサイズ
+static const UINT SHADOWMAP_SIZE = 2048;
 
 SceneRenderer::SceneRenderer(UINT width, UINT height)
 {
@@ -23,6 +27,13 @@ SceneRenderer::SceneRenderer(UINT width, UINT height)
 	// ライトデバッグフラグ
 	drawDebugPrimitive = false;
 
+	//シャドウマップ用に深度ステンシルの生成
+	{
+		for (auto& it : shadowmapDepthStencil)
+		{
+			it = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+		}
+	}
 
 }
 
@@ -34,6 +45,7 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 
 	// 現在設定されているバッファを退避
 	CacheRenderTargets(dc);
+
 
 	// 画面クリア＆レンダーターゲット設定
 	ID3D11RenderTargetView* rtv = renderTarget->GetRenderTargetView().Get();
@@ -76,7 +88,13 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		LightManager::Instance().PushRenderContext(rc);
 
 		// シャドウマップの情報をセット
-		rc.shadowMapData = shadowMapData;
+		for (int i = 0; i < ShadowmapCount; ++i)
+		{
+			rc.shadowMapData.shadowMap[i] = shadowmapDepthStencil[i]->GetShaderResourceView().Get();
+			rc.shadowMapData.lightViewProjection[i] = lightViewProjection[i];
+			rc.shadowMapData.shadowBias[i] = shadowBias[i];
+		}
+		rc.shadowMapData.shadowColor = {1,0,0};
 
 	}
 

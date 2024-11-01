@@ -23,13 +23,26 @@ PostprocessingRenderer::~PostprocessingRenderer()
 {
 }
 
-void	PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
+void PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
+
 {
 	Graphics& graphics = Graphics::Instance();
 	Camera& camera = Camera::Instance();
 
 	// 現在設定されているバッファを退避
 	CacheRenderTargets(dc);
+
+	////現在設定されているバッファを退避して初期化しておく
+	//UINT cachedViewportCount{ D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE };
+	//D3D11_VIEWPORT cachedViewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
+	//Microsoft::WRL::ComPtr<ID3D11RenderTargetView> cachedRenderTargetView;
+	//Microsoft::WRL::ComPtr<ID3D11DepthStencilView> cachedDepthStencilView;
+	//{
+	//	dc->RSGetViewports(&cachedViewportCount, cachedViewports);
+	//	dc->OMGetRenderTargets(1,
+	//		cachedRenderTargetView.ReleaseAndGetAddressOf(),
+	//		cachedDepthStencilView.ReleaseAndGetAddressOf());
+	//}
 
 	RenderContext rc;
 	rc.deviceContext = dc;

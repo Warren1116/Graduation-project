@@ -223,25 +223,11 @@ void FinalpassShader::Draw(const RenderContext& rc, const Sprite* sprite)
     cbFinalpassConstances.saturation = rc.colorGradingData.saturation;
     cbFinalpassConstances.brightness = rc.colorGradingData.brightness;
 
-
     rc.deviceContext->UpdateSubresource(finalpassConstantBuffer[0].Get(), 0, 0, &cbFinalpassConstances, 0, 0);
-
-    Fog fog;
-    fog.fogColor = rc.fogData.fogColor;
-    fog.fogDensity = rc.fogData.fogDensity;
-    fog.fogHeightFalloff = rc.fogData.fogHeightFalloff;
-    fog.fogCutoffDistance = rc.fogData.fogCutoffDistance;
-    fog.groundLevel = rc.fogData.groundLevel;
-
-    //fog.mieScatteringCoef = rc.fogData.mieScatteringCoef;
-    //fog.timeScale = rc.fogData.timeScale;
-    //fog.noiseScale = rc.fogData.noiseScale;
-
-    rc.deviceContext->UpdateSubresource(finalpassConstantBuffer[1].Get(), 0, 0, &fog, 0, 0);
-
 
     UINT stride = sizeof(Sprite::Vertex);
     UINT offset = 0;
+
     rc.deviceContext->IASetVertexBuffers(0, 1, sprite->GetVertexBuffer().GetAddressOf(), &stride, &offset);
     ID3D11ShaderResourceView* srvs[] =
     {

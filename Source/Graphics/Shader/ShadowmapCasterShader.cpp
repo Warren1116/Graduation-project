@@ -176,6 +176,46 @@ void ShadowmapCasterShader::DrawSubset(const RenderContext& rc, const ModelResou
 	rc.deviceContext->DrawIndexed(subset.indexCount, subset.startIndex, 0);
 }
 
+void ShadowmapCasterShader::Draw(const RenderContext& rc, const Model* model)
+{
+	const ModelResource* resource = model->GetResource();
+	const std::vector<Model::Node>& nodes = model->GetNodes();
+
+	for (const ModelResource::Mesh& mesh : resource->GetMeshes())
+	{
+		//メッシュ用定数バッファ更新
+		CbMesh cbMesh;
+		::memset(&cbMesh, 0, sizeof(cbMesh));
+		if (mesh.nodeIndices.size() > 0)
+		{
+			for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
+			{
+				DirectX::XMMATRIX worldTransform =
+					DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+				DirectX::XMMATRIX offsetTransorm = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+				DirectX::XMMATRIX boneTransform = offsetTransorm * worldTransform;
+				DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
+			}
+		}
+		else
+		{
+			cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
+		}
+		rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+
+		UINT stride = sizeof(ModelResource::Vertex);
+		UINT offset = 0;
+		rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+		rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		for (const ModelResource::Subset& subset : mesh.subsets)
+		{
+			rc.deviceContext->DrawIndexed(subset.indexCount, subset.startIndex, 0);
+		}
+	}
+}
+
 // 描画終了
 void ShadowmapCasterShader::End(const RenderContext& rc)
 {

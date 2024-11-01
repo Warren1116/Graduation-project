@@ -37,16 +37,17 @@ private:
 	//	シャドウマップで使用する各行列を算出
 	void CalcShadowmapMatrix(DirectX::XMFLOAT4X4& view, DirectX::XMFLOAT4X4& projection);
 
+
 private:
 	std::unique_ptr<DepthStencil>	depthStencil;						// シャドウマップ用深度バッファ
 	float							shadowRect = 500.0f;				// 描画範囲
 	DirectX::XMFLOAT3				shadowColor = { 0.2f, 0.2f, 0.2f };	// 影の色
 	float							shadowBias = 0.0001f;				// 深度比較用のオフセット値
 
-	//std::unique_ptr<DepthStencil> shadowmapDepthStnecil[ShadowmapCount];
-	//DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
+	std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
+	DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
 	//float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
-	//DirectX::XMFLOAT3 shadowCount = { 0.2f,0.2f,0.2f };
+	//DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
 
 };
