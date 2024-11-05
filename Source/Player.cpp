@@ -11,6 +11,7 @@
 #include "SceneGame.h"
 #include "ProjectileWall.h"
 #include "CharacterManager.h"
+#include "SwingWeb.h"
 
 Player* Player::instance = nullptr;
 
@@ -23,7 +24,6 @@ Player::Player(bool flag)
     // モデル読み込み
     model = std::make_unique<Model>("Data/Model/Spider-man/spider-man.mdl");
     model->GetNodePoses(nodePoses);
-    //SwingWeb = std::make_unique<Model>("Data/Model/SpiderWeb/SwingWeb.mdl");
 
     radius = 0.5f;
 
@@ -35,10 +35,6 @@ Player::Player(bool flag)
 
     scale.x = scale.y = scale.z = 0.01f;
 
-    //outOfBullets = Audio::Instance().LoadAudioSource("Data/Audio/Tamagire.wav");
-    //walk = Audio::Instance().LoadAudioSource("Data/Audio/walk.wav");
-    //key = Audio::Instance().LoadAudioSource("Data/Audio/keypick.wav");
-    angularVelocity = 0;
     hitEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
 
     // 待機ステートへ遷移
@@ -89,6 +85,7 @@ void Player::Update(float elapsedTime)
         break;
     }
 
+    //  カメラステートの更新処理
     UpdateCameraState(elapsedTime);
 
     //弾丸更新処理
@@ -107,6 +104,7 @@ void Player::Update(float elapsedTime)
     // オブジェクト行列を更新
     UpdateTransform();
 
+    // アニメーション更新
     model->UpdateAnimation(elapsedTime);
 
     // モデル行列更新
@@ -121,15 +119,6 @@ bool Player::InputMove(float elapsedTime)
     Camera& camera = Camera::Instance();
     DirectX::XMFLOAT3 cameraRight = camera.GetRight();
     DirectX::XMFLOAT3 cameraFront = camera.GetFront();
-    //if (lockonState != LockonState::NotLocked)
-    //{
-    //    //	ロックオン中は敵への向きで考える
-    //    cameraFront = lockDirection;
-    //    DirectX::XMVECTOR	z = DirectX::XMLoadFloat3(&lockDirection);
-    //    DirectX::XMVECTOR	y = DirectX::XMVectorSet(0, 1, 0, 0);
-    //    DirectX::XMVECTOR	x = DirectX::XMVector3Cross(y, z);
-    //    DirectX::XMStoreFloat3(&cameraRight, x);
-    //}
 
     //進行ベクトル取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -140,19 +129,6 @@ bool Player::InputMove(float elapsedTime)
     {
         Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
     }
-
-    //if (!onClimb)
-    //{
-    //    if (lockonState != LockonState::NotLocked)
-    //    {
-    //        //	ロックオン処理中はロックオン対象に向ける
-    //        Turn(elapsedTime, cameraFront.x, cameraFront.z, turnSpeed);
-    //    }
-    //    else
-    //    {
-    //      Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-    //    }
-    //}
 
     return moveVec.x != 0 || moveVec.y != 0 || moveVec.z != 0;
 }
@@ -210,17 +186,6 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
         //vec.y = 0;
         vec.y = ay * cameraUpY * 3.0f;
     }
-    //else
-    //{
-    //    DirectX::XMFLOAT3 start = { position.x,position.y ,position.z };
-    //    //レイの終点位置は移動後の位置
-    //    DirectX::XMFLOAT3 end = { position.x + velocity.x ,position.y ,position.z + velocity.z };
-    //    HitResult hit;
-    //    if (StageManager::Instance().RayCast(start, end, hit))
-    //    vec.x = ax * cameraRightX;
-    //    vec.y = ay * cameraUpY * 3.0f;
-    //    vec.z = ax * cameraRightZ;
-    //}
 
     return vec;
 }
@@ -251,21 +216,9 @@ void Player::CollisionPlayerVsEnemies()
             DirectX::XMFLOAT3 normal;
             DirectX::XMStoreFloat3(&normal, N);
 
-            // 上から踏んづけた場合は小ジャンプする
-            if (normal.y > 0.8)
-            {
-                Jump(jumpSpeed * 0.5f);
-                enemy->ApplyDamage(1, 0.0f);
-                DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
-                enemyPos.y += enemy->GetHeight();
-                //if (enemy->GetHealth() != 0) hitEffect->Play(enemyPos);
-                //else blowEffect->Play({ enemyPos.x, enemyPos.y -= enemy->GetHeight() * 0.5f, enemyPos.z });
-            }
-            else
-            {
-                // 押し出し後の位置設定
-                enemy->SetPosition(outPosition);
-            }
+            // 押し出し後の位置設定
+            enemy->SetPosition(outPosition);
+
         }
     }
 }
@@ -331,7 +284,6 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                         {
                             hitEffect->Play(enemyPos);
                         }
-                        //else blowEffect->Play(enemyPos);
                     }
                 }
             }
@@ -341,6 +293,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
 
 void Player::PlayAttackAnimation()
 {
+    // 連撃のアニメーション
     switch (attackCount)
     {
     case 1:
@@ -358,12 +311,14 @@ void Player::PlayAttackAnimation()
 
 }
 
+//　カメラステート更新処理
 void Player::UpdateCameraState(float elapsedTime)
 {
+    //  ロックオン・オフ判定用
     static bool tabPressed = false;
 
     CharacterManager& manager = CharacterManager::Instance();
-
+    //  敵の数を取得
     int enemyCount = 0;
     for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
     {
@@ -375,6 +330,7 @@ void Player::UpdateCameraState(float elapsedTime)
         }
     }
 
+    //  敵がいない場合強制フリーカメラ
     if (enemyCount == 0)
     {
         lockonState = LockonState::NotLocked;
@@ -398,17 +354,19 @@ void Player::UpdateCameraState(float elapsedTime)
     {
         if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_TAB)
         {
+            // Tabキーを押すと、ロック判定
             if (!tabPressed)
             {
                 tabPressed = true;
 
+                //  ロックの時
                 if (lockonState == LockonState::Locked)
                 {
                     lockonState = LockonState::NotLocked;
                     lockonEnemy = nullptr;
                     Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &position);
                 }
-                else
+                else //次一番近い敵を比較して探す
                 {
                     DirectX::XMVECTOR p, t, v;
                     float length1, length2;
@@ -531,6 +489,7 @@ void Player::UpdateCameraState(float elapsedTime)
         }
         break;
     }
+    //  死亡した時のカメラ
     case State::Death:
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
         float vx = sinf(angle.y) * 6;
@@ -542,12 +501,14 @@ void Player::UpdateCameraState(float elapsedTime)
     }
 }
 
+//  発射ステートべの遷移
 void Player::TransitionShotingState()
 {
     state = State::Shot;
     model->PlayAnimation(Anim_Shoting, false);
 }
 
+//  発射ステートの更新処理
 void Player::UpdateShotingState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
@@ -556,10 +517,10 @@ void Player::UpdateShotingState(float elapsedTime)
     }
 }
 
+//  弾丸の入力処理
 bool Player::InputProjectile()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-
 
     if (gamePad.GetButtonDown() & GamePad::BTN_X)
     {
@@ -574,13 +535,13 @@ bool Player::InputProjectile()
             angle.y = atan2f(lockDirection.x, lockDirection.z);
             dir = lockDirection;
         }
-        else  //　そうじゃないと直進弾丸発射
+        else  //　ロックしてないなら直進弾丸発射
         {
             dir.x = sinf(angle.y);
             dir.y = 0;
             dir.z = cosf(angle.y);
         }
-        
+
         //　弾が手から出るように、右手のNodeを探す
         Model::Node* RightHandPos = model->FindNode("mixamorig:RightHand");
         DirectX::XMFLOAT3 pos;
@@ -591,19 +552,19 @@ bool Player::InputProjectile()
         ProjectileStraight* projectile = new ProjectileStraight(&projectileManager);
         projectile->Launch(dir, pos);
 
+        //  モデルをレンダラーに登録
         SceneGame& sceneGame = SceneGame::Instance();
-
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
             sceneGame.RegisterRenderModel(projectile->GetModel());
 
         }
-
         return true;
     }
     return false;
 }
 
+//  弾丸と敵との衝突処理
 void Player::CollisionProjectileVsEnemies()
 {
     EnemyManager& enemyManager = EnemyManager::Instance();
@@ -668,7 +629,6 @@ void Player::CollisionProjectileVsEnemies()
 
 }
 
-
 // 攻撃入力処理
 bool Player::InputAttack()
 {
@@ -696,10 +656,13 @@ void Player::TransitionIdleState()
 {
     state = State::Idle;
     onSwing = false;
+
+    //　クライミング中なら別の待機モーション
     if (onClimb)
     {
         model->PlayAnimation(Anim_HoldInWall, true);
     }
+    //　普通も待機モーション
     else
     {
         model->PlayAnimation(Anim_Idle, true);
@@ -769,19 +732,32 @@ void Player::TransitionMoveState()
 // 移動ステート更新処理
 void Player::UpdateMoveState(float elapsedTime)
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    //  ジャンブ中移動とSHIFTキー同時に押すと
+    if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime))
+    {
+        lastState = State::Move;
+        TransitionSwingState();
+    }
+
+    //  目の前に壁がある同時にSpeacキー押したら
     if (hitWall && onClimb)
     {
+        //クライミングステートへの遷移
         TransitionClimbWallState();
     }
 
+    //  移動してないなら
     if (!InputMove(elapsedTime))
     {
+        //待機ステートへの遷移
         TransitionIdleState();
     }
 
-    //ジャンプ入力処理
+    //　もし目の前に壁がいない、ジャンプ入力処理
     if (!hitWall && InputJump())
     {
+        //ジャンブステートへの遷移
         TransitionJumpState();
     }
 
@@ -798,6 +774,7 @@ void Player::UpdateMoveState(float elapsedTime)
     }
 }
 
+//  ジャンブステート
 void Player::TransitionJumpState()
 {
     state = State::Jump;
@@ -806,39 +783,54 @@ void Player::TransitionJumpState()
 
 }
 
+//  ジャンブステートの更新処理
 void Player::UpdateJumpState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
+
+    //　ジャンブ中Spaceキー押すと(仮)
+    //if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
+
+    //  ジャンブ中移動とSHIFTキー同時に押すと
+    if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime))
     {
+        lastState = State::Jump;
+        //  スイングステートへの遷移
         TransitionSwingState();
     }
 
-    //移動入力処理
-    InputMove(elapsedTime);
-    if (!model->IsPlayAnimation())
-    {
-        TransitionIdleState();
-    }
-
+    //  もしクライミング中なら、クライミング状態をキャンセルする
     if (onClimb)
     {
         onClimb = false;
     }
 
+    //移動入力処理
+    InputMove(elapsedTime);
+
+    if (!model->IsPlayAnimation())
+    {
+        // 待機ステートへの遷移
+        TransitionIdleState();
+    }
+
+    //  弾丸の入力処理
     if (InputProjectile())
     {
+        //  発射ステートへの遷移
         TransitionShotingState();
     }
 
 }
 
+//　クライミングステート
 void Player::TransitionClimbWallState()
 {
     state = State::Climb;
     model->PlayAnimation(Anim_Climb, true);
 }
 
+//  クライミングステートへの遷移
 void Player::UpdateClimbWallState(float elapsedTime)
 {
     //　クライミング中Spaceキー押せば元の状態に戻る
@@ -847,6 +839,7 @@ void Player::UpdateClimbWallState(float elapsedTime)
         TransitionJumpState();
     }
 
+    //  移動してないなら待機ステートへの遷移
     if (!InputMove(elapsedTime))
     {
         TransitionIdleState();
@@ -882,8 +875,10 @@ void Player::UpdateAttackState(float elapsedTime)
 
     if (attackCollisionFlag)
     {
+        //  カメラロック中攻撃すると
         if (lockonState == LockonState::Locked && lockonEnemy != nullptr)
         {
+            //  ちょっとだけ敵の方向移動する
             DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
             DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
             DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
@@ -898,16 +893,17 @@ void Player::UpdateAttackState(float elapsedTime)
             DirectX::XMStoreFloat3(&position, playerPos);
         }
 
+        //  連撃によって、ノードとエネミーの衝突処理
         switch (attackCount)
         {
         case 1:
-            CollisionNodeVsEnemies("mixamorig:LeftHandMiddle1", HandRadius);
+            CollisionNodeVsEnemies("mixamorig:LeftHandMiddle1", attackRadius);
             break;
         case 2:
-            CollisionNodeVsEnemies("mixamorig:RightHandMiddle2", HandRadius);
+            CollisionNodeVsEnemies("mixamorig:RightHandMiddle2", attackRadius);
             break;
         case 3:
-            CollisionNodeVsEnemies("mixamorig:RightFoot", HandRadius + 0.2f);
+            CollisionNodeVsEnemies("mixamorig:RightFoot", attackRadius + 0.2f);
             break;
 
         }
@@ -915,8 +911,6 @@ void Player::UpdateAttackState(float elapsedTime)
     }
 
 }
-
-
 
 // ダメージステートへ遷移
 void Player::TransitionDamageState()
@@ -978,7 +972,7 @@ void Player::DrawDebugPrimitive()
                 leftHandBone->worldTransform._41,
                 leftHandBone->worldTransform._42,
                 leftHandBone->worldTransform._43),
-                HandRadius,
+                attackRadius,
                 DirectX::XMFLOAT4(1, 0, 0, 1));
         }
         if (attackCount == 2)
@@ -988,7 +982,7 @@ void Player::DrawDebugPrimitive()
                 rightHandBone->worldTransform._41,
                 rightHandBone->worldTransform._42,
                 rightHandBone->worldTransform._43),
-                HandRadius,
+                attackRadius,
                 DirectX::XMFLOAT4(1, 0, 0, 1));
         }
         if (attackCount == 3)
@@ -998,7 +992,7 @@ void Player::DrawDebugPrimitive()
                 rightFootBone->worldTransform._41,
                 rightFootBone->worldTransform._42,
                 rightFootBone->worldTransform._43),
-                HandRadius,
+                attackRadius,
                 DirectX::XMFLOAT4(1, 0, 0, 1));
         }
 
@@ -1014,48 +1008,38 @@ bool Player::InputJump()
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
     {
-        jumpCount++;
-        switch (jumpCount)
-        {
-        case 1:
-            // ジャンプ入力した
-            Jump(jumpSpeed);
-            return true;
-            break;
-        default:
-            break;
-        }
-
+        // ジャンプ入力した
+        Jump(jumpSpeed);
+        return true;
     }
     return false;
 }
 
+//  着地の時に
 void Player::OnLanding()
 {
-    jumpCount = 0;
+    //下方向の速力が一定以上なら着地ステートへ
+    if (velocity.y < gravity * 5.0f && state != State::Death && state != State::Damage)
+    {
+        //  着地ステートへの遷移
+        TransitionLandState();
+    }
+}
+
+//　着地ステート
+void Player::TransitionLandState()
+{
+    //  スイング同時に着地すると、velocityの影響で床に滑るので
+    //この状況を防ぐため velocityを0にする
     velocity.x = 0;
     velocity.y = 0;
     velocity.z = 0;
-    //下方向の速力が一定以上なら着地ステートへ
-    if (velocity.y < gravity * 5.0f)
-    {
-        TransitionLandState();
-    }
-
-    if (state != State::Death && state != State::Damage)
-    {
-        TransitionLandState();
-    }
-
-}
-
-void Player::TransitionLandState()
-{
     state = State::Land;
     model->PlayAnimation(Anim_Landing, false);
 
 }
 
+//  着地ステートの更新処理
 void Player::UpdateLandState(float elapsedTime)
 {
     onClimb = false;
@@ -1065,52 +1049,91 @@ void Player::UpdateLandState(float elapsedTime)
     }
 }
 
+// スイングステート
 void Player::TransitionSwingState()
 {
     state = State::Swing;
-    if (!onSwing)
+
+    if (lastState == State::Move)
     {
-        model->PlayAnimation(Anim_Swinging2, false);
+        model->PlayAnimation(Anim_StartSwing, false);
+
+        //  スイング糸の貼り付けるのPosition(仮空中)
+        //  プレイヤーの前方上に設定
+        DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+        forwardVec = DirectX::XMVector3Normalize(forwardVec);
+        upVec = DirectX::XMVector3Normalize(upVec);
+
+        forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
+        upVec = DirectX::XMVectorScale(upVec, 11.0f);
+
+        swingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
+
+        DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
+        SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingwebDirection);
+
+        DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
+        onSwing = true;
+
+        //  スイングモデル（現在仮、Geometricに変更予定）
+        SwingWeb* swingWeb = new SwingWeb(&projectileManager);
+        SceneGame& sceneGame = SceneGame::Instance();
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        {
+            //  レンダラーに登録
+            sceneGame.RegisterRenderModel(swingWeb->GetModel());
+
+        }
     }
     else
     {
-        model->PlayAnimation(Anim_Swinging, false);
+        //  連続スイングのモーション
+        if (!onSwing)
+        {
+            model->PlayAnimation(Anim_Swinging2, false);
+        }
+        else //　初回スイングのモーション  
+        {
+            model->PlayAnimation(Anim_Swinging, false);
+        }
+        //  スイング糸の貼り付けるのPosition(仮空中)
+        //  プレイヤーの前方上に設定
+        DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+        forwardVec = DirectX::XMVector3Normalize(forwardVec);
+        upVec = DirectX::XMVector3Normalize(upVec);
+
+        forwardVec = DirectX::XMVectorScale(forwardVec, 10.0f);
+        upVec = DirectX::XMVectorScale(upVec, 7.0f);
+
+        swingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
+
+        DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
+        SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingwebDirection);
+
+        DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
+        onSwing = true;
+
+        //  スイングモデル（現在仮、Geometricに変更予定）
+        SwingWeb* swingWeb = new SwingWeb(&projectileManager);
+        SceneGame& sceneGame = SceneGame::Instance();
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        {
+            //  レンダラーに登録
+            sceneGame.RegisterRenderModel(swingWeb->GetModel());
+
+        }
     }
-    DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
-    DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
-    forwardVec = DirectX::XMVector3Normalize(forwardVec);
-    upVec = DirectX::XMVector3Normalize(upVec);
-
-    forwardVec = DirectX::XMVectorScale(forwardVec, 10.0f);
-    upVec = DirectX::XMVectorScale(upVec, 7.0f);
-
-    DirectX::XMVECTOR swingDirection = DirectX::XMVectorAdd(forwardVec, upVec);
-
-    DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
-    SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingDirection);
-
-    DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
-    onSwing = true;
-
 
 }
 
+//  スイングステートの更新処理
 void Player::UpdateSwingState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
     {
         model->PlayAnimation(Anim_Swinging2, true);
-    }
-
-    //レイの開始位置と終点位置
-    DirectX::XMFLOAT3 start = { position.x,position.y + 0.5f,position.z };
-    DirectX::XMFLOAT3 end = { position.x + velocity.x, position.y + 0.5f, position.z + velocity.z };
-
-    //レイキャストによる壁判定
-    HitResult hit;
-    if (StageManager::Instance().RayCast(start, end, hit))
-    {
-        position = hit.position;
     }
 
     //スイング位置
@@ -1126,6 +1149,14 @@ void Player::UpdateSwingState(float elapsedTime)
     //仮の重力
     DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -10.0f, 0.0f, 0.0f);
 
+    //速力更新
+    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
+    //仮の空気阻力系数
+    const float dragCoefficient = 0.005f;
+    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
+
+
     //糸の修正
     if (currentLength > ropeLength)
     {
@@ -1133,14 +1164,6 @@ void Player::UpdateSwingState(float elapsedTime)
         DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
         Q = DirectX::XMVectorAdd(Q, correction);
     }
-
-    //速力更新
-    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
-
-    //仮の空気阻力系数
-    const float dragCoefficient = 0.005f;
-    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
 
     DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
 
@@ -1150,10 +1173,12 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMStoreFloat3(&velocity, tangentVelocity);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
+
+
+    if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
     {
-        TransitionSwingState();
-        //TransitionIdleState();
+        //TransitionSwingState();
+        TransitionIdleState();
         //velocity = { 0.0f, 0.0f, 0.0f }; 
     }
 }

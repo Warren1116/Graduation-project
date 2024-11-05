@@ -15,6 +15,7 @@
 #include "Renderer/PostprocessingRenderer.h"
 #include "MetaAI.h"
 
+
 // ゲームシーン
 class SceneGame : public Scene
 {
@@ -22,6 +23,20 @@ public:
     SceneGame() {}
     ~SceneGame() override {}
     static SceneGame& Instance() { return *instance; }
+
+    enum class TutorialState
+    {
+        Null,
+        Move,
+        Jump,
+        Attack,
+        Shot,
+        CameraLock,
+        LockAttack,
+        LockShot,
+        //Swing,
+        Done,
+    };
 
     // 初期化
     void Initialize() override;
@@ -35,9 +50,24 @@ public:
     // 描画処理
     void Render() override;
 
-    void RenderEnemyGauge(ID3D11DeviceContext* dc,
-        const DirectX::XMFLOAT4X4& view,
-        const DirectX::XMFLOAT4X4& projection);
+
+    //　チュトリアル用判定
+    bool isPaused = false;
+    //  チュトリアルステートの更新処理
+    void UpdateTutorialState(float elapsedTime);
+    //  チュトリアル始まる時にの設定
+    void SceneGame::StartTutorial(TutorialState newState);
+    //  チュトリアルステートの変更
+    void SceneGame::AdvanceTutorialState(TutorialState newState);
+    //  チュトリアルのタイマーチェック
+    void SceneGame::CheckTutorialTimeout(float timeout);
+
+    bool GetIsPaused() { return isPaused; }
+
+    TutorialState GetTutorialState() { return tutorialState; }
+
+    void UnpauseGame();
+    void PauseGame();
 
     void RegisterRenderModel(Model* model);
     void UnregisterRenderModel(Model* model);
@@ -59,31 +89,10 @@ public:
     DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
 private:
-    // 3D空間の描画
-    //void Render3DScene();
-
-
-private:
     std::unique_ptr<Player> player;
-
-    std::unique_ptr<Sprite> gauge;
-    std::unique_ptr<Sprite> crossHair;
-    std::unique_ptr<Sprite> ammo;
-    std::unique_ptr<Sprite> dead;
-    std::unique_ptr<Sprite> clear;
-    std::unique_ptr<Sprite> text1;
-    std::unique_ptr<Sprite> text2;
-    std::unique_ptr<AudioSource> bgm = nullptr;
-    std::unique_ptr<AudioSource> heri = nullptr;
-
     std::unique_ptr<CameraController> cameraController;
 
-    float a = 0;
-    float deadAlpha = 0;
-    float clearAlpha = 0;
-    int clearTimer = 0;
-
-    //オフスクリーンレンダリング用描画ターゲット
+    //  オフスクリーンレンダリング用描画ターゲット
     std::unique_ptr<RenderTarget> renderTarget;
 
     Light* mainDirectionalLight = nullptr;
@@ -93,9 +102,13 @@ private:
     Light* spotLights[3];
     std::unique_ptr<Sprite>		renderSplite;
 
-    //MetaAIオブジェクト追加
+    //  MetaAIオブジェクト追加
     Meta* meta = nullptr;
 
+    //  チュトリアルステート
+    TutorialState tutorialState = TutorialState::Null;
+    float  tutorialTimer;
+    bool canAcceptInput;
 
 
 };

@@ -46,6 +46,9 @@
     <Filter Include="Source\Graphics\Shader">
       <UniqueIdentifier>{299213e9-1eed-4d6d-a2e6-9444c3762147}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI">
+      <UniqueIdentifier>{2a6f9028-dfd6-4505-9da3-334498146ea1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -207,9 +210,6 @@
     <ClInclude Include="Source\WayPoint.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneTutorial.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SearchAlgorithm.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
@@ -258,12 +258,6 @@
     <ClInclude Include="Source\Graphics\Texture.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\TutorialZombie.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\TitleZombie.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SceneClear.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
@@ -306,7 +300,7 @@
     <ClInclude Include="Source\CharacterManager.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\geometric_primitive.h">
+    <ClInclude Include="Source\Graphics\Geometric_primitive.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\BrokenProjectileManager.h">
@@ -314,6 +308,12 @@
     </ClInclude>
     <ClInclude Include="Source\Renderer\SceneRenderer.h">
       <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UI.h">
+      <Filter>Source\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SwingWeb.h">
+      <Filter>Source\Character</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -455,9 +455,6 @@
     <ClCompile Include="Source\Graphics\LightManager.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\TutorialZombie.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Renderer\BaseRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
@@ -482,9 +479,6 @@
     <ClCompile Include="Source\Graphics\RenderTarget.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SceneTutorial.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\Shader\ShadowmapCasterShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
     </ClCompile>
@@ -508,9 +502,6 @@
     </ClCompile>
     <ClCompile Include="Source\BehaviorData.cpp">
       <Filter>Source\System\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\TitleZombie.cpp">
-      <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\SceneClear.cpp">
       <Filter>Source\Scene</Filter>
@@ -545,7 +536,7 @@
     <ClCompile Include="Source\CharacterManager.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\geometric_primitive.cpp">
+    <ClCompile Include="Source\Graphics\Geometric_primitive.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Shader.cpp">
@@ -556,6 +547,12 @@
     </ClCompile>
     <ClCompile Include="Source\Renderer\SceneRenderer.cpp">
       <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI.cpp">
+      <Filter>Source\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SwingWeb.cpp">
+      <Filter>Source\Character</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -598,10 +595,10 @@
     <None Include="HLSL\Skybox.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\geometric_primitive.hlsli">
-      <Filter>Source\Graphics\Shader</Filter>
-    </None>
     <None Include="HLSL\ShadowmapFunctions.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\geometric_primitive.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>
@@ -669,11 +666,11 @@
     <FxCompile Include="HLSL\SkyboxVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\geometric_primitive_ps.hlsl">
-      <Filter>Source\Graphics\Shader</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\geometric_primitive_vs.hlsl">
-      <Filter>Source\Graphics\Shader</Filter>
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\geometric_primitive_ps.hlsl">
+      <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

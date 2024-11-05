@@ -4,18 +4,12 @@
 #include "Projectile.h"
 #include "Audio/Audio.h"
 
-// 直進弾丸
+// 壁にぶつかった弾丸（仮）
 class ProjectileWall : public Projectile
 {
 public:
 	ProjectileWall(BrokenProjectileManager* manager);
 	~ProjectileWall() override;
-
-	//static ProjectileWall& Instance()
-	//{
-	//	static ProjectileWall instance;
-	//	return instance;
-	//}
 
 	// 更新処理
 	void Update(float elapsedTime) override;
@@ -25,9 +19,6 @@ public:
 
 private:
 	float lifeTimer = 3.0f;
-
-
-	std::unique_ptr<AudioSource> nohit = nullptr;
 
 };
 

@@ -14,6 +14,7 @@
 #include "Graphics/geometric_primitive.h"
 #include "BrokenProjectileManager.h"
 #include <memory.h>
+#include "Enemy.h"
 
 
 // プレイヤー
@@ -36,17 +37,36 @@ public:
 	// ジャンプ入力処理
 	bool InputJump();
 
-	
+	//　弾丸の入力処理
+	bool InputProjectile();
+
+	// 攻撃入力処理
+	bool InputAttack();
+
+	// ロックオンステート
+	enum class LockonState
+	{
+		NotLocked,
+		Locked,
+	};
 
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive();
 
+	//	弾丸のマネージャーを取る
 	ProjectileManager& GetProjectileManager() { return projectileManager; }
+	//	破壊した弾丸のマネージャーを取る（仮）
 	BrokenProjectileManager& GetBrokenProjectileManager() { return brokenprojectileManager; }
-
+	//	プレイヤーのロックステートを取る
+	LockonState GetlockonState() { return lockonState; }
+	//　ロック中の敵を取得
+	Enemy* GetLockonEnemy() const { return static_cast<Enemy*>(lockonEnemy); }
+	//	スイング位置を取得（仮）
+	DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }
 
 	std::unique_ptr<Model> model = nullptr;
 
+	// ステート
 	enum class State
 	{
 		Idle,
@@ -68,26 +88,26 @@ public:
 	const State& GetState() const { return state; }
 	const State& GetAttackState() const { return State::Attack; }
 
-	//std::unique_ptr<AudioSource> null = nullptr;
-
 
 protected:
 
-	// 死亡したときに呼ばれる
+	// ダメージを受けたときに呼ばれる
 	void OnDamaged() override;
 
 	// 死亡したときに呼ばれる
 	void OnDead() override;
 
+	//　着地の時に呼ばれる
 	void OnLanding() override;
 
 private:
-	// 攻撃入力処理
-	bool InputAttack();
 	// プレイヤーとエネミーとの衝突処理
 	void CollisionPlayerVsEnemies();
-
+	//	弾丸と敵との衝突処理
 	void CollisionProjectileVsEnemies();
+
+	// ノードとエネミーの衝突処理
+	void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);
 
 	// 待機ステートへ遷移
 	void TransitionIdleState();
@@ -137,33 +157,24 @@ private:
 	// 着地ステート更新処理
 	void UpdateLandState(float elapsedTime);
 
-	// Swingテートへ遷移
+	// スイングステートをへ遷移
 	void TransitionSwingState();
 
-	// Swingステート更新処理
+	// スイングステート更新処理
 	void UpdateSwingState(float elapsedTime);
-
-	// ノードとエネミーの衝突処理
-	void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);
-
-	void PlayAttackAnimation();
 
 	// カメラステートの更新
 	void UpdateCameraState(float elapsedTime);
 
+	//	発射ステートをへ遷移
 	void TransitionShotingState();
 
+	//	発射ステート更新処理
 	void UpdateShotingState(float elapsedTime);
 
+	//	連撃攻撃のモーション
+	void PlayAttackAnimation();
 
-
-private:
-	static Player* instance;
-
-	ProjectileManager projectileManager;
-	BrokenProjectileManager brokenprojectileManager;
-
-	bool InputProjectile();
 
 private:
 	//アニメーション
@@ -189,47 +200,47 @@ private:
 		Anim_Shoting,
 	};
 
-	// ロックオンステート
-	enum class LockonState
-	{
-		NotLocked,
-		Locked,
-	};
 
 private:
+	// 唯一のinstance
+	static Player* instance;
+	ProjectileManager projectileManager;
+	BrokenProjectileManager brokenprojectileManager;
+
+private:
+	// 移動ベクトル取得
 	DirectX::XMFLOAT3 GetMoveVec() const;
-
+	//　移動スビート
 	float moveSpeed = 5.0f;
-
+	//	クライミングスビート
 	float climbSpeed = 5.0f;
+	//	回転スビート
 	float turnSpeed = DirectX::XMConvertToRadians(720);
+	//　ジャンブスビート
 	float jumpSpeed = 20.0f;
-	int jumpCount = 0;
-	int jumpLimit = 1;
+	//　ヒットエフェクト
 	std::unique_ptr<Effect> hitEffect = nullptr;
 
-	std::unique_ptr<AudioSource> outOfBullets = nullptr;
-	std::unique_ptr<AudioSource> walk = nullptr;
-	
+	// ステート
 	State state = State::Idle;
-	float leftHandRadius = 0.4f;
 	bool attackCollisionFlag = false;
 	float maxAngleX = DirectX::XMConvertToRadians(35);
 	float mixAngleX = DirectX::XMConvertToRadians(-35);
+	State lastState;
 
-
+	//モデルノード
 	std::vector<Model::NodePose> nodePoses;
 
-	float HandRadius = 0.4f;
-
-	//攻撃の回数
+	// 攻撃半径
+	float attackRadius = 0.4f;
+	// 攻撃の回数
 	int attackCount = 0;
 	int attackLimit = 3;
 	float attackTimer = 0;
-
+	//	攻撃判定
 	bool attacking = false;
 
-
+	//カメラロック用
 	LockonState			lockonState = LockonState::NotLocked;
 	float				lockonTargetChangeTime = 0;
 	float				lockonTargetChangeTimeMax = 8;
@@ -240,10 +251,8 @@ private:
 	//糸用
 	float swingTime = 0.0f;
 	float swingAngle = 0.0f;
-	DirectX::XMFLOAT3 swingPoint = { 0.0f, 10.0f, 0.0f };
-	float angularVelocity;
-	std::unique_ptr<Model> SwingWeb;
-	float shotingTimer = 0.0f;
-
+	DirectX::XMFLOAT3 swingPoint;
+	DirectX::XMVECTOR swingwebDirection;
+	DirectX::XMFLOAT3 highestSwingPoint;
 };
 

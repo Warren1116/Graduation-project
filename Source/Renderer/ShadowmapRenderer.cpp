@@ -15,33 +15,19 @@ ShadowmapRenderer::~ShadowmapRenderer()
 
 ShadowMapData ShadowmapRenderer::GetShadowMapData()
 {
-    //ShadowMapData shadowMapData;
-    //for (int i = 0; i < ShadowmapCount; ++i)
-    //{
-    //    shadowMapData.shadowMap[i] = depthStencil->GetShaderResourceView().Get();
-    //    DirectX::XMFLOAT4X4 view, projection;
-    //    CalcShadowmapMatrix(view, projection);
-    //    DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection[i],
-    //        DirectX::XMLoadFloat4x4(&view) * DirectX::XMLoadFloat4x4(&projection));
-    //    shadowMapData.shadowBias[i] = shadowBias;
-    //    shadowMapData.shadowColor = shadowColor;
-    //}
-
-    //return shadowMapData;
-
     ShadowMapData shadowMapData;
-    shadowMapData.shadowMap[0] = depthStencil->GetShaderResourceView().Get();
-
-    DirectX::XMFLOAT4X4 view, projection;
-    CalcShadowmapMatrix(view, projection);
-    DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection[0],
-        DirectX::XMLoadFloat4x4(&view) * DirectX::XMLoadFloat4x4(&projection));
-
-    shadowMapData.shadowBias[0] = shadowBias;
-    shadowMapData.shadowColor = shadowColor;
+    for (int i = 0; i < ShadowmapCount; ++i)
+    {
+        shadowMapData.shadowMap[i] = depthStencil->GetShaderResourceView().Get();
+        DirectX::XMFLOAT4X4 view, projection;
+        CalcShadowmapMatrix(view, projection);
+        DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection[i],
+            DirectX::XMLoadFloat4x4(&view) * DirectX::XMLoadFloat4x4(&projection));
+        shadowMapData.shadowBias[i] = shadowBias;
+        shadowMapData.shadowColor = shadowColor;
+    }
 
     return shadowMapData;
-
 }
 
 void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
@@ -57,29 +43,6 @@ void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
     dc->OMSetRenderTargets(0, nullptr, dsv);
     dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-
-    //for (int i = 0; i < ShadowmapCount ;++i)
-    //{
-    //    //ビューポートの設定
-    //    D3D11_VIEWPORT vp{};
-    //    vp.Width = static_cast<float>(shadowmapDepthStencil[i]->GetWidth());
-    //    vp.Height = static_cast<float> (shadowmapDepthStencil[i]->GetHeight());
-    //    vp.MinDepth = 0.0f;
-    //    vp.MaxDepth = 1.0f;
-    //    dc->RSSetViewports(1, &vp);
-
-    //    // 描画コンテキストに情報をセット
-    //    RenderContext rc;
-    //    {
-    //        rc.deviceContext = dc;
-    //        rc.screenSize.x = vp.Width;
-    //        rc.screenSize.y = vp.Height;
-    //        rc.screenSize.z = Near;
-    //        rc.screenSize.w = Far;
-    //        CalcShadowmapMatrix(rc.view, rc.projection);
-    //    }
-
-    //}
 
     // ビューポートの設定
     D3D11_VIEWPORT	vp = {};
@@ -122,10 +85,8 @@ void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
     }
     shader->End(rc);
 
-
     //	元のバッファに戻す
     RestoreRenderTargets(dc);
-
 
 }
 

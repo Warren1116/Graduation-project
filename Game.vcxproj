@@ -138,7 +138,7 @@
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\DepthStencil.h" />
-    <ClInclude Include="Source\Graphics\geometric_primitive.h" />
+    <ClInclude Include="Source\Graphics\Geometric_primitive.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h" />
     <ClInclude Include="Source\Graphics\Light.h" />
@@ -186,7 +186,6 @@
     <ClInclude Include="Source\SceneLoading.h" />
     <ClInclude Include="Source\SceneManager.h" />
     <ClInclude Include="Source\SceneTitle.h" />
-    <ClInclude Include="Source\SceneTutorial.h" />
     <ClInclude Include="Source\SearchAlgorithm.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageMain.h" />
@@ -194,9 +193,9 @@
     <ClInclude Include="Source\StageTutorial.h" />
     <ClInclude Include="Source\StateDerived.h" />
     <ClInclude Include="Source\StateMachine.h" />
+    <ClInclude Include="Source\SwingWeb.h" />
     <ClInclude Include="Source\Telegram.h" />
-    <ClInclude Include="Source\TitleZombie.h" />
-    <ClInclude Include="Source\TutorialZombie.h" />
+    <ClInclude Include="Source\UI.h" />
     <ClInclude Include="Source\WayPoint.h" />
   </ItemGroup>
   <ItemGroup>
@@ -226,7 +225,7 @@
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\DepthStencil.cpp" />
-    <ClCompile Include="Source\Graphics\geometric_primitive.cpp" />
+    <ClCompile Include="Source\Graphics\Geometric_primitive.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp" />
     <ClCompile Include="Source\Graphics\Light.cpp" />
@@ -269,7 +268,6 @@
     <ClCompile Include="Source\SceneLoading.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\SceneTitle.cpp" />
-    <ClCompile Include="Source\SceneTutorial.cpp" />
     <ClCompile Include="Source\SearchAlgorithm.cpp" />
     <ClCompile Include="Source\StageMain.cpp" />
     <ClCompile Include="Source\StageManager.cpp" />
@@ -277,8 +275,8 @@
     <ClCompile Include="Source\StateBase.cpp" />
     <ClCompile Include="Source\StateDerived.cpp" />
     <ClCompile Include="Source\StateMachine.cpp" />
-    <ClCompile Include="Source\TitleZombie.cpp" />
-    <ClCompile Include="Source\TutorialZombie.cpp" />
+    <ClCompile Include="Source\SwingWeb.cpp" />
+    <ClCompile Include="Source\UI.cpp" />
     <ClCompile Include="Source\WayPoint.cpp" />
   </ItemGroup>
   <ItemGroup>

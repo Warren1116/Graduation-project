@@ -233,30 +233,25 @@ void PhongShader::Begin(const RenderContext& rc)
     // シャドウマップ用定数バッファ更新
     CbShadowMap cbShadowMap;
     cbShadowMap.shadowColor = rc.shadowMapData.shadowColor;
-    //cbShadowMap.shadowBias = rc.shadowMapData.shadowBias;
-    //cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection;
-    //cbShadowMap.shadowBias = rc.shadowMapData.shadowBias[0];
-    //cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection[0];
 
-    //for (int i = 0; i < ShadowmapCount; ++i)
-    //{
-    //    //	バイアスの処理が4枚以上は考慮していないのでアサートで止めておく
-    //    assert(ShadowmapCount <= 4);  //本来はstatic_assertの使用が望ましい
-    //    (&cbShadowMap.shadowBias.x)[i] = rc.shadowMapData.shadowBias[i];
-    //    cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
-    //}
+    for (int i = 0; i < ShadowmapCount; ++i)
+    {
+        //	バイアスの処理が4枚以上は考慮していないのでアサートで止めておく
+        assert(ShadowmapCount <= 4);  //本来はstatic_assertの使用が望ましい
+        (&cbShadowMap.shadowBias.x)[i] = rc.shadowMapData.shadowBias[i];
+        cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
+    }
 
-    //rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
+    rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
     //シャドウマップ設定
 
-    //rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap);
-    //rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap[0]);
-    //ID3D11ShaderResourceView* srvs[ShadowmapCount];
-    //for (int i = 0; i < ShadowmapCount; ++i)
-    //{
-    //    srvs[i] = rc.shadowMapData.shadowMap[i];
-    //}
-    //rc.deviceContext->PSSetShaderResources(2, ShadowmapCount, srvs);
+    rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap[0]);
+    ID3D11ShaderResourceView* srvs[ShadowmapCount];
+    for (int i = 0; i < ShadowmapCount; ++i)
+    {
+        srvs[i] = rc.shadowMapData.shadowMap[i];
+    }
+    rc.deviceContext->PSSetShaderResources(2, ShadowmapCount, srvs);
 
 }
 

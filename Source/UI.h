@@ -3,7 +3,6 @@
 #include "Graphics\Model.h"
 #include "Graphics\Sprite.h"
 
-
 class UI
 {
 public:
@@ -26,8 +25,15 @@ public:
 
 
 private:
-    std::unique_ptr<Sprite> HpBar;
-    std::unique_ptr<Sprite> Hp;
+    std::unique_ptr<Sprite> LockOnScope;
+    std::unique_ptr<Sprite> TutorialMove;
+    std::unique_ptr<Sprite> TutorialJump;
+    std::unique_ptr<Sprite> TutorialAttack;
+    std::unique_ptr<Sprite> TutorialShot;
+    std::unique_ptr<Sprite> TutorialCameraLock;
+    std::unique_ptr<Sprite> TextFont;
+
+    std::unique_ptr<Sprite> TutorialKey;
 
 
 };

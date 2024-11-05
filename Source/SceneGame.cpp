@@ -17,11 +17,13 @@
 #include "EnemyThief.h"
 #include "CharacterManager.h"
 #include "Messenger.h"
+#include "UI.h"
 
 #include "Graphics/geometric_primitive.h"
 
 SceneGame* SceneGame::instance = nullptr;
 
+//#define Tutorial
 
 // 初期化
 void SceneGame::Initialize()
@@ -92,58 +94,6 @@ void SceneGame::Initialize()
     enemyManager.Register(people2);
 
 
-
-    //switch (stageMain->GetStageNum())
-    //{
-    //case 0:
-    //{
-    //    Zombie* zombies[11];
-    //    for (int i = 0; i < 11; ++i)
-    //    {
-    //        zombies[i] = new Zombie();
-    //        enemyManager.Register(zombies[i]);
-    //    }
-    //    zombies[0]->SetPosition(DirectX::XMFLOAT3(15.0f, 0.0f, 4.0f));
-    //    zombies[1]->SetPosition(DirectX::XMFLOAT3(22.0f, 0.0f, 4.0f));
-    //    zombies[2]->SetPosition(DirectX::XMFLOAT3(30.0f, 0.0f, 4.0f));
-    //    zombies[3]->SetPosition(DirectX::XMFLOAT3(37.0f, 0.0f, 4.0f));
-    //    zombies[4]->SetPosition(DirectX::XMFLOAT3(45.0f, 0.0f, 4.0f));
-    //    zombies[5]->SetPosition(DirectX::XMFLOAT3(44.0f, 0.0f, 20.0f));
-    //    zombies[6]->SetPosition(DirectX::XMFLOAT3(37.0f, 0.0f, 20.0f));
-    //    zombies[7]->SetPosition(DirectX::XMFLOAT3(15.0f, 0.0f, 15.0f));
-    //    zombies[8]->SetPosition(DirectX::XMFLOAT3(20.0f, 0.0f, 15.0f));
-    //    zombies[9]->SetPosition(DirectX::XMFLOAT3(25.0f, 0.0f, 15.0f));
-    //    zombies[10]->SetPosition(DirectX::XMFLOAT3(35.0f, 0.0f, 15.0f));
-    //    for (int i = 0; i < 11; ++i)
-    //    {
-    //        zombies[i]->AddStart(zombies[i]);
-    //    }
-    //    ItemKey* items[3];
-    //    for (int i = 0; i < 3; ++i)
-    //    {
-    //        items[i] = new ItemKey();
-    //        items[i]->SetAngle({ DirectX::XMConvertToRadians(90), DirectX::XMConvertToRadians(90), DirectX::XMConvertToRadians(90) });
-    //        itemManager.Register(items[i]);
-    //    }
-    //    items[0]->SetPosition(DirectX::XMFLOAT3(15.0f, 0.0f, 15.0f));
-    //    items[1]->SetPosition(DirectX::XMFLOAT3(44.0f, 0.0f, 4.0f));
-    //    items[2]->SetPosition(DirectX::XMFLOAT3(3.0f, 0.0f, 13.5f));
-    //    break;
-    //}
-    //for (int i = 0; i < 3; ++i)
-    //{
-    //    spotLights[i] = new Light(LightType::Spot);
-    //    DirectX::XMFLOAT3 targetPosition;
-    //    targetPosition = { itemManager.GetItem(i)->GetPosition().x, itemManager.GetItem(i)->GetPosition().y + 5.0f, itemManager.GetItem(i)->GetPosition().z };
-    //    spotLights[i]->SetPosition(targetPosition);
-    //    spotLights[i]->SetRange(10);
-    //    spotLights[i]->SetDirection({ 0,-1,0 });
-    //    spotLights[i]->SetColor({ 1,1,1,1 });
-    //    spotLights[i]->SetOuterCorn(0.99f);
-    //    LightManager::Instance().Register(spotLights[i]);
-    //}
-    //}
-
     //	モデルを各レンダラーに登録
     if (stageMain->GetStageNum() == 0 || stageMain->GetStageNum() == 1)
     {
@@ -158,14 +108,7 @@ void SceneGame::Initialize()
         for (Model* model : list)
         {
             RegisterRenderModel(model);
-            //shadowmapRenderer->RegisterRenderModel(model);
-            //sceneRenderer->RegisterRenderModel(model);
-            //const ModelResource* resource = model->GetResource();
-            //for (const ModelResource::Material& material : resource->GetMaterials())
-            //{
-            //    ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
-            //    mat.shaderId = static_cast<int>(ModelShaderId::Phong);
-            //}
+
         }
     }
 
@@ -177,22 +120,13 @@ void SceneGame::Initialize()
 
         // カメラコントローラー初期化
         cameraController = std::make_unique<CameraController>();
-       
+
         // エネミー初期化
         characterManager.Register(people);
         characterManager.Register(people2);
 
     }
 
-    ammo = std::make_unique<Sprite>("Data/Sprite/ammo.png");
-    dead = std::make_unique<Sprite>("Data/Sprite/youdead.png");
-    clear = std::make_unique<Sprite>("Data/Sprite/black.png");
-    text1 = std::make_unique<Sprite>("Data/Font/font1.png");
-    text2 = std::make_unique<Sprite>("Data/Font/font6.png");
-
-    // ゲージスプライト
-    gauge = std::make_unique<Sprite>();
-    crossHair = std::make_unique<Sprite>();
 
     // 平行光源を追加
     {
@@ -207,10 +141,9 @@ void SceneGame::Initialize()
 
     meta = new Meta(player.get(), &enemyManager);
 
+    //  UIの初期化
+    UI::Instance().Initialize();
 
-    //bgm = Audio::Instance().LoadAudioSource("Data/Audio/zombie.wav");
-    //heri = Audio::Instance().LoadAudioSource("Data/Audio/heri1.wav");
-    //bgm->Play(true);
 }
 
 // 終了化
@@ -223,20 +156,40 @@ void SceneGame::Finalize()
     StageManager::Instance().Clear();
 
     LightManager::Instance().Clear();
-
     EffectManager::Instance().Finalize();
     instance = nullptr;
 
     shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
-    
+
     mainDirectionalLight = nullptr;
+    //  UI終了化
+    UI::Instance().Clear();
 
 }
 
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+
+#ifdef Tutorial
+        //  チュトリアルのタイマー
+        tutorialTimer += elapsedTime;
+
+        if (tutorialTimer > 5.0f && tutorialState == SceneGame::TutorialState::Null)
+        {
+            StartTutorial(SceneGame::TutorialState::Move);
+        }
+
+        UpdateTutorialState(elapsedTime);
+
+
+        if (isPaused)
+        {
+            return;
+        }
+#endif // Tutorial
+
     Graphics& graphics = Graphics::Instance();
 
     // カメラコントローラー更新処理
@@ -246,24 +199,19 @@ void SceneGame::Update(float elapsedTime)
     // ステージ更新処理
     StageManager::Instance().Update(elapsedTime);
 
-    //DirectX::XMFLOAT3 target = player->GetPosition();
-    //target.y += 0.5f;
-    //CameraController::Instance().SetTarget(target);
-    //CameraController::Instance().Update(elapsedTime);
-
-
     // プレイヤー更新処理
     player->Update(elapsedTime);
-
-    //if (player->GetHealth() <= 0)  deadAlpha += 0.015f;
-    //if (deadAlpha >= 1.5f)  SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle));
-
 
     // エネミー更新処理
     EnemyManager::Instance().Update(elapsedTime);
 
     // エフェクト更新処理
     EffectManager::Instance().Update(elapsedTime);
+
+    //  UI更新処理
+    UI::Instance().Update(elapsedTime);
+
+
 }
 
 // 描画処理
@@ -282,11 +230,10 @@ void SceneGame::Render()
     dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
-
     // 描画処理
     RenderContext rc;
     rc.deviceContext = dc;
-
+    rc.shadowMapData = shadowmapRenderer->GetShadowMapData();
     // シャドウマップの描画
     shadowmapRenderer->Render(rc.deviceContext);
 
@@ -310,37 +257,7 @@ void SceneGame::Render()
 
     //2Dスプライト描画
     {
-        //gauge->Render(dc,
-        //    100, 750,
-        //    15 * (player->GetMaxHealth() * player->GetMaxHealth()), 25,
-        //    0, 0,
-        //    static_cast<float>(gauge->GetTextureWidth()), static_cast<float>(gauge->GetTextureHeight()),
-        //    0,
-        //    0, 0, 0, 1);
-
-        //gauge->Render(dc,
-        //    100, 750,
-        //    15 * (player->GetHealth() * player->GetMaxHealth()), 25,
-        //    0, 0,
-        //    static_cast<float>(gauge->GetTextureWidth()), static_cast<float>(gauge->GetTextureHeight()),
-        //    0,
-        //    0, 1, 0, 1);
-
-        //crossHair->Render(dc,
-        //    graphics.GetScreenWidth() / 2.0f + 5.0f, graphics.GetScreenHeight() / 2.0f + 5.0f,
-        //    3.5, 3.5,
-        //    0, 0,
-        //    static_cast<float>(crossHair->GetTextureWidth()), static_cast<float>(crossHair->GetTextureHeight()),
-        //    0,
-        //    1, 1, 1, 1);
-
-        //ammo->Render(dc,
-        //    1265, 735,
-        //    75, 75,
-        //    0, 0,
-        //    static_cast<float>(ammo->GetTextureWidth()), static_cast<float>(ammo->GetTextureHeight()),
-        //    0,
-        //    1, 1, 1, 1);
+        UI::Instance().DrawUI(dc, rc.view, rc.projection);
     }
 
     // 2DデバッグGUI描画
@@ -348,7 +265,51 @@ void SceneGame::Render()
         player->DrawDebugGUI();
         EnemyManager::Instance().DrawDebugGUI();
 
-        //StageManager::Instance().GetStage(0)->DrawDebugGUI();
+        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+        if (ImGui::Begin("Tutorial", nullptr, ImGuiWindowFlags_None))
+        {
+            if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::InputFloat("Tutorial", &tutorialTimer);
+
+                std::string str = "";
+                switch (tutorialState)
+                {
+                case TutorialState::Move:
+                    str = "Tutorial Move";
+                    break;
+                case TutorialState::Jump:
+                    str = "Tutorial Jump";
+                    break;
+                case TutorialState::Attack:
+                    str = "Tutorial Attack";
+                    break;
+                case TutorialState::Shot:
+                    str = "Tutorial Shot";
+                    break;
+                case TutorialState::CameraLock:
+                    str = "Tutorial CameraLock";
+                    break;
+                case TutorialState::LockAttack:
+                    str = "Tutorial LockAttack";
+                    break;
+                case TutorialState::LockShot:
+                    str = "Tutorial LockShot";
+                    break;
+                case TutorialState::Done:
+                    str = "Tutorial Finish";
+                    break;
+                }
+                ImGui::Text(u8"State　%s", str.c_str());
+
+
+            }
+
+        }
+        ImGui::End();
+
     }
 
 
@@ -365,107 +326,97 @@ void SceneGame::Render()
 
     }
 
-    {
-        float screenWidth = static_cast<float>(graphics.GetScreenWidth());
-        float screenHeight = static_cast<float>(graphics.GetScreenHeight());
-        float textureWidth = static_cast<float>(dead->GetTextureWidth());
-        float textureHeight = static_cast<float>(dead->GetTextureHeight());
-
-        dead->Render(dc,
-            0, 0,
-            screenWidth, screenHeight,
-            0, 0,
-            textureWidth, textureHeight,
-            0,
-            1, 1, 1, deadAlpha);
-
-        clear->Render(dc,
-            0, 0,
-            screenWidth, screenHeight,
-            0, 0,
-            screenWidth, screenHeight,
-            0,
-            1, 1, 1, clearAlpha);
-    }
 }
 
-// エネミーHPゲージ描画
-void SceneGame::RenderEnemyGauge(ID3D11DeviceContext* dc,
-    const DirectX::XMFLOAT4X4& view,
-    const DirectX::XMFLOAT4X4& projection)
+void SceneGame::UpdateTutorialState(float elapsedTime)
 {
-    // ビューポート
-    D3D11_VIEWPORT viewport;
-    UINT numViewports = 1;
-    dc->RSGetViewports(&numViewports, &viewport);
+    GamePad& gamePad = Input::Instance().GetGamePad();
 
-    // 変換行列
-    DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
-    DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
-    DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
-
-    // すべての敵の頭上にHPゲージを表示
-    EnemyManager& enemyManager = EnemyManager::Instance();
-    int enemyCount = enemyManager.GetEnemyCount();
-
-    for (int i = 0; i < enemyCount; ++i)
+    switch (tutorialState)
     {
-        Enemy* enemy = enemyManager.GetEnemy(i);
+    case SceneGame::TutorialState::Move:
+        CheckTutorialTimeout(0.0f);
+        if (Player::Instance().InputMove(elapsedTime) &&canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::Jump);
+        break;
 
-        DirectX::XMVECTOR enemyPosition = DirectX::XMVectorSet(enemy->GetPosition().x,
-            enemy->GetPosition().y + (enemy->GetHeight()),
-            enemy->GetPosition().z, 0.0f);
+    case SceneGame::TutorialState::Jump:
+        CheckTutorialTimeout(5.0f);
+        if (Player::Instance().InputJump() && canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::Attack);
+        break;
 
-        // 模範解答
-        /*DirectX::XMFLOAT3 worldPosition = enemy->GetPosition();
-        worldPosition.y += enemy->GetHeight();
+    case SceneGame::TutorialState::Attack:
+        CheckTutorialTimeout(5.0f);
+        if (Player::Instance().InputAttack() && canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::Shot);
+        break;
 
-        DirectX::XMVECTOR WorldPosition = DirectX::XMLoadFloat3(&worldPosition);*/
+    case SceneGame::TutorialState::Shot:
+        CheckTutorialTimeout(5.0f);
+        if (Player::Instance().InputProjectile() && canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::CameraLock);
+        break;
 
-        // ワールド座標からスクリーン座標へ変換
-        DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
-            enemyPosition,
-            viewport.TopLeftX,
-            viewport.TopLeftY,
-            viewport.Width,
-            viewport.Height,
-            viewport.MinDepth,
-            viewport.MaxDepth,
-            Projection,
-            View,
-            World);
+    case SceneGame::TutorialState::CameraLock:
+        CheckTutorialTimeout(5.0f);
+        if (gamePad.GetButtonDown() & GamePad::BTN_TAB && canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::LockAttack);
+        break;
 
-        DirectX::XMFLOAT3 screenPosition;
-        DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
+    case SceneGame::TutorialState::LockAttack:
+        CheckTutorialTimeout(5.0f);
+        if (Player::Instance().InputAttack() && canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::LockShot);
+        break;
 
-        if (screenPosition.z > 1.0f) continue;
+    case SceneGame::TutorialState::LockShot:
+        CheckTutorialTimeout(5.0f);
+        if (Player::Instance().InputProjectile() && canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::Done);
+        break;
 
-        float textureWidth = static_cast<float>(gauge->GetTextureWidth());
-        float textureHeight = static_cast<float>(gauge->GetTextureHeight());
-
-        const float gaugeWidth = 30.0f;
-        const float gaugeHeight = 5.0f;
-
-        float healthRate = enemy->GetHealth() / static_cast<float>(enemy->GetMaxHealth());
-
-        gauge->Render(dc,
-            screenPosition.x - gaugeWidth * 0.5f, screenPosition.y,
-            1 * gaugeWidth, gaugeHeight,
-            0, 0,
-            static_cast<float>(gauge->GetTextureWidth()), static_cast<float>(gauge->GetTextureHeight()),
-            0,
-            0, 0, 0, 1);
-
-        gauge->Render(dc,
-            screenPosition.x - gaugeWidth * 0.5f, screenPosition.y,
-            healthRate * gaugeWidth, gaugeHeight,
-            0, 0,
-            static_cast<float>(gauge->GetTextureWidth()), static_cast<float>(gauge->GetTextureHeight()),
-            0,
-            1, 0, 0, 1);
+    case SceneGame::TutorialState::Done:
+        tutorialTimer = 0;
+        break;
     }
 }
 
+void SceneGame::StartTutorial(TutorialState newState)
+{
+    PauseGame();
+    tutorialState = newState;
+    tutorialTimer = 0;
+}
+
+void SceneGame::AdvanceTutorialState(TutorialState newState)
+{
+    UnpauseGame();
+    tutorialState = newState;
+    tutorialTimer = 0;
+}
+
+void SceneGame::CheckTutorialTimeout(float timeout)
+{
+    if (tutorialTimer > timeout)
+    {
+        PauseGame();
+        canAcceptInput = true;
+    }
+}
+
+void SceneGame::UnpauseGame()
+{
+    isPaused = false;
+    canAcceptInput = false;
+}
+
+void SceneGame::PauseGame()
+{
+    isPaused = true;
+}
+
+//  モデルをレンダラーに登録
 void SceneGame::RegisterRenderModel(Model* model)
 {
     shadowmapRenderer->RegisterRenderModel(model);
@@ -475,10 +426,10 @@ void SceneGame::RegisterRenderModel(Model* model)
     {
         ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
         mat.shaderId = static_cast<int>(ModelShaderId::Phong);
-        //mat.shaderId = static_cast<int>(ModelShaderId::Lambert);
     }
 }
 
+//  モデルをレンダラーに削除
 void SceneGame::UnregisterRenderModel(Model* model)
 {
     shadowmapRenderer->UnregisterRenderModel(model);
