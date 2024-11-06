@@ -75,31 +75,6 @@ void Character::UpdateInvincibleTimer(float elapsedTime)
     }
 }
 
-void Character::CheckHaveWall(float elapsedTime)
-{
-    float mx = velocity.x ;
-    float mz = velocity.z ;
-
-    //レイの開始位置と終点位置
-    DirectX::XMFLOAT3 start = { position.x,position.y + 0.5f,position.z };
-    DirectX::XMFLOAT3 end = { position.x + mx, position.y + 0.5f, position.z + mz };
-
-    //レイキャストによる壁判定
-    HitResult hit;
-    if (StageManager::Instance().RayCast(start, end, hit))
-    {
-        // 壁が検出された場合、登れない
-        CanClimb = false;
-    }
-    else
-    {
-        // 壁が検出されなかった場合、登れる
-        CanClimb = true;
-    }
-
-
-}
-
 // 垂直速力更新処理
 void Character::UpdateVerticalVelocity(float elapsedFrame)
 {

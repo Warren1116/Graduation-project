@@ -26,7 +26,7 @@ public:
 
     enum class TutorialState
     {
-        Null,
+        First,
         Move,
         Jump,
         Attack,
@@ -34,8 +34,9 @@ public:
         CameraLock,
         LockAttack,
         LockShot,
-        //Swing,
-        Done,
+        Swing,
+        Climb,
+        Finish,
     };
 
     // 初期化
@@ -65,7 +66,7 @@ public:
     bool GetIsPaused() { return isPaused; }
 
     TutorialState GetTutorialState() { return tutorialState; }
-
+    void SetTutorialState(TutorialState newstate) { tutorialState = newstate; }
     void UnpauseGame();
     void PauseGame();
 
@@ -106,7 +107,7 @@ private:
     Meta* meta = nullptr;
 
     //  チュトリアルステート
-    TutorialState tutorialState = TutorialState::Null;
+    TutorialState tutorialState = TutorialState::First;
     float  tutorialTimer;
     bool canAcceptInput;
 

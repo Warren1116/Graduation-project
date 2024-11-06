@@ -109,7 +109,6 @@ protected:
 	// Ž€–S‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
 	virtual void OnDead() {}
 
-	void CheckHaveWall(float elapsedTime);
 
 protected:
 
@@ -131,7 +130,7 @@ protected:
 	float gravity = -1.0f;
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
 	bool isGround = false;
-	int health = 5;
+	int health = 15;
 	int maxHealth = 5;
 	float stepOffset = 1.5f;
 	float invincibleTimer = 0.0f;

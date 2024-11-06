@@ -12,8 +12,7 @@
 
 
 // 垂直同期間隔設定
-//static const int syncInterval = 1;
-static const int syncInterval = 0;
+static const int syncInterval = 1;
 
 // コンストラクタ
 Framework::Framework(HWND hWnd)
@@ -25,7 +24,6 @@ Framework::Framework(HWND hWnd)
 	EffectManager::Instance().Initialize();
 
 	// シーン初期化
-	//SceneManager::Instance().ChangeScene(new SceneTitle);
 	SceneManager::Instance().ChangeScene(new SceneGame);
 
 	cameraController = new CameraController();
@@ -53,17 +51,6 @@ void Framework::Update(float elapsedTime)
 	// 入力更新処理
 	input.Update();
 
-	//if (cameraController->GetMoveCursorFlag())
-	//{
-	//	POINT point{ graphics.GetScreenWidth() / 2, graphics.GetScreenHeight() / 2 };
-	//	ClientToScreen(hWnd, &point);
-
-	//	//SetCursorPos((int)point.x, (int)point.y);
-	//	
-	//}
-
-	// カメラコントローラー更新処理
-	//cameraController->Update(elapsedTime);
 	// シーン更新処理
 	SceneManager::Instance().Update(elapsedTime);
 }
@@ -137,11 +124,10 @@ int Framework::Run()
 			timer.Tick();
 			CalculateFrameStats();
 
-			//float elapsedTime = syncInterval == 0
-				//? timer.TimeInterval()
-				//: syncInterval / 60.0f
-				//;
-			float elapsedTime = timer.TimeInterval();
+			float elapsedTime = syncInterval == 0
+				? timer.TimeInterval()
+				: syncInterval / 60.0f
+				;
 			Update(elapsedTime);
 			Render(elapsedTime);
 		}

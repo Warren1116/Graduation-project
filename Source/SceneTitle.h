@@ -36,5 +36,11 @@ private:
 	std::unique_ptr<SceneRenderer>			sceneRenderer;
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 
+	std::unique_ptr<Sprite> Font;
+	std::unique_ptr<Sprite> TextFont;
+
+	float alpha = 1.0f;
+	float alphaSpeed = 0.02f;
+	bool increasingAlpha = false;
 };
 

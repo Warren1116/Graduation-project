@@ -88,7 +88,7 @@
 // SV_TARGET                0   xyzw        0   TARGET   float   xyzw
 //
 ps_5_0
-dcl_globalFlags refactoringAllowed | skipOptimization
+dcl_globalFlags refactoringAllowed
 dcl_constantbuffer CB0[41], dynamicIndexed
 dcl_constantbuffer CB3[18], immediateIndexed
 dcl_sampler s0, mode_default
@@ -110,31 +110,10 @@ dcl_input_ps linear v8.xyz
 dcl_input_ps linear v9.xyz
 dcl_input_ps linear v10.xyz
 dcl_output o0.xyzw
-dcl_temps 15
-//
-// Initial variable locations:
-//   v0.x <- pin.position.x; v0.y <- pin.position.y; v0.z <- pin.position.z; v0.w <- pin.position.w; 
-//   v1.x <- pin.world_position.x; v1.y <- pin.world_position.y; v1.z <- pin.world_position.z; 
-//   v2.x <- pin.normal.x; v2.y <- pin.normal.y; v2.z <- pin.normal.z; 
-//   v3.x <- pin.tangent.x; v3.y <- pin.tangent.y; v3.z <- pin.tangent.z; 
-//   v4.x <- pin.binormal.x; v4.y <- pin.binormal.y; v4.z <- pin.binormal.z; 
-//   v5.x <- pin.texcoord.x; v5.y <- pin.texcoord.y; 
-//   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
-//   v7.x <- pin.shadowTexcoord[0].x; v7.y <- pin.shadowTexcoord[0].y; v7.z <- pin.shadowTexcoord[0].z; 
-//   v8.x <- pin.shadowTexcoord[1].x; v8.y <- pin.shadowTexcoord[1].y; v8.z <- pin.shadowTexcoord[1].z; 
-//   v9.x <- pin.shadowTexcoord[2].x; v9.y <- pin.shadowTexcoord[2].y; v9.z <- pin.shadowTexcoord[2].z; 
-//   v10.x <- pin.shadowTexcoord[3].x; v10.y <- pin.shadowTexcoord[3].y; v10.z <- pin.shadowTexcoord[3].z; 
-//   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
-//
-#line 15 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
+dcl_temps 9
 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v5.xyxx, t0.xyzw, s0
-mul r0.xyzw, r0.xyzw, v6.xyzw  // r0.x <- diffuseColor.x; r0.y <- diffuseColor.y; r0.z <- diffuseColor.z; r0.w <- diffuseColor.w
-
-#line 18
+mul r0.xyzw, r0.xyzw, v6.xyzw
 sample_indexable(texture2d)(float,float,float,float) r1.xyz, v5.xyxx, t1.xyzw, s0
-mov r1.xyz, r1.xyzx  // r1.x <- normal.x; r1.y <- normal.y; r1.z <- normal.z
-
-#line 24
 dp3 r1.w, v3.xyzx, v3.xyzx
 rsq r1.w, r1.w
 mul r2.xyz, r1.wwww, v3.xyzx
@@ -144,585 +123,187 @@ mul r3.xyz, r1.wwww, v4.xyzx
 dp3 r1.w, v2.xyzx, v2.xyzx
 rsq r1.w, r1.w
 mul r4.xyz, r1.wwww, v2.xyzx
-mov r5.x, r2.x  // r5.x <- CM._m00
-mov r5.y, r3.x  // r5.y <- CM._m10
-mov r5.z, r4.x  // r5.z <- CM._m20
-mov r6.x, r2.y  // r6.x <- CM._m01
-mov r6.y, r3.y  // r6.y <- CM._m11
-mov r6.z, r4.y  // r6.z <- CM._m21
-mov r4.x, r2.z  // r4.x <- CM._m02
-mov r4.y, r3.z  // r4.y <- CM._m12
-mov r4.z, r4.z  // r4.z <- CM._m22
-
-#line 28
-mul r1.xyz, r1.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
-mov r2.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
-add r1.xyz, r1.xyzx, r2.xyzx
-dp3 r2.x, r1.xyzx, r5.xyzx
-dp3 r2.y, r1.xyzx, r6.xyzx
-dp3 r2.z, r1.xyzx, r4.xyzx
-dp3 r1.x, r2.xyzx, r2.xyzx
-rsq r1.x, r1.x
-mul r1.xyz, r1.xxxx, r2.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
-
-#line 30
+mad r1.xyz, r1.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000), l(-1.000000, -1.000000, -1.000000, 0.000000)
+mul r3.xyz, r3.xyzx, r1.yyyy
+mad r1.xyw, r1.xxxx, r2.xyxz, r3.xyxz
+mad r1.xyz, r1.zzzz, r4.xyzx, r1.xywx
+dp3 r1.w, r1.xyzx, r1.xyzx
+rsq r1.w, r1.w
+mul r1.xyz, r1.wwww, r1.xyzx
 dp3 r1.w, cb0[6].xyzx, cb0[6].xyzx
 rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, cb0[6].xyzx  // r2.x <- L.x; r2.y <- L.y; r2.z <- L.z
-
-#line 31
-mov r3.xyz, -v1.xyzx
-add r3.xyz, r3.xyzx, cb0[0].xyzx
+mul r2.xyz, r1.wwww, cb0[6].xyzx
+add r3.xyz, -v1.xyzx, cb0[0].xyzx
 dp3 r1.w, r3.xyzx, r3.xyzx
 rsq r1.w, r1.w
-mul r3.xyz, r1.wwww, r3.xyzx  // r3.x <- E.x; r3.y <- E.y; r3.z <- E.z
-
-#line 34
-itof r4.xyz, l(1, 1, 1, 0)  // r4.x <- ka.x; r4.y <- ka.y; r4.z <- ka.z
-
-#line 35
-itof r5.xyz, l(1, 1, 1, 0)  // r5.x <- kd.x; r5.y <- kd.y; r5.z <- kd.z
-
-#line 36
-itof r6.xyz, l(1, 1, 1, 0)  // r6.x <- ks.x; r6.y <- ks.y; r6.z <- ks.z
-
-#line 37
-itof r1.w, l(128)  // r1.w <- shiness
-
-#line 41
-mul r4.xyz, r4.xyzx, cb0[5].xyzx  // r4.x <- ambient.x; r4.y <- ambient.y; r4.z <- ambient.z
-
-#line 49
-nop 
-mov r1.xyz, r1.xyzx
-mov r2.xyz, r2.xyzx
-mov r7.xyz, cb0[7].xyzx
-mov r5.xyz, r5.xyzx
-
-#line 50 "C:\Users\2220012\Desktop\Graduation-project\HLSL\Light.hlsli"
-mov r8.xyz, -r2.xyzx
-dp3 r2.w, r1.xyzx, r8.xyzx
-max r2.w, r2.w, l(0.000000)
-min r2.w, r2.w, l(1.000000)  // r2.w <- d
-
-#line 53
-mul r7.xyz, r2.wwww, r7.xyzx
-mul r7.xyz, r5.xyzx, r7.xyzx  // r7.x <- <CalcLambertDiffuse return value>.x; r7.y <- <CalcLambertDiffuse return value>.y; r7.z <- <CalcLambertDiffuse return value>.z
-
-#line 49 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
-mov r7.xyz, r7.xyzx  // r7.x <- diffuse.x; r7.y <- diffuse.y; r7.z <- diffuse.z
-
-#line 50
-nop 
-mov r1.xyz, r1.xyzx
-mov r2.xyz, r2.xyzx
-mov r8.xyz, cb0[7].xyzx
-mov r3.xyz, r3.xyzx
-mov r1.w, r1.w
-mov r6.xyz, r6.xyzx
-
-#line 69 "C:\Users\2220012\Desktop\Graduation-project\HLSL\Light.hlsli"
-dp3 r2.w, r2.xyzx, r1.xyzx
-add r2.w, r2.w, r2.w
-mov r2.w, -r2.w
-mul r9.xyz, r1.xyzx, r2.wwww
-add r2.xyz, r2.xyzx, r9.xyzx  // r2.x <- R.x; r2.y <- R.y; r2.z <- R.z
-
-#line 73
-dp3 r2.x, r3.xyzx, r2.xyzx
-itof r2.y, l(0)
-max r2.x, r2.y, r2.x  // r2.x <- d
-
-#line 79
-log r2.x, r2.x
-mul r2.x, r1.w, r2.x
-exp r2.x, r2.x  // r2.x <- d
-
-#line 82
-mul r2.xyz, r2.xxxx, r8.xyzx
-mul r2.xyz, r6.xyzx, r2.xyzx  // r2.x <- <CalcPhongSpecular return value>.x; r2.y <- <CalcPhongSpecular return value>.y; r2.z <- <CalcPhongSpecular return value>.z
-
-#line 50 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
-mov r2.xyz, r2.xyzx  // r2.x <- specular.x; r2.y <- specular.y; r2.z <- specular.z
-
-#line 53
-itof r8.xyz, l(1, 1, 1, 0)  // r8.x <- shadow.x; r8.y <- shadow.y; r8.z <- shadow.z
-
-#line 56
-mov r9.xyz, v7.xyzx  // r9.x <- shadowTexcoord.x; r9.y <- shadowTexcoord.y; r9.z <- shadowTexcoord.z
-
-#line 58
-itof r2.w, l(0)
-ge r2.w, r9.z, r2.w
-itof r3.w, l(1)
-ge r3.w, r3.w, r9.z
-and r2.w, r2.w, r3.w
-itof r3.w, l(0)
-ge r3.w, r9.x, r3.w
-and r2.w, r2.w, r3.w
-itof r3.w, l(1)
-ge r3.w, r3.w, r9.x
-and r2.w, r2.w, r3.w
-itof r3.w, l(0)
-ge r3.w, r9.y, r3.w
-and r2.w, r2.w, r3.w
-itof r3.w, l(1)
-ge r3.w, r3.w, r9.y
-and r2.w, r2.w, r3.w
-if_nz r2.w
-
-#line 63
-  sample_indexable(texture2d)(float,float,float,float) r3.w, v7.xyxx, t2.yzwx, s1  // r3.w <- depth
-
-#line 65
-  mov r3.w, -r3.w
-  add r3.w, r3.w, r9.z
-  lt r3.w, cb3[16].x, r3.w
-  if_nz r3.w
-
-#line 66
-    mov r8.xyz, cb3[17].xyzx
-  endif 
-
-#line 68
-endif 
-
-#line 54
-not r3.w, r2.w
-not r3.w, r3.w
-or r2.w, r2.w, r3.w
-if_z r2.w
-
-#line 56
-  mov r9.xyz, v8.xyzx
-
-#line 58
-  if_z r2.w
-    itof r3.w, l(0)
-    ge r3.w, r9.z, r3.w
-    itof r4.w, l(1)
-    ge r4.w, r4.w, r9.z
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(0)
-    ge r4.w, r9.x, r4.w
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(1)
-    ge r4.w, r4.w, r9.x
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(0)
-    ge r4.w, r9.y, r4.w
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(1)
-    ge r4.w, r4.w, r9.y
-    and r3.w, r3.w, r4.w
-    if_nz r3.w
-
-#line 63
-      sample_indexable(texture2d)(float,float,float,float) r4.w, v8.xyxx, t3.yzwx, s1  // r4.w <- depth
-
-#line 65
-      mov r4.w, -r4.w
-      add r4.w, r4.w, r9.z
-      lt r4.w, cb3[16].y, r4.w
-      if_nz r4.w
-
-#line 66
-        mov r8.xyz, cb3[17].xyzx
-      endif 
-
-#line 68
-    endif 
-  else 
-    mov r3.w, l(-1)
-  endif 
-  or r2.w, r2.w, r3.w
-
-#line 54
-  not r3.w, r2.w
-  not r3.w, r3.w
-  or r2.w, r2.w, r3.w
-
-#line 69
+mul r3.xyz, r1.wwww, r3.xyzx
+dp3_sat r1.w, r1.xyzx, -r2.xyzx
+mul r4.xyz, r1.wwww, cb0[7].xyzx
+dp3 r1.w, r2.xyzx, r1.xyzx
+add r1.w, r1.w, r1.w
+mad r2.xyz, r1.xyzx, -r1.wwww, r2.xyzx
+dp3 r1.w, r3.xyzx, r2.xyzx
+max r1.w, r1.w, l(0.000000)
+log r1.w, r1.w
+mul r1.w, r1.w, l(128.000000)
+exp r1.w, r1.w
+mul r2.xyz, r1.wwww, cb0[7].xyzx
+ge r5.xyz, v7.zxyz, l(0.000000, 0.000000, 0.000000, 0.000000)
+ge r6.xyz, l(1.000000, 1.000000, 1.000000, 0.000000), v7.zxyz
+and r1.w, r5.x, r6.x
+and r1.w, r5.y, r1.w
+and r1.w, r6.y, r1.w
+and r1.w, r5.z, r1.w
+and r1.w, r6.z, r1.w
+if_nz r1.w
+  sample_indexable(texture2d)(float,float,float,float) r2.w, v7.xyxx, t2.yzwx, s1
+  add r2.w, -r2.w, v7.z
+  lt r2.w, cb3[16].x, r2.w
+  movc r5.xyz, r2.wwww, cb3[17].xyzx, l(1.000000,1.000000,1.000000,0)
 else 
-  mov r2.w, l(-1)
+  mov r5.xyz, l(1.000000,1.000000,1.000000,0)
 endif 
-
-#line 54
-if_z r2.w
-
-#line 56
-  mov r9.xyz, v9.xyzx
-
-#line 58
-  itof r2.w, l(0)
-  ge r2.w, r9.z, r2.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.z
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.x, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.x
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.y, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.y
-  and r2.w, r2.w, r3.w
-  if_nz r2.w
-
-#line 63
-    sample_indexable(texture2d)(float,float,float,float) r3.w, v9.xyxx, t4.yzwx, s1  // r3.w <- depth
-
-#line 65
-    mov r3.w, -r3.w
-    add r3.w, r3.w, r9.z
-    lt r3.w, cb3[16].z, r3.w
-    if_nz r3.w
-
-#line 66
-      mov r8.xyz, cb3[17].xyzx
-    endif 
-
-#line 68
+if_z r1.w
+  ge r6.xyz, v8.zxyz, l(0.000000, 0.000000, 0.000000, 0.000000)
+  ge r7.xyz, l(1.000000, 1.000000, 1.000000, 0.000000), v8.zxyz
+  and r1.w, r6.x, r7.x
+  and r1.w, r6.y, r1.w
+  and r1.w, r7.y, r1.w
+  and r1.w, r6.z, r1.w
+  and r1.w, r7.z, r1.w
+  if_nz r1.w
+    sample_indexable(texture2d)(float,float,float,float) r2.w, v8.xyxx, t3.yzwx, s1
+    add r2.w, -r2.w, v8.z
+    lt r2.w, cb3[16].y, r2.w
+    movc r5.xyz, r2.wwww, cb3[17].xyzx, r5.xyzx
   endif 
-
-#line 54
-  not r3.w, r2.w
-  not r3.w, r3.w
-  or r2.w, r2.w, r3.w
-
-#line 69
 else 
-  mov r2.w, l(-1)
+  mov r1.w, l(-1)
 endif 
-
-#line 54
-if_z r2.w
-
-#line 56
-  mov r9.xyz, v10.xyzx
-
-#line 58
-  itof r2.w, l(0)
-  ge r2.w, r9.z, r2.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.z
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.x, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.x
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.y, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.y
-  and r2.w, r2.w, r3.w
-  if_nz r2.w
-
-#line 63
-    sample_indexable(texture2d)(float,float,float,float) r2.w, v10.xyxx, t5.yzwx, s1  // r2.w <- depth
-
-#line 65
-    mov r2.w, -r2.w
-    add r2.w, r2.w, r9.z
-    lt r2.w, cb3[16].w, r2.w
-    if_nz r2.w
-
-#line 66
-      mov r8.xyz, cb3[17].xyzx
-    endif 
-
-#line 68
+if_z r1.w
+  ge r6.xyz, v9.zxyz, l(0.000000, 0.000000, 0.000000, 0.000000)
+  ge r7.xyz, l(1.000000, 1.000000, 1.000000, 0.000000), v9.zxyz
+  and r1.w, r6.x, r7.x
+  and r1.w, r6.y, r1.w
+  and r1.w, r7.y, r1.w
+  and r1.w, r6.z, r1.w
+  and r1.w, r7.z, r1.w
+  if_nz r1.w
+    sample_indexable(texture2d)(float,float,float,float) r2.w, v9.xyxx, t4.yzwx, s1
+    add r2.w, -r2.w, v9.z
+    lt r2.w, cb3[16].z, r2.w
+    movc r5.xyz, r2.wwww, cb3[17].xyzx, r5.xyzx
   endif 
-
-#line 69
+else 
+  mov r1.w, l(-1)
 endif 
-
-#line 70
-mul r7.xyz, r7.xyzx, r8.xyzx
-
-#line 71
-mul r2.xyz, r2.xyzx, r8.xyzx
-
-#line 74
-mov r2.w, l(0)  // r2.w <- i
-mov r8.xyz, r7.xyzx  // r8.x <- diffuse.x; r8.y <- diffuse.y; r8.z <- diffuse.z
-mov r9.xyz, r2.xyzx  // r9.x <- specular.x; r9.y <- specular.y; r9.z <- specular.z
-mov r3.w, r2.w  // r3.w <- i
+if_z r1.w
+  ge r6.xyz, v10.zxyz, l(0.000000, 0.000000, 0.000000, 0.000000)
+  ge r7.xyz, l(1.000000, 1.000000, 1.000000, 0.000000), v10.zxyz
+  and r1.w, r6.x, r7.x
+  and r1.w, r6.y, r1.w
+  and r1.w, r7.y, r1.w
+  and r1.w, r6.z, r1.w
+  and r1.w, r7.z, r1.w
+  if_nz r1.w
+    sample_indexable(texture2d)(float,float,float,float) r1.w, v10.xyxx, t5.yzwx, s1
+    add r1.w, -r1.w, v10.z
+    lt r1.w, cb3[16].w, r1.w
+    movc r5.xyz, r1.wwww, cb3[17].xyzx, r5.xyzx
+  endif 
+endif 
+mul r4.xyz, r4.xyzx, r5.xyzx
+mul r2.xyz, r2.xyzx, r5.xyzx
+mov r5.xyz, r4.xyzx
+mov r6.xyz, r2.xyzx
+mov r1.w, l(0)
 loop 
-  ilt r4.w, r3.w, cb0[40].x
-  breakc_z r4.w
-
-#line 77
-  imul null, r4.w, r3.w, l(4)
-  mov r10.xyz, -cb0[r4.w + 8].xyzx
-  add r10.xyz, r10.xyzx, v1.xyzx  // r10.x <- lightVector.x; r10.y <- lightVector.y; r10.z <- lightVector.z
-
-#line 80
-  dp3 r4.w, r10.xyzx, r10.xyzx
-  sqrt r4.w, r4.w  // r4.w <- lightLength
-
-#line 82
-  imul null, r5.w, r3.w, l(4)
-  ge r5.w, r4.w, cb0[r5.w + 11].x
+  ige r2.w, r1.w, cb0[40].x
+  breakc_nz r2.w
+  ishl r2.w, r1.w, l(2)
+  add r7.xyz, v1.xyzx, -cb0[r2.w + 8].xyzx
+  dp3 r3.w, r7.xyzx, r7.xyzx
+  sqrt r4.w, r3.w
+  ge r5.w, r4.w, cb0[r2.w + 11].x
   if_nz r5.w
-
-#line 83
-    iadd r3.w, r3.w, l(1)
+    iadd r5.w, r1.w, l(1)
+    mov r1.w, r5.w
     continue 
   endif 
-
-#line 86
-  imul null, r5.w, r3.w, l(4)
-  div r4.w, r4.w, cb0[r5.w + 11].x
-  mov r4.w, -r4.w
-  add r4.w, r4.w, l(1.000000)
+  div r4.w, r4.w, cb0[r2.w + 11].x
+  add_sat r4.w, -r4.w, l(1.000000)
+  rsq r3.w, r3.w
+  mul r7.xyz, r3.wwww, r7.xyzx
+  dp3 r3.w, cb0[r2.w + 9].xyzx, cb0[r2.w + 9].xyzx
+  rsq r3.w, r3.w
+  mul r8.xyz, r3.wwww, cb0[r2.w + 9].xyzx
+  dp3 r3.w, r8.xyzx, r7.xyzx
+  add r5.w, -cb0[r2.w + 11].w, cb0[r2.w + 11].z
+  add r3.w, -r3.w, cb0[r2.w + 11].z
+  div r3.w, r3.w, r5.w
+  add_sat r3.w, -r3.w, l(1.000000)
+  mul r3.w, r3.w, r4.w
+  dp3_sat r4.w, r1.xyzx, -r7.xyzx
+  mul r8.xyz, r4.wwww, cb0[r2.w + 10].xyzx
+  mad r5.xyz, r8.xyzx, r3.wwww, r5.xyzx
+  dp3 r4.w, r7.xyzx, r1.xyzx
+  add r4.w, r4.w, r4.w
+  mad r7.xyz, r1.xyzx, -r4.wwww, r7.xyzx
+  dp3 r4.w, r3.xyzx, r7.xyzx
   max r4.w, r4.w, l(0.000000)
-  min r4.w, r4.w, l(1.000000)  // r4.w <- attenuate
-
-#line 88
-  dp3 r5.w, r10.xyzx, r10.xyzx
-  rsq r5.w, r5.w
-  mul r10.xyz, r5.wwww, r10.xyzx
-
-#line 91
-  imul null, r5.w, r3.w, l(4)
-  dp3 r6.w, cb0[r5.w + 9].xyzx, cb0[r5.w + 9].xyzx
-  rsq r6.w, r6.w
-  mul r11.xyz, r6.wwww, cb0[r5.w + 9].xyzx  // r11.x <- spotDirection.x; r11.y <- spotDirection.y; r11.z <- spotDirection.z
-
-#line 92
-  dp3 r5.w, r11.xyzx, r10.xyzx  // r5.w <- angle
-
-#line 93
-  imul null, r6.w, r3.w, l(4)
-  imul null, r7.w, r3.w, l(4)
-  mov r7.w, -cb0[r7.w + 11].w
-  add r6.w, r7.w, cb0[r6.w + 11].z  // r6.w <- area
-
-#line 94
-  imul null, r7.w, r3.w, l(4)
-  mov r5.w, -r5.w
-  add r5.w, r5.w, cb0[r7.w + 11].z
-  div r5.w, r5.w, r6.w
-  mov r5.w, -r5.w
-  add r5.w, r5.w, l(1.000000)
-  max r5.w, r5.w, l(0.000000)
-  min r5.w, r5.w, l(1.000000)
-  mul r4.w, r4.w, r5.w
-
-#line 96
-  nop 
-  mov r11.xyz, r1.xyzx
-  mov r10.xyz, r10.xyzx
-  imul null, r5.w, r3.w, l(4)
-  mov r12.xyz, cb0[r5.w + 10].xyzx
-  mov r13.xyz, r5.xyzx
-
-#line 50 "C:\Users\2220012\Desktop\Graduation-project\HLSL\Light.hlsli"
-  mov r14.xyz, -r10.xyzx
-  dp3 r5.w, r11.xyzx, r14.xyzx
-  max r5.w, r5.w, l(0.000000)
-  min r5.w, r5.w, l(1.000000)  // r5.w <- d
-
-#line 53
-  mul r11.xyz, r5.wwww, r12.xyzx
-  mul r11.xyz, r13.xyzx, r11.xyzx  // r11.x <- <CalcLambertDiffuse return value>.x; r11.y <- <CalcLambertDiffuse return value>.y; r11.z <- <CalcLambertDiffuse return value>.z
-
-#line 96 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
-  mul r11.xyz, r4.wwww, r11.xyzx
-  add r8.xyz, r8.xyzx, r11.xyzx
-
-#line 98
-  nop 
-  mov r11.xyz, r1.xyzx
-  mov r10.xyz, r10.xyzx
-  imul null, r5.w, r3.w, l(4)
-  mov r12.xyz, cb0[r5.w + 10].xyzx
-  mov r13.xyz, r3.xyzx
-  mov r5.w, r1.w
-  mov r14.xyz, r6.xyzx
-
-#line 69 "C:\Users\2220012\Desktop\Graduation-project\HLSL\Light.hlsli"
-  dp3 r6.w, r10.xyzx, r11.xyzx
-  add r6.w, r6.w, r6.w
-  mov r6.w, -r6.w
-  mul r11.xyz, r6.wwww, r11.xyzx
-  add r10.xyz, r10.xyzx, r11.xyzx  // r10.x <- R.x; r10.y <- R.y; r10.z <- R.z
-
-#line 73
-  dp3 r6.w, r13.xyzx, r10.xyzx
-  itof r7.w, l(0)
-  max r6.w, r6.w, r7.w  // r6.w <- d
-
-#line 79
-  log r6.w, r6.w
-  mul r5.w, r5.w, r6.w
-  exp r5.w, r5.w  // r5.w <- d
-
-#line 82
-  mul r10.xyz, r5.wwww, r12.xyzx
-  mul r10.xyz, r14.xyzx, r10.xyzx  // r10.x <- <CalcPhongSpecular return value>.x; r10.y <- <CalcPhongSpecular return value>.y; r10.z <- <CalcPhongSpecular return value>.z
-
-#line 98 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
-  mul r10.xyz, r4.wwww, r10.xyzx
-  add r9.xyz, r9.xyzx, r10.xyzx
-
-#line 74
-  iadd r3.w, r3.w, l(1)
-
-#line 101
+  log r4.w, r4.w
+  mul r4.w, r4.w, l(128.000000)
+  exp r4.w, r4.w
+  mul r7.xyz, r4.wwww, cb0[r2.w + 10].xyzx
+  mad r6.xyz, r7.xyzx, r3.wwww, r6.xyzx
+  iadd r1.w, r1.w, l(1)
 endloop 
-
-#line 104
-mov r2.x, l(0)  // r2.x <- i
-mov r2.yzw, r8.xxyz  // r2.y <- diffuse.x; r2.z <- diffuse.y; r2.w <- diffuse.z
-mov r7.xyz, r9.xyzx  // r7.x <- specular.x; r7.y <- specular.y; r7.z <- specular.z
-mov r3.w, r2.x  // r3.w <- i
+mov r2.xyz, r5.xyzx
+mov r4.xyz, r6.xyzx
+mov r1.w, l(0)
 loop 
-  ilt r4.w, r3.w, cb0[40].x
-  breakc_z r4.w
-
-#line 107
-  imul null, r4.w, r3.w, l(4)
-  mov r10.xyz, -cb0[r4.w + 8].xyzx
-  add r10.xyz, r10.xyzx, v1.xyzx  // r10.x <- lightVector.x; r10.y <- lightVector.y; r10.z <- lightVector.z
-
-#line 110
-  dp3 r4.w, r10.xyzx, r10.xyzx
-  sqrt r4.w, r4.w  // r4.w <- lightLength
-
-#line 112
-  imul null, r5.w, r3.w, l(4)
-  ge r5.w, r4.w, cb0[r5.w + 11].x
+  ige r2.w, r1.w, cb0[40].x
+  breakc_nz r2.w
+  ishl r2.w, r1.w, l(2)
+  add r7.xyz, v1.xyzx, -cb0[r2.w + 8].xyzx
+  dp3 r3.w, r7.xyzx, r7.xyzx
+  sqrt r4.w, r3.w
+  ge r5.w, r4.w, cb0[r2.w + 11].x
   if_nz r5.w
-
-#line 113
-    iadd r3.w, r3.w, l(1)
+    iadd r5.w, r1.w, l(1)
+    mov r1.w, r5.w
     continue 
   endif 
-
-#line 116
-  imul null, r5.w, r3.w, l(4)
-  div r4.w, r4.w, cb0[r5.w + 11].x
-  mov r4.w, -r4.w
-  add r4.w, r4.w, l(1.000000)
+  div r4.w, r4.w, cb0[r2.w + 11].x
+  add_sat r4.w, -r4.w, l(1.000000)
+  rsq r3.w, r3.w
+  mul r7.xyz, r3.wwww, r7.xyzx
+  dp3 r3.w, cb0[r2.w + 9].xyzx, cb0[r2.w + 9].xyzx
+  rsq r3.w, r3.w
+  mul r8.xyz, r3.wwww, cb0[r2.w + 9].xyzx
+  dp3 r3.w, r8.xyzx, r7.xyzx
+  add r5.w, -cb0[r2.w + 11].w, cb0[r2.w + 11].z
+  add r3.w, -r3.w, cb0[r2.w + 11].z
+  div r3.w, r3.w, r5.w
+  add_sat r3.w, -r3.w, l(1.000000)
+  mul r3.w, r3.w, r4.w
+  dp3_sat r4.w, r1.xyzx, -r7.xyzx
+  mul r8.xyz, r4.wwww, cb0[r2.w + 10].xyzx
+  mad r2.xyz, r8.xyzx, r3.wwww, r2.xyzx
+  dp3 r4.w, r7.xyzx, r1.xyzx
+  add r4.w, r4.w, r4.w
+  mad r7.xyz, r1.xyzx, -r4.wwww, r7.xyzx
+  dp3 r4.w, r3.xyzx, r7.xyzx
   max r4.w, r4.w, l(0.000000)
-  min r4.w, r4.w, l(1.000000)  // r4.w <- attenuate
-
-#line 118
-  dp3 r5.w, r10.xyzx, r10.xyzx
-  rsq r5.w, r5.w
-  mul r10.xyz, r5.wwww, r10.xyzx
-
-#line 121
-  imul null, r5.w, r3.w, l(4)
-  dp3 r6.w, cb0[r5.w + 9].xyzx, cb0[r5.w + 9].xyzx
-  rsq r6.w, r6.w
-  mul r11.xyz, r6.wwww, cb0[r5.w + 9].xyzx  // r11.x <- spotDirection.x; r11.y <- spotDirection.y; r11.z <- spotDirection.z
-
-#line 122
-  dp3 r5.w, r11.xyzx, r10.xyzx  // r5.w <- angle
-
-#line 123
-  imul null, r6.w, r3.w, l(4)
-  imul null, r7.w, r3.w, l(4)
-  mov r7.w, -cb0[r7.w + 11].w
-  add r6.w, r7.w, cb0[r6.w + 11].z  // r6.w <- area
-
-#line 124
-  imul null, r7.w, r3.w, l(4)
-  mov r5.w, -r5.w
-  add r5.w, r5.w, cb0[r7.w + 11].z
-  div r5.w, r5.w, r6.w
-  mov r5.w, -r5.w
-  add r5.w, r5.w, l(1.000000)
-  max r5.w, r5.w, l(0.000000)
-  min r5.w, r5.w, l(1.000000)
-  mul r4.w, r4.w, r5.w
-
-#line 126
-  nop 
-  mov r11.xyz, r1.xyzx
-  mov r10.xyz, r10.xyzx
-  imul null, r5.w, r3.w, l(4)
-  mov r12.xyz, cb0[r5.w + 10].xyzx
-  mov r13.xyz, r5.xyzx
-
-#line 50 "C:\Users\2220012\Desktop\Graduation-project\HLSL\Light.hlsli"
-  mov r14.xyz, -r10.xyzx
-  dp3 r5.w, r11.xyzx, r14.xyzx
-  max r5.w, r5.w, l(0.000000)
-  min r5.w, r5.w, l(1.000000)  // r5.w <- d
-
-#line 53
-  mul r11.xyz, r5.wwww, r12.xyzx
-  mul r11.xyz, r13.xyzx, r11.xyzx  // r11.x <- <CalcLambertDiffuse return value>.x; r11.y <- <CalcLambertDiffuse return value>.y; r11.z <- <CalcLambertDiffuse return value>.z
-
-#line 126 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
-  mul r11.xyz, r4.wwww, r11.xyzx
-  add r2.yzw, r2.yyzw, r11.xxyz
-
-#line 128
-  nop 
-  mov r11.xyz, r1.xyzx
-  mov r10.xyz, r10.xyzx
-  imul null, r5.w, r3.w, l(4)
-  mov r12.xyz, cb0[r5.w + 10].xyzx
-  mov r13.xyz, r3.xyzx
-  mov r5.w, r1.w
-  mov r14.xyz, r6.xyzx
-
-#line 69 "C:\Users\2220012\Desktop\Graduation-project\HLSL\Light.hlsli"
-  dp3 r6.w, r10.xyzx, r11.xyzx
-  add r6.w, r6.w, r6.w
-  mov r6.w, -r6.w
-  mul r11.xyz, r6.wwww, r11.xyzx
-  add r10.xyz, r10.xyzx, r11.xyzx  // r10.x <- R.x; r10.y <- R.y; r10.z <- R.z
-
-#line 73
-  dp3 r6.w, r13.xyzx, r10.xyzx
-  itof r7.w, l(0)
-  max r6.w, r6.w, r7.w  // r6.w <- d
-
-#line 79
-  log r6.w, r6.w
-  mul r5.w, r5.w, r6.w
-  exp r5.w, r5.w  // r5.w <- d
-
-#line 82
-  mul r10.xyz, r5.wwww, r12.xyzx
-  mul r10.xyz, r14.xyzx, r10.xyzx  // r10.x <- <CalcPhongSpecular return value>.x; r10.y <- <CalcPhongSpecular return value>.y; r10.z <- <CalcPhongSpecular return value>.z
-
-#line 128 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
-  mul r10.xyz, r4.wwww, r10.xyzx
-  add r7.xyz, r7.xyzx, r10.xyzx
-
-#line 104
-  iadd r3.w, r3.w, l(1)
-
-#line 131
+  log r4.w, r4.w
+  mul r4.w, r4.w, l(128.000000)
+  exp r4.w, r4.w
+  mul r7.xyz, r4.wwww, cb0[r2.w + 10].xyzx
+  mad r4.xyz, r7.xyzx, r3.wwww, r4.xyzx
+  iadd r1.w, r1.w, l(1)
 endloop 
-
-#line 135
-mov r4.xyz, r4.xyzx  // r4.x <- color.x; r4.y <- color.y; r4.z <- color.z
-mov r0.w, r0.w  // r0.w <- color.w
-
-#line 136
-mul r0.xyz, r0.xyzx, r2.yzwy
-add r0.xyz, r0.xyzx, r4.xyzx  // r0.x <- color.x; r0.y <- color.y; r0.z <- color.z
-
-#line 137
-add r0.xyz, r7.xyzx, r0.xyzx
-
-#line 139
-mov o0.xyz, r0.xyzx
+mad r0.xyz, r0.xyzx, r2.xyzx, cb0[5].xyzx
+add o0.xyz, r4.xyzx, r0.xyzx
 mov o0.w, r0.w
 ret 
-// Approximately 388 instruction slots used
+// Approximately 195 instruction slots used

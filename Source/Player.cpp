@@ -50,6 +50,9 @@ Player::~Player()
 // 更新処理
 void Player::Update(float elapsedTime)
 {
+    //  カメラステートの更新処理
+    UpdateCameraState(elapsedTime);
+
     // ステート毎の処理
     switch (state)
     {
@@ -85,9 +88,6 @@ void Player::Update(float elapsedTime)
         break;
     }
 
-    //  カメラステートの更新処理
-    UpdateCameraState(elapsedTime);
-
     //弾丸更新処理
     projectileManager.Update(elapsedTime);
     brokenprojectileManager.Update(elapsedTime);
@@ -115,10 +115,10 @@ void Player::Update(float elapsedTime)
 // 移動入力処理
 bool Player::InputMove(float elapsedTime)
 {
-    // カメラ方向とスティックの入力値によって進行方向を計算する
-    Camera& camera = Camera::Instance();
-    DirectX::XMFLOAT3 cameraRight = camera.GetRight();
-    DirectX::XMFLOAT3 cameraFront = camera.GetFront();
+    //// カメラ方向とスティックの入力値によって進行方向を計算する
+    //Camera& camera = Camera::Instance();
+    //DirectX::XMFLOAT3 cameraRight = camera.GetRight();
+    //DirectX::XMFLOAT3 cameraFront = camera.GetFront();
 
     //進行ベクトル取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -255,7 +255,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                 outPosition))
             {
                 // ダメージを与える
-                if (enemy->ApplyDamage(1, 0.5f))
+                if (enemy->ApplyDamage(3, 0.5f))
                 {
                     // 吹き飛ばす
                     {
@@ -592,7 +592,7 @@ void Player::CollisionProjectileVsEnemies()
             {
                 //ダメージを与える
 
-                if (enemy->ApplyDamage(1, 1.0f))
+                if (enemy->ApplyDamage(3, 1.0f))
                 {
                     //吹き飛ばす
                     {
@@ -681,7 +681,6 @@ void Player::TransitionIdleState()
 // 待機ステート更新処理
 void Player::UpdateIdleState(float elapsedTime)
 {
-    //CheckHaveWall();
     if (attacking)
     {
         attackTimer++;
@@ -734,7 +733,7 @@ void Player::UpdateMoveState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
     //  ジャンブ中移動とSHIFTキー同時に押すと
-    if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime))
+    if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime) && firstSwing)
     {
         lastState = State::Move;
         TransitionSwingState();
@@ -1034,6 +1033,8 @@ void Player::TransitionLandState()
     velocity.x = 0;
     velocity.y = 0;
     velocity.z = 0;
+    //  最初の判定がないと、無限に飛び続けるので
+    firstSwing = true;
     state = State::Land;
     model->PlayAnimation(Anim_Landing, false);
 
@@ -1052,6 +1053,7 @@ void Player::UpdateLandState(float elapsedTime)
 // スイングステート
 void Player::TransitionSwingState()
 {
+    firstSwing = false;
     state = State::Swing;
 
     if (lastState == State::Move)
@@ -1177,6 +1179,7 @@ void Player::UpdateSwingState(float elapsedTime)
 
     if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
     {
+        
         //TransitionSwingState();
         TransitionIdleState();
         //velocity = { 0.0f, 0.0f, 0.0f }; 

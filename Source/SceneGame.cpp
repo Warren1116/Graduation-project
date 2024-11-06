@@ -23,29 +23,14 @@
 
 SceneGame* SceneGame::instance = nullptr;
 
-//#define Tutorial
+//#define TUTORIAL
+#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
 {
     instance = this;
     Graphics& graphics = Graphics::Instance();
-    // カメラ初期設定
-    Camera& camera = Camera::Instance();
-    camera.SetLookAt(
-        DirectX::XMFLOAT3(0, 10, -10),
-        DirectX::XMFLOAT3(0, 0, 0),
-        DirectX::XMFLOAT3(0, 1, 0)
-    );
-    camera.SetPerspectiveFov(
-        DirectX::XMConvertToRadians(45),
-        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
-        0.1f,
-        1000.0f
-    );
-
-
-
     //	各種レンダラー生成
     {
         UINT width = static_cast<UINT>(graphics.GetScreenWidth());
@@ -65,6 +50,19 @@ void SceneGame::Initialize()
 
     }
 
+    // カメラ初期設定
+    Camera& camera = Camera::Instance();
+    camera.SetLookAt(
+        DirectX::XMFLOAT3(0, 10, -10),
+        DirectX::XMFLOAT3(0, 0, 0),
+        DirectX::XMFLOAT3(0, 1, 0)
+    );
+    camera.SetPerspectiveFov(
+        DirectX::XMConvertToRadians(45),
+        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+        0.1f,
+        1000.0f
+    );
 
     // ステージ初期化
     StageManager& stageManager = StageManager::Instance();
@@ -76,41 +74,38 @@ void SceneGame::Initialize()
     //　プレイヤー生成
     player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(45), 0));
-
+    player->SetPosition({ 0,0,25 });
     // エネミー初期化
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
     // スライム（ステートマシン用）
     EnemyThief* people = new EnemyThief();
-    people->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, 0.0f));
+    people->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
     people->SetTerritory(people->GetPosition(), 10.0f);
     enemyManager.Register(people);
 
     //	通信相手用に１匹増やす
     EnemyThief* people2 = new EnemyThief();
-    people2->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 25.0f));
+    people2->SetPosition(DirectX::XMFLOAT3(3.0f, 0.0f, -25.0f));
     people2->SetTerritory(people2->GetPosition(), 10.0f);
     enemyManager.Register(people2);
 
-
     //	モデルを各レンダラーに登録
-    if (stageMain->GetStageNum() == 0 || stageMain->GetStageNum() == 1)
+    Model* list[] =
     {
-        Model* list[] =
-        {
-            player->model.get(),
-            stageMain->GetModel(),
-            people->GetModel(),
-            people2->GetModel(),
-        };
+        player->model.get(),
+        stageMain->GetModel(),
+        people->GetModel(),
+        people2->GetModel(),
 
-        for (Model* model : list)
-        {
-            RegisterRenderModel(model);
+    };
+    for (Model* model : list)
+    {
+        RegisterRenderModel(model);
 
-        }
     }
+
 
     // キャラクター生成処理
     CharacterManager& characterManager = CharacterManager::Instance();
@@ -124,6 +119,7 @@ void SceneGame::Initialize()
         // エネミー初期化
         characterManager.Register(people);
         characterManager.Register(people2);
+
 
     }
 
@@ -171,30 +167,33 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-
-#ifdef Tutorial
-        //  チュトリアルのタイマー
-        tutorialTimer += elapsedTime;
-
-        if (tutorialTimer > 5.0f && tutorialState == SceneGame::TutorialState::Null)
-        {
-            StartTutorial(SceneGame::TutorialState::Move);
-        }
-
-        UpdateTutorialState(elapsedTime);
-
-
-        if (isPaused)
-        {
-            return;
-        }
-#endif // Tutorial
-
     Graphics& graphics = Graphics::Instance();
+    //  UI更新処理
+    UI::Instance().Update(elapsedTime);
+
+
+
+#ifdef TUTORIAL
+    //  チュトリアルのタイマー
+    tutorialTimer += elapsedTime;
+
+    if (tutorialTimer > 5.0f && tutorialState == SceneGame::TutorialState::First)
+    {
+        StartTutorial(SceneGame::TutorialState::Move);
+    }
+
+    UpdateTutorialState(elapsedTime);
+
+    if (isPaused)
+    {
+        return;
+    }
+#endif // TUTORIAL
 
     // カメラコントローラー更新処理
     Camera& camera = Camera::Instance();
     cameraController->Update(elapsedTime);
+
 
     // ステージ更新処理
     StageManager::Instance().Update(elapsedTime);
@@ -207,9 +206,6 @@ void SceneGame::Update(float elapsedTime)
 
     // エフェクト更新処理
     EffectManager::Instance().Update(elapsedTime);
-
-    //  UI更新処理
-    UI::Instance().Update(elapsedTime);
 
 
 }
@@ -228,7 +224,6 @@ void SceneGame::Render()
     dc->OMSetRenderTargets(1, &rtv, dsv);
     dc->ClearRenderTargetView(rtv, color);
     dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 
     // 描画処理
     RenderContext rc;
@@ -260,6 +255,7 @@ void SceneGame::Render()
         UI::Instance().DrawUI(dc, rc.view, rc.projection);
     }
 
+#ifdef DEBUG
     // 2DデバッグGUI描画
     {
         player->DrawDebugGUI();
@@ -270,48 +266,45 @@ void SceneGame::Render()
 
         if (ImGui::Begin("Tutorial", nullptr, ImGuiWindowFlags_None))
         {
-            if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+            ImGui::InputFloat("Tutorial", &tutorialTimer);
+
+            std::string str = "";
+            switch (tutorialState)
             {
-                ImGui::InputFloat("Tutorial", &tutorialTimer);
-
-                std::string str = "";
-                switch (tutorialState)
-                {
-                case TutorialState::Move:
-                    str = "Tutorial Move";
-                    break;
-                case TutorialState::Jump:
-                    str = "Tutorial Jump";
-                    break;
-                case TutorialState::Attack:
-                    str = "Tutorial Attack";
-                    break;
-                case TutorialState::Shot:
-                    str = "Tutorial Shot";
-                    break;
-                case TutorialState::CameraLock:
-                    str = "Tutorial CameraLock";
-                    break;
-                case TutorialState::LockAttack:
-                    str = "Tutorial LockAttack";
-                    break;
-                case TutorialState::LockShot:
-                    str = "Tutorial LockShot";
-                    break;
-                case TutorialState::Done:
-                    str = "Tutorial Finish";
-                    break;
-                }
-                ImGui::Text(u8"State　%s", str.c_str());
-
-
+            case TutorialState::Move:
+                str = "Tutorial Move";
+                break;
+            case TutorialState::Jump:
+                str = "Tutorial Jump";
+                break;
+            case TutorialState::Attack:
+                str = "Tutorial Attack";
+                break;
+            case TutorialState::Shot:
+                str = "Tutorial Shot";
+                break;
+            case TutorialState::CameraLock:
+                str = "Tutorial CameraLock";
+                break;
+            case TutorialState::LockAttack:
+                str = "Tutorial LockAttack";
+                break;
+            case TutorialState::LockShot:
+                str = "Tutorial LockShot";
+                break;
+            case TutorialState::Swing:
+                str = "Tutorial Swing";
+                break;
+            case TutorialState::Finish:
+                str = "Tutorial Finish";
+                break;
             }
+            ImGui::Text(u8"State　%s", str.c_str());
 
         }
         ImGui::End();
 
     }
-
 
     // デバッグ情報の表示
     {
@@ -325,6 +318,8 @@ void SceneGame::Render()
         postprocessingRenderer->DrawDebugGUI();
 
     }
+#endif // DEBUG
+
 
 }
 
@@ -336,47 +331,52 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
     {
     case SceneGame::TutorialState::Move:
         CheckTutorialTimeout(0.0f);
-        if (Player::Instance().InputMove(elapsedTime) &&canAcceptInput)
+        if (Player::Instance().InputMove(elapsedTime) && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Jump);
         break;
 
     case SceneGame::TutorialState::Jump:
-        CheckTutorialTimeout(5.0f);
+        CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputJump() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Attack);
         break;
 
     case SceneGame::TutorialState::Attack:
-        CheckTutorialTimeout(5.0f);
+        CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputAttack() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Shot);
         break;
 
     case SceneGame::TutorialState::Shot:
-        CheckTutorialTimeout(5.0f);
+        CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputProjectile() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::CameraLock);
         break;
 
     case SceneGame::TutorialState::CameraLock:
-        CheckTutorialTimeout(5.0f);
+        CheckTutorialTimeout(3.5f);
         if (gamePad.GetButtonDown() & GamePad::BTN_TAB && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::LockAttack);
         break;
 
     case SceneGame::TutorialState::LockAttack:
-        CheckTutorialTimeout(5.0f);
+        CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputAttack() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::LockShot);
         break;
 
     case SceneGame::TutorialState::LockShot:
-        CheckTutorialTimeout(5.0f);
+        CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputProjectile() && canAcceptInput)
-            AdvanceTutorialState(SceneGame::TutorialState::Done);
+            AdvanceTutorialState(SceneGame::TutorialState::Swing);
         break;
-
-    case SceneGame::TutorialState::Done:
+    case SceneGame::TutorialState::Swing:
+        tutorialTimer = 0;
+        break;
+    case SceneGame::TutorialState::Climb:
+        tutorialTimer = 0;
+        break;
+    case SceneGame::TutorialState::Finish:
         tutorialTimer = 0;
         break;
     }

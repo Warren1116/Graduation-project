@@ -35,7 +35,6 @@ void CameraController::Update(float elapsedTime)
     case	Mode::MotionCamera:	MotionCamera(elapsedTime);	break;
     }
 
-
     // 地形との当たり判定を行う
     HitResult	hitResult;
     if (StageManager::Instance().RayCast(newTarget, newPosition, hitResult))
@@ -45,8 +44,6 @@ void CameraController::Update(float elapsedTime)
         p = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorReplicate(4), cuv, p);
         DirectX::XMStoreFloat3(&newPosition, p);
     }
-
-    // 徐々に目標に近づける
     static	constexpr	float	Speed = 1.0f / 8.0f;
     position.x += (newPosition.x - position.x) * Speed;
     position.y += (newPosition.y - position.y) * Speed;
@@ -54,6 +51,7 @@ void CameraController::Update(float elapsedTime)
     target.x += (newTarget.x - target.x) * Speed;
     target.y += (newTarget.y - target.y) * Speed;
     target.z += (newTarget.z - target.z) * Speed;
+
 
     // カメラに視点を注視点を設定
     Camera::Instance().SetLookAt(position, target, DirectX::XMFLOAT3(0, 1, 0));
@@ -71,43 +69,7 @@ void CameraController::ShakeCamera(float intensity, float duration)
 
 void CameraController::FreeCamera(float elapsedTime)
 {
-    //GamePad& gamePad = Input::Instance().GetGamePad();
-    //float ax = gamePad.GetAxisRX();
-    //float ay = gamePad.GetAxisRY();
-    //// カメラの回転速度
-    //float speed = rollSpeed * elapsedTime;
-    //// スティックの入力値に合わせてX軸とY軸を回転
-    //angle.x += ay * speed;
-    //angle.y += ax * speed;
-    //// X軸のカメラ回転を制限
-    //if (angle.x < minAngle)
-    //{
-    //    angle.x = minAngle;
-    //}
-    //if (angle.x > maxAngle)
-    //{
-    //    angle.x = maxAngle;
-    //}
-    //// Y軸の回転値を-3.14～3.14に収まるようにする
-    //if (angle.y < -DirectX::XM_PI)
-    //{
-    //    angle.y += DirectX::XM_2PI;
-    //}
-    //if (angle.y > DirectX::XM_PI)
-    //{
-    //    angle.y -= DirectX::XM_2PI;
-    //}
-    //// カメラ回転値を回転行列に変換
-    //DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
-    //// 回転行列から前方向ベクトルを取り出す
-    //DirectX::XMVECTOR Front = Transform.r[2];
-    //DirectX::XMFLOAT3 front;
-    //DirectX::XMStoreFloat3(&front, Front);
-    //// 注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
-    //newPosition.x = target.x - front.x * range;
-    //newPosition.y = target.y - front.y * range;
-    //newPosition.z = target.z - front.z * range;
-
+#if 1
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -140,7 +102,6 @@ void CameraController::FreeCamera(float elapsedTime)
         angle.y += ax * speed;
     }
 
-
     //カメラ回転を回転行列に変換
     DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
 
@@ -171,6 +132,7 @@ void CameraController::FreeCamera(float elapsedTime)
         angle.y -= DirectX::XM_2PI;
     }
 
+#endif
 }
 
 void CameraController::LockonCamera(float elapsedTime)
