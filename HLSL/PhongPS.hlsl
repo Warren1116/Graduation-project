@@ -50,25 +50,25 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 specular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks);
 
     
-    float3 shadow = 1;
-    for (int j = 0; j < ShadowmapCount; ++j)
-    {
-        float3 shadowTexcoord = pin.shadowTexcoord[j];
-        //シャドウマップのUV範囲内か、深度値が範囲内か判定する
-        if (shadowTexcoord.z >= 0 && shadowTexcoord.z <= 1 &&
-            shadowTexcoord.x >= 0 && shadowTexcoord.x <= 1 &&
-            shadowTexcoord.y >= 0 && shadowTexcoord.y <= 1)
-        {
-            //シャドウマップから深度値取得
-            float depth = shadowMap[j].Sample(shadowMapSamplerState, shadowTexcoord.xy).r;
-            //深度値を比較して影かどうかを判定する
-            if (shadowTexcoord.z - depth > shadowBias[j])
-                shadow = shadowColor;
-            break;
-        }
-    }
-    diffuse *= shadow;
-    specular *= shadow;
+    //float3 shadow = 1;
+    //for (int j = 0; j < ShadowmapCount; ++j)
+    //{
+    //    float3 shadowTexcoord = pin.shadowTexcoord[j];
+    //    //シャドウマップのUV範囲内か、深度値が範囲内か判定する
+    //    if (shadowTexcoord.z >= 0 && shadowTexcoord.z <= 1 &&
+    //        shadowTexcoord.x >= 0 && shadowTexcoord.x <= 1 &&
+    //        shadowTexcoord.y >= 0 && shadowTexcoord.y <= 1)
+    //    {
+    //        //シャドウマップから深度値取得
+    //        float depth = shadowMap[j].Sample(shadowMapSamplerState, shadowTexcoord.xy).r;
+    //        //深度値を比較して影かどうかを判定する
+    //        if (shadowTexcoord.z - depth > shadowBias[j])
+    //            shadow = shadowColor;
+    //        break;
+    //    }
+    //}
+    //diffuse *= shadow;
+    //specular *= shadow;
     
 	// スポットライトの処理
     for (int i = 0; i < spotLightCount; ++i)
@@ -130,12 +130,12 @@ float4 main(VS_OUT pin) : SV_TARGET
 
     }
     
-    //return float4((diffuseColor.rgb * (ambient + diffuse) + specular), diffuseColor.a);
+    return float4((diffuseColor.rgb * (ambient + diffuse) + specular), diffuseColor.a);
 
-    float4 color = float4(ambient, diffuseColor.a);
-    color.rgb += diffuseColor.rgb * (diffuse);
-    color.rgb += specular;
-    //color.rgb += CalcRimLight(N, E, L, directionalLightData.color.rgb);
-    return color;
+    //float4 color = float4(ambient, diffuseColor.a);
+    //color.rgb += diffuseColor.rgb * (diffuse);
+    //color.rgb += specular;
+    ////color.rgb += CalcRimLight(N, E, L, directionalLightData.color.rgb);
+    //return color;
     
 }

@@ -42,15 +42,15 @@ cbuffer CbSubset : register(b2)
     float4 materialColor;
 }
 
-cbuffer CbShadowmap : register(b3)
-{
-    //row_major float4x4 lightViewProjection;  //ライトビュープロジェクション行列
-    //float3 shadowColor;                      //影の色
-    //float shadowBias;                        //深度値比較時のオフセット
+//cbuffer CbShadowmap : register(b3)
+//{
+//    //row_major float4x4 lightViewProjection;  //ライトビュープロジェクション行列
+//    //float3 shadowColor;                      //影の色
+//    //float shadowBias;                        //深度値比較時のオフセット
 
-    row_major float4x4 lightViewProjection[ShadowmapCount]; //ライトビュープロジェクション行列
-    float4 shadowBias; //深度値比較時のオフセット
-    float3 shadowColor; //影の色
-    float dummy;
+//    row_major float4x4 lightViewProjection[ShadowmapCount]; //ライトビュープロジェクション行列
+//    float4 shadowBias; //深度値比較時のオフセット
+//    float3 shadowColor; //影の色
+//    float dummy;
 
-}
+//}
