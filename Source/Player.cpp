@@ -656,6 +656,7 @@ void Player::TransitionIdleState()
 {
     state = State::Idle;
     onSwing = false;
+    firstSwing = true;
 
     //　クライミング中なら別の待機モーション
     if (onClimb)
@@ -1053,7 +1054,6 @@ void Player::UpdateLandState(float elapsedTime)
 // スイングステート
 void Player::TransitionSwingState()
 {
-    firstSwing = false;
     state = State::Swing;
 
     if (lastState == State::Move)
@@ -1144,6 +1144,7 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
     float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
 
+
     //糸の長さ
     const float ropeLength = 10.0f;
     //糸の向き
@@ -1158,7 +1159,6 @@ void Player::UpdateSwingState(float elapsedTime)
     const float dragCoefficient = 0.005f;
     velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
 
-
     //糸の修正
     if (currentLength > ropeLength)
     {
@@ -1167,7 +1167,17 @@ void Player::UpdateSwingState(float elapsedTime)
         Q = DirectX::XMVectorAdd(Q, correction);
     }
 
+
     DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
+
+    DirectX::XMFLOAT3 front = GetFront();
+    DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
+
+    float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
+    if (dotProduct <= 0)
+    {
+        TransitionSwingState();
+    }
 
     //位置更新
     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
@@ -1176,13 +1186,9 @@ void Player::UpdateSwingState(float elapsedTime)
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-
     if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
     {
-        
-        //TransitionSwingState();
         TransitionIdleState();
-        //velocity = { 0.0f, 0.0f, 0.0f }; 
     }
 }
 

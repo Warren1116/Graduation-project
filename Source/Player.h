@@ -64,7 +64,10 @@ public:
 	//	スイング位置を取得（仮）
 	DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }
 
+	bool GetFirstSwing() { return firstSwing; }
+
 	std::unique_ptr<Model> model = nullptr;
+
 
 	// ステート
 	enum class State

@@ -40,21 +40,24 @@ void SwingWeb::Update(float elapsedTime)
             sceneGame.UnregisterRenderModel(model.get());
         }
     }
-    //　糸は手から出るように、右手のNodeを探す
-    Model::Node* RightHandPos = player.model->FindNode("mixamorig:RightHand");
-    DirectX::XMFLOAT3 pos;
-    pos.x = RightHandPos->worldTransform._41;
-    pos.y = RightHandPos->worldTransform._42;
-    pos.z = RightHandPos->worldTransform._43;
 
-    DirectX::XMFLOAT3 swingPos = player.GetswingPoint();
+    {
+        //　糸は手から出るように、右手のNodeを探す
+        Model::Node* RightHandPos = player.model->FindNode("mixamorig:RightHand");
+        DirectX::XMFLOAT3 pos;
+        pos.x = RightHandPos->worldTransform._41;
+        pos.y = RightHandPos->worldTransform._42;
+        pos.z = RightHandPos->worldTransform._43;
 
-    DirectX::XMFLOAT3 dir = swingPos - pos ;
-    DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
-    dirVec = DirectX::XMVector3Normalize(dirVec);
-    DirectX::XMStoreFloat3(&direction, dirVec);
+        DirectX::XMFLOAT3 swingPos = player.GetswingPoint();
 
-    position = pos;
+        DirectX::XMFLOAT3 dir = swingPos - pos;
+        DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
+        dirVec = DirectX::XMVector3Normalize(dirVec);
+        DirectX::XMStoreFloat3(&direction, dirVec);
+
+        position = pos;
+    }
    
 
     UpdateTransform();
