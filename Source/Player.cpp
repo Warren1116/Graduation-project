@@ -25,6 +25,7 @@ Player::Player(bool flag)
     model = std::make_unique<Model>("Data/Model/Spider-man/spider-man.mdl");
     model->GetNodePoses(nodePoses);
 
+
     radius = 0.5f;
 
     // モデルが大きいのでスケーリング

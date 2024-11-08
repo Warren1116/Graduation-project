@@ -14,6 +14,7 @@ void UI::Initialize()
     TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
     Font = std::make_unique<Sprite>("Data/Sprite/Font.png");
     Font2 = std::make_unique<Sprite>("Data/Sprite/Font2.png");
+    spiderSense = std::make_unique<Sprite>("Data/Sprite/SpiderSense.png");
 
 
     ShiftKey = std::make_unique<Sprite>("Data/Sprite/ShiftKey.png");
@@ -239,8 +240,48 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
             static_cast<float>(LockOnScope->GetTextureWidth()), static_cast<float>(LockOnScope->GetTextureHeight()),
             0,
             1, 1, 1, 1);
+
     }
 
+    {
+        // •ÏŠ·s—ñ
+        DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
+        DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
+        DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+
+        Model::Node* PlayerHeadPos = Player::Instance().model->FindNode("mixamorig:HeadTop_End");
+        DirectX::XMVECTOR playerHeadPos = DirectX::XMVectorSet(
+            PlayerHeadPos->worldTransform._41,
+            PlayerHeadPos->worldTransform._42,
+            PlayerHeadPos->worldTransform._43,
+            1.0f);
+
+
+
+        DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
+            playerHeadPos,
+            viewport.TopLeftX,
+            viewport.TopLeftY,
+            viewport.Width,
+            viewport.Height,
+            viewport.MinDepth,
+            viewport.MaxDepth,
+            Projection,
+            View,
+            World);
+
+        DirectX::XMFLOAT3 screenPosition;
+        DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
+
+        spiderSense->Render(dc,
+            screenPosition.x - 55.0f, screenPosition.y - 30.0f,
+            100.0f, 70.0f,
+            0, 0,
+            static_cast<float>(spiderSense->GetTextureWidth()), static_cast<float>(spiderSense->GetTextureHeight()),
+            0,
+            1, 1, 1, 1);
+
+    }
 
 }
 

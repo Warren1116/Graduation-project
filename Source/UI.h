@@ -36,6 +36,7 @@ private:
     std::unique_ptr<Sprite> ShiftKey;
     std::unique_ptr<Sprite> Font;
     std::unique_ptr<Sprite> Font2;
+    std::unique_ptr<Sprite> spiderSense;
 
     float alpha = 1.0f;
     float alphaSpeed = 0.02f;

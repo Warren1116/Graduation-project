@@ -258,5 +258,6 @@ private:
 	DirectX::XMVECTOR swingwebDirection;
 	DirectX::XMFLOAT3 highestSwingPoint;
 	bool firstSwing = true;
+
 };
 
