@@ -5,8 +5,8 @@
 
 ShadowmapRenderer::ShadowmapRenderer(UINT shadowmapSize)
 {
-    depthStencil.release();
-    depthStencil = std::make_unique<DepthStencil>(shadowmapSize, shadowmapSize);
+    shadowmapDepthStencil.release();
+    shadowmapDepthStencil = std::make_unique<DepthStencil>(shadowmapSize, shadowmapSize);
 
 }
 
@@ -20,7 +20,7 @@ ShadowMapData ShadowmapRenderer::GetShadowMapData()
 
     DirectX::XMFLOAT4X4 view, projection;
     CalcShadowmapMatrix(view, projection);
-    shadowMapData.shadowMap = depthStencil->GetShaderResourceView().Get();
+    shadowMapData.shadowMap = shadowmapDepthStencil->GetShaderResourceView().Get();
     DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection,
         DirectX::XMLoadFloat4x4(&view) * DirectX::XMLoadFloat4x4(&projection));
     shadowMapData.shadowBias = shadowBias;
@@ -38,7 +38,7 @@ void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
     CacheRenderTargets(dc);
 
     // 画面クリア＆レンダーターゲット設定
-    ID3D11DepthStencilView* dsv = depthStencil->GetDepthStencilView().Get();
+    ID3D11DepthStencilView* dsv = shadowmapDepthStencil->GetDepthStencilView().Get();
     FLOAT color[] = { 0.0f, 0.0f, 0.5f, 1.0f };	// RGBA(0.0～1.0)
     dc->OMSetRenderTargets(0, nullptr, dsv);
     dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -46,8 +46,8 @@ void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
 
     // ビューポートの設定
     D3D11_VIEWPORT	vp = {};
-    vp.Width = static_cast<float>(depthStencil->GetWidth());
-    vp.Height = static_cast<float>(depthStencil->GetHeight());
+    vp.Width = static_cast<float>(shadowmapDepthStencil->GetWidth());
+    vp.Height = static_cast<float>(shadowmapDepthStencil->GetHeight());
     vp.MinDepth = 0.0f;
     vp.MaxDepth = 1.0f;
     dc->RSSetViewports(1, &vp);
@@ -61,13 +61,6 @@ void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
         rc.screenSize.z = Near;
         rc.screenSize.w = Far;
         CalcShadowmapMatrix(rc.view, rc.projection);
-
-        ShadowMapData shadowMapData;
-        shadowMapData.shadowMap = depthStencil->GetShaderResourceView().Get();
-        DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection,
-            DirectX::XMLoadFloat4x4(&rc.view) * DirectX::XMLoadFloat4x4(&rc.projection));
-        shadowMapData.shadowBias = shadowBias;
-        shadowMapData.shadowColor = shadowColor;
     }
 
     // 登録モデルを描画
@@ -104,7 +97,7 @@ void ShadowmapRenderer::DrawDebugGUI()
 {
     if (ImGui::TreeNode("Shadowmap Rendering"))
     {
-        ImGui::SliderFloat("Rectangle", &shadowRect, 1.0f, 2048.0f);
+        ImGui::SliderFloat("Rectangle", &shadowRect, 1.0f, 500.0f);
         ImGui::ColorEdit3("Color", &shadowColor.x);
         ImGui::SliderFloat("Bias", &shadowBias, 0.0f, 0.1f, "%0.4f");
 
@@ -112,7 +105,7 @@ void ShadowmapRenderer::DrawDebugGUI()
         {
             ImGui::Text("Shadowmap");
 
-            ImGui::Image(depthStencil->GetShaderResourceView().Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
+            ImGui::Image(shadowmapDepthStencil->GetShaderResourceView().Get(), { 256, 256 }, { 0, 0 }, { 1, 1 }, { 1, 1, 1, 1 });
 
             ImGui::TreePop();
         }
@@ -129,7 +122,7 @@ const SRVHandleList ShadowmapRenderer::GetRenderTargetShaderResourceViews() cons
 //	DepthStencilのShaderResourceViewを取得
 const SRVHandle ShadowmapRenderer::GetDepthStencilShaderResourceView() const
 {
-    return	depthStencil->GetShaderResourceView();
+    return	shadowmapDepthStencil->GetShaderResourceView();
 
 }
 

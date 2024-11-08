@@ -244,7 +244,7 @@ void SceneGame::Render()
     shadowmapRenderer->Render(rc.deviceContext);
 
     // ƒV[ƒ“‚Ì•`‰æ
-    sceneRenderer->SetShadowmapData(shadowmapRenderer->GetShadowMapData());
+    sceneRenderer->SetShadowmapData(rc.shadowMapData);
     sceneRenderer->Render(rc.deviceContext);
 
     postprocessingRenderer->Render(rc.deviceContext);

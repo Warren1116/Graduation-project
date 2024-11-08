@@ -92,10 +92,8 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		//	rc.shadowMapData.shadowBias[i] = shadowBias[i];
 		//}
 
-		rc.shadowMapData.shadowMap = shadowmapDepthStencil->GetShaderResourceView().Get();
-		rc.shadowMapData.lightViewProjection = lightViewProjection;
-		rc.shadowMapData.shadowColor = shadowColor;
-		rc.shadowMapData.shadowBias = shadowBias;
+		//シャドウマップの情報をセット
+		rc.shadowMapData = shadowMapData;
 
 	}
 

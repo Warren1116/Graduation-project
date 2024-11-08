@@ -232,9 +232,9 @@ void PhongShader::Begin(const RenderContext& rc)
 
     // シャドウマップ用定数バッファ更新
     CbShadowMap cbShadowMap;
+    cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection;
     cbShadowMap.shadowColor = rc.shadowMapData.shadowColor;
     cbShadowMap.shadowBias = rc.shadowMapData.shadowBias;
-    cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection;
 
     //for (int i = 0; i < ShadowmapCount; ++i)
     //{
