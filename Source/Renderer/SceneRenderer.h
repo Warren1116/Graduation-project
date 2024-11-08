@@ -43,13 +43,19 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState>		depthStencilState;
 private:
 	//	シャドウマップ用深度ステンシルバッファ
-	std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
+	std::unique_ptr<DepthStencil> shadowmapDepthStencil;
 	//	ライトビュープロジェクション行列
-	DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
+	DirectX::XMFLOAT4X4 lightViewProjection;
 	//	深度比較用のオフセット値
-	float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
+	float shadowBias= { 0.001f};
 	//	影の色
 	DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
+
+
+	//std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
+	//DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
+	//float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
+	//DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
 
 };

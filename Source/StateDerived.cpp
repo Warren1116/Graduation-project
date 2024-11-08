@@ -122,8 +122,8 @@ void PursuitState::Execute(float elapsedTime)
 	float dist = sqrtf(vx * vx + vy * vy + vz * vz);
 
 	//// 攻撃範囲に入ったとき攻撃ステートへ遷移
-	//if (owner->GetAttackRange() > dist)
-	//	owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
+	if (owner->GetAttackRange() > dist)
+		owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
 }
 
 // 追跡ステートから出ていくときのメソッド

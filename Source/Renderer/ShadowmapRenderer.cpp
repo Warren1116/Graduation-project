@@ -1,6 +1,7 @@
 #include "ShadowmapRenderer.h"
 #include "Graphics/LightManager.h"
 #include "SceneGame.h"
+#include "Camera.h"
 
 ShadowmapRenderer::ShadowmapRenderer(UINT shadowmapSize)
 {
@@ -16,16 +17,15 @@ ShadowmapRenderer::~ShadowmapRenderer()
 ShadowMapData ShadowmapRenderer::GetShadowMapData()
 {
     ShadowMapData shadowMapData;
-    for (int i = 0; i < ShadowmapCount; ++i)
-    {
-        shadowMapData.shadowMap[i] = depthStencil->GetShaderResourceView().Get();
-        DirectX::XMFLOAT4X4 view, projection;
-        CalcShadowmapMatrix(view, projection);
-        DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection[i],
-            DirectX::XMLoadFloat4x4(&view) * DirectX::XMLoadFloat4x4(&projection));
-        shadowMapData.shadowBias[i] = shadowBias;
-        shadowMapData.shadowColor = shadowColor;
-    }
+
+    DirectX::XMFLOAT4X4 view, projection;
+    CalcShadowmapMatrix(view, projection);
+    shadowMapData.shadowMap = depthStencil->GetShaderResourceView().Get();
+    DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection,
+        DirectX::XMLoadFloat4x4(&view) * DirectX::XMLoadFloat4x4(&projection));
+    shadowMapData.shadowBias = shadowBias;
+    shadowMapData.shadowColor = shadowColor;
+
 
     return shadowMapData;
 }
@@ -61,6 +61,13 @@ void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
         rc.screenSize.z = Near;
         rc.screenSize.w = Far;
         CalcShadowmapMatrix(rc.view, rc.projection);
+
+        ShadowMapData shadowMapData;
+        shadowMapData.shadowMap = depthStencil->GetShaderResourceView().Get();
+        DirectX::XMStoreFloat4x4(&shadowMapData.lightViewProjection,
+            DirectX::XMLoadFloat4x4(&rc.view) * DirectX::XMLoadFloat4x4(&rc.projection));
+        shadowMapData.shadowBias = shadowBias;
+        shadowMapData.shadowColor = shadowColor;
     }
 
     // 登録モデルを描画
@@ -84,6 +91,7 @@ void ShadowmapRenderer::Render(ID3D11DeviceContext* dc)
         }
     }
     shader->End(rc);
+
 
     //	元のバッファに戻す
     RestoreRenderTargets(dc);
@@ -147,4 +155,5 @@ void ShadowmapRenderer::CalcShadowmapMatrix(DirectX::XMFLOAT4X4& view, DirectX::
     // シャドウマップに描画したい範囲の射影行列を生成
     DirectX::XMStoreFloat4x4(&view, V);
     DirectX::XMStoreFloat4x4(&projection, P);
+
 }

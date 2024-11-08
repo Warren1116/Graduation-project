@@ -80,14 +80,20 @@ public:
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 
 
-    //	シャドウマップ用深度ステンシルバッファ
-    std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
-    //	ライトビュープロジェクション行列
-    DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
-    //	深度比較用のオフセット値
-    float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
-    //	影の色
-    DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
+    std::unique_ptr<DepthStencil> shadowmapDepthStencil;	//シャドウマップ用深度ステンシルバッファ
+    float shadowDrawRect = 200.0f;							//シャドウマップに描画する範囲
+    DirectX::XMFLOAT4X4 lightViewProjection;				//ライトビュープロジェクション行列
+    DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };		//影の色
+    float shadowBias = 0.001f;								//深度比較用のオフセット値
+
+    ////	シャドウマップ用深度ステンシルバッファ
+    //std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
+    ////	ライトビュープロジェクション行列
+    //DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
+    ////	深度比較用のオフセット値
+    //float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
+    ////	影の色
+    //DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
 private:
     std::unique_ptr<Player> player;

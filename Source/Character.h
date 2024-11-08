@@ -90,7 +90,6 @@ protected:
 	// ù‰ñˆ—
 	void Turn(float elapsedTime, float vx, float vz, float speed);
 
-
 	// ƒWƒƒƒ“ƒvˆ—
 	void Jump(float speed);
 

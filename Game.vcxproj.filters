@@ -315,6 +315,9 @@
     <ClInclude Include="Source\SwingWeb.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Renderer\ShadowmapCasterRenderer.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -553,6 +556,9 @@
     </ClCompile>
     <ClCompile Include="Source\SwingWeb.cpp">
       <Filter>Source\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ShadowmapCasterRenderer.cpp">
+      <Filter>Source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

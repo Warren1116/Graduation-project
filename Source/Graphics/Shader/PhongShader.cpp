@@ -230,9 +230,11 @@ void PhongShader::Begin(const RenderContext& rc)
 
     rc.deviceContext->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
 
-    //// シャドウマップ用定数バッファ更新
-    //CbShadowMap cbShadowMap;
-    //cbShadowMap.shadowColor = rc.shadowMapData.shadowColor;
+    // シャドウマップ用定数バッファ更新
+    CbShadowMap cbShadowMap;
+    cbShadowMap.shadowColor = rc.shadowMapData.shadowColor;
+    cbShadowMap.shadowBias = rc.shadowMapData.shadowBias;
+    cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection;
 
     //for (int i = 0; i < ShadowmapCount; ++i)
     //{
@@ -242,10 +244,10 @@ void PhongShader::Begin(const RenderContext& rc)
     //    cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
     //}
 
-    //rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
-    ////シャドウマップ設定
+    rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
+    //シャドウマップ設定
 
-    //rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap[0]);
+    rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap);
     //ID3D11ShaderResourceView* srvs[ShadowmapCount];
     //for (int i = 0; i < ShadowmapCount; ++i)
     //{

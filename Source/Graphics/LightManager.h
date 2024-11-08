@@ -55,7 +55,7 @@ public:
 
 private:
 	std::vector<Light*>			lights;
-	DirectX::XMFLOAT4			ambientColor	= {0.2f, 0.2f, 0.2f, 1.0f};
+	DirectX::XMFLOAT4			ambientColor	= {0.5f, 0.5f, 0.5f, 1.0f};
 	std::unique_ptr<Texture>	skyTexture;
 	Light* shadowmapLight = nullptr;
 

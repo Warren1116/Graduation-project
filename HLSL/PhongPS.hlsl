@@ -2,9 +2,9 @@
 
 Texture2D diffuseMap : register(t0);
 Texture2D normalMap : register(t1); //法線マップ
-//Texture2D shadowMap : register(t2); //シャドウマップ
+Texture2D shadowMap : register(t2); //シャドウマップ
 
-Texture2D shadowMap[ShadowmapCount] : register(t2); //シャドウマップ(配列にしているのでShadowmapCount分
+//Texture2D shadowMap[ShadowmapCount] : register(t2); //シャドウマップ(配列にしているのでShadowmapCount分
 //レジスターを利用していると考えてください。ShadowmapCount = 4　の場合はt2,t3,t4,t5まで使われています)
 
 SamplerState diffuseMapSamplerState : register(s0);
@@ -49,7 +49,9 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 diffuse = CalcLambertDiffuse(N, L, directionalLightData.color.rgb, kd);
     float3 specular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks);
 
-    
+    // 平行光源の影なので、平行光源に対して影を適応
+    float3 shadow = CalcShadowColorPCFFilter(shadowMap, shadowMapSamplerState, pin.shadowTexcoord, shadowColor, shadowBias);
+
     //float3 shadow = 1;
     //for (int j = 0; j < ShadowmapCount; ++j)
     //{
@@ -67,8 +69,9 @@ float4 main(VS_OUT pin) : SV_TARGET
     //        break;
     //    }
     //}
-    //diffuse *= shadow;
-    //specular *= shadow;
+    
+    diffuse *= shadow;
+    specular *= shadow;
     
 	// スポットライトの処理
     for (int i = 0; i < spotLightCount; ++i)
@@ -99,37 +102,7 @@ float4 main(VS_OUT pin) : SV_TARGET
 									spotLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
 
     }
-    
-    // スポットライトの処理
-    for (i = 0; i < spotLightCount; ++i)
-    {
-		// ライトベクトルを算出
-        float3 lightVector = pin.world_position - spotLightData[i].position.xyz;
-
-		// ライトベクトルの長さを算出
-        float lightLength = length(lightVector);
-
-        if (lightLength >= spotLightData[i].range)
-            continue;
-
-		// 距離減衰を算出する
-        float attenuate = saturate(1.0f - lightLength / spotLightData[i].range);
-
-        lightVector = normalize(lightVector);
-
-		// 角度減衰を算出してattenuateに乗算する
-        float3 spotDirection = normalize(spotLightData[i].direction.xyz);
-        float angle = dot(spotDirection, lightVector);
-        float area = spotLightData[i].innerCorn - spotLightData[i].outerCorn;
-        attenuate *= saturate(1.0f - (spotLightData[i].innerCorn - angle) / area);
-
-        diffuse += CalcLambertDiffuse(N, lightVector,
-									spotLightData[i].color.rgb, kd.rgb) * attenuate;
-        specular += CalcPhongSpecular(N, lightVector,
-									spotLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
-
-    }
-    
+        
     return float4((diffuseColor.rgb * (ambient + diffuse) + specular), diffuseColor.a);
 
     //float4 color = float4(ambient, diffuseColor.a);

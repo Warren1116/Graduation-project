@@ -22,6 +22,9 @@
 #include "Graphics/geometric_primitive.h"
 
 SceneGame* SceneGame::instance = nullptr;
+//シャドウマップのサイズ
+static const UINT SHADOWMAP_SIZE = 2048;
+
 
 //#define TUTORIAL
 #define DEBUG
@@ -31,6 +34,14 @@ void SceneGame::Initialize()
 {
     instance = this;
     Graphics& graphics = Graphics::Instance();
+
+    //シャドウマップ用に深度ステンシルの生成
+    {
+        shadowmapDepthStencil = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+
+    }
+
+
     //	各種レンダラー生成
     {
         UINT width = static_cast<UINT>(graphics.GetScreenWidth());
@@ -132,7 +143,7 @@ void SceneGame::Initialize()
         mainDirectionalLight->SetColor({ 1,1,1,1 });
         mainDirectionalLight->SetPosition({ 0,3,0 });
         LightManager::Instance().Register(mainDirectionalLight);
-
+        LightManager::Instance().SetShadowmapLight(mainDirectionalLight);
     }
 
     meta = new Meta(player.get(), &enemyManager);
@@ -263,6 +274,7 @@ void SceneGame::Render()
 
         ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
 
         if (ImGui::Begin("Tutorial", nullptr, ImGuiWindowFlags_None))
         {

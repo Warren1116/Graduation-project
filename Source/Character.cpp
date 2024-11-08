@@ -374,6 +374,8 @@ void Character::Turn(float elapsedTime, float vx, float vz, float speed)
         angle.y += rot * 0.5f;
     }
 
+
+
 }
 
 

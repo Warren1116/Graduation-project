@@ -110,6 +110,10 @@ void Player::Update(float elapsedTime)
     // モデル行列更新
     model->UpdateTransform(transform);
 
+    if (attacking)
+    {
+        attackTimer++;
+    }
 }
 
 // 移動入力処理
@@ -123,7 +127,6 @@ bool Player::InputMove(float elapsedTime)
     //進行ベクトル取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
     //移動処理
-
     Move(moveVec.x, moveVec.y, moveVec.z, moveSpeed);
     if (!onClimb)
     {
@@ -669,7 +672,7 @@ void Player::TransitionIdleState()
         model->PlayAnimation(Anim_Idle, true);
         if (attacking)
         {
-            if (attackCount >= attackLimit || attackTimer > 120)
+            if (attackCount >= attackLimit || attackTimer > 100)
             {
                 attackTimer = 0;
                 attackCount = 0;
@@ -682,10 +685,7 @@ void Player::TransitionIdleState()
 // 待機ステート更新処理
 void Player::UpdateIdleState(float elapsedTime)
 {
-    if (attacking)
-    {
-        attackTimer++;
-    }
+
     //移動入力処理
     if (InputMove(elapsedTime))
     {
