@@ -109,7 +109,7 @@ private:
     std::unique_ptr<Sprite>		renderSplite;
 
     //  MetaAIオブジェクト追加
-    Meta* meta = nullptr;
+    std::unique_ptr<Meta> meta = nullptr;
 
     //  チュトリアルステート
     TutorialState tutorialState = TutorialState::First;

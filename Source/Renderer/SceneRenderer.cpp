@@ -158,15 +158,15 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 				shader->DrawSubset(rc, subset);
 			}
 		}
-
-		EffectManager::Instance().Render(rc.view, rc.projection);
-
 	}
 
 
 	//	シェーダーがあれば終了処理
 	if (shader)
 		shader->End(rc);
+
+	EffectManager::Instance().Render(rc.view, rc.projection);
+
 
 	//	デバッグプリミティブの表示
 	if (drawDebugPrimitive)

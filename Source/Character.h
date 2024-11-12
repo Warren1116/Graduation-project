@@ -68,6 +68,8 @@ public:
 	// 生死判定フラグ
 	bool GetAlive() { return isAlive; }
 
+	// スイングしてるフラグ
+	bool GetOnSwing() { return onSwing; }
 private:
 
 	// 垂直速力更新処理　
@@ -147,12 +149,13 @@ protected:
 
 	bool isAlive = true;
 
+	//　プレイヤー用判定
 	bool hitWall = false;
 	bool onClimb = false;
 	bool CanClimb = false;
 	bool onSwing = false;
 
-	float lastPositionY = 0.0f;  
-	const float landingThreshold = 1.0f;
+	float fallStartHeight = 0.0f;
+	float landingHeightThreshold = 1.0f;
 };
 

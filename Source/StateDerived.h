@@ -45,6 +45,9 @@ public:
     void Execute(float elapsedTime)override;
     //ステートから出ていくときのメソッド
     void Exit()override;
+private:
+    float attackCooldownTimer;
+    float attackWarningTime = 1.0f;
 };
 
 class AttackState : public State
@@ -131,5 +134,8 @@ public:
     void Execute(float elapsedTime) override;
     // ステートから出ていくときのメソッド
     void Exit() override;
+private:
+    float attackCooldownTimer;
+    float attackWarningTime = 1.0f;
 };
 

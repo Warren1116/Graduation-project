@@ -43,6 +43,9 @@ public:
 	// 攻撃入力処理
 	bool InputAttack();
 
+	// Dodge入力処理
+	bool InputDodge();
+
 	// ロックオンステート
 	enum class LockonState
 	{
@@ -65,6 +68,12 @@ public:
 	DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }
 
 	bool GetFirstSwing() { return firstSwing; }
+
+	//	記録されたスイングポイントを取得
+	DirectX::XMFLOAT3 GetPreviousSwingPoint() { return previousSwingPoint; }
+
+	bool GetAttackSoon() { return getAttacksoon; }
+	void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
 
 	std::unique_ptr<Model> model = nullptr;
 
@@ -160,7 +169,7 @@ private:
 	// 着地ステート更新処理
 	void UpdateLandState(float elapsedTime);
 
-	// スイングステートをへ遷移
+	// スイングステートへ遷移
 	void TransitionSwingState();
 
 	// スイングステート更新処理
@@ -177,6 +186,13 @@ private:
 
 	//	連撃攻撃のモーション
 	void PlayAttackAnimation();
+
+	//	回避ステートへ遷移
+	void TransitionDodgeState();
+
+	//	回避ステートの更新
+	void UpdateDodgeState(float elapsedTime);
+
 
 
 private:
@@ -201,6 +217,7 @@ private:
 		Anim_Swinging,
 		Anim_Swinging2,
 		Anim_Shoting,
+		Anim_Dodge,
 	};
 
 
@@ -220,7 +237,7 @@ private:
 	//	回転スビート
 	float turnSpeed = DirectX::XMConvertToRadians(720);
 	//　ジャンブスビート
-	float jumpSpeed = 20.0f;
+	float jumpSpeed = 16.0f;
 	//　ヒットエフェクト
 	std::unique_ptr<Effect> hitEffect = nullptr;
 
@@ -243,6 +260,8 @@ private:
 	//	攻撃判定
 	bool attacking = false;
 
+	bool getAttacksoon = false;
+
 	//カメラロック用
 	LockonState			lockonState = LockonState::NotLocked;
 	float				lockonTargetChangeTime = 0;
@@ -252,12 +271,14 @@ private:
 
 private:
 	//糸用
-	float swingTime = 0.0f;
-	float swingAngle = 0.0f;
+	//	スイングポイントの位置
 	DirectX::XMFLOAT3 swingPoint;
+	//	スイングポイントの方向
 	DirectX::XMVECTOR swingwebDirection;
-	DirectX::XMFLOAT3 highestSwingPoint;
+	//	初回のスイングを判定
 	bool firstSwing = true;
+	//	前回のスイングポイントを記録
+	DirectX::XMFLOAT3 previousSwingPoint;
 
 };
 

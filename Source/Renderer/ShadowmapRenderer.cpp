@@ -129,8 +129,8 @@ const SRVHandle ShadowmapRenderer::GetDepthStencilShaderResourceView() const
 //	シャドウマップで使用する各行列を算出
 void ShadowmapRenderer::CalcShadowmapMatrix(DirectX::XMFLOAT4X4& view, DirectX::XMFLOAT4X4& projection)
 {
-    Light* light = LightManager::Instance().GetShadowmapLight();
-    if (!light)
+    Light* light = LightManager::Instance().GetShadowmapLight(); // ディレクショナルライトを取得
+    if (!light) // ライトが存在しない場合
     {
         view = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
         projection = { 1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1 };
@@ -138,14 +138,15 @@ void ShadowmapRenderer::CalcShadowmapMatrix(DirectX::XMFLOAT4X4& view, DirectX::
     }
 
     // 平行光源からカメラ位置を作成し、そこから原点の位置を見るように視線行列を生成
-    DirectX::XMVECTOR LightPosition = DirectX::XMLoadFloat3(&light->GetDirection());
-    LightPosition = DirectX::XMVectorScale(LightPosition, -250.0f);
+    DirectX::XMVECTOR LightPosition = DirectX::XMLoadFloat3(&light->GetDirection()); // 方向ベクトル取得
+    LightPosition = DirectX::XMVectorScale(LightPosition, -250.0f); // 取得した方向に対して、伸ばす
 
+    // シャドウマップに描画したい範囲の射影行列を生成
     DirectX::XMMATRIX V = DirectX::XMMatrixLookAtLH(LightPosition,
         DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f),
         DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f));
     DirectX::XMMATRIX P = DirectX::XMMatrixOrthographicLH(shadowRect, shadowRect, Near, Far);
-    // シャドウマップに描画したい範囲の射影行列を生成
+    // 生成した値をviewとprojectionに保存
     DirectX::XMStoreFloat4x4(&view, V);
     DirectX::XMStoreFloat4x4(&projection, P);
 

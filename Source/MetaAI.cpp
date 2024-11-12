@@ -64,12 +64,12 @@ bool Meta::OnMessage(const Telegram& telegram)
 			// enmVecのサイズで乱数を取得し、取得した値をインデックス値として
 			// enmVecに登録された敵の一人に攻撃権を与える
 			// 攻撃権を与えるメッセージはMsgGiveAttackRightです。
-			int random = 0;
-			random = rand() % enmVec.size();
+			int random = rand() % enmVec.size();
 			Meta::Instance().SendMessaging(
 				static_cast<int>(Meta::Identity::Meta),
 				enmVec.at(random)->GetId(),
 				MESSAGE_TYPE::MsgGiveAttackRight);
+
 		}
 		return true;
 		break;

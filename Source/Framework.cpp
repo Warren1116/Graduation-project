@@ -8,6 +8,9 @@
 #include "SceneTitle.h"
 #include "SceneManager.h"
 #include "SceneGame.h"
+#include "SceneLoading.h"
+
+#include<ctime>
 
 
 
@@ -25,6 +28,7 @@ Framework::Framework(HWND hWnd)
 
 	// ÉVÅ[Éìèâä˙âª
 	SceneManager::Instance().ChangeScene(new SceneGame);
+	//SceneManager::Instance().ChangeScene(new SceneTitle);
 
 	cameraController = new CameraController();
 }
@@ -112,6 +116,10 @@ int Framework::Run()
 {
 	MSG msg = {};
 
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	//_CrtSetBreakAlloc(21999); 
+
 	while (WM_QUIT != msg.message)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -128,8 +136,21 @@ int Framework::Run()
 				? timer.TimeInterval()
 				: syncInterval / 60.0f
 				;
+			//auto start = std::chrono::high_resolution_clock::now();
 			Update(elapsedTime);
+			//auto end = std::chrono::high_resolution_clock::now();
+			//std::chrono::duration<double> dir = end - start;
+			//std::string str = "Update";
+			//str += std::to_string(dir.count());
+			//OutputDebugStringA(str.c_str());
+			//start = std::chrono::high_resolution_clock::now();
 			Render(elapsedTime);
+			//end = std::chrono::high_resolution_clock::now();
+			// dir = end - start;
+			// str = "Render";
+			//str += std::to_string(dir.count());
+			//str += "\n";
+			//OutputDebugStringA(str.c_str());
 		}
 	}
 	return static_cast<int>(msg.wParam);

@@ -87,6 +87,9 @@ void Player::Update(float elapsedTime)
     case State::Shot:
         UpdateShotingState(elapsedTime);
         break;
+    case State::Dodge:
+        UpdateDodgeState(elapsedTime);
+        break;
     }
 
     //弾丸更新処理
@@ -315,6 +318,33 @@ void Player::PlayAttackAnimation()
 
 }
 
+void Player::TransitionDodgeState()
+{
+    state = State::Dodge;
+    model->PlayAnimation(Anim_Dodge, false);
+}
+
+void Player::UpdateDodgeState(float elapsedTime)
+{
+    DirectX::XMVECTOR vel = DirectX::XMLoadFloat3(&velocity);
+    vel = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&GetFront()), -110.0f);
+
+    DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
+    playerPos = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&position), DirectX::XMVectorScale(vel, elapsedTime));
+
+    DirectX::XMStoreFloat3(&velocity, vel);
+    DirectX::XMStoreFloat3(&position, playerPos);
+
+    if (InputMove(elapsedTime))
+    {
+        TransitionMoveState();
+    }
+    if (!model->IsPlayAnimation())
+    {
+        TransitionIdleState();
+    }
+}
+
 //　カメラステート更新処理
 void Player::UpdateCameraState(float elapsedTime)
 {
@@ -355,6 +385,7 @@ void Player::UpdateCameraState(float elapsedTime)
     case State::Damage:
     case State::Climb:
     case State::Swing:
+    case State::Dodge:
     {
         if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_TAB)
         {
@@ -655,6 +686,18 @@ bool Player::InputAttack()
 
 }
 
+bool Player::InputDodge()
+{
+    // ボタン入力でジャンプ
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
+    {
+        return true;
+    }
+    return false;
+
+}
+
 // 待機ステートへ遷移
 void Player::TransitionIdleState()
 {
@@ -694,9 +737,14 @@ void Player::UpdateIdleState(float elapsedTime)
     }
 
     //ジャンプ入力処理
-    if (InputJump())
+    if (!GetAttackSoon() && InputJump())
     {
         TransitionJumpState();
+
+    }
+    else if (GetAttackSoon() && InputDodge())
+    {
+        TransitionDodgeState();
     }
 
 
@@ -734,11 +782,16 @@ void Player::TransitionMoveState()
 void Player::UpdateMoveState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-    //  ジャンブ中移動とSHIFTキー同時に押すと
+    //  移動中SHIFTキー同時に押すと
     if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime) && firstSwing)
     {
         lastState = State::Move;
         TransitionSwingState();
+    }
+
+    if (GetAttackSoon() && InputDodge())
+    {
+        TransitionDodgeState();
     }
 
     //  目の前に壁がある同時にSpeacキー押したら
@@ -789,8 +842,6 @@ void Player::UpdateJumpState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    //　ジャンブ中Spaceキー押すと(仮)
-    //if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
 
     //  ジャンブ中移動とSHIFTキー同時に押すと
     if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime))
@@ -1007,9 +1058,9 @@ bool Player::InputJump()
 {
     // ボタン入力でジャンプ
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
+    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
     {
-        // ジャンプ入力した
+        //ジャンプ入力した
         Jump(jumpSpeed);
         return true;
     }
@@ -1059,7 +1110,15 @@ void Player::TransitionSwingState()
 
     if (lastState == State::Move)
     {
-        model->PlayAnimation(Anim_StartSwing, false);
+        if (firstSwing)
+        {
+            model->PlayAnimation(Anim_StartSwing, false);
+            firstSwing = false;
+        }
+        else
+        {
+            model->PlayAnimation(Anim_Swinging, false);
+        }
 
         //  スイング糸の貼り付けるのPosition(仮空中)
         //  プレイヤーの前方上に設定
@@ -1080,25 +1139,47 @@ void Player::TransitionSwingState()
         onSwing = true;
 
         //  スイングモデル（現在仮、Geometricに変更予定）
-        SwingWeb* swingWeb = new SwingWeb(&projectileManager);
+        SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true); 
+        SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
         SceneGame& sceneGame = SceneGame::Instance();
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
             //  レンダラーに登録
-            sceneGame.RegisterRenderModel(swingWeb->GetModel());
-
+            sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+            sceneGame.RegisterRenderModel(swingWebRight->GetModel());
         }
     }
-    else
+    else if(lastState == State::Jump)
     {
         //  連続スイングのモーション
         if (!onSwing)
         {
             model->PlayAnimation(Anim_Swinging2, false);
+
+            //  スイングモデル（現在仮、Geometricに変更予定）
+            SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
+            SceneGame& sceneGame = SceneGame::Instance();
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+            {
+                //  レンダラーに登録
+                sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+            }
+
         }
         else //　初回スイングのモーション  
         {
             model->PlayAnimation(Anim_Swinging, false);
+
+            //  スイングモデル（現在仮、Geometricに変更予定）
+            SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
+            SceneGame& sceneGame = SceneGame::Instance();
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+            {
+                //  レンダラーに登録
+                sceneGame.RegisterRenderModel(swingWebRight->GetModel());
+            }
+
+
         }
         //  スイング糸の貼り付けるのPosition(仮空中)
         //  プレイヤーの前方上に設定
@@ -1118,15 +1199,7 @@ void Player::TransitionSwingState()
         DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
         onSwing = true;
 
-        //  スイングモデル（現在仮、Geometricに変更予定）
-        SwingWeb* swingWeb = new SwingWeb(&projectileManager);
-        SceneGame& sceneGame = SceneGame::Instance();
-        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-        {
-            //  レンダラーに登録
-            sceneGame.RegisterRenderModel(swingWeb->GetModel());
 
-        }
     }
 
 }
@@ -1168,7 +1241,6 @@ void Player::UpdateSwingState(float elapsedTime)
         Q = DirectX::XMVectorAdd(Q, correction);
     }
 
-
     DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
 
     DirectX::XMFLOAT3 front = GetFront();
@@ -1190,6 +1262,9 @@ void Player::UpdateSwingState(float elapsedTime)
     if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
     {
         TransitionIdleState();
+        velocity.x = 0;
+        velocity.y = 0;
+        velocity.z = 0;
     }
 }
 
@@ -1227,24 +1302,37 @@ void Player::DrawDebugGUI()
             ImGui::InputInt("attackCount", &attackCount);
             ImGui::InputFloat("attackTimer", &attackTimer);
 
-            if (hitWall)
+        }
+        if (ImGui::CollapsingHeader("Skill", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if (ImGui::CollapsingHeader("Spider Sense", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                ImGui::Text("Is Hit Wall");
+                ImGui::Checkbox("SpiderSense", &getAttacksoon);
             }
-            else ImGui::Text("Not Hiting Wall");
 
-            if (onClimb)
+            if (ImGui::CollapsingHeader("Clime Wall", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                ImGui::Text("On Climb");
-            }
-            else ImGui::Text("Not On Climb");
+                if (hitWall)
+                {
+                    ImGui::Text("Is Hit Wall");
+                }
+                else ImGui::Text("Not Hiting Wall");
 
-            if (CanClimb)
-            {
-                ImGui::Text("Can Climb Up");
-            }
-            else ImGui::Text("Can't Climb Up");
+                if (onClimb)
+                {
+                    ImGui::Text("On Climb");
+                }
+                else ImGui::Text("Not On Climb");
 
+                if (CanClimb)
+                {
+                    ImGui::Text("Can Climb Up");
+                }
+                else ImGui::Text("Can't Climb Up");
+            }
+        }
+        if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+        {
             std::string str = "";
             switch (lockonState)
             {
@@ -1256,8 +1344,6 @@ void Player::DrawDebugGUI()
                 break;
             }
             ImGui::Text(u8"State　%s", str.c_str());
-
-
         }
 
     }

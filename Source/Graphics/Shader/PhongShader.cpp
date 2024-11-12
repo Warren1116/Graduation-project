@@ -227,6 +227,7 @@ void PhongShader::Begin(const RenderContext& rc)
     cbScene.ambientLightColor = rc.ambientLightColor;
     cbScene.viewPosition = rc.viewPosition;
     cbScene.directionalLightData = rc.directionalLightData;
+    cbScene.spotLightCount = 0;
 
     rc.deviceContext->UpdateSubresource(sceneConstantBuffer.Get(), 0, 0, &cbScene, 0, 0);
 

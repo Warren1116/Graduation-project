@@ -38,9 +38,7 @@ void SceneGame::Initialize()
     //シャドウマップ用に深度ステンシルの生成
     {
         shadowmapDepthStencil = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
-
     }
-
 
     //	各種レンダラー生成
     {
@@ -81,7 +79,6 @@ void SceneGame::Initialize()
     StageMain* stageMain = new StageMain();
     stageManager.Register(stageMain);
 
-
     //　プレイヤー生成
     player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(45), 0));
@@ -102,6 +99,11 @@ void SceneGame::Initialize()
     people2->SetTerritory(people2->GetPosition(), 10.0f);
     enemyManager.Register(people2);
 
+    //EnemyThief* people3 = new EnemyThief();
+    //people3->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
+    //people3->SetTerritory(people3->GetPosition(), 10.0f);
+    //enemyManager.Register(people3);
+
     //	モデルを各レンダラーに登録
     Model* list[] =
     {
@@ -109,6 +111,7 @@ void SceneGame::Initialize()
         stageMain->GetModel(),
         people->GetModel(),
         people2->GetModel(),
+       // people3->GetModel(),
 
     };
     for (Model* model : list)
@@ -130,6 +133,7 @@ void SceneGame::Initialize()
         // エネミー初期化
         characterManager.Register(people);
         characterManager.Register(people2);
+        //characterManager.Register(people3);
 
 
     }
@@ -137,7 +141,6 @@ void SceneGame::Initialize()
 
     // 平行光源を追加
     {
-
         mainDirectionalLight = new Light(LightType::Directional);
         mainDirectionalLight->SetDirection({ -0.5, -1, -1 });
         mainDirectionalLight->SetColor({ 1,1,1,1 });
@@ -146,7 +149,7 @@ void SceneGame::Initialize()
         LightManager::Instance().SetShadowmapLight(mainDirectionalLight);
     }
 
-    meta = new Meta(player.get(), &enemyManager);
+    meta = make_unique<Meta>(player.get(), &enemyManager);
 
     //  UIの初期化
     UI::Instance().Initialize();
@@ -181,7 +184,6 @@ void SceneGame::Update(float elapsedTime)
     Graphics& graphics = Graphics::Instance();
     //  UI更新処理
     UI::Instance().Update(elapsedTime);
-
 
 
 #ifdef TUTORIAL

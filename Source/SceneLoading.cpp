@@ -35,7 +35,7 @@ void SceneLoading::Update(float elapsedTime)
 {
 	Graphics& graphics = Graphics::Instance();
 	SetCursorPos(graphics.GetScreenWidth() / 2, graphics.GetScreenHeight() / 2);
-	ShowCursor(false);
+	ShowCursor(true);
 
 	constexpr float  speed = 1800;
 	if(loadTimer % 6 == 0) angle += speed * elapsedTime;

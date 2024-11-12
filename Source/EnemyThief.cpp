@@ -26,22 +26,6 @@ EnemyThief::EnemyThief()
 	stateMachine->RegisterState(new SearchState(this));
 	stateMachine->RegisterState(new BattleState(this));
 
-	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new WanderState(this));
-	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new IdleState(this));
-	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PursuitState(this));
-	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new AttackState(this));
-
-	// ステートマシンにメッセージを受信したときの一層目のステートを追加登録
-	stateMachine->RegisterState(new RecieveState(this));
-
-	// ステートマシンにメッセージを受信したときのサブステートを追加登録
-	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Recieve), new CalledState(this));
-
-	// 戦闘中攻撃権の持っていない状態での待機ステートを追加登録
-	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new StandbyState(this));
-
-	stateMachine->SetState(static_cast<int>(State::Search));
-
 	// ステートマシンにメッセージを受信したときの１層目のステートを追加登録
 	stateMachine->RegisterState(new RecieveState(this));
 
@@ -50,7 +34,6 @@ EnemyThief::EnemyThief()
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new WanderState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PursuitState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new AttackState(this));
-
 
 	// ステートマシンにメッセージを受信したときのサブステートを追加登録
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Recieve), new CalledState(this));

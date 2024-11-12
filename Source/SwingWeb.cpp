@@ -4,11 +4,24 @@
 #include "Mathf.h"
 
 SwingWeb* SwingWeb::instance = nullptr;
+SwingWeb* SwingWeb::instanceLeft = nullptr;
+SwingWeb* SwingWeb::instanceRight = nullptr;
 
 // コンストラクタ
-SwingWeb::SwingWeb(ProjectileManager* manager) : Projectile(manager)
+SwingWeb::SwingWeb(ProjectileManager* manager,bool leftHand) : Projectile(manager),isLeftHand(leftHand)
 {
-    instance = this;
+    //instance = this;
+
+    if (isLeftHand)
+    {
+        instanceLeft = this;
+    }
+    else
+    {
+        instanceRight = this;
+    }
+    
+
     model = std::make_unique<Model>("Data/Model/SpiderWeb/SwingWeb.mdl");
 
 

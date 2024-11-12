@@ -21,6 +21,10 @@ public:
 
     void DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    void RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+
+    void RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+
     void Clear();
 
 private:
@@ -37,9 +41,12 @@ private:
     std::unique_ptr<Sprite> Font;
     std::unique_ptr<Sprite> Font2;
     std::unique_ptr<Sprite> spiderSense;
+    std::unique_ptr<Sprite> spiderSense2;
 
     float alpha = 1.0f;
+    float alphaColor = 0.3f;
     float alphaSpeed = 0.02f;
     bool increasingAlpha = false;
-
+    bool fadeOut = true;
+    int TutorialCounter;
 };

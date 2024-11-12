@@ -103,6 +103,11 @@ void Character::UpdateVerticalMove(float elapsedTime)
     //落下中
     if (my < 0.0f)
     {
+        if (isGround)
+        {
+            fallStartHeight = position.y;
+        }
+
         //レイの開始位置は足元より少し上
         DirectX::XMFLOAT3 start = { position.x,position.y + stepOffset,position.z };
         //レイの終点位置は移動後の位置
@@ -121,7 +126,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
             angle.y += hit.rotation.y;
 
             //着地した
-            if (!isGround )
+            if (!isGround && (fallStartHeight - position.y) >= landingHeightThreshold)
             {
                 OnLanding();
             }
