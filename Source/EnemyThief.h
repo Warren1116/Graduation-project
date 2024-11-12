@@ -11,22 +11,13 @@
 // エネミーアニメーション
 enum class EnemyAnimation
 {
-	IdleNormal,
-	IdleBattle,
-	Attack01,
-	Attack02,
-	WalkFWD,
-	WalkBWD,
-	WalkLeft,
-	WalkRight,
-	RunFWD,
-	SenseSomethingST,
-	SenseSomethingRPT,
-	Taunt,
-	Victory,
-	GetHit,
-	Dizzy,
+	Idle,
+	Walk,
+	Run,
+	AttackShot,
 	Die,
+	GetHit,
+	AttackPunch,
 };
 
 class StateMachine;
@@ -78,6 +69,7 @@ public:
 
 	// 攻撃範囲取得
 	float GetAttackRange() { return attackRange; }
+	float GetPunchRange() { return punchRange; }
 
 	//2週目
 	//ステートマシン取得
@@ -123,6 +115,7 @@ public:
 	{
 		Pursuit,
 		Attack,
+		Shot,
 		// 戦闘中に攻撃権を持っていないときの処理を追加
 		Standby,
 		Dead,
@@ -148,7 +141,7 @@ private:
 	float				turnSpeed = DirectX::XMConvertToRadians(360);
 
 	float				searchRange = 5.0f;
-	float				attackRange = 1.5f;
-
+	float				attackRange = 5.0f;
+	float				punchRange = 1.5f;
 	StateMachine* stateMachine = nullptr;
 };

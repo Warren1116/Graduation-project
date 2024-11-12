@@ -93,16 +93,16 @@ void SceneGame::Initialize()
     people->SetTerritory(people->GetPosition(), 10.0f);
     enemyManager.Register(people);
 
-    //	通信相手用に１匹増やす
+    ////	通信相手用に１匹増やす
     EnemyThief* people2 = new EnemyThief();
     people2->SetPosition(DirectX::XMFLOAT3(3.0f, 0.0f, -25.0f));
     people2->SetTerritory(people2->GetPosition(), 10.0f);
     enemyManager.Register(people2);
 
-    //EnemyThief* people3 = new EnemyThief();
-    //people3->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
-    //people3->SetTerritory(people3->GetPosition(), 10.0f);
-    //enemyManager.Register(people3);
+    EnemyThief* people3 = new EnemyThief();
+    people3->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
+    people3->SetTerritory(people3->GetPosition(), 10.0f);
+    enemyManager.Register(people3);
 
     //	モデルを各レンダラーに登録
     Model* list[] =
@@ -111,7 +111,7 @@ void SceneGame::Initialize()
         stageMain->GetModel(),
         people->GetModel(),
         people2->GetModel(),
-       // people3->GetModel(),
+        people3->GetModel(),
 
     };
     for (Model* model : list)
@@ -133,7 +133,7 @@ void SceneGame::Initialize()
         // エネミー初期化
         characterManager.Register(people);
         characterManager.Register(people2);
-        //characterManager.Register(people3);
+        characterManager.Register(people3);
 
 
     }

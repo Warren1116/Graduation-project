@@ -12,7 +12,7 @@
 // コンストラクタ
 EnemyThief::EnemyThief()
 {
-	model = std::make_unique<Model>("Data/Model/Slime/Slime.mdl");
+	model = std::make_unique<Model>("Data/Model/Enemy/Thief.mdl");
 
 	// モデルが大きいのでスケーリング
 	scale.x = scale.y = scale.z = 0.01f;
@@ -34,6 +34,7 @@ EnemyThief::EnemyThief()
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new WanderState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PursuitState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new AttackState(this));
+	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new ShotState(this));
 
 	// ステートマシンにメッセージを受信したときのサブステートを追加登録
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Recieve), new CalledState(this));
@@ -78,6 +79,9 @@ void EnemyThief::Update(float elapsedTime)
 
 void EnemyThief::TransitionDeathState()
 {
+	velocity.x = 0;
+	velocity.y = 0;
+	velocity.z = 0;
 	state = State::Dead;
 	model->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
 }
@@ -145,6 +149,7 @@ void EnemyThief::MoveToTarget(float elapsedTime, float speedRate)
 	Move(vx, vz, moveSpeed * speedRate);
 	Turn(elapsedTime, vx, vz, turnSpeed * speedRate);
 }
+
 
 bool EnemyThief::OnMessage(const Telegram& telegram)
 {

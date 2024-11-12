@@ -325,7 +325,7 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
 
         LockOnScope->Render(dc,
-            screenPosition.x - 15.0f, screenPosition.y - 15.0f,
+            screenPosition.x - 15.0f, screenPosition.y - 60.0f,
             30.0f, 30.0f,
             0, 0,
             static_cast<float>(LockOnScope->GetTextureWidth()), static_cast<float>(LockOnScope->GetTextureHeight()),

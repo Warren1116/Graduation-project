@@ -268,6 +268,7 @@ private:
 	float				lockonTargetChangeTimeMax = 8;
 	Character*			lockonEnemy = nullptr;
 	DirectX::XMFLOAT3	lockDirection;
+	const float MAX_LOCKON_DISTANCE = 15.0f;
 
 private:
 	//Ž…—p

@@ -326,6 +326,7 @@ void Player::TransitionDodgeState()
 
 void Player::UpdateDodgeState(float elapsedTime)
 {
+    invincibleTimer = 2.0f;
     DirectX::XMVECTOR vel = DirectX::XMLoadFloat3(&velocity);
     vel = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&GetFront()), -110.0f);
 
@@ -374,6 +375,7 @@ void Player::UpdateCameraState(float elapsedTime)
         Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
         return;
     }
+
 
     switch (state)
     {
@@ -437,9 +439,12 @@ void Player::UpdateCameraState(float elapsedTime)
                             v = DirectX::XMVectorSubtract(t, p);
                             DirectX::XMStoreFloat(&length1, DirectX::XMVector3LengthSq(v));
 
-                            lockonEnemy = character;
-                            DirectX::XMStoreFloat3(&lockDirection, DirectX::XMVector3Normalize(v));
-                            lockonState = LockonState::Locked;
+                            if (length1 <= MAX_LOCKON_DISTANCE * MAX_LOCKON_DISTANCE)
+                            {
+                                lockonEnemy = character;
+                                DirectX::XMStoreFloat3(&lockDirection, DirectX::XMVector3Normalize(v));
+                                lockonState = LockonState::Locked;
+                            }
                         }
                     }
 
@@ -485,7 +490,7 @@ void Player::UpdateCameraState(float elapsedTime)
                 float distance;
                 DirectX::XMStoreFloat(&distance, DirectX::XMVector3LengthSq(toEnemy));
 
-                if (distance < closestDistance)
+                if (distance < closestDistance && distance <= MAX_LOCKON_DISTANCE * MAX_LOCKON_DISTANCE)
                 {
                     closestDistance = distance;
                     lockonEnemy = character;
@@ -513,6 +518,19 @@ void Player::UpdateCameraState(float elapsedTime)
             DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
             DirectX::XMVECTOR direction = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
             DirectX::XMStoreFloat3(&lockDirection, direction);
+
+            //  敵を遠く過ぎならロックできないの処理
+            float distanceSq;
+            DirectX::XMStoreFloat(&distanceSq, DirectX::XMVector3LengthSq(DirectX::XMVectorSubtract(enemyPos, playerPos)));
+            if (distanceSq > MAX_LOCKON_DISTANCE * MAX_LOCKON_DISTANCE)
+            {
+                lockonState = LockonState::NotLocked;
+                lockonEnemy = nullptr;
+
+                MessageData::CAMERACHANGEFREEMODEDATA p = { position };
+                Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
+                return;
+            }
 
             MessageData::CAMERACHANGELOCKONMODEDATA p = { position, lockonEnemy->GetPosition() };
             Messenger::Instance().SendData(MessageData::CAMERACHANGELOCKONMODE, &p);
@@ -1114,10 +1132,19 @@ void Player::TransitionSwingState()
         {
             model->PlayAnimation(Anim_StartSwing, false);
             firstSwing = false;
+
         }
         else
         {
             model->PlayAnimation(Anim_Swinging, false);
+            SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
+            SceneGame& sceneGame = SceneGame::Instance();
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+            {
+                //  レンダラーに登録
+                sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+            }
+
         }
 
         //  スイング糸の貼り付けるのPosition(仮空中)
@@ -1135,17 +1162,17 @@ void Player::TransitionSwingState()
         DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
         SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingwebDirection);
 
+        previousSwingPoint = swingPoint;
         DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
+
         onSwing = true;
 
         //  スイングモデル（現在仮、Geometricに変更予定）
-        SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true); 
         SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
         SceneGame& sceneGame = SceneGame::Instance();
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
             //  レンダラーに登録
-            sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
             sceneGame.RegisterRenderModel(swingWebRight->GetModel());
         }
     }
@@ -1196,6 +1223,7 @@ void Player::TransitionSwingState()
         DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
         SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingwebDirection);
 
+        previousSwingPoint = swingPoint;
         DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
         onSwing = true;
 

@@ -54,23 +54,44 @@ void SwingWeb::Update(float elapsedTime)
         }
     }
 
-    {
-        //　糸は手から出るように、右手のNodeを探す
-        Model::Node* RightHandPos = player.model->FindNode("mixamorig:RightHand");
-        DirectX::XMFLOAT3 pos;
-        pos.x = RightHandPos->worldTransform._41;
-        pos.y = RightHandPos->worldTransform._42;
-        pos.z = RightHandPos->worldTransform._43;
+    DirectX::XMFLOAT3 handPos;
+    Model::Node* handNode = isLeftHand
+        ? player.model->FindNode("mixamorig:LeftHand")
+        : player.model->FindNode("mixamorig:RightHand");
 
-        DirectX::XMFLOAT3 swingPos = player.GetswingPoint();
+    handPos = {
+        handNode->worldTransform._41,
+        handNode->worldTransform._42,
+        handNode->worldTransform._43
+    };
 
-        DirectX::XMFLOAT3 dir = swingPos - pos;
-        DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
-        dirVec = DirectX::XMVector3Normalize(dirVec);
-        DirectX::XMStoreFloat3(&direction, dirVec);
+    DirectX::XMFLOAT3 targetPoint = isLeftHand ? player.GetPreviousSwingPoint() : player.GetswingPoint();
+    DirectX::XMFLOAT3 dir = targetPoint - handPos;
 
-        position = pos;
-    }
+    DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
+    dirVec = DirectX::XMVector3Normalize(dirVec);
+    DirectX::XMStoreFloat3(&direction, dirVec);
+
+    position = handPos;
+
+
+    //{
+    //    //　糸は手から出るように、右手のNodeを探す
+    //    Model::Node* RightHandPos = player.model->FindNode("mixamorig:RightHand");
+    //    DirectX::XMFLOAT3 pos;
+    //    pos.x = RightHandPos->worldTransform._41;
+    //    pos.y = RightHandPos->worldTransform._42;
+    //    pos.z = RightHandPos->worldTransform._43;
+
+    //    DirectX::XMFLOAT3 swingPos = player.GetswingPoint();
+
+    //    DirectX::XMFLOAT3 dir = swingPos - pos;
+    //    DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
+    //    dirVec = DirectX::XMVector3Normalize(dirVec);
+    //    DirectX::XMStoreFloat3(&direction, dirVec);
+
+    //    position = pos;
+    //}
    
 
     UpdateTransform();

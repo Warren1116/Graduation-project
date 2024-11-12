@@ -48,6 +48,12 @@ public:
 private:
     float attackCooldownTimer;
     float attackWarningTime = 1.0f;
+
+    enum class AttackType
+    {
+        Punch,
+        Shot,
+    };
 };
 
 class AttackState : public State
@@ -57,6 +63,21 @@ public:
     AttackState(EnemyThief* enemy) : State(enemy) {};
     //  デストラクタ
     ~AttackState() {}
+    //  ステートに入った時のメソッド
+    void Enter()override;
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime)override;
+    //ステートから出ていくときのメソッド
+    void Exit()override;
+};
+
+class ShotState : public State
+{
+public:
+    //  コンストラクタ
+    ShotState(EnemyThief* enemy) : State(enemy) {};
+    //  デストラクタ
+    ~ShotState() {}
     //  ステートに入った時のメソッド
     void Enter()override;
     //ステートで実行するメソッド
@@ -137,5 +158,11 @@ public:
 private:
     float attackCooldownTimer;
     float attackWarningTime = 1.0f;
+
+    enum class AttackType
+    {
+        Punch,
+        Shot,
+    };
 };
 
