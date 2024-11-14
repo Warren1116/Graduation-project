@@ -140,6 +140,54 @@ void PursuitState::Exit()
 // 攻撃ステートに入った時のメソッド
 void AttackState::Enter()
 {
+
+}
+
+// 攻撃ステートで実行するメソッド
+void AttackState::Execute(float elapsedTime)
+{
+    randomType = static_cast<AttackType>(Mathf::RandomRange(0, 1));
+
+    if (randomType == AttackType::Punch)
+    {
+        owner->SetTargetPosition(Player::Instance().GetPosition());
+
+        // 目的地点へ移動
+        owner->MoveToTarget(elapsedTime, 1.0);
+
+        float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
+        float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
+        float vz = owner->GetTargetPosition().z - owner->GetPosition().z;
+        float dist = sqrtf(vx * vx + vy * vy + vz * vz);
+
+        //// 攻撃範囲に入ったとき攻撃ステートへ遷移
+        if (owner->GetPunchRange() > dist)
+        {
+            owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Punch));
+            return;            
+        }
+    }
+    if (randomType == AttackType::Shot)
+    {
+        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
+        return;
+    }
+
+}
+
+// 攻撃ステートから出ていくときのメソッド
+void AttackState::Exit()
+{
+    if (randomType == AttackType::Punch)
+    {
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
+    }
+}
+
+
+// パンチステートに入った時のメソッド
+void PunchState::Enter()
+{
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
     {
@@ -153,35 +201,20 @@ void AttackState::Enter()
     // 攻撃権があればモーション再生開始
     if (owner->GetAttackFlg())
     {
-        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackPunch), false);
+        Player::Instance().ApplyDamage(1, 2.0f);
+        CameraController::Instance().ShakeCamera(0.1f, 0.3f);
     }
 }
 
-// 攻撃ステートで実行するメソッド
-void AttackState::Execute(float elapsedTime)
+// パンチステートで実行するメソッド
+void PunchState::Execute(float elapsedTime)
 {
-    owner->SetTargetPosition(Player::Instance().GetPosition());
-
-    // 目的地点へ移動
-    owner->MoveToTarget(elapsedTime, 1.0);
-
-    float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
-    float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
-    float vz = owner->GetTargetPosition().z - owner->GetPosition().z;
-    float dist = sqrtf(vx * vx + vy * vy + vz * vz);
 
     // 攻撃権があるとき
     if (owner->GetAttackFlg())
     {
-        //// 攻撃範囲に入ったとき攻撃ステートへ遷移
-        if (owner->GetPunchRange() > dist)
-        {
 
-                owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackPunch), false);
-                Player::Instance().ApplyDamage(1, 2.0f);
-                CameraController::Instance().ShakeCamera(0.1f, 0.3f);
-            
-        }
         if (!owner->GetModel()->IsPlayAnimation())
         {
             // 攻撃モーションが終わっていれば追跡へ遷移
@@ -197,9 +230,8 @@ void AttackState::Execute(float elapsedTime)
     }
 
 }
-
-// 攻撃ステートから出ていくときのメソッド
-void AttackState::Exit()
+// パンチステートから出ていくときのメソッド
+void PunchState::Exit()
 {
     if (owner->GetAttackFlg())
     {
@@ -214,6 +246,7 @@ void AttackState::Exit()
         Player::Instance().SetgetAttackSoon(false);
     }
 }
+
 
 
 // シュートステートに入った時のメソッド
@@ -439,7 +472,7 @@ void StandbyState::Execute(float elapsedTime)
         case AttackType::Shot:
             if (attackCooldownTimer <= 0)
             {
-                owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
+                owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
             }
             break;
         }

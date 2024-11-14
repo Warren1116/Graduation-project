@@ -34,6 +34,7 @@ EnemyThief::EnemyThief()
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new WanderState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PursuitState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new AttackState(this));
+	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PunchState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new ShotState(this));
 
 	// ステートマシンにメッセージを受信したときのサブステートを追加登録

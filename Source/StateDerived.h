@@ -69,6 +69,28 @@ public:
     void Execute(float elapsedTime)override;
     //ステートから出ていくときのメソッド
     void Exit()override;
+private:
+    enum class AttackType
+    {
+        Punch,
+        Shot,
+    };
+    AttackType randomType;
+};
+
+class PunchState : public State
+{
+public:
+    //  コンストラクタ
+    PunchState(EnemyThief* enemy) : State(enemy) {};
+    //  デストラクタ
+    ~PunchState() {}
+    //  ステートに入った時のメソッド
+    void Enter()override;
+    //ステートで実行するメソッド
+    void Execute(float elapsedTime)override;
+    //ステートから出ていくときのメソッド
+    void Exit()override;
 };
 
 class ShotState : public State

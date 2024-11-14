@@ -116,10 +116,6 @@ int Framework::Run()
 {
 	MSG msg = {};
 
-	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
-	//_CrtSetBreakAlloc(21999); 
-
 	while (WM_QUIT != msg.message)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

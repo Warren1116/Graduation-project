@@ -115,6 +115,7 @@ public:
 	{
 		Pursuit,
 		Attack,
+		Punch,
 		Shot,
 		// í“¬’†‚ÉUŒ‚Œ ‚ğ‚Á‚Ä‚¢‚È‚¢‚Æ‚«‚Ìˆ—‚ğ’Ç‰Á
 		Standby,
