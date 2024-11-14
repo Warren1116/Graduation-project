@@ -140,48 +140,47 @@ void PursuitState::Exit()
 // 攻撃ステートに入った時のメソッド
 void AttackState::Enter()
 {
+    randomType = static_cast<AttackType>(Mathf::RandomRange(1, 2));
 
+    if (randomType == AttackType::Punch)
+    {
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
+
+    }
+
+    if (randomType == AttackType::Shot)
+    {
+        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
+    }
 }
 
 // 攻撃ステートで実行するメソッド
 void AttackState::Execute(float elapsedTime)
 {
-    randomType = static_cast<AttackType>(Mathf::RandomRange(0, 1));
+    owner->SetTargetPosition(Player::Instance().GetPosition());
 
-    if (randomType == AttackType::Punch)
+    // 目的地点へ移動
+    owner->MoveToTarget(elapsedTime, 1.0);
+
+    float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
+    float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
+    float vz = owner->GetTargetPosition().z - owner->GetPosition().z;
+    float dist = sqrtf(vx * vx + vy * vy + vz * vz);
+
+    //// 攻撃範囲に入ったとき攻撃ステートへ遷移
+    if (owner->GetPunchRange() > dist)
     {
-        owner->SetTargetPosition(Player::Instance().GetPosition());
-
-        // 目的地点へ移動
-        owner->MoveToTarget(elapsedTime, 1.0);
-
-        float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
-        float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
-        float vz = owner->GetTargetPosition().z - owner->GetPosition().z;
-        float dist = sqrtf(vx * vx + vy * vy + vz * vz);
-
-        //// 攻撃範囲に入ったとき攻撃ステートへ遷移
-        if (owner->GetPunchRange() > dist)
-        {
-            owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Punch));
-            return;            
-        }
-    }
-    if (randomType == AttackType::Shot)
-    {
-        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
+        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Punch));
         return;
     }
+
 
 }
 
 // 攻撃ステートから出ていくときのメソッド
 void AttackState::Exit()
 {
-    if (randomType == AttackType::Punch)
-    {
-        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
-    }
+
 }
 
 
@@ -210,11 +209,19 @@ void PunchState::Enter()
 // パンチステートで実行するメソッド
 void PunchState::Execute(float elapsedTime)
 {
+    owner->SetTargetPosition(Player::Instance().GetPosition());
+
+    // 目的地点へ移動
+    owner->MoveToTarget(elapsedTime, 1.0);
+
+    float vx = owner->GetTargetPosition().x - owner->GetPosition().x;
+    float vy = owner->GetTargetPosition().y - owner->GetPosition().y;
+    float vz = owner->GetTargetPosition().z - owner->GetPosition().z;
+    float dist = sqrtf(vx * vx + vy * vy + vz * vz);
 
     // 攻撃権があるとき
     if (owner->GetAttackFlg())
     {
-
         if (!owner->GetModel()->IsPlayAnimation())
         {
             // 攻撃モーションが終わっていれば追跡へ遷移
@@ -428,8 +435,6 @@ void CalledState::Exit()
 // 戦闘待機ステートに入った時のメソッド
 void StandbyState::Enter()
 {
-    AttackType randomType = static_cast<AttackType>(Mathf::RandomRange(0, 1));
-
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
     {
@@ -450,8 +455,8 @@ void StandbyState::Enter()
 // 戦闘待機ステートで実行するメソッド
 void StandbyState::Execute(float elapsedTime)
 {
-    AttackType randomType = static_cast<AttackType>(Mathf::RandomRange(0, 1));
-    //AttackType randomType = static_cast<AttackType>(1);
+    //AttackType randomType = static_cast<AttackType>(Mathf::RandomRange(1, 2));
+    //randomType = static_cast<AttackType>(2);
 
     if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) {
         Player::Instance().SetgetAttackSoon(true);
@@ -461,21 +466,11 @@ void StandbyState::Execute(float elapsedTime)
     if (owner->GetAttackFlg())
     {
         attackCooldownTimer -= elapsedTime;
-        switch (randomType)
+        if (attackCooldownTimer <= 0)
         {
-        case AttackType::Punch:
-            if (attackCooldownTimer <= 0)
-            {
-                owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
-            }
-            break;
-        case AttackType::Shot:
-            if (attackCooldownTimer <= 0)
-            {
-                owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
-            }
-            break;
+            owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Attack));
         }
+
     }
 
     // 目標地点をプレイヤー位置に設定

@@ -20,6 +20,15 @@ public:
 
 protected:
     EnemyThief* owner;
+
+    enum class AttackType
+    {
+        Null,
+        Punch,
+        Shot,
+    };
+    AttackType randomType = AttackType::Null;
+
 };
 
 //  1層目のステートクラスの作成(StateBase.cppに関数定義をする)

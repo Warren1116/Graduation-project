@@ -1,6 +1,8 @@
 #pragma once
 #include "StateBase.h"
 
+
+
 // 徘徊ステートオブジェクト
 class WanderState : public State
 {
@@ -49,11 +51,7 @@ private:
     float attackCooldownTimer;
     float attackWarningTime = 1.0f;
 
-    enum class AttackType
-    {
-        Punch,
-        Shot,
-    };
+
 };
 
 class AttackState : public State
@@ -70,12 +68,6 @@ public:
     //ステートから出ていくときのメソッド
     void Exit()override;
 private:
-    enum class AttackType
-    {
-        Punch,
-        Shot,
-    };
-    AttackType randomType;
 };
 
 class PunchState : public State
@@ -169,6 +161,7 @@ public:
 class StandbyState : public State
 {
 public:
+
     StandbyState(EnemyThief* enemy) : State(enemy) {};
     ~StandbyState() {}
     // ステートに入ったときのメソッド
@@ -177,14 +170,9 @@ public:
     void Execute(float elapsedTime) override;
     // ステートから出ていくときのメソッド
     void Exit() override;
+
 private:
     float attackCooldownTimer;
     float attackWarningTime = 1.0f;
-
-    enum class AttackType
-    {
-        Punch,
-        Shot,
-    };
 };
 
