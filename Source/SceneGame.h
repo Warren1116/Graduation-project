@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Player.h"
-#include "Zombie.h"
 #include "CameraController.h"
 #include "EnemyManager.h"
 #include "Scene.h"

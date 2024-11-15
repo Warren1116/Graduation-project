@@ -1,6 +1,6 @@
 // EVENT_POINT 識別子 X Y Z 範囲 イベントファイル名
 // チュートリアルイベント
-EVENT_POINT TUTORIAL 0.0 0.0 +0.0 5.0 Data/Script/TestEvent2D.txt
+EVENT_POINT TUTORIAL 0.0 0.0 +20.0 5.0 Data/Script/TestEvent2D.txt
 
 // テキトーなイベント
 EVENT_POINT EVENT 0.0 0.0 +10.0 5.0 Data/Script/TestEvent3D.txt

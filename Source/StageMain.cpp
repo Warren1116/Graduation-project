@@ -1,8 +1,6 @@
 #include "StageMain.h"
 #include "Graphics/Graphics.h"
 #include "Input/Input.h"
-#include "Zombie.h"
-#include "PoisonZombie.h"
 #include "EnemyManager.h"
 
 static  StageMain* instance = nullptr;
@@ -33,9 +31,10 @@ StageMain::StageMain()
     model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
-    //model = std::make_unique<Model>("Data/Model/City/city_fixed.mdl");
+
+    //model = std::make_unique<Model>("Data/Model/City/city_fixed3.mdl");
     //position = { 10.0f, -50.0f, 25.0f };
-    //scale.x = scale.y = scale.z = 0.08f;
+    //scale.x = scale.y = scale.z = 0.04f;
     angle.y = DirectX::XMConvertToRadians(180);
 
     stageNum++;

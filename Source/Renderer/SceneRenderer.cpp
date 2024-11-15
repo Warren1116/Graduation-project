@@ -9,6 +9,7 @@
 #include "Input/Input.h"
 #include "EffectManager.h"
 #include "SceneGame.h"
+#include "EventPointManager.h"
 
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
@@ -171,6 +172,9 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 	//	デバッグプリミティブの表示
 	if (drawDebugPrimitive)
 	{
+		// イベントスクリプトの範囲描画
+		EventPointManager::Instance().DrawDebugPrimitive();
+
 		// ライトのデバッグプリミティブ描画
 		LightManager::Instance().DrawDebugPrimitive();
 

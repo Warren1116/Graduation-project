@@ -308,6 +308,9 @@ void SceneGame::Render()
 #ifdef DEBUG
     // 2DデバッグGUI描画
     {
+        headUpDisplay->DrawDebugGUI();
+
+
         player->DrawDebugGUI();
         EnemyManager::Instance().DrawDebugGUI();
 
