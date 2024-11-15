@@ -5,10 +5,24 @@
 #include <DirectXMath.h>
 #include <string>
 
+
 // スプライト
 class Sprite
 {
 public:
+	enum class Pivot
+	{
+		LeftTop,
+		LeftCenter,
+		LeftBottom,
+		CenterTop,
+		CenterCenter,
+		CenterBottom,
+		RightTop,
+		RightCenter,
+		RightBottom,
+	};
+
 	Sprite();
 	Sprite(const char* filename);
 	~Sprite() {}
@@ -29,9 +43,25 @@ public:
 		float angle,
 		float r, float g, float b, float a) const;
 
+	// 描画実行
+	void Render(ID3D11DeviceContext* dc,
+		float dx, float dy,
+		float dw, float dh,
+		float sx, float sy,
+		float sw, float sh,
+		float angle, Pivot pivot = Pivot::LeftTop,
+		float r = 1, float g = 1, float b = 1, float a = 1) const;
+
+	// 描画実行
+	void Render(ID3D11DeviceContext* dc, Vertex* vertices) const;
+
+
 	void textout(ID3D11DeviceContext* immediate_context, std::string s,
 		float x, float y, float w, float h,
 		DirectX::XMFLOAT4 color);
+
+	void RenderNumber(ID3D11DeviceContext* immediate_context, int nums,
+		float x, float y, float w, float h, float r, float g, float b, float a);
 
 	// バッファ更新
 	void Update(
@@ -57,6 +87,7 @@ public:
 
 	// テクスチャ高さ取得
 	int GetTextureHeight() const { return textureHeight; }
+
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader;

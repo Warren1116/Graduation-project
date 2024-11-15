@@ -20,14 +20,16 @@
 #include "UI.h"
 
 #include "Graphics/geometric_primitive.h"
+#include "EventScripter.h"
+#include "EventPointManager.h"
 
 SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
 
-#define TUTORIAL
-//#define DEBUG
+//#define TUTORIAL
+#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -39,6 +41,13 @@ void SceneGame::Initialize()
     {
         shadowmapDepthStencil = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
     }
+
+    // イベントスクリプト初期化
+    EventScripter::Instance().Initialize();
+
+    // イベントスクリプトポイント読み込み
+    EventPointManager::Instance().LoadPoints("Data/Script/EventScript.txt");
+
 
     //	各種レンダラー生成
     {
@@ -154,11 +163,22 @@ void SceneGame::Initialize()
     //  UIの初期化
     UI::Instance().Initialize();
 
+    // HUD生成
+    headUpDisplay = new HeadUpDisplay();
+
+
 }
 
 // 終了化
 void SceneGame::Finalize()
 {
+    // HUD終了化
+    if (headUpDisplay != nullptr)
+    {
+        delete headUpDisplay;
+        headUpDisplay = nullptr;
+    }
+
     // エネミー終了化
     EnemyManager::Instance().Clear();
 
@@ -176,11 +196,21 @@ void SceneGame::Finalize()
     //  UI終了化
     UI::Instance().Clear();
 
+    // イベントスクリプトポイントクリア
+    EventPointManager::Instance().Clear();
+
+    // イベントスクリプト終了化
+    EventScripter::Instance().Finalize();
+
 }
 
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+    // イベントスクリプト初期化
+    EventScripter::Instance().Update(elapsedTime);
+
+
     Graphics& graphics = Graphics::Instance();
     //  UI更新処理
     UI::Instance().Update(elapsedTime);
@@ -219,6 +249,10 @@ void SceneGame::Update(float elapsedTime)
 
     // エフェクト更新処理
     EffectManager::Instance().Update(elapsedTime);
+
+
+    // HUD更新
+    headUpDisplay->Update(elapsedTime);
 
 
 }
@@ -266,6 +300,9 @@ void SceneGame::Render()
     //2Dスプライト描画
     {
         UI::Instance().DrawUI(dc, rc.view, rc.projection);
+
+        headUpDisplay->Render(dc);
+
     }
 
 #ifdef DEBUG

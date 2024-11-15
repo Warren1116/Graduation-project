@@ -136,9 +136,13 @@
     <ClInclude Include="Source\Enemy.h" />
     <ClInclude Include="Source\EnemyManager.h" />
     <ClInclude Include="Source\EnemyThief.h" />
+    <ClInclude Include="Source\EventData.h" />
+    <ClInclude Include="Source\EventPointManager.h" />
+    <ClInclude Include="Source\EventScripter.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />
     <ClInclude Include="Source\Graphics\DepthStencil.h" />
+    <ClInclude Include="Source\Graphics\Font.h" />
     <ClInclude Include="Source\Graphics\Geometric_primitive.h" />
     <ClInclude Include="Source\Graphics\Graphics.h" />
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h" />
@@ -158,6 +162,7 @@
     <ClInclude Include="Source\Graphics\Shader\SkyboxShader.h" />
     <ClInclude Include="Source\Graphics\Sprite.h" />
     <ClInclude Include="Source\Graphics\Texture.h" />
+    <ClInclude Include="Source\HeadUpDisplay.h" />
     <ClInclude Include="Source\HighResolutionTimer.h" />
     <ClInclude Include="Source\Input\GamePad.h" />
     <ClInclude Include="Source\Input\Input.h" />
@@ -189,6 +194,7 @@
     <ClInclude Include="Source\SceneManager.h" />
     <ClInclude Include="Source\SceneTitle.h" />
     <ClInclude Include="Source\SearchAlgorithm.h" />
+    <ClInclude Include="Source\SpriteLayout.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageMain.h" />
     <ClInclude Include="Source\StageManager.h" />
@@ -224,9 +230,13 @@
     <ClCompile Include="Source\Enemy.cpp" />
     <ClCompile Include="Source\EnemyManager.cpp" />
     <ClCompile Include="Source\EnemyThief.cpp" />
+    <ClCompile Include="Source\EventData.cpp" />
+    <ClCompile Include="Source\EventPointManager.cpp" />
+    <ClCompile Include="Source\EventScripter.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\DepthStencil.cpp" />
+    <ClCompile Include="Source\Graphics\Font.cpp" />
     <ClCompile Include="Source\Graphics\Geometric_primitive.cpp" />
     <ClCompile Include="Source\Graphics\Graphics.cpp" />
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp" />
@@ -245,6 +255,7 @@
     <ClCompile Include="Source\Graphics\Shader\SkyboxShader.cpp" />
     <ClCompile Include="Source\Graphics\Sprite.cpp" />
     <ClCompile Include="Source\Graphics\Texture.cpp" />
+    <ClCompile Include="Source\HeadUpDisplay.cpp" />
     <ClCompile Include="Source\Input\GamePad.cpp" />
     <ClCompile Include="Source\Input\Input.cpp" />
     <ClCompile Include="Source\Input\Mouse.cpp" />
@@ -272,6 +283,7 @@
     <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\SceneTitle.cpp" />
     <ClCompile Include="Source\SearchAlgorithm.cpp" />
+    <ClCompile Include="Source\SpriteLayout.cpp" />
     <ClCompile Include="Source\StageMain.cpp" />
     <ClCompile Include="Source\StageManager.cpp" />
     <ClCompile Include="Source\StageTutorial.cpp" />
@@ -287,6 +299,7 @@
     <None Include="HLSL\Debug.hlsli" />
     <None Include="HLSL\FilterFunctions.hlsli" />
     <None Include="HLSL\Finalpass.hlsli" />
+    <None Include="HLSL\Font.hlsli" />
     <None Include="HLSL\GaussianBlur.hlsli" />
     <None Include="HLSL\geometric_primitive.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
@@ -329,6 +342,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\FinalpassVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\FontPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\FontVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

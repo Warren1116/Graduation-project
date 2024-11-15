@@ -166,9 +166,8 @@ public:
 	//現在のアニメーション再生時間取得
 	float GetCurrentAnimationSeconds() const { return currentAnimationSeconds; }
 
-	// アニメーション計算
-	void ComputeAnimation(int animationIndex, int nodeIndex, float time, NodePose& nodePose) const;
-	void ComputeAnimation(int animationIndex, float time, std::vector<NodePose>& nodePoses) const;
+	// 現在のアニメーション番号
+	int GetCurrentAnimationIndex() const { return currentAnimationIndex; }
 
 	// ノードポーズ設定
 	void SetNodePoses(const std::vector<NodePose>& nodePoses);

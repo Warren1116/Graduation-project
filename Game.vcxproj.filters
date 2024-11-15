@@ -49,6 +49,9 @@
     <Filter Include="Source\UI">
       <UniqueIdentifier>{2a6f9028-dfd6-4505-9da3-334498146ea1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Event">
+      <UniqueIdentifier>{37d7831b-76d1-4923-a6e6-c17044a7ec20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -318,6 +321,24 @@
     <ClInclude Include="Source\Renderer\ShadowmapCasterRenderer.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Source\EventData.h">
+      <Filter>Source\System\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EventPointManager.h">
+      <Filter>Source\System\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EventScripter.h">
+      <Filter>Source\System\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\HeadUpDisplay.h">
+      <Filter>Source\System\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Font.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SpriteLayout.h">
+      <Filter>Source\System\Event</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -560,6 +581,24 @@
     <ClCompile Include="Source\Renderer\ShadowmapCasterRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Source\EventData.cpp">
+      <Filter>Source\System\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EventPointManager.cpp">
+      <Filter>Source\System\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EventScripter.cpp">
+      <Filter>Source\System\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\HeadUpDisplay.cpp">
+      <Filter>Source\System\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Font.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SpriteLayout.cpp">
+      <Filter>Source\System\Event</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Debug.hlsli">
@@ -605,6 +644,9 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="HLSL\geometric_primitive.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\Font.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>
@@ -676,6 +718,12 @@
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\geometric_primitive_ps.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\FontPS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\FontVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>

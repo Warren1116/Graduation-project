@@ -2,6 +2,9 @@
 #include "Graphics\Graphics.h"
 #include "Graphics\Model.h"
 #include "Graphics\Sprite.h"
+#include <fstream>
+#include <string>
+#include <iostream>
 
 class UI
 {
@@ -23,9 +26,10 @@ public:
 
     void RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
-    void RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+    void RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection); 
 
     void Clear();
+
 
 private:
     std::unique_ptr<Sprite> LockOnScope;
@@ -42,6 +46,10 @@ private:
     std::unique_ptr<Sprite> Font2;
     std::unique_ptr<Sprite> spiderSense;
     std::unique_ptr<Sprite> spiderSense2;
+
+    std::unique_ptr<Sprite> HpBox;
+    std::unique_ptr<Sprite> Number;
+    std::unique_ptr<Sprite> HpBar;
 
     float alpha = 1.0f;
     float alphaColor = 0.3f;

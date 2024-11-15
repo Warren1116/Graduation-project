@@ -13,6 +13,10 @@
 #include "CharacterManager.h"
 #include "SwingWeb.h"
 
+#include "MessageData.h"
+#include "Messenger.h"
+#include "EventPointManager.h"
+
 Player* Player::instance = nullptr;
 
 // コンストラクタ
@@ -40,12 +44,44 @@ Player::Player(bool flag)
 
     // 待機ステートへ遷移
     TransitionIdleState();
+
+    EventModeIndex = Messenger::Instance().AddReceiver(MessageData::EVENTMODEEVENT, [&](void* data) { TransitionIdleState(); state = State::EventMode; });
+    GameModeIndex = Messenger::Instance().AddReceiver(MessageData::GAMEMODEEVENT, [&](void* data) { state = State::Idle; });
+
+    SetPositionIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERSETPOSITIONEVENT,
+        [&](void* data)
+        {
+            MessageData::PLAYERSETPOSITIONDATA* d = static_cast<MessageData::PLAYERSETPOSITIONDATA*>(data);
+            position = d->position;
+        });
+    MoveIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERMOVEEVENT,
+        [&](void* data)
+        {
+            MessageData::PLAYERMOVEDATA* d = static_cast<MessageData::PLAYERMOVEDATA*>(data);
+            moveData.moveVec = d->moveVec;
+            moveData.moveSpeed = d->moveSpeed;
+            moveData.turnSpeed = d->turnSpeed;
+        });
+    MotionIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERMOTIONEVENT,
+        [&](void* data)
+        {
+            MessageData::PLAYERMOTIONDATA* d = static_cast<MessageData::PLAYERMOTIONDATA*>(data);
+            if (model->GetCurrentAnimationIndex())
+                model->PlayAnimation(d->index, d->loop, d->blendSecond);
+        });
+
+
 }
 
 // デストラクタ
 Player::~Player()
 {
+    Messenger::Instance().RemoveReceiver(EventModeIndex);
+    Messenger::Instance().RemoveReceiver(GameModeIndex);
 
+    Messenger::Instance().RemoveReceiver(SetPositionIndex);
+    Messenger::Instance().RemoveReceiver(MoveIndex);
+    Messenger::Instance().RemoveReceiver(MotionIndex);
 }
 
 // 更新処理
@@ -105,6 +141,11 @@ void Player::Update(float elapsedTime)
     // プレイヤーとエネミーとの衝突処理
     CollisionPlayerVsEnemies();
     CollisionProjectileVsEnemies();
+
+    // イベントスクリプトポイントクリア
+    EventPointManager::Instance().CheckPoint(position, radius);
+
+
     // オブジェクト行列を更新
     UpdateTransform();
 

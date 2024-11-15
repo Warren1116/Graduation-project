@@ -14,6 +14,7 @@
 #include "Renderer/SceneRenderer.h"
 #include "Renderer/PostprocessingRenderer.h"
 #include "MetaAI.h"
+#include "HeadUpDisplay.h"
 
 
 // ゲームシーン
@@ -97,6 +98,8 @@ public:
 private:
     std::unique_ptr<Player> player;
     std::unique_ptr<CameraController> cameraController;
+    HeadUpDisplay* headUpDisplay = nullptr;
+
 
     //  オフスクリーンレンダリング用描画ターゲット
     std::unique_ptr<RenderTarget> renderTarget;

@@ -1,0 +1,29 @@
+// 画像の読み込み
+//  指定のIDに画像を読み込む
+LOAD_TALKPICTURE 0, Data/Sprite/ecc_girl.png
+
+// 指定のIDで画像を表示する
+DISPLAY_TALKPICTURE 0, 0, 2, 0
+
+// 文字列表示
+// サボったので改行は半角スペースです。
+WINDOW_MESSAGE はじめましてのかたははじめまして。こんにちわ。こんばんわ。 これ作った人の就職作品で登場した、モノ黒子です。 規約守るのめんどくさかったので久しぶりに絵を書きました。フリー素材ではありませんの。 イベント中はカメラの操作及びキャラの操作が効きません。 A・B・X・Yのどれかを押すことでメッセージを送れます。
+
+// キー入力を待ちます。
+INPUT_KEY_WAIT
+
+DISPLAY_TALKPICTURE 0, 0, 0, 1
+WINDOW_MESSAGE 色々(サボり散らかしているので)改造して使ってください。 まずは鬱陶しいことこの上ないウィンドウアニメーションをどうにかしたほうが良いと思います。
+INPUT_KEY_WAIT
+
+DISPLAY_TALKPICTURE 1, 0, 2, 0
+WINDOW_MESSAGE というわけで終わりです。 不要なものを削除して終わります。
+INPUT_KEY_WAIT
+
+WINDOW_MESSAGE あ、メッセージウィンドウ閉じられへんわ。 自分で何とかしてね～ すぐ前に3Dイベントのサンプルあるからそっちも見てね～。 もう移動できるよ～
+
+// 画像類の非表示設定・破棄
+HIDE_TALKPICTURE 0
+HIDE_TALKPICTURE 1
+DISPOSE_TALKPICTURE 0
+

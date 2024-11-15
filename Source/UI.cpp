@@ -18,6 +18,10 @@ void UI::Initialize()
     spiderSense2 = std::make_unique<Sprite>("Data/Sprite/SpiderSense2.png");
 
 
+    HpBox = std::make_unique<Sprite>("Data/Sprite/HpBox1.png");
+    Number = std::make_unique<Sprite>("Data/Sprite/Numbers.png");
+    HpBar = std::make_unique<Sprite>("Data/Sprite/HpBar.png");
+
     ShiftKey = std::make_unique<Sprite>("Data/Sprite/ShiftKey.png");
     TutorialCounter = 0;
 }
@@ -75,12 +79,46 @@ void UI::Update(float elapsedtime)
 
 void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
+    //  UŒ‚‚ðŽó‚¯‚éŽž‚ÉSpiderSense‚ð•`‰æ‚·‚é
     if (Player::Instance().GetAttackSoon())
     {
         RenderSpiderSense(dc, view, projection);
     }
 
+    //  ƒ`ƒ…ƒgƒŠƒAƒ‹‚Ì•`‰æ
     RenderTutorial(dc, view, projection);
+
+    //  HP‚ÌUI•\Œ»
+    {
+        HpBox->Render(dc,
+            30, 20,
+            100, 50,
+            0, 0,
+            static_cast<float>(HpBox->GetTextureWidth()), static_cast<float>(HpBox->GetTextureHeight()),
+            1.5f,
+            1, 1, 1, 0.8f);
+        Number->RenderNumber(dc, Player::Instance().GetHealth(),50,30,25,25, 1, 1, 1, 1);
+
+        float gaugeWidth = Player::Instance().GetMaxHealth() * Player::Instance().GetHealth() * 5.0f;
+
+        //  HPƒo[‰º‚Ì˜g
+        HpBar->Render(dc,
+            30 + 100, 35,
+            5*15*5, 25,
+            0, 0,
+            static_cast<int>(HpBar->GetTextureWidth()), static_cast<int>(HpBar->GetTextureHeight()),
+            1.5f,
+            1, 1, 1, 0.5f);
+
+        // HPƒo[
+        HpBar->Render(dc,
+            30 + 100, 35,
+            gaugeWidth, 25,
+            0, 0, 
+            static_cast<int>(HpBar->GetTextureWidth()), static_cast<int>(HpBar->GetTextureHeight()),
+            1.5f,
+            1, 1, 1, 1);
+    }
 
 }
 
