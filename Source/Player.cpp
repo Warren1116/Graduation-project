@@ -126,6 +126,9 @@ void Player::Update(float elapsedTime)
     case State::Dodge:
         UpdateDodgeState(elapsedTime);
         break;
+    case State::ClimbTop:
+        UpdateClimbTopState(elapsedTime);
+        break;
     }
 
     //弾丸更新処理
@@ -385,6 +388,69 @@ void Player::UpdateDodgeState(float elapsedTime)
     {
         TransitionIdleState();
     }
+}
+
+void Player::TransitionClimbTopState()
+{
+    state = State::ClimbTop;
+    model->PlayAnimation(Anim_ClimbUpWall, false);
+
+}
+
+void Player::UpdateClimbTopState(float elapsedTime)
+{
+    if (!model->IsPlayAnimation())
+    {
+        TransitionIdleState();
+    }
+}
+
+bool Player::IsNearWallTop()
+{
+    //　頭の位置を取得
+    Model::Node* HeadPos = model->FindNode("mixamorig:Head");
+    DirectX::XMFLOAT3 pos;
+    pos.x = HeadPos->worldTransform._41;
+    pos.y = HeadPos->worldTransform._42;
+    pos.z = HeadPos->worldTransform._43;
+
+    const float frontCheckDistance = 1.0f;
+    const float verticalOffset = 0.5f;
+
+    DirectX::XMFLOAT3 front = GetFront();
+    DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+    DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+    forwardVec = DirectX::XMVector3Normalize(forwardVec);
+    upVec = DirectX::XMVector3Normalize(upVec);
+
+    forwardVec = DirectX::XMVectorScale(forwardVec, 1.1f);
+    upVec = DirectX::XMVectorScale(upVec, 0.3f);
+
+    checkDirection = DirectX::XMVectorAdd(forwardVec, upVec);
+
+    DirectX::XMVECTOR CheckPoint = DirectX::XMLoadFloat3(&pos);
+    CheckPoint = DirectX::XMVectorAdd(CheckPoint, checkDirection);
+
+    DirectX::XMStoreFloat3(&checkpos, CheckPoint);
+
+    //レイの開始位置と終点位置
+    DirectX::XMFLOAT3 start = { pos };
+    DirectX::XMFLOAT3 end = {
+        checkpos.x,
+        checkpos.y,
+        checkpos.z
+    };
+    checkpos = end;
+
+    //レイキャストによる壁判定
+    HitResult hit;
+    if (!StageManager::Instance().RayCast(start, end, hit))
+    {
+        CanClimb = true;
+        position = checkpos;
+        return true;
+    }
+    return false;
 }
 
 //　カメラステート更新処理
@@ -944,6 +1010,7 @@ void Player::TransitionClimbWallState()
 //  クライミングステートへの遷移
 void Player::UpdateClimbWallState(float elapsedTime)
 {
+
     //　クライミング中Spaceキー押せば元の状態に戻る
     if (InputJump())
     {
@@ -955,7 +1022,15 @@ void Player::UpdateClimbWallState(float elapsedTime)
     {
         TransitionIdleState();
     }
-    InputMove(elapsedTime);
+
+    if (IsNearWallTop())
+    {
+        TransitionClimbTopState();
+    }
+    else
+    {
+        CanClimb = false;
+    }
 }
 
 // 攻撃ステートへ遷移
@@ -1070,6 +1145,7 @@ void Player::DrawDebugPrimitive()
     //衝突判定用のデバッグ円柱を描画
     debugRender->DrawCylinder(position, radius, height, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(swingPoint, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
+    debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
 
 
     projectileManager.DrawDebugPrimitive();
@@ -1217,7 +1293,7 @@ void Player::TransitionSwingState()
             sceneGame.RegisterRenderModel(swingWebRight->GetModel());
         }
     }
-    else if(lastState == State::Jump)
+    else if (lastState == State::Jump)
     {
         //  連続スイングのモーション
         if (!onSwing)
@@ -1392,12 +1468,11 @@ void Player::DrawDebugGUI()
                     ImGui::Text("On Climb");
                 }
                 else ImGui::Text("Not On Climb");
-
                 if (CanClimb)
                 {
-                    ImGui::Text("Can Climb Up");
+                    ImGui::Text("Can Climb");
                 }
-                else ImGui::Text("Can't Climb Up");
+                else ImGui::Text("Can't Climb");
             }
         }
         if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))

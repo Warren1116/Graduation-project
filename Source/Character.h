@@ -149,7 +149,7 @@ protected:
 
 	bool isAlive = true;
 
-	//　プレイヤー用判定
+	//　プレイヤー判定用
 	bool hitWall = false;
 	bool onClimb = false;
 	bool CanClimb = false;

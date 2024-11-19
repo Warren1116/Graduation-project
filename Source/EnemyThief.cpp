@@ -85,6 +85,7 @@ void EnemyThief::TransitionDeathState()
 	velocity.z = 0;
 	state = State::Dead;
 	model->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
+	SetAttackFlg(false);
 }
 
 void EnemyThief::UpdateDeathState(float elapsedTime)

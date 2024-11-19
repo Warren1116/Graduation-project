@@ -131,6 +131,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 
 	// 四角柱メッシュ作成
 	CreateSquareMesh(device);
+
 }
 
 // 描画開始
@@ -495,6 +496,6 @@ void DebugRenderer::CreateSquareMesh(ID3D11Device* device)
 }
 
 // 矢印メッシュ作成
-void DebugRenderer::CreateArrowMesh(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
+void DebugRenderer::CreateArrowMesh(ID3D11Device* device,const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
 {
 }

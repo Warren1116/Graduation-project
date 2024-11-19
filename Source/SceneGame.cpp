@@ -46,7 +46,7 @@ void SceneGame::Initialize()
     EventScripter::Instance().Initialize();
 
     // イベントスクリプトポイント読み込み
-    EventPointManager::Instance().LoadPoints("Data/Script/EventScript.txt");
+    //EventPointManager::Instance().LoadPoints("Data/Script/EventScript.txt");
 
 
     //	各種レンダラー生成
@@ -164,7 +164,7 @@ void SceneGame::Initialize()
     UI::Instance().Initialize();
 
     // HUD生成
-    headUpDisplay = new HeadUpDisplay();
+    //headUpDisplay = new HeadUpDisplay();
 
 
 }
@@ -173,11 +173,11 @@ void SceneGame::Initialize()
 void SceneGame::Finalize()
 {
     // HUD終了化
-    if (headUpDisplay != nullptr)
-    {
-        delete headUpDisplay;
-        headUpDisplay = nullptr;
-    }
+    //if (headUpDisplay != nullptr)
+    //{
+    //    delete headUpDisplay;
+    //    headUpDisplay = nullptr;
+    //}
 
     // エネミー終了化
     EnemyManager::Instance().Clear();
@@ -196,19 +196,19 @@ void SceneGame::Finalize()
     //  UI終了化
     UI::Instance().Clear();
 
-    // イベントスクリプトポイントクリア
-    EventPointManager::Instance().Clear();
+    //// イベントスクリプトポイントクリア
+    //EventPointManager::Instance().Clear();
 
-    // イベントスクリプト終了化
-    EventScripter::Instance().Finalize();
+    //// イベントスクリプト終了化
+    //EventScripter::Instance().Finalize();
 
 }
 
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-    // イベントスクリプト初期化
-    EventScripter::Instance().Update(elapsedTime);
+    //// イベントスクリプト初期化
+    //EventScripter::Instance().Update(elapsedTime);
 
 
     Graphics& graphics = Graphics::Instance();
@@ -251,8 +251,8 @@ void SceneGame::Update(float elapsedTime)
     EffectManager::Instance().Update(elapsedTime);
 
 
-    // HUD更新
-    headUpDisplay->Update(elapsedTime);
+    //// HUD更新
+    //headUpDisplay->Update(elapsedTime);
 
 
 }
@@ -301,14 +301,14 @@ void SceneGame::Render()
     {
         UI::Instance().DrawUI(dc, rc.view, rc.projection);
 
-        headUpDisplay->Render(dc);
+        //headUpDisplay->Render(dc);
 
     }
 
 #ifdef DEBUG
     // 2DデバッグGUI描画
     {
-        headUpDisplay->DrawDebugGUI();
+        //headUpDisplay->DrawDebugGUI();
 
 
         player->DrawDebugGUI();

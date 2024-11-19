@@ -93,6 +93,7 @@ public:
 		Climb,
 		Swing,
 		Shot,
+		ClimbTop,
 
 		EventMode,
 	};
@@ -195,6 +196,13 @@ private:
 	//	回避ステートの更新
 	void UpdateDodgeState(float elapsedTime);
 
+	//	登るステートへ遷移
+	void TransitionClimbTopState();
+
+	//	登るステートの更新
+	void UpdateClimbTopState(float elapsedTime);
+
+	bool IsNearWallTop();
 
 
 private:
@@ -209,7 +217,6 @@ private:
 		Anim_Climb,
 		Anim_Landing,
 		Anim_Jump,
-		Anim_ClimbUpWall,
 		Anim_ClimbDown,
 		Anim_HoldInWall,
 		Anim_Attack,
@@ -220,6 +227,7 @@ private:
 		Anim_Swinging2,
 		Anim_Shoting,
 		Anim_Dodge,
+		Anim_ClimbUpWall,
 	};
 
 
@@ -273,6 +281,9 @@ private:
 	const float MAX_LOCKON_DISTANCE = 15.0f;
 
 private:
+	DirectX::XMFLOAT3 checkpos;
+	DirectX::XMVECTOR checkDirection;
+
 	//糸用
 	//	スイングポイントの位置
 	DirectX::XMFLOAT3 swingPoint;

@@ -40,7 +40,7 @@ private:
 	void CreateSquareMesh(ID3D11Device* device);
 
 	// –îˆóƒƒbƒVƒ…ì¬
-	void CreateArrowMesh(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
+	void CreateArrowMesh(ID3D11Device* device, const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
 
 
 private:
