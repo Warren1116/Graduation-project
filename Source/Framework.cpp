@@ -23,6 +23,8 @@ Framework::Framework(HWND hWnd)
 	, input(hWnd)
 	, graphics(hWnd)
 {
+	hDC = GetDC(hWnd);
+
 	// エフェクトマネージャー初期化
 	EffectManager::Instance().Initialize();
 
@@ -36,6 +38,7 @@ Framework::Framework(HWND hWnd)
 // デストラクタ
 Framework::~Framework()
 {
+	
 	// シーン終了化
 	SceneManager::Instance().Clear();
 
@@ -47,6 +50,9 @@ Framework::~Framework()
 		delete cameraController;
 		cameraController = nullptr;
 	}
+
+	ReleaseDC(hWnd, hDC);
+
 }
 
 // 更新処理
@@ -130,23 +136,11 @@ int Framework::Run()
 
 			float elapsedTime = syncInterval == 0
 				? timer.TimeInterval()
-				: syncInterval / 60.0f
+				: syncInterval / static_cast<float>(GetDeviceCaps(hDC, VREFRESH));
 				;
-			//auto start = std::chrono::high_resolution_clock::now();
+
 			Update(elapsedTime);
-			//auto end = std::chrono::high_resolution_clock::now();
-			//std::chrono::duration<double> dir = end - start;
-			//std::string str = "Update";
-			//str += std::to_string(dir.count());
-			//OutputDebugStringA(str.c_str());
-			//start = std::chrono::high_resolution_clock::now();
 			Render(elapsedTime);
-			//end = std::chrono::high_resolution_clock::now();
-			// dir = end - start;
-			// str = "Render";
-			//str += std::to_string(dir.count());
-			//str += "\n";
-			//OutputDebugStringA(str.c_str());
 		}
 	}
 	return static_cast<int>(msg.wParam);

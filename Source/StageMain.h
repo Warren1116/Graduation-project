@@ -23,6 +23,15 @@ public:
 		const DirectX::XMFLOAT3& end,
 		HitResult& hit) override;
 
+	// スフィアキャスト
+	bool SphereCast(
+		const DirectX::XMFLOAT3& origin,
+		const DirectX::XMFLOAT3& direction,
+		float radius,
+		float& distance,
+		DirectX::XMFLOAT3& hitPosition,
+		DirectX::XMFLOAT3& hitNormal);
+
 	// 位置設定
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
 	DirectX::XMFLOAT3 GetPosition() const { return position; }
@@ -41,8 +50,17 @@ public:
 
 	Model* GetModel() { return model.get(); }
 
-	//void SetEnemyObject(int index);
 
+private:
+	struct CollisionMesh
+	{
+		struct Triangle
+		{
+			DirectX::XMFLOAT3	positions[3];
+			DirectX::XMFLOAT3	normal;
+		};
+		std::vector<Triangle>	triangles;
+	};
 private:
 	// 行列更新
 	void UpdateTransform()
@@ -60,4 +78,7 @@ private:
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 0.01f, 0.01f, 0.01f };
 	DirectX::XMFLOAT4X4 transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+
+	CollisionMesh						collisionMesh;
+
 };

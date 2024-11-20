@@ -30,5 +30,6 @@ private:
 	Graphics				graphics;
 	Input					input;
 	CameraController* cameraController = nullptr;
+	HDC						hDC;
 };
 

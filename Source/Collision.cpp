@@ -264,3 +264,130 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
     }
     return hit;
 }
+
+bool Collision::IntersectSphereVsModel(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, float radius, const Model* model, HitResult& result)
+{
+    DirectX::XMVECTOR WorldStart = DirectX::XMLoadFloat3(&start);
+    DirectX::XMVECTOR WorldEnd = DirectX::XMLoadFloat3(&end);
+    DirectX::XMVECTOR WorldRayVec = DirectX::XMVectorSubtract(WorldEnd, WorldStart);
+    DirectX::XMVECTOR WorldRayLength = DirectX::XMVector3Length(WorldRayVec);
+
+    DirectX::XMStoreFloat(&result.distance, WorldRayLength);
+
+    bool hit = false;
+    const ModelResource* resource = model->GetResource();
+
+    for (const ModelResource::Mesh& mesh : resource->GetMeshes())
+    {
+        const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
+
+        DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
+        DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
+
+        DirectX::XMVECTOR S = DirectX::XMVector3TransformCoord(WorldStart, InverseWorldTransform);
+        DirectX::XMVECTOR E = DirectX::XMVector3TransformCoord(WorldEnd, InverseWorldTransform);
+        DirectX::XMVECTOR SE = DirectX::XMVectorSubtract(E, S);
+
+        const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
+        const std::vector<UINT> indices = mesh.indices;
+
+        int materialIndex = -1;
+        DirectX::XMVECTOR HitPosition;
+        DirectX::XMVECTOR HitNormal;
+
+        for (const ModelResource::Subset& subset : mesh.subsets)
+        {
+            for (UINT i = 0; i < subset.indexCount; i += 3)
+            {
+                UINT index = subset.startIndex + i;
+
+                const ModelResource::Vertex& a = vertices.at(indices.at(index));
+                const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
+                const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
+
+                DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&a.position);
+                DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&b.position);
+                DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&c.position);
+
+                float distance;
+                DirectX::XMVECTOR contactPoint;
+                if (IntersectSphereVsTriangle(S, SE, radius, A, B, C, distance, contactPoint))
+                {
+                    if (distance < result.distance)
+                    {
+                        result.distance = distance;
+                        HitPosition = contactPoint;
+                        HitNormal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(
+                            DirectX::XMVectorSubtract(B, A),
+                            DirectX::XMVectorSubtract(C, A)
+                        ));
+                        materialIndex = subset.materialIndex;
+                        hit = true;
+                    }
+                }
+            }
+        }
+
+        if (materialIndex >= 0)
+        {
+            DirectX::XMVECTOR WorldHitPosition = DirectX::XMVector3TransformCoord(HitPosition, WorldTransform);
+            DirectX::XMVECTOR WorldHitNormal = DirectX::XMVector3TransformNormal(HitNormal, WorldTransform);
+
+            DirectX::XMStoreFloat3(&result.position, WorldHitPosition);
+            DirectX::XMStoreFloat3(&result.normal, DirectX::XMVector3Normalize(WorldHitNormal));
+            result.materialIndex = materialIndex;
+        }
+    }
+
+    return hit;
+}
+
+bool Collision::IntersectSphereVsTriangle(DirectX::XMVECTOR sphereStart, DirectX::XMVECTOR sphereDir, float radius, DirectX::XMVECTOR A, DirectX::XMVECTOR B, DirectX::XMVECTOR C, float& outDistance, DirectX::XMVECTOR& outContactPoint)
+{
+    DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
+    DirectX::XMVECTOR AC = DirectX::XMVectorSubtract(C, A);
+    DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(AB, AC));
+
+    DirectX::XMVECTOR sphereToPlane = DirectX::XMVectorSubtract(A, sphereStart);
+    float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(sphereToPlane, normal)) /
+        DirectX::XMVectorGetX(DirectX::XMVector3Dot(sphereDir, normal));
+
+    if (t < 0 || t > 1) return false;
+
+    DirectX::XMVECTOR contactPoint = DirectX::XMVectorAdd(sphereStart, DirectX::XMVectorScale(sphereDir, t));
+    DirectX::XMVECTOR sphereCenterToContact = DirectX::XMVectorSubtract(contactPoint, normal);
+
+    float distToPlane = DirectX::XMVectorGetX(DirectX::XMVector3Length(sphereCenterToContact));
+
+    if (distToPlane > radius) return false;
+
+    if (PointInTriangle(contactPoint, A, B, C))
+    {
+        outDistance = t;
+        outContactPoint = contactPoint;
+        return true;
+    }
+
+    return false;
+}
+
+bool Collision::PointInTriangle(DirectX::XMVECTOR point, DirectX::XMVECTOR A, DirectX::XMVECTOR B, DirectX::XMVECTOR C)
+{
+    DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
+    DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
+    DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
+
+    DirectX::XMVECTOR AP = DirectX::XMVectorSubtract(point, A);
+    DirectX::XMVECTOR BP = DirectX::XMVectorSubtract(point, B);
+    DirectX::XMVECTOR CP = DirectX::XMVectorSubtract(point, C);
+
+    DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(AB, AP);
+    DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(BC, BP);
+    DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(CA, CP);
+
+    float d1 = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Cross1, Cross2));
+    float d2 = DirectX::XMVectorGetX(DirectX::XMVector3Dot(Cross2, Cross3));
+
+    return d1 >= 0.0f && d2 >= 0.0f;
+}
+

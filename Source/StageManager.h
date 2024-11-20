@@ -34,6 +34,15 @@ public:
 		const DirectX::XMFLOAT3& end, 
 		HitResult& hit);
 
+	// スフィアキャスト
+	bool SphereCast(
+		const DirectX::XMFLOAT3& origin,
+		const DirectX::XMFLOAT3& direction,
+		float radius,
+		float& distance,
+		DirectX::XMFLOAT3& hitPosition,
+		DirectX::XMFLOAT3& hitNormal);
+
 	// ステージ取得
 	Stage* GetStage(int index) { return stages.at(index); }
 
