@@ -1334,7 +1334,7 @@ void Player::TransitionSwingState()
         forwardVec = DirectX::XMVector3Normalize(forwardVec);
         upVec = DirectX::XMVector3Normalize(upVec);
 
-        forwardVec = DirectX::XMVectorScale(forwardVec, 10.0f);
+        forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
         upVec = DirectX::XMVectorScale(upVec, 8.5f);
 
         swingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
