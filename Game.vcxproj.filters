@@ -216,12 +216,6 @@
     <ClInclude Include="Source\SearchAlgorithm.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BehaviorData.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BehaviorTree.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Renderer\BaseRenderer.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
@@ -271,18 +265,6 @@
       <Filter>Source\System\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\MetaAI.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentBase.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\JudgmentDerived.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActionBase.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ActionDerived.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\StateMachine.h">
@@ -515,12 +497,6 @@
     <ClCompile Include="Source\SearchAlgorithm.cpp">
       <Filter>Source\System\AI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BehaviorTree.cpp">
-      <Filter>Source\System\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BehaviorData.cpp">
-      <Filter>Source\System\AI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SceneClear.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
@@ -537,12 +513,6 @@
       <Filter>Source\System\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\MetaAI.cpp">
-      <Filter>Source\System\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\JudgmentDerived.cpp">
-      <Filter>Source\System\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ActionDerived.cpp">
       <Filter>Source\System\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\StateMachine.cpp">

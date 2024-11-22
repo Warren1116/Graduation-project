@@ -3,7 +3,7 @@
 #include "SceneGame.h"
 #include "Graphics\Graphics.h"
 
-//#define TUTORIAL
+#define TUTORIAL
 
 void UI::Initialize()
 {
@@ -122,6 +122,10 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
             static_cast<int>(HpBar->GetTextureWidth()), static_cast<int>(HpBar->GetTextureHeight()),
             1.5f,
             1, 1, 1, 1);
+    }
+    if (Player::Instance().GetHealth() == 0)
+    {
+        TextFont->textout(dc, "Right Click To Go Back Title", 1280 * 0.3f, 720 * 0.5f, 20, 20, {1,1,1,1});
     }
 
 }

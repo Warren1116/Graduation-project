@@ -17,6 +17,9 @@
 #include "Messenger.h"
 #include "EventPointManager.h"
 
+#include "SceneManager.h"
+#include "SceneTitle.h"
+
 Player* Player::instance = nullptr;
 
 // コンストラクタ
@@ -1132,7 +1135,11 @@ void Player::UpdateDeathState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
     {
-
+        Mouse& mouse = Input::Instance().GetMouse();
+        if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
+        {
+            SceneManager::Instance().ChangeScene(new SceneTitle);
+        }
     }
 }
 

@@ -30,6 +30,7 @@ public:
 
     void Clear();
 
+    int GetTutorialCounter() { return TutorialCounter; }
 
 private:
     std::unique_ptr<Sprite> LockOnScope;

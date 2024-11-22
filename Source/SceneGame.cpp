@@ -28,8 +28,8 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 
-//#define TUTORIAL
-#define DEBUG
+#define TUTORIAL
+//#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -96,31 +96,43 @@ void SceneGame::Initialize()
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
-    //// スライム（ステートマシン用）
-    //EnemyThief* people = new EnemyThief();
-    //people->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
-    //people->SetTerritory(people->GetPosition(), 10.0f);
-    //enemyManager.Register(people);
+    // スライム（ステートマシン用）
+    EnemyThief* people = new EnemyThief();
+    people->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
+    people->SetTerritory(people->GetPosition(), 10.0f);
+    enemyManager.Register(people);
 
-    //////	通信相手用に１匹増やす
-    //EnemyThief* people2 = new EnemyThief();
-    //people2->SetPosition(DirectX::XMFLOAT3(3.0f, 0.0f, -25.0f));
-    //people2->SetTerritory(people2->GetPosition(), 10.0f);
-    //enemyManager.Register(people2);
+    ////	通信相手用に１匹増やす
+    EnemyThief* people2 = new EnemyThief();
+    people2->SetPosition(DirectX::XMFLOAT3(3.0f, 0.0f, -25.0f));
+    people2->SetTerritory(people2->GetPosition(), 10.0f);
+    enemyManager.Register(people2);
 
-    //EnemyThief* people3 = new EnemyThief();
-    //people3->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
-    //people3->SetTerritory(people3->GetPosition(), 10.0f);
-    //enemyManager.Register(people3);
+    EnemyThief* people3 = new EnemyThief();
+    people3->SetPosition(DirectX::XMFLOAT3(7.0f, 0.0f, -25.0f));
+    people3->SetTerritory(people3->GetPosition(), 10.0f);
+    enemyManager.Register(people3);
+
+    EnemyThief* people4 = new EnemyThief();
+    people4->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
+    people4->SetTerritory(people4->GetPosition(), 10.0f);
+    enemyManager.Register(people4);
+
+    EnemyThief* people5 = new EnemyThief();
+    people5->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -21.0f));
+    people5->SetTerritory(people5->GetPosition(), 10.0f);
+    enemyManager.Register(people5);
 
     //	モデルを各レンダラーに登録
     Model* list[] =
     {
         player->model.get(),
         stageMain->GetModel(),
-        //people->GetModel(),
-        //people2->GetModel(),
-        //people3->GetModel(),
+        people->GetModel(),
+        people2->GetModel(),
+        people3->GetModel(),
+        people4->GetModel(),
+        people5->GetModel(),
 
     };
     for (Model* model : list)
@@ -139,10 +151,12 @@ void SceneGame::Initialize()
         // カメラコントローラー初期化
         cameraController = std::make_unique<CameraController>();
 
-        //    // エネミー初期化
-        //    characterManager.Register(people);
-        //    characterManager.Register(people2);
-        //    characterManager.Register(people3);
+        // エネミー初期化
+        characterManager.Register(people);
+        characterManager.Register(people2);
+        characterManager.Register(people3);
+        characterManager.Register(people4);
+        characterManager.Register(people5);
 
 
     }
@@ -207,28 +221,10 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+
+
     //// イベントスクリプト初期化
     //EventScripter::Instance().Update(elapsedTime);
-
-
-#ifdef DEBUG
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_E)
-    {
-        isPaused = !isPaused;
-    }
-    // カメラコントローラー更新処理
-    Camera& camera = Camera::Instance();
-    cameraController->Update(elapsedTime);
-    if (isPaused)
-    {
-        return;
-    }
-#endif // DEBUG
-
-    //// カメラコントローラー更新処理
-    //Camera& camera = Camera::Instance();
-    //cameraController->Update(elapsedTime);
 
     Graphics& graphics = Graphics::Instance();
     //  UI更新処理
@@ -268,14 +264,25 @@ void SceneGame::Update(float elapsedTime)
     //// HUD更新
     //headUpDisplay->Update(elapsedTime);
 
+    // カメラコントローラー更新処理
+    Camera& camera = Camera::Instance();
+    cameraController->Update(elapsedTime);
+
 #ifdef DEBUG
-    //GamePad& gamePad = Input::Instance().GetGamePad();
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (gamePad.GetButtonDown() & GamePad::BTN_E)
+    {
+        isPaused = !isPaused;
+    }
 
     if (gamePad.GetButton() & GamePad::BTN_SHIFT && gamePad.GetButton() & GamePad::BTN_R)
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
     }
-
+    if (isPaused)
+    {
+        return;
+    }
 #endif // 
 
 
@@ -453,6 +460,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         break;
     case SceneGame::TutorialState::Climb:
         tutorialTimer = 0;
+
         break;
     case SceneGame::TutorialState::Finish:
         tutorialTimer = 0;
