@@ -28,16 +28,102 @@ StageMain::StageMain()
     instance = this;
 
     //// ステージモデルの読み込み
-    //model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
-    //position = { 0.0f, 0.0f, 0.0f };
-    //scale.x = scale.y = scale.z = 1.0f;
+    model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
+    position = { 0.0f, 0.0f, 0.0f };
+    scale.x = scale.y = scale.z = 1.0f;
 
-    model = std::make_unique<Model>("Data/Model/City/city_fixed3.mdl");
-    position = { 10.0f, -50.0f, 25.0f };
-    scale.x = scale.y = scale.z = 0.04f;
+    //model = std::make_unique<Model>("Data/Model/City/city_fixed3.mdl");
+    //position = { 10.0f, -50.0f, 25.0f };
+    //scale.x = scale.y = scale.z = 0.04f;
     angle.y = DirectX::XMConvertToRadians(180);
 
-    stageNum++;
+
+    DirectX::XMVECTOR VolumeMin = DirectX::XMVectorReplicate(FLT_MAX);
+    DirectX::XMVECTOR VolumeMax = DirectX::XMVectorReplicate(-FLT_MAX);
+
+    // 頂点データをワールド空間変換し、三角形データを作成
+    for (const Model::Mesh& mesh : model->GetMeshes())
+    {
+        DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&mesh.node->worldTransform);
+        for (size_t i = 0; i < mesh.indices.size(); i += 3)
+        {
+            // 頂点データをワールド空間変換
+            uint32_t a = mesh.indices.at(i + 0);
+            uint32_t b = mesh.indices.at(i + 1);
+            uint32_t c = mesh.indices.at(i + 2);
+            DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&mesh.vertices.at(a).position);
+            DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&mesh.vertices.at(b).position);
+            DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&mesh.vertices.at(c).position);
+            A = DirectX::XMVector3Transform(A, WorldTransform);
+            B = DirectX::XMVector3Transform(B, WorldTransform);
+            C = DirectX::XMVector3Transform(C, WorldTransform);
+
+            // 法線ベクトルを算出
+            DirectX::XMVECTOR N = DirectX::XMVector3Cross(DirectX::XMVectorSubtract(B, A), DirectX::XMVectorSubtract(C, A));
+            if (DirectX::XMVector3Equal(N, DirectX::XMVectorZero()))
+            {
+                // 面を構成できない場合は除外
+                continue;
+            }
+            N = DirectX::XMVector3Normalize(N);
+
+            // 三角形データを格納
+            CollisionMesh::Triangle& triangle = collisionMesh.triangles.emplace_back();
+            DirectX::XMStoreFloat3(&triangle.positions[0], A);
+            DirectX::XMStoreFloat3(&triangle.positions[1], B);
+            DirectX::XMStoreFloat3(&triangle.positions[2], C);
+            DirectX::XMStoreFloat3(&triangle.normal, N);
+
+            // モデル全体のAABBを計測
+            VolumeMin = DirectX::XMVectorMin(VolumeMin, A);
+            VolumeMin = DirectX::XMVectorMin(VolumeMin, B);
+            VolumeMin = DirectX::XMVectorMin(VolumeMin, C);
+            VolumeMax = DirectX::XMVectorMax(VolumeMax, A);
+            VolumeMax = DirectX::XMVectorMax(VolumeMax, B);
+            VolumeMax = DirectX::XMVectorMax(VolumeMax, C);
+        }
+    }
+
+    // モデル全体のAABB
+    DirectX::XMFLOAT3 volumeMin, volumeMax;
+    DirectX::XMStoreFloat3(&volumeMin, VolumeMin);
+    DirectX::XMStoreFloat3(&volumeMax, VolumeMax);
+
+    // モデル全体のAABBからXZ平面に指定のサイズで分割されたコリジョンエリアを作成する
+    {
+        const int cellSize = 4;
+        //エリアを作成していく。
+        for (float x = volumeMin.x; x < volumeMax.x; x += cellSize)
+        {
+            for (float z = volumeMin.z; z < volumeMax.z; z += cellSize)
+            {
+                CollisionMesh::Area area;
+                //AABBを作成
+                area.boundingBox.Center.x = x + cellSize / 2;
+                area.boundingBox.Center.y = volumeMin.y + (volumeMax.y - volumeMin.y) / 2;
+                area.boundingBox.Center.z = z + cellSize / 2;
+                area.boundingBox.Extents.x = cellSize / 2;
+                area.boundingBox.Extents.y = (volumeMax.y - volumeMin.y) / 2;
+                area.boundingBox.Extents.z = cellSize / 2;
+
+                //内包するポリゴンを収集する
+                int triangleIndex = 0;
+                for (auto& triangle : collisionMesh.triangles)
+                {
+                    DirectX::XMVECTOR V1, V2, V3;
+                    V1 = DirectX::XMLoadFloat3(&triangle.positions[0]);
+                    V2 = DirectX::XMLoadFloat3(&triangle.positions[1]);
+                    V3 = DirectX::XMLoadFloat3(&triangle.positions[2]);
+                    if (area.boundingBox.Intersects(V1, V2, V3))
+                    {
+                        area.triangleIndices.emplace_back(triangleIndex);
+                    }
+                    ++triangleIndex;
+                }
+                collisionMesh.areas.emplace_back(area);
+            }
+        }
+    }
 
 }
 
@@ -53,50 +139,51 @@ void StageMain::Update(float elapsedTime)
     model->UpdateTransform(transform);
 }
 
+void StageMain::DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+
+}
+
+
 // レイキャスト
 bool StageMain::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit)
 {
     return Collision::IntersectRayVsModel(start, end, model.get(), hit);
 }
 
-// スフィアキャスト
-bool StageMain::SphereCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, float radius, HitResult& hit)
-{
-    return Collision::IntersectSphereVsModel(start, end, radius, model.get(), hit);
-}
 
-DirectX::XMFLOAT3 StageMain::GetIndexWayPoint(int index)
-{
-    return wayPoint[index]->position;
-}
+//DirectX::XMFLOAT3 StageMain::GetIndexWayPoint(int index)
+//{
+//    return wayPoint[index]->position;
+//}
 
-int StageMain::NearWayPointIndex(DirectX::XMFLOAT3 target)
-{
-    float minLength = FLT_MAX;
-    float length = 0.0f;
-    int index = -1;
-
-    DirectX::XMVECTOR targetPos = DirectX::XMLoadFloat3(&target);
-
-    for (int i = 0; i < MAX_WAY_POINT; ++i)
-    {
-        DirectX::XMVECTOR point = DirectX::XMLoadFloat3(&(wayPoint[i]->position));
-
-        // 距離を求める
-        DirectX::XMVECTOR vector = DirectX::XMVectorSubtract(targetPos, point);
-        DirectX::XMVECTOR vectorLength = DirectX::XMVector3Length(vector);
-        DirectX::XMStoreFloat(&length, vectorLength);
-
-        // 求めた距離が保存しているものより小さければ
-        if (minLength > length)
-        {
-            // 値を更新
-            minLength = length;
-            index = i;
-        }
-    }
-    return index;
-}
+//int StageMain::NearWayPointIndex(DirectX::XMFLOAT3 target)
+//{
+//    float minLength = FLT_MAX;
+//    float length = 0.0f;
+//    int index = -1;
+//
+//    DirectX::XMVECTOR targetPos = DirectX::XMLoadFloat3(&target);
+//
+//    for (int i = 0; i < MAX_WAY_POINT; ++i)
+//    {
+//        DirectX::XMVECTOR point = DirectX::XMLoadFloat3(&(wayPoint[i]->position));
+//
+//        // 距離を求める
+//        DirectX::XMVECTOR vector = DirectX::XMVectorSubtract(targetPos, point);
+//        DirectX::XMVECTOR vectorLength = DirectX::XMVector3Length(vector);
+//        DirectX::XMStoreFloat(&length, vectorLength);
+//
+//        // 求めた距離が保存しているものより小さければ
+//        if (minLength > length)
+//        {
+//            // 値を更新
+//            minLength = length;
+//            index = i;
+//        }
+//    }
+//    return index;
+//}
 
 
 //void StageMain::DrawDebugGUI()

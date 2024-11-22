@@ -6,6 +6,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
+
 class ModelResource
 {
 public:

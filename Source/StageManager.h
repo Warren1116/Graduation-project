@@ -33,14 +33,7 @@ public:
 	bool RayCast(const DirectX::XMFLOAT3& start, 
 		const DirectX::XMFLOAT3& end, 
 		HitResult& hit);
-
-	// スフィアキャスト
-	bool SphereCast(const DirectX::XMFLOAT3& start,
-		const DirectX::XMFLOAT3& end,
-		float radius,
-		HitResult& hit);
-
-
+	
 	// ステージ取得
 	Stage* GetStage(int index) { return stages.at(index); }
 

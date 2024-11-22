@@ -255,9 +255,6 @@
     <ClInclude Include="Source\Graphics\Shader\SkyboxShader.h">
       <Filter>Source\Graphics\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Source\StageTutorial.h">
-      <Filter>Source\Stage</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\Texture.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
@@ -511,9 +508,6 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\Shader\SkyboxShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\StageTutorial.cpp">
-      <Filter>Source\Stage</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Texture.cpp">
       <Filter>Source\Graphics</Filter>

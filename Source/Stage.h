@@ -22,13 +22,6 @@ public:
 		const DirectX::XMFLOAT3& end,
 		HitResult& hit) = 0;
 
-	// スフィアキャスト
-	virtual bool SphereCast(const DirectX::XMFLOAT3& start,
-		const DirectX::XMFLOAT3& end,
-		float radius,
-		HitResult& hit) = 0;
-		//SphereCastResult& hit) = 0;
-
 	//// ウェイポイントのインデックスからポジションを取得
 	//virtual DirectX::XMFLOAT3 GetIndexWayPoint(int index) = 0;
 
@@ -38,12 +31,12 @@ public:
 	//// 接続先ポイントを設定
 	//virtual void DestinationPointSet(int index) = 0;
 
-	//virtual void DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection) = 0;
+	virtual void DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection) = 0;
 
 	//virtual void DrawDebugGUI() = 0;
-
-public:
-	WayPoint* wayPoint[MAX_WAY_POINT];
+	// 
+//public:
+//	WayPoint* wayPoint[MAX_WAY_POINT];
 };
 
 

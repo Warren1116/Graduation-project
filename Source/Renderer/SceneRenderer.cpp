@@ -168,7 +168,6 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 
 	EffectManager::Instance().Render(rc.view, rc.projection);
 
-
 	//	デバッグプリミティブの表示
 	if (drawDebugPrimitive)
 	{
@@ -185,9 +184,10 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		graphics.GetDebugRenderer()->Render(rc.deviceContext, rc.view, rc.projection);
 
 		graphics.GetGeometricPrimitiver()->Render(rc.deviceContext, rc.view, rc.projection);
-		//Stage* stage = StageManager::Instance().GetStage(0);
-		//stage->DrawDebugPrimitive(dc, rc.view, rc.projection);
-		
+
+		Stage* stage = StageManager::Instance().GetStage(0);
+		stage->DrawDebugPrimitive(dc, rc.view, rc.projection);
+
 		//SearchAlgorithm::Instance().SearchRender(dc, rc.view, rc.projection, stage);
 
 		Player::Instance().DrawDebugPrimitive();

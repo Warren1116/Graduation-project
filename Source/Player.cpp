@@ -1147,8 +1147,6 @@ void Player::DrawDebugPrimitive()
     debugRender->DrawCylinder(position, radius, height, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(swingPoint, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
-    debugRender->DrawSphere(Spherepos, 1.0f, DirectX::XMFLOAT4(1, 0, 0, 1));
-
 
     projectileManager.DrawDebugPrimitive();
 

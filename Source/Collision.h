@@ -2,6 +2,7 @@
 
 #include <DirectXMath.h>
 #include "Graphics/Model.h"
+#include <DirectXCollision.h>
 
 struct HitResult
 {
@@ -68,32 +69,6 @@ public:
         const Model* model,
         HitResult& result
     );
-    
-    // スフィアキャストVsモデル
-    static bool Collision::IntersectSphereVsModel(
-        const DirectX::XMFLOAT3& start,
-        const DirectX::XMFLOAT3& end,
-        float radius,
-        const Model* model,
-        HitResult& result);
-        //SphereCastResult& result);
 
-    // スフィアキャスト三角形
-    static bool IntersectSphereVsTriangle(
-        DirectX::XMVECTOR sphereStart,
-        DirectX::XMVECTOR sphereDir,
-        float radius,
-        DirectX::XMVECTOR A,
-        DirectX::XMVECTOR B,
-        DirectX::XMVECTOR C,
-        float& outDistance,
-        DirectX::XMVECTOR& outContactPoint);
-
-    // 三角形内にいるかどうかの判定
-    static bool Collision::PointInTriangle(
-        DirectX::XMVECTOR point,
-        DirectX::XMVECTOR A,
-        DirectX::XMVECTOR B,
-        DirectX::XMVECTOR C);
 };
 

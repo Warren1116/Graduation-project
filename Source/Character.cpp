@@ -281,37 +281,6 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 
         //レイキャストによる壁判定
         HitResult hit;
-        //if (onSwing)
-        //{
-        //    DirectX::XMFLOAT3 stepStart = position;
-        //    DirectX::XMFLOAT3 stepEnd = stepStart;
-        //    int stepCount = static_cast<int>(velocityLengthXZ * 10);
-        //    stepCount = fmax(stepCount, 10);
-
-        //    for (int i = 1; i <= stepCount; ++i) {
-        //        stepEnd.x = position.x + (velocity.x * elapsedTime * (i / float(stepCount)));
-        //        stepEnd.z = position.z + (velocity.z * elapsedTime * (i / float(stepCount)));
-
-        //        HitResult hit;
-        //        if (StageManager::Instance().RayCast(stepStart, stepEnd, hit)) {
-        //            position.x = hit.position.x;
-        //            position.y = hit.position.y;
-        //            position.z = hit.position.z;
-
-        //            DirectX::XMVECTOR collisionNormal = DirectX::XMLoadFloat3(&hit.normal);
-        //            DirectX::XMVECTOR offset = DirectX::XMVectorScale(collisionNormal, 0.1f);
-        //            DirectX::XMVECTOR correctedPosition = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&position), offset);
-        //            DirectX::XMStoreFloat3(&position, correctedPosition);
-
-        //            velocity.x = 0.0f;
-        //            velocity.z = 0.0f;
-
-        //            hitWall = true;
-        //            onClimb = true;
-        //            break;
-        //        }
-        //    }
-        //}
 
         if (StageManager::Instance().RayCast(start, end, hit))
         {

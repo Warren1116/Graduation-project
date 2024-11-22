@@ -198,7 +198,6 @@
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageMain.h" />
     <ClInclude Include="Source\StageManager.h" />
-    <ClInclude Include="Source\StageTutorial.h" />
     <ClInclude Include="Source\StateDerived.h" />
     <ClInclude Include="Source\StateMachine.h" />
     <ClInclude Include="Source\SwingWeb.h" />
@@ -286,7 +285,6 @@
     <ClCompile Include="Source\SpriteLayout.cpp" />
     <ClCompile Include="Source\StageMain.cpp" />
     <ClCompile Include="Source\StageManager.cpp" />
-    <ClCompile Include="Source\StageTutorial.cpp" />
     <ClCompile Include="Source\StateBase.cpp" />
     <ClCompile Include="Source\StateDerived.cpp" />
     <ClCompile Include="Source\StateMachine.cpp" />

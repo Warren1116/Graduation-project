@@ -132,6 +132,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 	// 四角柱メッシュ作成
 	CreateSquareMesh(device);
 
+	CreateBoxMesh(device, 1.0f, 1.0f, 1.0f);
 }
 
 // 描画開始
@@ -282,6 +283,16 @@ void DebugRenderer::DrawArrow(const DirectX::XMFLOAT3& position, float radius, f
 	arrow.height = height;
 	arrow.color = color;
 	arrows.emplace_back(arrow);
+}
+
+void DebugRenderer::DrawBox(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& size, const DirectX::XMFLOAT4& color)
+{
+	Box box;
+	box.position = position;
+	box.angle;
+	box.size;
+	box.color = color;
+	boxs.emplace_back(box);
 }
 
 // 球メッシュ作成
@@ -498,4 +509,69 @@ void DebugRenderer::CreateSquareMesh(ID3D11Device* device)
 // 矢印メッシュ作成
 void DebugRenderer::CreateArrowMesh(ID3D11Device* device,const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
 {
+}
+
+void DebugRenderer::CreateBoxMesh(ID3D11Device* device, float width, float height, float depth)
+{
+	DirectX::XMFLOAT3 positions[8] =
+	{
+		// top
+		{ -width,  height, -depth},
+		{  width,  height, -depth},
+		{  width,  height,  depth},
+		{ -width,  height,  depth},
+		// bottom
+		{ -width, -height, -depth},
+		{  width, -height, -depth},
+		{  width, -height,  depth},
+		{ -width, -height,  depth},
+	};
+
+	std::vector<DirectX::XMFLOAT3> vertices;
+	vertices.resize(32);
+
+	// top
+	vertices.emplace_back(positions[0]);
+	vertices.emplace_back(positions[1]);
+	vertices.emplace_back(positions[1]);
+	vertices.emplace_back(positions[2]);
+	vertices.emplace_back(positions[2]);
+	vertices.emplace_back(positions[3]);
+	vertices.emplace_back(positions[3]);
+	vertices.emplace_back(positions[0]);
+	// bottom
+	vertices.emplace_back(positions[4]);
+	vertices.emplace_back(positions[5]);
+	vertices.emplace_back(positions[5]);
+	vertices.emplace_back(positions[6]);
+	vertices.emplace_back(positions[6]);
+	vertices.emplace_back(positions[7]);
+	vertices.emplace_back(positions[7]);
+	vertices.emplace_back(positions[4]);
+	// side
+	vertices.emplace_back(positions[0]);
+	vertices.emplace_back(positions[4]);
+	vertices.emplace_back(positions[1]);
+	vertices.emplace_back(positions[5]);
+	vertices.emplace_back(positions[2]);
+	vertices.emplace_back(positions[6]);
+	vertices.emplace_back(positions[3]);
+	vertices.emplace_back(positions[7]);
+
+	// メッシュ生成
+	D3D11_BUFFER_DESC desc = {};
+	desc.ByteWidth = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size());
+	desc.Usage = D3D11_USAGE_IMMUTABLE;
+	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+	desc.StructureByteStride = 0;
+	D3D11_SUBRESOURCE_DATA subresourceData = {};
+	subresourceData.pSysMem = vertices.data();
+	subresourceData.SysMemPitch = 0;
+	subresourceData.SysMemSlicePitch = 0;
+
+	HRESULT hr = device->CreateBuffer(&desc, &subresourceData, boxVertexBuffer.GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
 }
