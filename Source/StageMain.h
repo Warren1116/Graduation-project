@@ -25,12 +25,10 @@ public:
 
 	// スフィアキャスト
 	bool SphereCast(
-		const DirectX::XMFLOAT3& origin,
-		const DirectX::XMFLOAT3& direction,
+		const DirectX::XMFLOAT3& start,
+		const DirectX::XMFLOAT3& end,
 		float radius,
-		float& distance,
-		DirectX::XMFLOAT3& hitPosition,
-		DirectX::XMFLOAT3& hitNormal);
+		HitResult& result);
 
 	// 位置設定
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }

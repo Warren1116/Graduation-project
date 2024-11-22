@@ -22,6 +22,13 @@ public:
 		const DirectX::XMFLOAT3& end,
 		HitResult& hit) = 0;
 
+	// スフィアキャスト
+	virtual bool SphereCast(const DirectX::XMFLOAT3& start,
+		const DirectX::XMFLOAT3& end,
+		float radius,
+		HitResult& hit) = 0;
+		//SphereCastResult& hit) = 0;
+
 	//// ウェイポイントのインデックスからポジションを取得
 	//virtual DirectX::XMFLOAT3 GetIndexWayPoint(int index) = 0;
 

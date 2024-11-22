@@ -446,6 +446,7 @@ bool Player::IsNearWallTop()
     HitResult hit;
     if (!StageManager::Instance().RayCast(start, end, hit))
     {
+        onClimb = false;
         CanClimb = true;
         position = checkpos;
         return true;
@@ -1146,6 +1147,7 @@ void Player::DrawDebugPrimitive()
     debugRender->DrawCylinder(position, radius, height, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(swingPoint, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
+    debugRender->DrawSphere(Spherepos, 1.0f, DirectX::XMFLOAT4(1, 0, 0, 1));
 
 
     projectileManager.DrawDebugPrimitive();
@@ -1272,7 +1274,7 @@ void Player::TransitionSwingState()
         upVec = DirectX::XMVector3Normalize(upVec);
 
         forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
-        upVec = DirectX::XMVectorScale(upVec, 11.0f);
+        upVec = DirectX::XMVectorScale(upVec, 10.0f);
 
         swingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
 
@@ -1333,7 +1335,7 @@ void Player::TransitionSwingState()
         upVec = DirectX::XMVector3Normalize(upVec);
 
         forwardVec = DirectX::XMVectorScale(forwardVec, 10.0f);
-        upVec = DirectX::XMVectorScale(upVec, 7.0f);
+        upVec = DirectX::XMVectorScale(upVec, 8.5f);
 
         swingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
 

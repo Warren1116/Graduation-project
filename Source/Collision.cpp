@@ -276,11 +276,12 @@ bool Collision::IntersectSphereVsModel(const DirectX::XMFLOAT3& start, const Dir
 
     bool hit = false;
     const ModelResource* resource = model->GetResource();
-
     for (const ModelResource::Mesh& mesh : resource->GetMeshes())
     {
+        // メッシュノード取得
         const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
 
+        // レイをワールド空間からローカル空間へ変換
         DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
         DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
 
@@ -344,15 +345,18 @@ bool Collision::IntersectSphereVsModel(const DirectX::XMFLOAT3& start, const Dir
 
 bool Collision::IntersectSphereVsTriangle(DirectX::XMVECTOR sphereStart, DirectX::XMVECTOR sphereDir, float radius, DirectX::XMVECTOR A, DirectX::XMVECTOR B, DirectX::XMVECTOR C, float& outDistance, DirectX::XMVECTOR& outContactPoint)
 {
+    //  三角形の法線を計算
     DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
     DirectX::XMVECTOR AC = DirectX::XMVectorSubtract(C, A);
     DirectX::XMVECTOR normal = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(AB, AC));
+
 
     DirectX::XMVECTOR sphereToPlane = DirectX::XMVectorSubtract(A, sphereStart);
     float t = DirectX::XMVectorGetX(DirectX::XMVector3Dot(sphereToPlane, normal)) /
         DirectX::XMVectorGetX(DirectX::XMVector3Dot(sphereDir, normal));
 
     if (t < 0 || t > 1) return false;
+
 
     DirectX::XMVECTOR contactPoint = DirectX::XMVectorAdd(sphereStart, DirectX::XMVectorScale(sphereDir, t));
     DirectX::XMVECTOR sphereCenterToContact = DirectX::XMVectorSubtract(contactPoint, normal);

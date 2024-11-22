@@ -12,15 +12,6 @@ struct HitResult
     DirectX::XMFLOAT3 rotation = { 0, 0 , 0 };
 };
 
-// スフィアキャスト結果
-struct SphereCastResult
-{
-    DirectX::XMVECTOR	position = { 0, 0, 0 };	// レイとポリゴンの交点
-    DirectX::XMVECTOR	normal = { 0, 0, 0 };	// 衝突したポリゴンの法線ベクトル
-    float				distance = 0.0f; 		// レイの始点から交点までの距離
-    DirectX::XMVECTOR	verts[3];
-    int					materialIndex = -1; 	// 衝突したポリゴンのマテリアル番号
-};
 
 // コリジョン
 class Collision
@@ -85,6 +76,7 @@ public:
         float radius,
         const Model* model,
         HitResult& result);
+        //SphereCastResult& result);
 
     // スフィアキャスト三角形
     static bool IntersectSphereVsTriangle(

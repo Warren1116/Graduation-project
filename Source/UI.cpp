@@ -3,6 +3,8 @@
 #include "SceneGame.h"
 #include "Graphics\Graphics.h"
 
+//#define TUTORIAL
+
 void UI::Initialize()
 {
     LockOnScope = std::make_unique<Sprite>("Data/Sprite/LockOnScope.png");
@@ -85,8 +87,10 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
         RenderSpiderSense(dc, view, projection);
     }
 
+#ifdef TUTORIAL
     //  チュトリアルの描画
     RenderTutorial(dc, view, projection);
+#endif // !TUTORIAL
 
     //  HPのUI表現
     {

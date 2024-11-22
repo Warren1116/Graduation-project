@@ -282,6 +282,7 @@ private:
 
 private:
 	DirectX::XMFLOAT3 checkpos;
+	DirectX::XMFLOAT3 Spherepos;
 	DirectX::XMVECTOR checkDirection;
 
 	//Ž…—p

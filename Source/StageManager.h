@@ -20,7 +20,7 @@ public:
 	// 更新処理
 	void Update(float elapsedTime);
 
-	//// 描画処理
+	// 描画処理
 	//void Render(const RenderContext& rc, ModelShader* shader);
 
 	// ステージ登録
@@ -35,13 +35,11 @@ public:
 		HitResult& hit);
 
 	// スフィアキャスト
-	bool SphereCast(
-		const DirectX::XMFLOAT3& origin,
-		const DirectX::XMFLOAT3& direction,
+	bool SphereCast(const DirectX::XMFLOAT3& start,
+		const DirectX::XMFLOAT3& end,
 		float radius,
-		float& distance,
-		DirectX::XMFLOAT3& hitPosition,
-		DirectX::XMFLOAT3& hitNormal);
+		HitResult& hit);
+
 
 	// ステージ取得
 	Stage* GetStage(int index) { return stages.at(index); }

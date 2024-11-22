@@ -59,6 +59,12 @@ bool StageMain::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3&
     return Collision::IntersectRayVsModel(start, end, model.get(), hit);
 }
 
+// スフィアキャスト
+bool StageMain::SphereCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, float radius, HitResult& hit)
+{
+    return Collision::IntersectSphereVsModel(start, end, radius, model.get(), hit);
+}
+
 DirectX::XMFLOAT3 StageMain::GetIndexWayPoint(int index)
 {
     return wayPoint[index]->position;

@@ -258,21 +258,25 @@ void Character::UpdateHorizontalVelocity(float elapsedFrame)
     moveVecZ = 0.0f;
 }
 
-// 水平移動更新処理　
+// 水平移動更新処理　RayCast用
 void Character::UpdateHorizontalMove(float elapsedTime)
 {
     //水平速力量計算
-    float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
+    float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
     if (velocityLengthXZ > 0.0f)
     {
         //水平移動値
         float mx = velocity.x * elapsedTime;
         float mz = velocity.z * elapsedTime;
-        float my = velocity.y * elapsedTime;
 
         //レイの開始位置と終点位置
         DirectX::XMFLOAT3 start = { position.x,position.y + stepOffset ,position.z };
-        DirectX::XMFLOAT3 end = { position.x + mx - 0.71f, position.y + stepOffset, position.z + mz - 0.71f };
+        DirectX::XMFLOAT3 end = { position.x + mx, position.y + stepOffset, position.z + mz };
+
+        DirectX::XMVECTOR velocityDirection = DirectX::XMVector3Normalize(DirectX::XMVectorSet(velocity.x, 0.0f, velocity.z, 0.0f));
+        DirectX::XMVECTOR offset = DirectX::XMVectorScale(velocityDirection, 0.71f);
+        DirectX::XMVECTOR endWithOffset = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&end), offset);
+        DirectX::XMStoreFloat3(&end, endWithOffset);
 
         //レイキャストによる壁判定
         HitResult hit;
@@ -288,7 +292,6 @@ void Character::UpdateHorizontalMove(float elapsedTime)
             DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(DirectX::XMVectorNegate(Vec), Normal);
             Dot = DirectX::XMVectorScale(Dot, 1.1f);
 
-
             //補正位置の計算
             DirectX::XMVECTOR CollectPosition = DirectX::XMVectorMultiplyAdd(Normal, Dot, End);
             DirectX::XMFLOAT3 collectPosition;
@@ -301,17 +304,26 @@ void Character::UpdateHorizontalMove(float elapsedTime)
                 GamePad& gamePad = Input::Instance().GetGamePad();
                 if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
                 {
+                    //  クライミングに入ります
                     onClimb = true;
-                    position.x = collectPosition.x + 0.7f;
-                    position.z = collectPosition.z + 0.7f;
+                    //  モデルが壁にぶち込んたので、位置の修正
+                    DirectX::XMVECTOR collisionNormal = DirectX::XMLoadFloat3(&hit.normal);
+                    collisionNormal = DirectX::XMVector3Normalize(collisionNormal);
+                    DirectX::XMVECTOR offset = DirectX::XMVectorScale(collisionNormal, 0.3f);
+
+                    DirectX::XMVECTOR currentPosition = DirectX::XMLoadFloat3(&collectPosition);
+                    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(currentPosition, offset);
+                    DirectX::XMFLOAT3 newpos;
+                    DirectX::XMStoreFloat3(&newpos, newPosition);
+                    position.x = newpos.x;
+                    position.z = newpos.z;
 
                 }
             }
             else
             {
-                position.x = hit2.position.x + 0.6f;
-                position.y = hit.position.y;
-                position.z = hit2.position.z + 0.6f;
+                position.x = hit2.position.x;
+                position.z = hit2.position.z;
             }
 
         }
@@ -321,10 +333,10 @@ void Character::UpdateHorizontalMove(float elapsedTime)
             onClimb = false;
             position.x += mx;
             position.z += mz;
-            position.y += my;
         }
     }
 }
+
 
 //移動処理
 void Character::Move(float vx, float vy, float vz, float speed)
@@ -372,7 +384,7 @@ void Character::Turn(float elapsedTime, float vx, float vz, float speed)
 
     if (cross <= 0.0f)
     {
-        angle.y -= rot * 0.5f;  
+        angle.y -= rot * 0.5f;
     }
     else
     {

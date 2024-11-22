@@ -339,9 +339,6 @@
     <ClInclude Include="Source\SpriteLayout.h">
       <Filter>Source\System\Event</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SphereCast.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
