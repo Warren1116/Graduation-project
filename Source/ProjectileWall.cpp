@@ -1,3 +1,4 @@
+#pragma once
 #include "ProjectileWall.h"
 #include "SceneGame.h"
 #include "ProjectileStraight.h"
@@ -6,9 +7,9 @@ ProjectileWall::ProjectileWall(BrokenProjectileManager* manager) : Projectile(ma
 {
     model = std::make_unique<Model>("Data/Model/SpiderWeb/WallWeb.mdl");
     scale.x = scale.y = scale.z = 0.1f;
+
+
 }
-
-
 
 ProjectileWall::~ProjectileWall()
 {

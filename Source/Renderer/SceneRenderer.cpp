@@ -183,7 +183,6 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		// デバッグレンダラ描画実行
 		graphics.GetDebugRenderer()->Render(rc.deviceContext, rc.view, rc.projection);
 
-		graphics.GetGeometricPrimitiver()->Render(rc.deviceContext, rc.view, rc.projection);
 
 		Stage* stage = StageManager::Instance().GetStage(0);
 		stage->DrawDebugPrimitive(dc, rc.view, rc.projection);

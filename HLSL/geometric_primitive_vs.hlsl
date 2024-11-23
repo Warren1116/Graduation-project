@@ -1,14 +1,9 @@
 #include "geometric_primitive.hlsli"
-VS_OUT main(float4 position : POSITION, float4 normal : NORMAL)
+VS_OUT main(float4 position : POSITION, float4 normal : NORMAL, float2 texcoord : TEXCOORD)
 {
     VS_OUT vout;
-    vout.position = mul(position, mul(world, view_projection));
-
-    normal.w = 0;
-    float4 N = normalize(mul(normal, world));
-    float4 L = normalize(-light_direction);
-
-    vout.color.rgb = material_color.rgb * max(0, dot(L, N));
-    vout.color.a = material_color.a;
+    vout.position = mul(position, mul(world, view_projection_transform));
+    vout.color = material_color;
+    vout.texcoord = texcoord;
     return vout;
 }

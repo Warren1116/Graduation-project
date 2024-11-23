@@ -613,6 +613,18 @@
     <None Include="HLSL\Font.hlsli">
       <Filter>HLSL</Filter>
     </None>
+    <None Include="HLSL\gbuffer_decal_constant_buffer.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\gbuffer_decal_primitive.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\gbuffer.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\scene_constant_buffer.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSL\DebugPS.hlsl">

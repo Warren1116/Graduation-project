@@ -3,22 +3,11 @@
 #include "misc.h"
 #include <memory>
 #include "Shader.h"
+#include <vector>
 
 GeometricPrimitive::GeometricPrimitive(ID3D11Device* device)
 {
-
     HRESULT hr{ S_OK };
-    D3D11_INPUT_ELEMENT_DESC input_element_desc[]
-    {
-        {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
-        D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
-        {"NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
-        D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
-    };
-
-    create_vs_from_cso(device, "Shader\\geometric_primitive_vs.cso", vertex_shader.GetAddressOf(),
-        input_layout.GetAddressOf(), input_element_desc, ARRAYSIZE(input_element_desc));
-    create_ps_from_cso(device, "Shader\\geometric_primitive_ps.cso", pixel_shader.GetAddressOf());
 
     D3D11_BUFFER_DESC buffer_desc{};
     buffer_desc.ByteWidth = sizeof(constants);
@@ -26,58 +15,26 @@ GeometricPrimitive::GeometricPrimitive(ID3D11Device* device)
     buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     hr = device->CreateBuffer(&buffer_desc, nullptr, constant_buffer.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-    // 円柱メッシュ作成
-    CreateCylinderMesh(device, 1.0f, 1.0f, 0.0f, 1.0f, 16, 1);
 }
 
-void GeometricPrimitive::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+void GeometricPrimitive::Render(ID3D11DeviceContext* immediate_context, const DirectX::XMFLOAT4X4& world, const DirectX::XMFLOAT4& material_color)
 {
-    // シェーダー設定
-    context->VSSetShader(vertex_shader.Get(), nullptr, 0);
-    context->PSSetShader(pixel_shader.Get(), nullptr, 0);
-    context->IASetInputLayout(input_layout.Get());
+    uint32_t stride{ sizeof(vertex) };
+    uint32_t offset{ 0 };
+    immediate_context->IASetVertexBuffers(0, 1, vertex_buffer.GetAddressOf(), &stride, &offset);
+    immediate_context->IASetIndexBuffer(index_buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-    // 定数バッファ設定
-    context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
-    //context->PSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+    constants data{ world, material_color };
+    immediate_context->UpdateSubresource(constant_buffer.Get(), 0, 0, &data, 0, 0);
+    immediate_context->VSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+    immediate_context->HSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+    immediate_context->DSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+    immediate_context->GSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
+    immediate_context->PSSetConstantBuffers(0, 1, constant_buffer.GetAddressOf());
 
-    // レンダーステート設定
-    const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    context->OMSetBlendState(blendState.Get(), blendFactor, 0xFFFFFFFF);
-    context->OMSetDepthStencilState(depthStencilState.Get(), 0);
-    context->RSSetState(rasterizerState.Get());
-
-    // ビュープロジェクション行列作成
-    DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
-    DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projection);
-    DirectX::XMMATRIX VP = V * P;
-
-    // プリミティブ設定
-    UINT stride = sizeof(DirectX::XMFLOAT3);
-    UINT offset = 0;
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    // 円柱描画
-    context->IASetVertexBuffers(0, 1, cylinderVertexBuffer.GetAddressOf(), &stride, &offset);
-    for (const Cylinder& cylinder : cylinders)
-    {
-        // ワールドビュープロジェクション行列作成
-        DirectX::XMMATRIX S = DirectX::XMMatrixScaling(cylinder.radius, cylinder.height, cylinder.radius);
-        DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(cylinder.position.x, cylinder.position.y, cylinder.position.z);
-        DirectX::XMMATRIX W = S * T;
-        DirectX::XMMATRIX WVP = W * VP;
-
-        // 定数バッファ更新
-        CbMesh cbMesh;
-        cbMesh.color = cylinder.color;
-        DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
-
-        context->UpdateSubresource(constant_buffer.Get(), 0, 0, &cbMesh, 0, 0);
-        context->Draw(cylinderVertexCount, 0);
-    }
-    cylinders.clear();
-
+    D3D11_BUFFER_DESC buffer_desc{};
+    index_buffer->GetDesc(&buffer_desc);
+    immediate_context->DrawIndexed(buffer_desc.ByteWidth / sizeof(uint32_t), 0, 0);
 }
 
 void GeometricPrimitive::create_com_buffers(ID3D11Device* device, vertex* vertices, size_t vertex_count, uint32_t* indices, size_t index_count)
