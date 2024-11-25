@@ -24,9 +24,7 @@ public:
     // 四角柱描画
     void DrawSquare(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT4& color);
 
-    // 矢印描画
-    void DrawArrow(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
-
+    // 箱描画
     void DrawBox(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& size, const DirectX::XMFLOAT4& color);
 
 
@@ -39,9 +37,6 @@ private:
 
     // 四角柱メッシュ作成
     void CreateSquareMesh(ID3D11Device* device);
-
-    // 矢印メッシュ作成
-    void CreateArrowMesh(ID3D11Device* device, const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color);
 
     // 箱メッシュ作成
     void CreateBoxMesh(ID3D11Device* device, float width, float height, float depth);

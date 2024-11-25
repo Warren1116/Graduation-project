@@ -4,7 +4,7 @@
 
 cbuffer GBUFFER_DECAL_CONSTANT_BUFFER : register(b10)
 {
-    row_major_float4x4 decal_inverse_transform;
+    row_major float4x4 decal_inverse_transform;
     float4 decal_direction;
 }
 

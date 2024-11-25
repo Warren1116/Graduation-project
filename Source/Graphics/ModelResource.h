@@ -17,16 +17,54 @@ public:
 
 	struct Node
 	{
-		NodeId				id;
-		std::string			name;
-		std::string			path;
-		int					parentIndex;
-		DirectX::XMFLOAT3	scale;
-		DirectX::XMFLOAT4	rotate;
-		DirectX::XMFLOAT3	translate;
+		NodeId              id;
+		std::string         name;
+		std::string         path;
+		int                 parentIndex = -1;
+		Node* parent = nullptr;
+		std::vector<Node*>  children;
+
+		DirectX::XMFLOAT3   scale = { 1.0f, 1.0f, 1.0f };
+		DirectX::XMFLOAT4   rotate = { 0.0f, 0.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT3   translate = { 0.0f, 0.0f, 0.0f };
+
+		DirectX::XMFLOAT4X4 localTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+		DirectX::XMFLOAT4X4 globalTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+		DirectX::XMFLOAT4X4 worldTransform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+
+		void UpdateTransform()
+		{
+			DirectX::XMStoreFloat4x4(&localTransform,
+				DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) *
+				DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&rotate)) *
+				DirectX::XMMatrixTranslation(translate.x, translate.y, translate.z)
+			);
+
+			if (parent)
+			{
+				DirectX::XMStoreFloat4x4(&globalTransform,
+					DirectX::XMLoadFloat4x4(&localTransform) * DirectX::XMLoadFloat4x4(&parent->globalTransform));
+			}
+			else
+			{
+				globalTransform = localTransform;
+			}
+
+			for (auto* child : children)
+			{
+				child->UpdateTransform();
+			}
+		}
+
+		void AddChild(Node* child)
+		{
+			child->parent = this;
+			children.push_back(child);
+		}
 
 		template<class Archive>
 		void serialize(Archive& archive, int version);
+
 	};
 
 	struct Material
@@ -92,12 +130,20 @@ public:
 		DirectX::XMFLOAT3						boundsMin;
 		DirectX::XMFLOAT3						boundsMax;
 
+		Node* node = nullptr;
+
 		Microsoft::WRL::ComPtr<ID3D11Buffer>	vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer>	indexBuffer;
+
+
 
 		template<class Archive>
 		void serialize(Archive& archive, int version);
 	};
+
+
+
+
 
 	struct NodeKeyData
 	{

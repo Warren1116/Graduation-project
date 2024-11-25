@@ -25,9 +25,10 @@ void StageMain::SetStageNum(int num)
 // コンストラクタ
 StageMain::StageMain()
 {
-    instance = this;
+    ID3D11Device* device = Graphics::Instance().GetDevice();
 
-    //// ステージモデルの読み込み
+    instance = this;
+    // ステージモデルの読み込み
     model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
@@ -41,10 +42,15 @@ StageMain::StageMain()
     DirectX::XMVECTOR VolumeMin = DirectX::XMVectorReplicate(FLT_MAX);
     DirectX::XMVECTOR VolumeMax = DirectX::XMVectorReplicate(-FLT_MAX);
 
-    // 頂点データをワールド空間変換し、三角形データを作成
-    for (const Model::Mesh& mesh : model->GetMeshes())
+    const ModelResource* resource = model->GetResource();
+    const std::vector<Model::Node>& nodes = model->GetNodes();
+
+        // 頂点データをワールド空間変換し、三角形データを作成
+        //for (const Model::Mesh& mesh : model->GetMeshes())
+    for (const ModelResource::Mesh& mesh : resource->GetMeshes())
     {
-        DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&mesh.node->worldTransform);
+        const Model::Node& node = nodes.at(mesh.nodeIndex);  
+        DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform); 
         for (size_t i = 0; i < mesh.indices.size(); i += 3)
         {
             // 頂点データをワールド空間変換
@@ -82,6 +88,7 @@ StageMain::StageMain()
             VolumeMax = DirectX::XMVectorMax(VolumeMax, B);
             VolumeMax = DirectX::XMVectorMax(VolumeMax, C);
         }
+        
     }
 
     // モデル全体のAABB
@@ -92,10 +99,11 @@ StageMain::StageMain()
     // モデル全体のAABBからXZ平面に指定のサイズで分割されたコリジョンエリアを作成する
     {
         const int cellSize = 4;
+        const float epsilon = 0.001f;
         //エリアを作成していく。
-        for (float x = volumeMin.x; x < volumeMax.x; x += cellSize)
+        for (float x = volumeMin.x; x < volumeMax.x + epsilon; x += cellSize)
         {
-            for (float z = volumeMin.z; z < volumeMax.z; z += cellSize)
+            for (float z = volumeMin.z; z < volumeMax.z + epsilon; z += cellSize)
             {
                 CollisionMesh::Area area;
                 //AABBを作成
@@ -141,6 +149,15 @@ void StageMain::Update(float elapsedTime)
 
 void StageMain::DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
+    DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
+
+    // バウンディングボックス描画
+    const DirectX::XMFLOAT4 boxColor = { 0, 1, 0, 1 };
+    const DirectX::XMFLOAT3 boxAngle = { 0, 0, 0 };
+    for (CollisionMesh::Area& area : collisionMesh.areas)
+    {
+        debugRender->DrawBox(area.boundingBox.Center, boxAngle, area.boundingBox.Extents, boxColor);
+    }
 
 }
 

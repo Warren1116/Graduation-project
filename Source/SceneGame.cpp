@@ -29,7 +29,7 @@ static const UINT SHADOWMAP_SIZE = 2048;
 
 
 //#define TUTORIAL
-//#define DEBUG
+#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -229,7 +229,6 @@ void SceneGame::Update(float elapsedTime)
     Graphics& graphics = Graphics::Instance();
     //  UI更新処理
     UI::Instance().Update(elapsedTime);
-
 
 #ifdef TUTORIAL
     //  チュトリアルのタイマー

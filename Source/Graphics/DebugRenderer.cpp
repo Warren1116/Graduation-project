@@ -132,6 +132,7 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 	// 四角柱メッシュ作成
 	CreateSquareMesh(device);
 
+	// 箱メッシュ作成
 	CreateBoxMesh(device, 1.0f, 1.0f, 1.0f);
 }
 
@@ -242,6 +243,27 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 		context->Draw(squareVertexCount, 0);
 	}
 	arrows.clear();
+
+	// 箱描画
+	context->IASetVertexBuffers(0, 1, boxVertexBuffer.GetAddressOf(), &stride, &offset);
+	for (const Box& box : boxs)
+	{
+		// ワールドプロジェクション行列
+		DirectX::XMMATRIX S = DirectX::XMMatrixScaling(box.size.x, box.size.y, box.size.z);
+		DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(box.position.x, box.position.y, box.position.z);
+		DirectX::XMMATRIX W = S * T;
+		DirectX::XMMATRIX WVP = W * VP;
+
+		// 定数バッファ更新
+		CbMesh cbMesh;
+		cbMesh.color = box.color;
+		DirectX::XMStoreFloat4x4(&cbMesh.wvp, WVP);
+
+		context->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+		context->Draw(boxVertexCount, 0);
+	}
+	boxs.clear();
+
 }
 
 // 球描画
@@ -275,22 +297,13 @@ void DebugRenderer::DrawSquare(const DirectX::XMFLOAT3& position, const DirectX:
 	squares.push_back(square);
 }
 
-void DebugRenderer::DrawArrow(const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
-{
-	Arrow arrow;
-	arrow.position = position;
-	arrow.radius = radius;
-	arrow.height = height;
-	arrow.color = color;
-	arrows.emplace_back(arrow);
-}
 
 void DebugRenderer::DrawBox(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& size, const DirectX::XMFLOAT4& color)
 {
 	Box box;
 	box.position = position;
-	box.angle;
-	box.size;
+	box.angle = angle;
+	box.size = size;
 	box.color = color;
 	boxs.emplace_back(box);
 }
@@ -506,10 +519,6 @@ void DebugRenderer::CreateSquareMesh(ID3D11Device* device)
 	}
 }
 
-// 矢印メッシュ作成
-void DebugRenderer::CreateArrowMesh(ID3D11Device* device,const DirectX::XMFLOAT3& position, float radius, float height, const DirectX::XMFLOAT4& color)
-{
-}
 
 void DebugRenderer::CreateBoxMesh(ID3D11Device* device, float width, float height, float depth)
 {
