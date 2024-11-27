@@ -308,6 +308,7 @@ void DebugRenderer::DrawBox(const DirectX::XMFLOAT3& position, const DirectX::XM
 	boxs.emplace_back(box);
 }
 
+
 // 球メッシュ作成
 void DebugRenderer::CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks)
 {
@@ -519,68 +520,53 @@ void DebugRenderer::CreateSquareMesh(ID3D11Device* device)
 	}
 }
 
-
+// 箱メッシュ作成
 void DebugRenderer::CreateBoxMesh(ID3D11Device* device, float width, float height, float depth)
 {
-	DirectX::XMFLOAT3 positions[8] =
-	{
-		// top
-		{ -width,  height, -depth},
-		{  width,  height, -depth},
-		{  width,  height,  depth},
-		{ -width,  height,  depth},
-		// bottom
-		{ -width, -height, -depth},
-		{  width, -height, -depth},
-		{  width, -height,  depth},
-		{ -width, -height,  depth},
+	boxVertexCount = 36;
+	std::unique_ptr<DirectX::XMFLOAT3[]> vertices = std::make_unique<DirectX::XMFLOAT3[]>(boxVertexCount);
+
+	float halfWidth = width * 0.5f;
+	float halfHeight = height * 0.5f;
+	float halfDepth = depth * 0.5f;
+
+	DirectX::XMFLOAT3 v[8] = {
+		{ -halfWidth, -halfHeight, -halfDepth },	//左下後
+		{ -halfWidth, +halfHeight, -halfDepth },	//左上後
+		{ +halfWidth, +halfHeight, -halfDepth },	//右上後
+		{ +halfWidth, -halfHeight, -halfDepth },	//右下後
+		{ -halfWidth, -halfHeight, +halfDepth },	//左下前
+		{ -halfWidth, +halfHeight, +halfDepth },	//左上前
+		{ +halfWidth, +halfHeight, +halfDepth },	//右上前
+		{ +halfWidth, -halfHeight, +halfDepth },	//右下前
 	};
 
-	std::vector<DirectX::XMFLOAT3> vertices;
-	vertices.resize(32);
+	int indices[36] = {
+		0, 1, 2, 0, 2, 3,
+		4, 6, 5, 4, 7, 6,
+		4, 5, 1, 4, 1, 0,
+		3, 2, 6, 3, 6, 7,
+		1, 5, 6, 1, 6, 2,
+		4, 0, 3, 4, 3, 7,
+	};
 
-	// top
-	vertices.emplace_back(positions[0]);
-	vertices.emplace_back(positions[1]);
-	vertices.emplace_back(positions[1]);
-	vertices.emplace_back(positions[2]);
-	vertices.emplace_back(positions[2]);
-	vertices.emplace_back(positions[3]);
-	vertices.emplace_back(positions[3]);
-	vertices.emplace_back(positions[0]);
-	// bottom
-	vertices.emplace_back(positions[4]);
-	vertices.emplace_back(positions[5]);
-	vertices.emplace_back(positions[5]);
-	vertices.emplace_back(positions[6]);
-	vertices.emplace_back(positions[6]);
-	vertices.emplace_back(positions[7]);
-	vertices.emplace_back(positions[7]);
-	vertices.emplace_back(positions[4]);
-	// side
-	vertices.emplace_back(positions[0]);
-	vertices.emplace_back(positions[4]);
-	vertices.emplace_back(positions[1]);
-	vertices.emplace_back(positions[5]);
-	vertices.emplace_back(positions[2]);
-	vertices.emplace_back(positions[6]);
-	vertices.emplace_back(positions[3]);
-	vertices.emplace_back(positions[7]);
+	for (int i = 0; i < boxVertexCount; ++i)
+	{
+		vertices[i] = v[indices[i]];
+	}
 
-	// メッシュ生成
 	D3D11_BUFFER_DESC desc = {};
-	desc.ByteWidth = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size());
-	desc.Usage = D3D11_USAGE_IMMUTABLE;
+	D3D11_SUBRESOURCE_DATA subresourceData = {};
+
+	desc.ByteWidth = static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * boxVertexCount);
+	desc.Usage = D3D11_USAGE_IMMUTABLE; 
 	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	desc.CPUAccessFlags = 0;
 	desc.MiscFlags = 0;
 	desc.StructureByteStride = 0;
-	D3D11_SUBRESOURCE_DATA subresourceData = {};
-	subresourceData.pSysMem = vertices.data();
-	subresourceData.SysMemPitch = 0;
-	subresourceData.SysMemSlicePitch = 0;
+
+	subresourceData.pSysMem = vertices.get();
 
 	HRESULT hr = device->CreateBuffer(&desc, &subresourceData, boxVertexBuffer.GetAddressOf());
-	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr)); 
 }

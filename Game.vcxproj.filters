@@ -318,6 +318,9 @@
     <ClInclude Include="Source\SpriteLayout.h">
       <Filter>Source\System\Event</Filter>
     </ClInclude>
+    <ClInclude Include="Source\PrimitiveRenderer.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -563,6 +566,9 @@
     <ClCompile Include="Source\SpriteLayout.cpp">
       <Filter>Source\System\Event</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PrimitiveRenderer.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Debug.hlsli">
@@ -623,6 +629,9 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="HLSL\scene_constant_buffer.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\PrimitiveRenderer.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>
@@ -700,6 +709,12 @@
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\FontVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\PrimitiveRendererPS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\PrimitiveRendererVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>
