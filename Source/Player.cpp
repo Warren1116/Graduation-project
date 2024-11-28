@@ -170,10 +170,7 @@ void Player::Update(float elapsedTime)
 // 移動入力処理
 bool Player::InputMove(float elapsedTime)
 {
-    //// カメラ方向とスティックの入力値によって進行方向を計算する
-    //Camera& camera = Camera::Instance();
-    //DirectX::XMFLOAT3 cameraRight = camera.GetRight();
-    //DirectX::XMFLOAT3 cameraFront = camera.GetFront();
+    GamePad& gamePad = Input::Instance().GetGamePad();
 
     //進行ベクトル取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -229,7 +226,6 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
     float cameraUpY = cameraUp.y;
 
     DirectX::XMFLOAT3 vec;
-    //if (!onClimb)
     {
         // スティックの水平入力値をカメラ右方向に反映し、
         // スティックの垂直入力値をカメラ前方向に反映し、
@@ -455,7 +451,10 @@ bool Player::IsNearWallTop()
         return true;
     }
     return false;
+
 }
+
+
 
 //　カメラステート更新処理
 void Player::UpdateCameraState(float elapsedTime)
@@ -1008,7 +1007,14 @@ void Player::UpdateJumpState(float elapsedTime)
 void Player::TransitionClimbWallState()
 {
     state = State::Climb;
-    model->PlayAnimation(Anim_Climb, true);
+    if (velocity.y >= 0)
+    {
+        model->PlayAnimation(Anim_Climb, true);
+    }
+    else
+    {
+        model->PlayAnimation(Anim_ClimbDown, true);
+    }
 }
 
 //  クライミングステートへの遷移
@@ -1031,6 +1037,8 @@ void Player::UpdateClimbWallState(float elapsedTime)
     {
         TransitionClimbTopState();
     }
+
+
     else
     {
         CanClimb = false;
@@ -1153,6 +1161,7 @@ void Player::DrawDebugPrimitive()
     //衝突判定用のデバッグ円柱を描画
     debugRender->DrawCylinder(position, radius, height, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(swingPoint, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
+    debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
 
     projectileManager.DrawDebugPrimitive();
@@ -1359,10 +1368,71 @@ void Player::TransitionSwingState()
 //  スイングステートの更新処理
 void Player::UpdateSwingState(float elapsedTime)
 {
+    float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
+    if (velocityLengthXZ > 0.0f) 
+    {
+        float mx = velocity.x * elapsedTime;
+        float mz = velocity.z * elapsedTime;
+
+        DirectX::XMFLOAT3 start = position;
+        DirectX::XMFLOAT3 end = {
+            position.x + mx,
+            position.y,
+            position.z + mz
+        };
+        float distance = sqrtf(mx * mx + mz * mz);
+
+        int steps = static_cast<int>(distance / 0.5f);
+        steps = max(steps, 5); 
+        HitResult hit;
+
+        const int raySamples = 5;  
+        float angleStep = DirectX::XM_2PI / raySamples;
+
+        for (int step = 0; step <= steps; ++step) {
+            float t = step / static_cast<float>(steps);
+            DirectX::XMVECTOR currentPoint = DirectX::XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
+
+            for (int i = 0; i < raySamples; ++i) {
+                float angle = i * angleStep;
+                float offsetX = radius * cosf(angle);
+                float offsetZ = radius * sinf(angle);
+
+                DirectX::XMFLOAT3 offsetPoint;
+                DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
+
+                if (StageManager::Instance().RayCast(position, offsetPoint, hit)) 
+                {
+                    DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
+
+                    float backOffset = -0.5f;
+                    DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
+                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorSubtract(hitPosition, DirectX::XMVectorScale(hitNormal, backOffset));
+
+                    DirectX::XMStoreFloat3(&position, adjustedPosition);
+
+                    onClimb = true;
+                    TransitionIdleState();
+                    velocity.x = 0;
+                    velocity.z = 0;
+                    return;  
+                }
+            }
+        }
+        position = end;
+    
+    }
+
     if (!model->IsPlayAnimation())
     {
         model->PlayAnimation(Anim_Swinging2, true);
     }
+
+    DirectX::XMFLOAT3 moveVec = GetMoveVec();
+
+    const float swingAdjustSpeed = 2.0f;
+    swingPoint.x += moveVec.x * swingAdjustSpeed * elapsedTime;
+    swingPoint.z += moveVec.z * swingAdjustSpeed * elapsedTime;
 
     //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);

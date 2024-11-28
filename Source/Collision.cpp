@@ -124,266 +124,188 @@ bool Collision::IntersectSphereVsCylinder(const DirectX::XMFLOAT3& spherePositio
     return true;
 }
 
-  //空間分割用レイキャスト
-bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const Model* model, HitResult& result)
-{
-    DirectX::XMVECTOR WorldStart = DirectX::XMLoadFloat3(&start);
-    DirectX::XMVECTOR WorldEnd = DirectX::XMLoadFloat3(&end);
-    DirectX::XMVECTOR WorldRayVec = DirectX::XMVectorSubtract(WorldEnd, WorldStart);
-    DirectX::XMVECTOR WorldRayLength = DirectX::XMVector3Length(WorldRayVec);
-    DirectX::XMVECTOR Direction = DirectX::XMVector3Normalize(WorldRayVec);
-    float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(WorldRayVec));
-
-     //ワールド空間のレイの長さ
-    DirectX::XMStoreFloat(&result.distance, WorldRayLength);
-
-    bool hit = false;
-    const ModelResource* resource = model->GetResource();
-
-    for (auto& area : StageMain::Instance().GetCollisionMesh().areas)
-    {
-        //①エリアのバウンディングボックスとレイが
-        //  ヒットしている時
-        float dist;     //バウンディングボックス
-        if (!area.boundingBox.Intersects(WorldStart, Direction, dist))continue;
-        //②ヒットしていればエリア内の三角形と判定
-        for (auto& triangleIndex : area.triangleIndices)
-        {
-            auto& triangle = StageMain::Instance().GetCollisionMesh().triangles[triangleIndex];
-            DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&triangle.positions[0]);
-            DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&triangle.positions[1]);
-            DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&triangle.positions[2]);
-            //ヒットしているかはこれを使うといい
-            if (DirectX::TriangleTests::Intersects(WorldStart, Direction, A, B, C, dist))
-            {
-                if (distance < dist) continue;
-                distance = dist;
-                result.normal = triangle.normal;
-                hit = true;
-            }
-        }
-        if (hit)
-        {
-            DirectX::XMVECTOR HitPosition = DirectX::XMVectorAdd(WorldStart, DirectX::XMVectorScale(Direction, distance));
-            DirectX::XMStoreFloat3(&result.position, HitPosition);
-        }
-        return hit;
-    }
-
-    for (const ModelResource::Mesh& mesh : resource->GetMeshes())
-    {
-        // メッシュノード取得
-        const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
-
-        // レイをワールド空間からローカル空間へ変換
-        DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
-        DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
-
-        DirectX::XMVECTOR S = DirectX::XMVector3TransformCoord(WorldStart, InverseWorldTransform);
-        DirectX::XMVECTOR E = DirectX::XMVector3TransformCoord(WorldEnd, InverseWorldTransform);
-        DirectX::XMVECTOR SE = DirectX::XMVectorSubtract(E, S);
-        DirectX::XMVECTOR V = DirectX::XMVector3Normalize(SE);
-        DirectX::XMVECTOR Length = DirectX::XMVector3Length(SE);
-
-        // レイの長さ
-        float neart;
-        DirectX::XMStoreFloat(&neart, Length);
-
-        // 三角形（面）との交差判定
-        const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
-        const std::vector<UINT> indices = mesh.indices;
-
-        int materialIndex = -1;
-        DirectX::XMVECTOR HitPosition;
-        DirectX::XMVECTOR HitNormal;
-        for (const ModelResource::Subset& subset : mesh.subsets)
-        {
-            for (UINT i = 0; i < subset.indexCount; i += 3)
-            {
-                UINT index = subset.startIndex + i;
-
-                // 三角形の頂点を抽出
-                const ModelResource::Vertex& a = vertices.at(indices.at(index));
-                const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
-                const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
-
-                DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&a.position);
-                DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&b.position);
-                DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&c.position);
-
-                DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
-                DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
-                DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
-
-                // 三角形の法線ベクトルを算出
-                DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB, BC);
-
-                // 内積の結果がプラスならば裏向き
-                DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(V, N);
-                float d;
-                DirectX::XMStoreFloat(&d, Dot);
-                if (d >= 0) continue;
-
-                // レイと平面の交点を算出
-                DirectX::XMVECTOR SA = DirectX::XMVectorSubtract(A, S);
-                DirectX::XMVECTOR X = DirectX::XMVectorDivide(DirectX::XMVector3Dot(SA, N), Dot);
-                float x;
-                DirectX::XMStoreFloat(&x, X);
-
-                // 交点までの距離が今までに計算した最近距離より大きいときはスキップ
-                if (x < .0f || x > neart) continue;
-
-                DirectX::XMVECTOR P = DirectX::XMVectorAdd(S, DirectX::XMVectorMultiply(V, X));
-
-                // 交点が三角形の内側にあるか判定
-                // １つめ
-                DirectX::XMVECTOR PA = DirectX::XMVectorSubtract(A, P);
-                DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(PA, AB);
-                DirectX::XMVECTOR Dot1 = DirectX::XMVector3Dot(N, Cross1);
-                float d1;
-                DirectX::XMStoreFloat(&d1, Dot1);
-                if (d1 < 0.0f) continue;
-
-                // ２つめ
-                DirectX::XMVECTOR PB = DirectX::XMVectorSubtract(B, P);
-                DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(PB, BC);
-                DirectX::XMVECTOR Dot2 = DirectX::XMVector3Dot(N, Cross2);
-                float d2;
-                DirectX::XMStoreFloat(&d2, Dot2);
-                if (d2 < 0.0f) continue;
-
-                // ３つめ
-                DirectX::XMVECTOR PC = DirectX::XMVectorSubtract(C, P);
-                DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(PC, CA);
-                DirectX::XMVECTOR Dot3 = DirectX::XMVector3Dot(N, Cross3);
-                float d3;
-                DirectX::XMStoreFloat(&d3, Dot3);
-                if (d3 < 0.0f) continue;
-
-                // 最近距離を更新
-                neart = x;
-
-                // 交点と法線を更新
-                HitPosition = P;
-                HitNormal = N;
-                materialIndex = subset.materialIndex;
-            }
-        }
-
-        if (materialIndex >= 0)
-        {
-            // ローカル空間からワールド空間へと変換
-            DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(HitPosition,
-                WorldTransform);
-            DirectX::XMVECTOR WorldCrossVec = DirectX::XMVectorSubtract(WorldPosition,
-                WorldStart);
-            DirectX::XMVECTOR WorldCrossLength = DirectX::XMVector3Length(WorldCrossVec);
-            float distance;
-            DirectX::XMStoreFloat(&distance, WorldCrossLength);
-
-            // ヒット情報保存
-            if (result.distance > distance)
-            {
-                DirectX::XMVECTOR WorldNormal = DirectX::XMVector3TransformNormal(HitNormal,
-                    WorldTransform);
-
-                result.distance = distance;
-                result.materialIndex = materialIndex;
-                DirectX::XMStoreFloat3(&result.position, WorldPosition);
-                DirectX::XMStoreFloat3(&result.normal,
-                    DirectX::XMVector3Normalize(WorldNormal));
-                hit = true;
-            }
-        }
-    }
-    return hit;
-}
-
-
+//  //空間分割用レイキャスト
 //bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const Model* model, HitResult& result)
 //{
-//    using namespace DirectX;
+//    DirectX::XMVECTOR WorldStart = DirectX::XMLoadFloat3(&start);
+//    DirectX::XMVECTOR WorldEnd = DirectX::XMLoadFloat3(&end);
+//    DirectX::XMVECTOR WorldRayVec = DirectX::XMVectorSubtract(WorldEnd, WorldStart);
+//    DirectX::XMVECTOR WorldRayLength = DirectX::XMVector3Length(WorldRayVec);
 //
-//    // 初期化
-//    XMVECTOR WorldStart = XMLoadFloat3(&start);
-//    XMVECTOR WorldEnd = XMLoadFloat3(&end);
-//    XMVECTOR WorldRayVec = XMVectorSubtract(WorldEnd, WorldStart);
-//    float distance = XMVectorGetX(XMVector3Length(WorldRayVec));
-//    XMVECTOR Direction = XMVector3Normalize(WorldRayVec);
-//    result.distance = distance;
+//    // ワールド空間のレイの長さ
+//    DirectX::XMStoreFloat(&result.distance, WorldRayLength);
+//
 //    bool hit = false;
-//
-//    // 1. 空間分割（AABB領域の検査）
-//    const auto& collisionMesh = StageMain::Instance().GetCollisionMesh();
-//
-//    for (const auto& area : collisionMesh.areas) {
-//        float aabbDist;
-//        if (!area.boundingBox.Intersects(WorldStart, Direction, aabbDist)) continue;
-//
-//        // エリア内の三角形を検査
-//        for (const auto& triangleIndex : area.triangleIndices) {
-//            const auto& triangle = collisionMesh.triangles[triangleIndex];
-//            XMVECTOR A = XMLoadFloat3(&triangle.positions[0]);
-//            XMVECTOR B = XMLoadFloat3(&triangle.positions[1]);
-//            XMVECTOR C = XMLoadFloat3(&triangle.positions[2]);
-//
-//            float triDist = distance;  // 初期値を設定
-//            if (TriangleTests::Intersects(WorldStart, Direction, A, B, C, triDist)) {
-//                if (triDist < result.distance) {  // 最も近い衝突点を更新
-//                    result.distance = triDist;
-//                    XMStoreFloat3(&result.position, XMVectorAdd(WorldStart, XMVectorScale(Direction, triDist)));
-//                    result.normal = triangle.normal;  // 三角形の法線をコピー
-//                    hit = true;
-//                }
-//            }
-//        }
-//    }
-//
-//    // 2. モデルの各メッシュに対する検査（ワールドからローカルへ）
 //    const ModelResource* resource = model->GetResource();
+//    for (const ModelResource::Mesh& mesh : resource->GetMeshes())
+//    {
+//        // メッシュノード取得
+//        const Model::Node& node = model->GetNodes().at(mesh.nodeIndex);
 //
-//    for (const auto& mesh : resource->GetMeshes()) {
-//        const auto& node = model->GetNodes().at(mesh.nodeIndex);
-//        XMMATRIX WorldTransform = XMLoadFloat4x4(&node.worldTransform);
-//        XMMATRIX InverseTransform = XMMatrixInverse(nullptr, WorldTransform);
+//        // レイをワールド空間からローカル空間へ変換
+//        DirectX::XMMATRIX WorldTransform = DirectX::XMLoadFloat4x4(&node.worldTransform);
+//        DirectX::XMMATRIX InverseWorldTransform = DirectX::XMMatrixInverse(nullptr, WorldTransform);
 //
-//        // ワールド座標からローカル座標に変換
-//        XMVECTOR LocalStart = XMVector3TransformCoord(WorldStart, InverseTransform);
-//        XMVECTOR LocalEnd = XMVector3TransformCoord(WorldEnd, InverseTransform);
-//        XMVECTOR LocalDirection = XMVector3Normalize(XMVectorSubtract(LocalEnd, LocalStart));
+//        DirectX::XMVECTOR S = DirectX::XMVector3TransformCoord(WorldStart, InverseWorldTransform);
+//        DirectX::XMVECTOR E = DirectX::XMVector3TransformCoord(WorldEnd, InverseWorldTransform);
+//        DirectX::XMVECTOR SE = DirectX::XMVectorSubtract(E, S);
+//        DirectX::XMVECTOR V = DirectX::XMVector3Normalize(SE);
+//        DirectX::XMVECTOR Length = DirectX::XMVector3Length(SE);
 //
-//        float localDist = result.distance;
+//        // レイの長さ
+//        float neart;
+//        DirectX::XMStoreFloat(&neart, Length);
+//
+//        // 三角形（面）との交差判定
+//        const std::vector<ModelResource::Vertex>& vertices = mesh.vertices;
+//        const std::vector<UINT> indices = mesh.indices;
+//
 //        int materialIndex = -1;
-//
-//        for (const auto& subset : mesh.subsets) {
-//            for (UINT i = 0; i < subset.indexCount; i += 3) {
+//        DirectX::XMVECTOR HitPosition;
+//        DirectX::XMVECTOR HitNormal;
+//        for (const ModelResource::Subset& subset : mesh.subsets)
+//        {
+//            for (UINT i = 0; i < subset.indexCount; i += 3)
+//            {
 //                UINT index = subset.startIndex + i;
 //
-//                const auto& vertices = mesh.vertices;
-//                const auto& indices = mesh.indices;
-//                XMVECTOR A = XMLoadFloat3(&vertices.at(indices.at(index)).position);
-//                XMVECTOR B = XMLoadFloat3(&vertices.at(indices.at(index + 1)).position);
-//                XMVECTOR C = XMLoadFloat3(&vertices.at(indices.at(index + 2)).position);
+//                // 三角形の頂点を抽出
+//                const ModelResource::Vertex& a = vertices.at(indices.at(index));
+//                const ModelResource::Vertex& b = vertices.at(indices.at(index + 1));
+//                const ModelResource::Vertex& c = vertices.at(indices.at(index + 2));
 //
-//                float triDist;
-//                if (TriangleTests::Intersects(LocalStart, LocalDirection, A, B, C, triDist) && triDist < localDist) {
-//                    localDist = triDist;
-//                    materialIndex = subset.materialIndex;
+//                DirectX::XMVECTOR A = DirectX::XMLoadFloat3(&a.position);
+//                DirectX::XMVECTOR B = DirectX::XMLoadFloat3(&b.position);
+//                DirectX::XMVECTOR C = DirectX::XMLoadFloat3(&c.position);
 //
-//                    XMVECTOR HitLocalPos = XMVectorAdd(LocalStart, XMVectorScale(LocalDirection, triDist));
-//                    XMVECTOR HitWorldPos = XMVector3TransformCoord(HitLocalPos, WorldTransform);
-//                    XMVECTOR HitNormal = XMVector3Normalize(XMVector3TransformNormal(XMVector3Cross(XMVectorSubtract(B, A), XMVectorSubtract(C, A)), WorldTransform));
+//                DirectX::XMVECTOR AB = DirectX::XMVectorSubtract(B, A);
+//                DirectX::XMVECTOR BC = DirectX::XMVectorSubtract(C, B);
+//                DirectX::XMVECTOR CA = DirectX::XMVectorSubtract(A, C);
 //
-//                    XMStoreFloat3(&result.position, HitWorldPos);
-//                    XMStoreFloat3(&result.normal, HitNormal);
-//                    result.distance = XMVectorGetX(XMVector3Length(XMVectorSubtract(HitWorldPos, WorldStart)));
-//                    result.materialIndex = materialIndex;
-//                    hit = true;
-//                }
+//                // 三角形の法線ベクトルを算出
+//                DirectX::XMVECTOR N = DirectX::XMVector3Cross(AB, BC);
+//
+//                // 内積の結果がプラスならば裏向き
+//                DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(V, N);
+//                float d;
+//                DirectX::XMStoreFloat(&d, Dot);
+//                if (d >= 0) continue;
+//
+//                // レイと平面の交点を算出
+//                DirectX::XMVECTOR SA = DirectX::XMVectorSubtract(A, S);
+//                DirectX::XMVECTOR X = DirectX::XMVectorDivide(DirectX::XMVector3Dot(SA, N), Dot);
+//                float x;
+//                DirectX::XMStoreFloat(&x, X);
+//
+//                // 交点までの距離が今までに計算した最近距離より大きいときはスキップ
+//                if (x < .0f || x > neart) continue;
+//
+//                DirectX::XMVECTOR P = DirectX::XMVectorAdd(S, DirectX::XMVectorMultiply(V, X));
+//
+//                // 交点が三角形の内側にあるか判定
+//                // １つめ
+//                DirectX::XMVECTOR PA = DirectX::XMVectorSubtract(A, P);
+//                DirectX::XMVECTOR Cross1 = DirectX::XMVector3Cross(PA, AB);
+//                DirectX::XMVECTOR Dot1 = DirectX::XMVector3Dot(N, Cross1);
+//                float d1;
+//                DirectX::XMStoreFloat(&d1, Dot1);
+//                if (d1 < 0.0f) continue;
+//
+//                // ２つめ
+//                DirectX::XMVECTOR PB = DirectX::XMVectorSubtract(B, P);
+//                DirectX::XMVECTOR Cross2 = DirectX::XMVector3Cross(PB, BC);
+//                DirectX::XMVECTOR Dot2 = DirectX::XMVector3Dot(N, Cross2);
+//                float d2;
+//                DirectX::XMStoreFloat(&d2, Dot2);
+//                if (d2 < 0.0f) continue;
+//
+//                // ３つめ
+//                DirectX::XMVECTOR PC = DirectX::XMVectorSubtract(C, P);
+//                DirectX::XMVECTOR Cross3 = DirectX::XMVector3Cross(PC, CA);
+//                DirectX::XMVECTOR Dot3 = DirectX::XMVector3Dot(N, Cross3);
+//                float d3;
+//                DirectX::XMStoreFloat(&d3, Dot3);
+//                if (d3 < 0.0f) continue;
+//
+//                // 最近距離を更新
+//                neart = x;
+//
+//                // 交点と法線を更新
+//                HitPosition = P;
+//                HitNormal = N;
+//                materialIndex = subset.materialIndex;
+//            }
+//        }
+//
+//        if (materialIndex >= 0)
+//        {
+//            // ローカル空間からワールド空間へと変換
+//            DirectX::XMVECTOR WorldPosition = DirectX::XMVector3TransformCoord(HitPosition,
+//                WorldTransform);
+//            DirectX::XMVECTOR WorldCrossVec = DirectX::XMVectorSubtract(WorldPosition,
+//                WorldStart);
+//            DirectX::XMVECTOR WorldCrossLength = DirectX::XMVector3Length(WorldCrossVec);
+//            float distance;
+//            DirectX::XMStoreFloat(&distance, WorldCrossLength);
+//
+//            // ヒット情報保存
+//            if (result.distance > distance)
+//            {
+//                DirectX::XMVECTOR WorldNormal = DirectX::XMVector3TransformNormal(HitNormal,
+//                    WorldTransform);
+//
+//                result.distance = distance;
+//                result.materialIndex = materialIndex;
+//                DirectX::XMStoreFloat3(&result.position, WorldPosition);
+//                DirectX::XMStoreFloat3(&result.normal,
+//                    DirectX::XMVector3Normalize(WorldNormal));
+//                hit = true;
 //            }
 //        }
 //    }
-//
 //    return hit;
 //}
+
+
+bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const Model* model, HitResult& result)
+{
+    using namespace DirectX;
+
+    // 初期化
+    XMVECTOR WorldStart = XMLoadFloat3(&start);
+    XMVECTOR WorldEnd = XMLoadFloat3(&end);
+    XMVECTOR WorldRayVec = XMVectorSubtract(WorldEnd, WorldStart);
+    float distance = XMVectorGetX(XMVector3Length(WorldRayVec));
+    XMVECTOR Direction = XMVector3Normalize(WorldRayVec);
+    result.distance = distance;
+    bool hit = false;
+
+    // 1. 空間分割（AABB領域の検査）
+    const auto& collisionMesh = StageMain::Instance().GetCollisionMesh();
+
+    for (const auto& area : collisionMesh.areas) {
+        float aabbDist = distance;
+        if (!area.boundingBox.Intersects(WorldStart, Direction, aabbDist)) continue;
+
+        // エリア内の三角形を検査
+        for (const auto& triangleIndex : area.triangleIndices) {
+            const auto& triangle = collisionMesh.triangles[triangleIndex];
+            XMVECTOR A = XMLoadFloat3(&triangle.positions[0]);
+            XMVECTOR B = XMLoadFloat3(&triangle.positions[1]);
+            XMVECTOR C = XMLoadFloat3(&triangle.positions[2]);
+
+            float triDist = distance;  // 初期値を設定
+            if (TriangleTests::Intersects(WorldStart, Direction, A, B, C, triDist)) {
+                if (triDist < result.distance) {  // 最も近い衝突点を更新
+                    result.distance = triDist;
+                    DirectX::XMStoreFloat3(&result.position, XMVectorAdd(WorldStart, XMVectorScale(Direction, triDist)));
+                    result.normal = triangle.normal;  // 三角形の法線をコピー
+                    hit = true;
+                }
+            }
+        }
+    }
+
+    return hit;
+}
 

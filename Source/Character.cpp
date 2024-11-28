@@ -266,6 +266,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
     float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
     if (velocityLengthXZ > 0.0f)
     {
+
         //水平移動値
         float mx = velocity.x * elapsedTime;
         float mz = velocity.z * elapsedTime;
@@ -289,6 +290,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
             DirectX::XMVECTOR End = DirectX::XMLoadFloat3(&end);
             DirectX::XMVECTOR Vec = DirectX::XMVectorSubtract(End, Start);
             DirectX::XMVECTOR Normal = DirectX::XMLoadFloat3(&hit.normal);
+
             //入射ベクトルを法線に射影
             Normal = DirectX::XMVector3Normalize(Normal);
             DirectX::XMVECTOR Dot = DirectX::XMVector3Dot(DirectX::XMVectorNegate(Vec), Normal);
@@ -317,6 +319,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
                     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(currentPosition, offset);
                     DirectX::XMFLOAT3 newpos;
                     DirectX::XMStoreFloat3(&newpos, newPosition);
+
                     position.x = newpos.x;
                     position.z = newpos.z;
 
@@ -392,7 +395,6 @@ void Character::Turn(float elapsedTime, float vx, float vz, float speed)
     {
         angle.y += rot * 0.5f;
     }
-
 
 
 }

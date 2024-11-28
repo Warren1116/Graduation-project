@@ -34,7 +34,6 @@ StageMain::StageMain()
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
 
-    //model = std::make_unique<Model>("Data/Model/City/123.mdl");
     //model = std::make_unique<Model>("Data/Model/City/city_fixed3.mdl");
     //position = { 10.0f, -50.0f, 25.0f };
     //scale.x = scale.y = scale.z = 0.04f;

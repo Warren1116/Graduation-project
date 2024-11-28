@@ -138,7 +138,6 @@ void SceneGame::Initialize()
     for (Model* model : list)
     {
         RegisterRenderModel(model);
-
     }
 
 
@@ -221,12 +220,11 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
-
+    Graphics& graphics = Graphics::Instance();
 
     //// イベントスクリプト初期化
     //EventScripter::Instance().Update(elapsedTime);
 
-    Graphics& graphics = Graphics::Instance();
     //  UI更新処理
     UI::Instance().Update(elapsedTime);
 
@@ -265,6 +263,7 @@ void SceneGame::Update(float elapsedTime)
 
     // カメラコントローラー更新処理
     Camera& camera = Camera::Instance();
+
     cameraController->Update(elapsedTime);
 
 #ifdef DEBUG

@@ -29,6 +29,7 @@ public:
 	const DirectX::XMFLOAT3& GetRight() const { return { transform._11, transform._12, transform._13 }; }
 	const DirectX::XMFLOAT3& GetUp() const { return { transform._21, transform._22, transform._23 }; }
 	const DirectX::XMFLOAT3& GetFront() const { return { transform._31, transform._32, transform._33 }; }
+
 	// ˆÊ’uÝ’è
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
 
@@ -155,5 +156,7 @@ protected:
 
 	float fallStartHeight = 0.0f;
 	float landingHeightThreshold = 1.0f;
+
+
 };
 

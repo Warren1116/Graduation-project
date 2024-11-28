@@ -217,7 +217,6 @@ private:
 		Anim_Climb,
 		Anim_Landing,
 		Anim_Jump,
-		Anim_ClimbDown,
 		Anim_HoldInWall,
 		Anim_Attack,
 		Anim_Attack2,
@@ -228,6 +227,7 @@ private:
 		Anim_Shoting,
 		Anim_Dodge,
 		Anim_ClimbUpWall,
+		Anim_ClimbDown,
 	};
 
 
@@ -281,8 +281,10 @@ private:
 	const float MAX_LOCKON_DISTANCE = 15.0f;
 
 private:
+	//壁当たり判定のチェック
 	DirectX::XMFLOAT3 checkpos;
 	DirectX::XMVECTOR checkDirection;
+
 
 	//糸用
 	//	スイングポイントの位置
