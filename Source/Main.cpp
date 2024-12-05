@@ -35,29 +35,29 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	wcex.hIconSm = 0;
 	RegisterClassEx(&wcex);
 
-	//　Window用
-	RECT rc = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-	HWND hWnd = CreateWindow(_T("Game"), _T(""), WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
-	ShowWindow(hWnd, cmd_show);
-
-	Framework f(hWnd);
-	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));
-	return f.Run();
-
-	////FullScreen用
-	//HMONITOR hPrimaryMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
-	//MONITORINFO monitorInfo = { sizeof(monitorInfo) };
-	//GetMonitorInfo(hPrimaryMonitor, &monitorInfo);
-	//RECT rc = monitorInfo.rcMonitor;
-
-	//LONG screenWidth = rc.right - rc.left;
-	//LONG screenHeight = rc.bottom - rc.top;
-
-	//HWND hWnd = CreateWindow(_T("Game"), _T(""), WS_POPUP | WS_VISIBLE, rc.left, rc.top, screenWidth, screenHeight, NULL, NULL, instance, NULL);
+	////　Window用
+	//RECT rc = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	//AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+	//HWND hWnd = CreateWindow(_T("Game"), _T(""), WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX ^ WS_THICKFRAME | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, instance, NULL);
 	//ShowWindow(hWnd, cmd_show);
 
 	//Framework f(hWnd);
 	//SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));
 	//return f.Run();
+
+	//FullScreen用
+	HMONITOR hPrimaryMonitor = MonitorFromWindow(NULL, MONITOR_DEFAULTTOPRIMARY);
+	MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+	GetMonitorInfo(hPrimaryMonitor, &monitorInfo);
+	RECT rc = monitorInfo.rcMonitor;
+
+	LONG screenWidth = rc.right - rc.left;
+	LONG screenHeight = rc.bottom - rc.top;
+
+	HWND hWnd = CreateWindow(_T("Game"), _T(""), WS_POPUP | WS_VISIBLE, rc.left, rc.top, screenWidth, screenHeight, NULL, NULL, instance, NULL);
+	ShowWindow(hWnd, cmd_show);
+
+	Framework f(hWnd);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&f));
+	return f.Run();
 }

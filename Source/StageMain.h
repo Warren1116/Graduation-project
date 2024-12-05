@@ -81,5 +81,7 @@ private:
 	DirectX::XMFLOAT4X4 transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	CollisionMesh						collisionMesh;
 
+	DirectX::XMFLOAT3 volumeMin, volumeMax;
+
 
 };

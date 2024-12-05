@@ -3,6 +3,9 @@
 #include "Input/Input.h"
 #include "EnemyManager.h"
 #include "Camera.h"
+#include "Player.h"
+#include <algorithm>
+
 
 static  StageMain* instance = nullptr;
 int stageNum = -1;
@@ -30,13 +33,12 @@ StageMain::StageMain()
 
     instance = this;
     // ステージモデルの読み込み
-    model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
+    model = std::make_unique<Model>("Data/Model/ExampleStage/a.mdl");
+
+    //model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
 
-    //model = std::make_unique<Model>("Data/Model/City/city_fixed3.mdl");
-    //position = { 10.0f, -50.0f, 25.0f };
-    //scale.x = scale.y = scale.z = 0.04f;
 
     angle.y = DirectX::XMConvertToRadians(0);
     //angle.y = DirectX::XMConvertToRadians(180);
@@ -99,7 +101,6 @@ StageMain::StageMain()
     }
 
     // モデル全体のAABB
-    DirectX::XMFLOAT3 volumeMin, volumeMax;
     DirectX::XMStoreFloat3(&volumeMin, VolumeMin);
     DirectX::XMStoreFloat3(&volumeMax, VolumeMax);
 
@@ -149,6 +150,17 @@ StageMain::~StageMain()
 // 更新処理
 void StageMain::Update(float elapsedTime)
 {
+    DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
+
+if (playerPos.x < volumeMin.x || playerPos.x > volumeMax.x
+    || playerPos.y < volumeMin.y || playerPos.y > volumeMax.y
+    || playerPos.z < volumeMin.z || playerPos.z > volumeMax.z)
+{
+    DirectX::XMFLOAT3 clampedPos = playerPos;
+    clampedPos.x = std::clamp(playerPos.x, volumeMin.x, volumeMax.x);
+    clampedPos.z = std::clamp(playerPos.z, volumeMin.z, volumeMax.z);
+    Player::Instance().SetPosition(clampedPos);
+}
     UpdateTransform();
     model->UpdateTransform(transform);
 }
