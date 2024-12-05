@@ -90,49 +90,56 @@ void SceneGame::Initialize()
 
     //　プレイヤー生成
     player = std::make_unique<Player>(true);
-    player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(45), 0));
-    player->SetPosition({ 0,0,25 });
+    player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
+    //player->SetPosition({ 0,0,25 });
+    player->SetPosition({ 66,0,42 });
     // エネミー初期化
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
-    // スライム（ステートマシン用）
-    EnemyThief* people = new EnemyThief();
-    people->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
-    people->SetTerritory(people->GetPosition(), 10.0f);
-    enemyManager.Register(people);
+    // 敵を初期化
+    EnemyThief* thief = new EnemyThief();
+    thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+    thief->SetTerritory(thief->GetPosition(), 10.0f);
+    thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+    enemyManager.Register(thief);
 
     ////	通信相手用に１匹増やす
-    EnemyThief* people2 = new EnemyThief();
-    people2->SetPosition(DirectX::XMFLOAT3(3.0f, 0.0f, -25.0f));
-    people2->SetTerritory(people2->GetPosition(), 10.0f);
-    enemyManager.Register(people2);
+    EnemyThief* thief2 = new EnemyThief();
+    thief2->SetPosition(DirectX::XMFLOAT3(41.0f, 0.0f, 39.0f));
+    thief2->SetTerritory(thief2->GetPosition(), 10.0f);
+    thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    enemyManager.Register(thief2);
 
-    EnemyThief* people3 = new EnemyThief();
-    people3->SetPosition(DirectX::XMFLOAT3(7.0f, 0.0f, -25.0f));
-    people3->SetTerritory(people3->GetPosition(), 10.0f);
-    enemyManager.Register(people3);
+    EnemyThief* thief3 = new EnemyThief();
+    thief3->SetPosition(DirectX::XMFLOAT3(38.0f, 0.0f, 44.0f));
+    thief3->SetTerritory(thief3->GetPosition(), 10.0f);
+    thief3->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    enemyManager.Register(thief3);
 
-    EnemyThief* people4 = new EnemyThief();
-    people4->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -25.0f));
-    people4->SetTerritory(people4->GetPosition(), 10.0f);
-    enemyManager.Register(people4);
+    EnemyThief* thief4 = new EnemyThief();
+    thief4->SetPosition(DirectX::XMFLOAT3(37.0f, 0.0f, 35.0f));
+    thief4->SetTerritory(thief4->GetPosition(), 10.0f);
+    thief4->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    enemyManager.Register(thief4);
 
-    EnemyThief* people5 = new EnemyThief();
-    people5->SetPosition(DirectX::XMFLOAT3(10.0f, 0.0f, -21.0f));
-    people5->SetTerritory(people5->GetPosition(), 10.0f);
-    enemyManager.Register(people5);
+    EnemyThief* thief5 = new EnemyThief();
+    thief5->SetPosition(DirectX::XMFLOAT3(42.0f, 0.0f, 37.0f));
+    thief5->SetTerritory(thief5->GetPosition(), 10.0f);
+    thief5->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    enemyManager.Register(thief5);
+
 
     //	モデルを各レンダラーに登録
     Model* list[] =
     {
         player->model.get(),
         stageMain->GetModel(),
-        people->GetModel(),
-        people2->GetModel(),
-        people3->GetModel(),
-        people4->GetModel(),
-        people5->GetModel(),
+        thief->GetModel(),
+        thief2->GetModel(),
+        thief3->GetModel(),
+        thief4->GetModel(),
+        thief5->GetModel(),
 
     };
     for (Model* model : list)
@@ -151,13 +158,11 @@ void SceneGame::Initialize()
         cameraController = std::make_unique<CameraController>();
 
         // エネミー初期化
-        characterManager.Register(people);
-        characterManager.Register(people2);
-        characterManager.Register(people3);
-        characterManager.Register(people4);
-        characterManager.Register(people5);
-
-
+        characterManager.Register(thief);
+        characterManager.Register(thief2);
+        characterManager.Register(thief3);
+        characterManager.Register(thief4);
+        characterManager.Register(thief5);
     }
 
 

@@ -45,6 +45,12 @@ Player::Player(bool flag)
 
     hitEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
 
+
+    punch = Audio::Instance().LoadAudioSource("Data/Audio/punch.wav");
+    punch2 = Audio::Instance().LoadAudioSource("Data/Audio/punch2.wav");
+    kick = Audio::Instance().LoadAudioSource("Data/Audio/kick.wav");
+
+
     // 待機ステートへ遷移
     TransitionIdleState();
 
@@ -332,6 +338,18 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                         enemyPos.y += enemy->GetHeight() * 0.5f;
                         if (enemy->GetHealth() != 0)
                         {
+                            switch (attackCount)
+                            {
+                            case 1:
+                                punch->Play(false);
+                                break;
+                            case 2:
+                                punch2->Play(false);
+                                break;
+                            case 3:
+                                kick->Play(false);
+                                break;
+                            }
                             hitEffect->Play(enemyPos);
                         }
                     }

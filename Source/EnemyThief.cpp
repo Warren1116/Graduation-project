@@ -30,8 +30,8 @@ EnemyThief::EnemyThief()
 	stateMachine->RegisterState(new RecieveState(this));
 
 	// 各親ステートにサブステートを登録(WanderState以外の2層目のステートも同様の方法で各自追加してください。)
-	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new IdleState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new WanderState(this));
+	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new IdleState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PursuitState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new AttackState(this));
 	stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PunchState(this));

@@ -250,6 +250,9 @@ private:
 	float jumpSpeed = 16.0f;
 	//　ヒットエフェクト
 	std::unique_ptr<Effect> hitEffect = nullptr;
+	std::unique_ptr<AudioSource> punch = nullptr;
+	std::unique_ptr<AudioSource> punch2 = nullptr;
+	std::unique_ptr<AudioSource> kick = nullptr;
 
 	// ステート
 	State state = State::Idle;
