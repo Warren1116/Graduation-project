@@ -134,6 +134,8 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 
 	// ” ƒƒbƒVƒ…ì¬
 	CreateBoxMesh(device, 1.0f, 1.0f, 1.0f);
+
+	CreateTriangleMesh(device);
 }
 
 // •`‰æŠJŽn
@@ -264,6 +266,22 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 	}
 	boxs.clear();
 
+	//ŽOŠpŒ`•`‰æ
+	context->IASetVertexBuffers(0, 1, triangleVertexBuffer.GetAddressOf(), &stride, &offset);
+	context->IASetInputLayout(inputLayout.Get());
+	for (const Triangle& triangle : triangles)
+	{
+
+		UINT stride = sizeof(DirectX::XMFLOAT3);
+		UINT offset = 0;
+
+		context->IASetIndexBuffer(triangleIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		context->DrawIndexed(3, 0, 0);
+	}
+	triangles.clear();
 }
 
 // ‹…•`‰æ
@@ -307,6 +325,19 @@ void DebugRenderer::DrawBox(const DirectX::XMFLOAT3& position, const DirectX::XM
 	box.color = color;
 	boxs.emplace_back(box);
 }
+
+void DebugRenderer::DrawTriangle(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2, const DirectX::XMFLOAT3& v3, const DirectX::XMFLOAT4& color)
+{
+	Triangle triangle;
+	triangle.v1 = v1;
+	triangle.v2 = v2;
+	triangle.v3 = v3;
+	triangle.color = color;
+
+	triangles.push_back(triangle);
+}
+
+
 
 
 // ‹…ƒƒbƒVƒ…ì¬
@@ -569,4 +600,39 @@ void DebugRenderer::CreateBoxMesh(ID3D11Device* device, float width, float heigh
 
 	HRESULT hr = device->CreateBuffer(&desc, &subresourceData, boxVertexBuffer.GetAddressOf());
 	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr)); 
+}
+
+void DebugRenderer::CreateTriangleMesh(ID3D11Device* device)
+{
+	DirectX::XMFLOAT3 vertices[] = {
+		{ 0.0f,  1.0f, 0.0f },  
+		{ 1.0f, -1.0f, 0.0f },  
+		{ -1.0f, -1.0f, 0.0f },
+	};
+
+	DWORD indices[] = { 0, 1, 2 };
+
+	D3D11_BUFFER_DESC vertexBufferDesc = {};
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(vertices);
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA vertexData = {};
+	vertexData.pSysMem = vertices;
+
+	HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexData, triangleVertexBuffer.GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+	D3D11_BUFFER_DESC indexBufferDesc = {};
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.ByteWidth = sizeof(indices);
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA indexData = {};
+	indexData.pSysMem = indices;
+
+	hr = device->CreateBuffer(&indexBufferDesc, &indexData, triangleIndexBuffer.GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 }

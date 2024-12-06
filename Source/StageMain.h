@@ -79,7 +79,7 @@ private:
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 0.01f, 0.01f, 0.01f };
 	DirectX::XMFLOAT4X4 transform = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-	CollisionMesh						collisionMesh;
+	CollisionMesh	collisionMesh;
 
 	DirectX::XMFLOAT3 volumeMin, volumeMax;
 

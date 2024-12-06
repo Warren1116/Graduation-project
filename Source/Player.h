@@ -204,6 +204,10 @@ private:
 
 	bool IsNearWallTop();
 
+	//void Player::ApplySwingPhysics(float elapsedTime, DirectX::XMVECTOR P, DirectX::XMVECTOR Q, DirectX::XMVECTOR displacement);
+	void InitializeSwingPoint();
+	void ApplySwingPhysics(float elapsedTime);
+	void SmoothUpdatePosition(float elapsedTime);
 
 private:
 	//アニメーション

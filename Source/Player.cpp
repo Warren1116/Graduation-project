@@ -875,7 +875,7 @@ void Player::TransitionIdleState()
 // 待機ステート更新処理
 void Player::UpdateIdleState(float elapsedTime)
 {
-
+    lastState = state;
     //移動入力処理
     if (InputMove(elapsedTime))
     {
@@ -931,7 +931,7 @@ void Player::UpdateMoveState(float elapsedTime)
     //  移動中SHIFTキー同時に押すと
     if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime) && firstSwing)
     {
-        lastState = State::Move;
+        lastState = state;
         TransitionSwingState();
     }
 
@@ -992,7 +992,7 @@ void Player::UpdateJumpState(float elapsedTime)
     //  ジャンブ中移動とSHIFTキー同時に押すと
     if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime))
     {
-        lastState = State::Jump;
+        lastState = state;
         //  スイングステートへの遷移
         TransitionSwingState();
     }
@@ -1283,18 +1283,25 @@ void Player::TransitionSwingState()
         {
             model->PlayAnimation(Anim_StartSwing, false);
             firstSwing = false;
-
-        }
-        else
-        {
-            model->PlayAnimation(Anim_Swinging, false);
-            SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
+            //  スイングモデル（現在仮、Geometricに変更予定）
+            SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
             SceneGame& sceneGame = SceneGame::Instance();
             if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
                 //  レンダラーに登録
-                sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+                sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
+        }
+        else
+        {
+            //model->PlayAnimation(Anim_Swinging, false);
+            //SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
+            //SceneGame& sceneGame = SceneGame::Instance();
+            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+            //{
+            //    //  レンダラーに登録
+            //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+            //}
 
         }
 
@@ -1306,10 +1313,9 @@ void Player::TransitionSwingState()
         upVec = DirectX::XMVector3Normalize(upVec);
 
         forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
-        upVec = DirectX::XMVectorScale(upVec, 10.0f);
+        upVec = DirectX::XMVectorScale(upVec, 11.0f);
 
         swingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
-
         DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
         SwingPoint = DirectX::XMVectorAdd(SwingPoint, swingwebDirection);
 
@@ -1318,22 +1324,13 @@ void Player::TransitionSwingState()
 
         onSwing = true;
 
-        //  スイングモデル（現在仮、Geometricに変更予定）
-        SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
-        SceneGame& sceneGame = SceneGame::Instance();
-        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-        {
-            //  レンダラーに登録
-            sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-        }
+
     }
     else if (lastState == State::Jump)
     {
-        //  連続スイングのモーション
+          //連続スイングのモーション
         if (!onSwing)
         {
-            model->PlayAnimation(Anim_Swinging2, false);
-
             //  スイングモデル（現在仮、Geometricに変更予定）
             SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
             SceneGame& sceneGame = SceneGame::Instance();
@@ -1344,7 +1341,7 @@ void Player::TransitionSwingState()
             }
 
         }
-        else //　初回スイングのモーション  
+         //　初回スイングのモーション  
         {
             model->PlayAnimation(Anim_Swinging, false);
 
@@ -1356,8 +1353,6 @@ void Player::TransitionSwingState()
                 //  レンダラーに登録
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
-
-
         }
         //  スイング糸の貼り付けるのPosition(仮空中)
         //  プレイヤーの前方上に設定
@@ -1367,7 +1362,7 @@ void Player::TransitionSwingState()
         upVec = DirectX::XMVector3Normalize(upVec);
 
         forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
-        upVec = DirectX::XMVectorScale(upVec, 8.5f);
+        upVec = DirectX::XMVectorScale(upVec, 9.5f);
 
         swingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
 
@@ -1386,12 +1381,14 @@ void Player::TransitionSwingState()
 //  スイングステートの更新処理
 void Player::UpdateSwingState(float elapsedTime)
 {
+    // スイング中壁にぶつかった時の処理
     float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
     if (velocityLengthXZ > 0.0f) 
     {
         float mx = velocity.x * elapsedTime;
         float mz = velocity.z * elapsedTime;
 
+        //レイを設定
         DirectX::XMFLOAT3 start = position;
         DirectX::XMFLOAT3 end = {
             position.x + mx,
@@ -1400,6 +1397,7 @@ void Player::UpdateSwingState(float elapsedTime)
         };
         float distance = sqrtf(mx * mx + mz * mz);
 
+        //そして判定を精度を上げるため、レイを分割して判定を行う
         int steps = static_cast<int>(distance / 0.5f);
         steps = max(steps, 5); 
         HitResult hit;
@@ -1407,6 +1405,7 @@ void Player::UpdateSwingState(float elapsedTime)
         const int raySamples = 5;  
         float angleStep = DirectX::XM_2PI / raySamples;
 
+        //簡易版のスフィアキャストを作る
         for (int step = 0; step <= steps; ++step) {
             float t = step / static_cast<float>(steps);
             DirectX::XMVECTOR currentPoint = DirectX::XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
@@ -1419,6 +1418,7 @@ void Player::UpdateSwingState(float elapsedTime)
                 DirectX::XMFLOAT3 offsetPoint;
                 DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
 
+                //レイを飛ばす
                 if (StageManager::Instance().RayCast(position, offsetPoint, hit)) 
                 {
                     DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
@@ -1429,6 +1429,7 @@ void Player::UpdateSwingState(float elapsedTime)
 
                     DirectX::XMStoreFloat3(&position, adjustedPosition);
 
+                    //当たったらクライミングステートへの変更
                     onClimb = true;
                     TransitionIdleState();
                     velocity.x = 0;
@@ -1438,12 +1439,19 @@ void Player::UpdateSwingState(float elapsedTime)
             }
         }
         position = end;
-    
     }
 
+    //連続スイングのモーション
     if (!model->IsPlayAnimation())
     {
-        model->PlayAnimation(Anim_Swinging2, true);
+        SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
+        SceneGame& sceneGame = SceneGame::Instance();
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        {
+            //  レンダラーに登録
+            sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+            model->PlayAnimation(Anim_Swinging, true);
+        }
     }
 
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -1478,14 +1486,21 @@ void Player::UpdateSwingState(float elapsedTime)
     {
         float correctionFactor = (currentLength - ropeLength) * 0.5f;
         DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-        Q = DirectX::XMVectorAdd(Q, correction);
+        //Q = DirectX::XMVectorAdd(Q, correction);
+
+        DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
+
+        float smoothFactor = 0.1f;
+        Q = DirectX::XMVectorLerp(Q, targetPosition, smoothFactor);
     }
 
     DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(velocityVec, DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
 
+    //スイング最高点の判定
+    //前方のベクトルの取得
     DirectX::XMFLOAT3 front = GetFront();
     DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
-
+    //もし最高点に着いたら、連続スイングを行う
     float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
     if (dotProduct <= 0)
     {
@@ -1499,12 +1514,12 @@ void Player::UpdateSwingState(float elapsedTime)
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
+    
     if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
     {
         TransitionIdleState();
-        velocity.x = 0;
-        velocity.y = 0;
-        velocity.z = 0;
+        velocity = { 0,0,0 };
+        firstSwing = true;
     }
 }
 

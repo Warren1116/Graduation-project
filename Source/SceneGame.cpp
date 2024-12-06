@@ -330,7 +330,6 @@ void SceneGame::Render()
     rc.view = camera.GetView();
     rc.projection = camera.GetProjection();
 
-
     //2Dスプライト描画
     {
         UI::Instance().DrawUI(dc, rc.view, rc.projection);

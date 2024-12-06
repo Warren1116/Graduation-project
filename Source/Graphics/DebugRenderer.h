@@ -27,6 +27,8 @@ public:
     // 箱描画
     void DrawBox(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT3& angle, const DirectX::XMFLOAT3& size, const DirectX::XMFLOAT4& color);
 
+    //三角形描画
+    void DrawTriangle(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2, const DirectX::XMFLOAT3& v3, const DirectX::XMFLOAT4& color);
 
 private:
     // 球メッシュ作成
@@ -41,6 +43,8 @@ private:
     // 箱メッシュ作成
     void CreateBoxMesh(ID3D11Device* device, float width, float height, float depth);
 
+    // 三角形メッシュ作成
+    void CreateTriangleMesh(ID3D11Device* device);
 
 private:
     struct CbMesh
@@ -87,12 +91,25 @@ private:
         DirectX::XMFLOAT3 size;
     };
 
+    struct Triangle
+    {
+        DirectX::XMFLOAT4 color;
+        DirectX::XMFLOAT3 v1;
+        DirectX::XMFLOAT3 v2;
+        DirectX::XMFLOAT3 v3;
+    };
+    std::vector<Triangle> triangles;
+
+
     Microsoft::WRL::ComPtr<ID3D11Buffer>			sphereVertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			cylinderVertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			squareVertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			arrowVertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			boxVertexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>            triangleVertexBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>            triangleIndexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			constantBuffer;
+
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>		vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>		pixelShader;
