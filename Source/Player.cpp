@@ -1038,7 +1038,6 @@ void Player::TransitionClimbWallState()
 //  クライミングステートへの遷移
 void Player::UpdateClimbWallState(float elapsedTime)
 {
-
     //　クライミング中Spaceキー押せば元の状態に戻る
     if (InputJump())
     {
@@ -1055,7 +1054,6 @@ void Player::UpdateClimbWallState(float elapsedTime)
     {
         TransitionClimbTopState();
     }
-
 
     else
     {
@@ -1328,7 +1326,7 @@ void Player::TransitionSwingState()
     }
     else if (lastState == State::Jump)
     {
-          //連続スイングのモーション
+        //連続スイングのモーション
         if (!onSwing)
         {
             //  スイングモデル（現在仮、Geometricに変更予定）
@@ -1341,7 +1339,7 @@ void Player::TransitionSwingState()
             }
 
         }
-         //　初回スイングのモーション  
+        //　初回スイングのモーション  
         {
             model->PlayAnimation(Anim_Swinging, false);
 
@@ -1383,7 +1381,7 @@ void Player::UpdateSwingState(float elapsedTime)
 {
     // スイング中壁にぶつかった時の処理
     float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
-    if (velocityLengthXZ > 0.0f) 
+    if (velocityLengthXZ > 0.0f)
     {
         float mx = velocity.x * elapsedTime;
         float mz = velocity.z * elapsedTime;
@@ -1399,10 +1397,10 @@ void Player::UpdateSwingState(float elapsedTime)
 
         //そして判定を精度を上げるため、レイを分割して判定を行う
         int steps = static_cast<int>(distance / 0.5f);
-        steps = max(steps, 5); 
+        steps = max(steps, 5);
         HitResult hit;
 
-        const int raySamples = 5;  
+        const int raySamples = 5;
         float angleStep = DirectX::XM_2PI / raySamples;
 
         //簡易版のスフィアキャストを作る
@@ -1419,7 +1417,7 @@ void Player::UpdateSwingState(float elapsedTime)
                 DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
 
                 //レイを飛ばす
-                if (StageManager::Instance().RayCast(position, offsetPoint, hit)) 
+                if (StageManager::Instance().RayCast(position, offsetPoint, hit))
                 {
                     DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
 
@@ -1434,7 +1432,8 @@ void Player::UpdateSwingState(float elapsedTime)
                     TransitionIdleState();
                     velocity.x = 0;
                     velocity.z = 0;
-                    return;  
+                    velocity.y = 0;
+                    return;
                 }
             }
         }
@@ -1512,9 +1511,12 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMStoreFloat3(&position, newPosition);
     DirectX::XMStoreFloat3(&velocity, tangentVelocity);
 
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    //キャラクターの向きを更新
+    DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
+        DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
+    DirectX::XMStoreFloat3(&front, swingDir);
 
-    
+    GamePad& gamePad = Input::Instance().GetGamePad();
     if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
     {
         TransitionIdleState();
