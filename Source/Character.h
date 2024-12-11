@@ -153,10 +153,10 @@ protected:
 	bool onClimb = false;
 	bool CanClimb = false;
 	bool onSwing = false;
+	bool isThrown = false;
 
 	float fallStartHeight = 0.0f;
 	float landingHeightThreshold = 1.0f;
-
 
 };
 

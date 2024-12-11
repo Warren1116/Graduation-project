@@ -20,6 +20,23 @@
 // プレイヤー
 class Player : public Character
 {
+private:
+	struct CollisionMesh
+	{
+		struct Triangle
+		{
+			DirectX::XMFLOAT3	positions[3];
+			DirectX::XMFLOAT3	normal;
+		};
+		std::vector<Triangle>	triangles;
+
+		struct Area
+		{
+			DirectX::BoundingBox	boundingBox;
+			std::vector<int>		triangleIndices;
+		};
+		std::vector<Area>		areas;
+	};
 public:
 	Player(bool flag);
 	~Player();
@@ -75,8 +92,10 @@ public:
 	bool GetAttackSoon() { return getAttacksoon; }
 	void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
 
+	bool GetIsUseGrab() { return IsUseGrab; }
 	std::unique_ptr<Model> model = nullptr;
 
+	float GetWebTimer() const { return webTimer; }
 
 	// ステート
 	enum class State
@@ -94,6 +113,7 @@ public:
 		Swing,
 		Shot,
 		ClimbTop,
+		Grab,
 
 		EventMode,
 	};
@@ -202,12 +222,18 @@ private:
 	//	登るステートの更新
 	void UpdateClimbTopState(float elapsedTime);
 
+	//	投げ技ステートへ遷移
+	void TransitionGrabState();
+
+	//	投げ技ステートの更新
+	void UpdateGrabState(float elapsedTime);
+
+	//	壁端っこの判定
 	bool IsNearWallTop();
 
-	//void Player::ApplySwingPhysics(float elapsedTime, DirectX::XMVECTOR P, DirectX::XMVECTOR Q, DirectX::XMVECTOR displacement);
-	void InitializeSwingPoint();
-	void ApplySwingPhysics(float elapsedTime);
-	void SmoothUpdatePosition(float elapsedTime);
+	//	スイングポイントを探す
+	bool FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistance, HitResult& result);
+
 
 private:
 	//アニメーション
@@ -232,6 +258,8 @@ private:
 		Anim_Dodge,
 		Anim_ClimbUpWall,
 		Anim_ClimbDown,
+		Anim_SwingToLand,
+		Anim_GrabAndDrop,
 	};
 
 
@@ -276,8 +304,10 @@ private:
 	float attackTimer = 0;
 	//	攻撃判定
 	bool attacking = false;
-
+	//攻撃予知
 	bool getAttacksoon = false;
+	//投げ技
+	bool IsUseGrab = false;
 
 	//カメラロック用
 	LockonState			lockonState = LockonState::NotLocked;
@@ -292,16 +322,18 @@ private:
 	DirectX::XMFLOAT3 checkpos;
 	DirectX::XMVECTOR checkDirection;
 
-
 	//糸用
 	//	スイングポイントの位置
 	DirectX::XMFLOAT3 swingPoint;
 	//	スイングポイントの方向
-	DirectX::XMVECTOR swingwebDirection;
+	DirectX::XMFLOAT3 swingwebDirection;
+	DirectX::XMVECTOR SwingwebDirection;
 	//	初回のスイングを判定
 	bool firstSwing = true;
 	//	前回のスイングポイントを記録
 	DirectX::XMFLOAT3 previousSwingPoint;
+	// 糸のタイマー
+	float webTimer;
 
 private:
 	// メッセージキー

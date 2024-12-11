@@ -111,23 +111,23 @@ void SceneGame::Initialize()
     thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
     enemyManager.Register(thief2);
 
-    EnemyThief* thief3 = new EnemyThief();
-    thief3->SetPosition(DirectX::XMFLOAT3(38.0f, 0.0f, 44.0f));
-    thief3->SetTerritory(thief3->GetPosition(), 10.0f);
-    thief3->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
-    enemyManager.Register(thief3);
+    //EnemyThief* thief3 = new EnemyThief();
+    //thief3->SetPosition(DirectX::XMFLOAT3(38.0f, 0.0f, 44.0f));
+    //thief3->SetTerritory(thief3->GetPosition(), 10.0f);
+    //thief3->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    //enemyManager.Register(thief3);
 
-    EnemyThief* thief4 = new EnemyThief();
-    thief4->SetPosition(DirectX::XMFLOAT3(37.0f, 0.0f, 35.0f));
-    thief4->SetTerritory(thief4->GetPosition(), 10.0f);
-    thief4->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
-    enemyManager.Register(thief4);
+    //EnemyThief* thief4 = new EnemyThief();
+    //thief4->SetPosition(DirectX::XMFLOAT3(37.0f, 0.0f, 35.0f));
+    //thief4->SetTerritory(thief4->GetPosition(), 10.0f);
+    //thief4->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    //enemyManager.Register(thief4);
 
-    EnemyThief* thief5 = new EnemyThief();
-    thief5->SetPosition(DirectX::XMFLOAT3(42.0f, 0.0f, 37.0f));
-    thief5->SetTerritory(thief5->GetPosition(), 10.0f);
-    thief5->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
-    enemyManager.Register(thief5);
+    //EnemyThief* thief5 = new EnemyThief();
+    //thief5->SetPosition(DirectX::XMFLOAT3(42.0f, 0.0f, 37.0f));
+    //thief5->SetTerritory(thief5->GetPosition(), 10.0f);
+    //thief5->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    //enemyManager.Register(thief5);
 
 
     //	モデルを各レンダラーに登録
@@ -137,9 +137,9 @@ void SceneGame::Initialize()
         stageMain->GetModel(),
         thief->GetModel(),
         thief2->GetModel(),
-        thief3->GetModel(),
-        thief4->GetModel(),
-        thief5->GetModel(),
+        //thief3->GetModel(),
+        //thief4->GetModel(),
+        //thief5->GetModel(),
 
     };
     for (Model* model : list)
@@ -157,12 +157,11 @@ void SceneGame::Initialize()
         // カメラコントローラー初期化
         cameraController = std::make_unique<CameraController>();
 
-        // エネミー初期化
-        characterManager.Register(thief);
-        characterManager.Register(thief2);
-        characterManager.Register(thief3);
-        characterManager.Register(thief4);
-        characterManager.Register(thief5);
+        //// エネミー初期化
+        for (int i = 0; i < enemyManager.GetEnemyCount(); i++) {
+            characterManager.Register(enemyManager.GetEnemy(i));
+        }
+
     }
 
 

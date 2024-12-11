@@ -135,6 +135,7 @@ bool Collision::IntersectRayVsModel(const DirectX::XMFLOAT3& start, const Direct
     XMVECTOR WorldRayVec = XMVectorSubtract(WorldEnd, WorldStart);
     float distance = XMVectorGetX(XMVector3Length(WorldRayVec));
     XMVECTOR Direction = XMVector3Normalize(WorldRayVec);
+
     result.distance = distance;
     bool hit = false;
 

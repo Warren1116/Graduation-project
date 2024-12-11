@@ -104,9 +104,13 @@ void PursuitState::Enter()
 void PursuitState::Execute(float elapsedTime)
 {
 
-    // 各種Execute関数の内容は各Update○○State関数を参考に
-    // 目標地点をプレイヤー位置に設定
-    owner->SetTargetPosition(Player::Instance().GetPosition());
+    if (!owner->IsThrown())
+    {
+        // 各種Execute関数の内容は各Update○○State関数を参考に
+        // 目標地点をプレイヤー位置に設定
+        owner->SetTargetPosition(Player::Instance().GetPosition());
+
+    }
 
     // 目的地点へ移動
     owner->MoveToTarget(elapsedTime, 1.0);

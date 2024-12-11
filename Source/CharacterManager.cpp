@@ -7,13 +7,19 @@ void CharacterManager::Update(float elapsedTime)
 	for (Character* character : characteres)
 	{
 		character->Update(elapsedTime);
+		if (!character->GetAlive())
+		{
+			removes.emplace_back(character);
+		}
 	}
+
 
 	// 破棄処理
 	// ※enemiesの範囲for文中でerase()すると不具合が発生してしまうため、
 	// 　更新処理が終わった後に破棄リストに積まれたオブジェクトを削除する。
 	for (Character* character : removes)
 	{
+		
 		// std::vectorから要素を削除する場合はイテレーターで削除しなければならない
 		std::vector<Character*>::iterator it = std::find(characteres.begin(), characteres.end(), character);
 		if (it != characteres.end())

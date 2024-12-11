@@ -8,7 +8,7 @@ SwingWeb* SwingWeb::instanceLeft = nullptr;
 SwingWeb* SwingWeb::instanceRight = nullptr;
 
 // コンストラクタ
-SwingWeb::SwingWeb(ProjectileManager* manager,bool leftHand) : Projectile(manager),isLeftHand(leftHand)
+SwingWeb::SwingWeb(ProjectileManager* manager, bool leftHand) : Projectile(manager), isLeftHand(leftHand)
 {
     //instance = this;
 
@@ -20,7 +20,7 @@ SwingWeb::SwingWeb(ProjectileManager* manager,bool leftHand) : Projectile(manage
     {
         instanceRight = this;
     }
-    
+
 
     model = std::make_unique<Model>("Data/Model/SpiderWeb/SwingWeb.mdl");
 
@@ -41,58 +41,62 @@ SwingWeb::~SwingWeb()
 // 更新処理
 void SwingWeb::Update(float elapsedTime)
 {
-    
-    Player& player = Player::Instance();
 
-    if (player.GetState() != Player::State::Swing)
+    Player& player = Player::Instance();
+    if (!player.GetIsUseGrab())
     {
-        SceneGame& sceneGame = SceneGame::Instance();
-        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        if (player.GetState() != Player::State::Swing)
         {
-            Destroy();
-            sceneGame.UnregisterRenderModel(model.get());
+            SceneGame& sceneGame = SceneGame::Instance();
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+            {
+                Destroy();
+                sceneGame.UnregisterRenderModel(model.get());
+            }
+        }
+
+        DirectX::XMFLOAT3 handPos;
+        Model::Node* handNode = isLeftHand
+            ? player.model->FindNode("mixamorig:LeftHand")
+            : player.model->FindNode("mixamorig:RightHand");
+
+        handPos = {
+            handNode->worldTransform._41,
+            handNode->worldTransform._42,
+            handNode->worldTransform._43
+        };
+
+        DirectX::XMFLOAT3 targetPoint = isLeftHand ? player.GetPreviousSwingPoint() : player.GetswingPoint();
+        DirectX::XMFLOAT3 dir = targetPoint - handPos;
+
+        DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
+        dirVec = DirectX::XMVector3Normalize(dirVec);
+        DirectX::XMStoreFloat3(&direction, dirVec);
+
+        position = handPos;
+
+    }
+    else
+    {
+        {
+            //　糸は手から出るように、右手のNodeを探す
+            Model::Node* RightHandPos = player.model->FindNode("mixamorig:RightHand");
+            DirectX::XMFLOAT3 pos;
+            pos.x = RightHandPos->worldTransform._41;
+            pos.y = RightHandPos->worldTransform._42;
+            pos.z = RightHandPos->worldTransform._43;
+
+            DirectX::XMFLOAT3 EnemyPos = player.GetLockonEnemy()->GetPosition();
+            DirectX::XMFLOAT3 dir = EnemyPos - pos;
+            DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
+            dirVec = DirectX::XMVector3Normalize(dirVec);
+            DirectX::XMStoreFloat3(&direction, dirVec);
+
+            position = pos;
         }
     }
 
-    DirectX::XMFLOAT3 handPos;
-    Model::Node* handNode = isLeftHand
-        ? player.model->FindNode("mixamorig:LeftHand")
-        : player.model->FindNode("mixamorig:RightHand");
 
-    handPos = {
-        handNode->worldTransform._41,
-        handNode->worldTransform._42,
-        handNode->worldTransform._43
-    };
-
-    DirectX::XMFLOAT3 targetPoint = isLeftHand ? player.GetPreviousSwingPoint() : player.GetswingPoint();
-    DirectX::XMFLOAT3 dir = targetPoint - handPos;
-
-    DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
-    dirVec = DirectX::XMVector3Normalize(dirVec);
-    DirectX::XMStoreFloat3(&direction, dirVec);
-
-    position = handPos;
-
-
-    //{
-    //    //　糸は手から出るように、右手のNodeを探す
-    //    Model::Node* RightHandPos = player.model->FindNode("mixamorig:RightHand");
-    //    DirectX::XMFLOAT3 pos;
-    //    pos.x = RightHandPos->worldTransform._41;
-    //    pos.y = RightHandPos->worldTransform._42;
-    //    pos.z = RightHandPos->worldTransform._43;
-
-    //    DirectX::XMFLOAT3 swingPos = player.GetswingPoint();
-
-    //    DirectX::XMFLOAT3 dir = swingPos - pos;
-    //    DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
-    //    dirVec = DirectX::XMVector3Normalize(dirVec);
-    //    DirectX::XMStoreFloat3(&direction, dirVec);
-
-    //    position = pos;
-    //}
-   
 
     UpdateTransform();
     model->UpdateTransform(transform);

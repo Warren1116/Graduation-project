@@ -18,6 +18,7 @@ enum class EnemyAnimation
 	Die,
 	GetHit,
 	AttackPunch,
+	GetThrow,
 };
 
 class StateMachine;
@@ -81,7 +82,8 @@ public:
 	//TODO 05_02 メッセージ受信関数を追加
 	bool OnMessage(const Telegram& msg);
 
-
+	void SetThrown(bool thrown) { isThrown = thrown; }
+	bool IsThrown() const { return isThrown; }
 
 private:
 
@@ -90,6 +92,13 @@ private:
 
 	// 死亡ステート更新処理
 	void UpdateDeathState(float elapsedTime);
+
+	// 投げられたステートへ遷移
+	void TransitionGetThrowState();
+
+	// 投げられたステート更新処理
+	void UpdateGetThrowState(float elapsedTime);
+
 
 protected:
 	void OnDead();
@@ -103,6 +112,7 @@ public:
 		// MetaAIからメッセージを受信したときのステートを追加
 		Recieve,
 		Dead,
+		GetThrow,
 	};
 
 	enum class Search
@@ -145,4 +155,10 @@ private:
 	float				attackRange = 5.0f;
 	float				punchRange = 1.5f;
 	StateMachine* stateMachine = nullptr;
+
+
+	float timeElapsed = 0.0f;;
+	float totalFlightTime;
+	float webTimer;
+	bool ThrowFlag;
 };

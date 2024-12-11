@@ -41,6 +41,9 @@ public:
 	// メッセージ受信したときの処理
 	virtual bool OnMessage(const Telegram& msg);
 
+	//ロックオンされているかどうか
+	virtual bool GetIsLockedOn() const { return IsLockedOn; }
+	virtual void SetLockedOn(bool lockStatus) { IsLockedOn = lockStatus;}
 
 	Model* GetModel() const { return model; }
 
@@ -54,5 +57,7 @@ protected:
 	int id = 0;
 	float searchRange = 0.0f;
 	float attackRange = 0.0f;
+
+	bool IsLockedOn = false;
 };
 

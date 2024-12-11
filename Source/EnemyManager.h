@@ -47,6 +47,7 @@ public:
 	// 付与したIDからエネミーを取得
 	Enemy* GetEnemyFromId(int id);
 
+
 private:
 	// エネミー同士の衝突処理
 	void CollisionEnemyVsEnemies();
