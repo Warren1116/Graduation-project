@@ -21,7 +21,9 @@ public:
 	// ƒXƒP[ƒ‹İ’è
 	void SetScale(Effekseer::Handle handle, const DirectX::XMFLOAT3& scale);
 
+	Effekseer::Handle GetHandle() { return effectHandle; }
 private:
 	Effekseer::EffectRef effekseerEffect;
+	Effekseer::Handle effectHandle;
 };
 

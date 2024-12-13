@@ -80,8 +80,8 @@ void EnemyThief::Update(float elapsedTime)
             playerBack = DirectX::XMVector3Normalize(playerBack);
             playerUp = DirectX::XMVector3Normalize(playerUp);
 
-            playerBack = DirectX::XMVectorScale(playerBack, 25.0f);
-            playerUp = DirectX::XMVectorScale(playerUp, 25.0f);
+            playerBack = DirectX::XMVectorScale(playerBack, 22.0f);
+            playerUp = DirectX::XMVectorScale(playerUp, 22.0f);
 
             DirectionVec = DirectX::XMVectorAdd(playerBack, playerUp);
 
@@ -108,7 +108,7 @@ void EnemyThief::Update(float elapsedTime)
             newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorSet(0.0f, -0.5f * gravity * timeElapsed * timeElapsed, 0.0f, 0.0f));
 
             position = DirectX::XMFLOAT3(DirectX::XMVectorGetX(newPosition), DirectX::XMVectorGetY(newPosition), DirectX::XMVectorGetZ(newPosition));
-            //model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
+            model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
 
             webTimer = 0;
             ThrowFlag = false;
@@ -125,11 +125,10 @@ void EnemyThief::Update(float elapsedTime)
         break;
     }
 
-    //if (!Player::Instance().GetIsUseGrab())
-    //{
-    //    stateMachine->Update(elapsedTime);
-    //}
-
+    if (!Player::Instance().GetIsUseGrab())
+    {
+        stateMachine->Update(elapsedTime);
+    }
 
     // ‘¬—Íˆ—XV
     UpdateVelocity(elapsedTime);

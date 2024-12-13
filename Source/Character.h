@@ -71,6 +71,12 @@ public:
 
 	// スイングしてるフラグ
 	bool GetOnSwing() { return onSwing; }
+
+	//ロックオンされているかどうか
+	bool GetIsLockedOn() const { return IsLockedOn; }
+	void SetLockedOn(bool lockStatus) { IsLockedOn = lockStatus; }
+
+
 private:
 
 	// 垂直速力更新処理　
@@ -154,6 +160,7 @@ protected:
 	bool CanClimb = false;
 	bool onSwing = false;
 	bool isThrown = false;
+	bool IsLockedOn = false;
 
 	float fallStartHeight = 0.0f;
 	float landingHeightThreshold = 1.0f;

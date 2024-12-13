@@ -33,6 +33,7 @@ Effekseer::Handle Effect::Play(const DirectX::XMFLOAT3& position, float scale)
 
     Effekseer::Handle handle = effekseerManager->Play(effekseerEffect, 
         position.x, position.y, position.z);
+    effectHandle = handle;
     effekseerManager->SetScale(handle, scale, scale, scale);
 
     return handle;

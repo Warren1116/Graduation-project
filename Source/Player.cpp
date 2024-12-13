@@ -44,8 +44,7 @@ Player::Player(bool flag)
 
     scale.x = scale.y = scale.z = 0.01f;
 
-    hitEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
-
+    hitEffect = std::make_unique<Effect>("Data/Effect/hitEffect.efk");
 
     punch = Audio::Instance().LoadAudioSource("Data/Audio/punch.wav");
     punch2 = Audio::Instance().LoadAudioSource("Data/Audio/punch2.wav");
@@ -82,6 +81,7 @@ Player::Player(bool flag)
 
 
 }
+
 
 // デストラクタ
 Player::~Player()
@@ -340,7 +340,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                     // ヒットエフェクト再生
                     {
                         DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
-                        enemyPos.y += enemy->GetHeight() * 0.5f;
+                        enemyPos.y += enemy->GetHeight() * 1.5f;
                         if (enemy->GetHealth() != 0)
                         {
                             switch (attackCount)
@@ -475,9 +475,6 @@ void Player::UpdateGrabState(float elapsedTime)
         lockonEnemy->ApplyDamage(1.0, 1.0);
     }
 
-
-
-
 }
 
 bool Player::IsNearWallTop()
@@ -535,46 +532,6 @@ bool Player::IsNearWallTop()
 //　カメラステート更新処理
 void Player::UpdateCameraState(float elapsedTime)
 {
-    if (lockonEnemy)
-    {
-        CharacterManager& manager = CharacterManager::Instance();
-        for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
-        {
-            Character* character = manager.GetCharacter(ii);
-            if (!character || !character->GetHealth() == 0)
-                continue;
-            EnemyThief* enemy = dynamic_cast<EnemyThief*>(character);
-            if (enemy != nullptr)
-            {
-                if (enemy == lockonEnemy)
-                {
-                    enemy->SetLockedOn(true);
-                }
-                else
-                {
-                    enemy->SetLockedOn(false);
-                }
-            }
-        }
-
-    }
-    else
-    {
-        CharacterManager& manager = CharacterManager::Instance();
-        for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
-        {
-            Character* character = manager.GetCharacter(ii);
-            if (!character || !character->GetHealth() == 0)
-                continue;
-            EnemyThief* enemy = dynamic_cast<EnemyThief*>(character);
-            if (enemy != nullptr)
-            {
-                enemy->SetLockedOn(false);
-            }
-        }
-
-    }
-
     //  ロックオン・オフ判定用
     static bool tabPressed = false;
 
@@ -625,6 +582,10 @@ void Player::UpdateCameraState(float elapsedTime)
                 //  ロックの時
                 if (lockonState == LockonState::Locked)
                 {
+                    if (lockonEnemy)
+                    {
+                        lockonEnemy->SetLockedOn(false);
+                    }
                     lockonState = LockonState::NotLocked;
                     lockonEnemy = nullptr;
                     Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &position);
@@ -637,7 +598,7 @@ void Player::UpdateCameraState(float elapsedTime)
                     for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
                     {
                         Character* character = manager.GetCharacter(ii);
-                        if (character == this || character->GetHealth() == 0)
+                        if (character == this || character->GetHealth() <= 0)
                             continue;
 
                         if (lockonState != LockonState::NotLocked)
@@ -654,13 +615,15 @@ void Player::UpdateCameraState(float elapsedTime)
 
                             if (length1 < length2)
                             {
+                                lockonEnemy->SetLockedOn(false);
                                 lockonEnemy = character;
+                                lockonEnemy->SetLockedOn(true);
+
                                 DirectX::XMStoreFloat3(&lockDirection, DirectX::XMVector3Normalize(v));
                             }
                         }
                         else
                         {
-
                             p = DirectX::XMLoadFloat3(&position);
                             t = DirectX::XMLoadFloat3(&character->GetPosition());
                             v = DirectX::XMVectorSubtract(t, p);
@@ -669,18 +632,17 @@ void Player::UpdateCameraState(float elapsedTime)
                             if (length1 <= MAX_LOCKON_DISTANCE * MAX_LOCKON_DISTANCE)
                             {
                                 lockonEnemy = character;
+                                lockonEnemy->SetLockedOn(true);
                                 DirectX::XMStoreFloat3(&lockDirection, DirectX::XMVector3Normalize(v));
                                 lockonState = LockonState::Locked;
-
                             }
-
                         }
                     }
 
                     if (lockonEnemy)
                     {
-
                         lockonState = LockonState::Locked;
+                        lockonEnemy->SetLockedOn(true);
                         MessageData::CAMERACHANGELOCKONMODEDATA p = { position, lockonEnemy->GetPosition() };
                         Messenger::Instance().SendData(MessageData::CAMERACHANGELOCKONMODE, &p);
                         break;
@@ -694,41 +656,17 @@ void Player::UpdateCameraState(float elapsedTime)
                     }
                 }
             }
-
         }
         else
         {
             tabPressed = false;
         }
 
-
-        if (lockonState == LockonState::NotLocked)
-        {
-            lockonEnemy = nullptr;
-
-            CharacterManager& manager = CharacterManager::Instance();
-            for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
-            {
-                Character* character = manager.GetCharacter(ii);
-                if (!character || !character->GetHealth() == 0)
-                    continue;
-                EnemyThief* enemy = dynamic_cast<EnemyThief*>(character);
-                if (enemy != nullptr)
-                {
-                    enemy->SetLockedOn(false);
-                }
-            }
-
-            MessageData::CAMERACHANGEFREEMODEDATA p = { position };
-            Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
-            return;
-        }
-
-
         //  今ロックしてる敵がまだ存在するかどうか（死亡）
         if (lockonState == LockonState::Locked && lockonEnemy != nullptr && lockonEnemy->GetHealth() == 0)
         {
             // 死亡したら次一番近いの敵を探す
+            lockonEnemy->SetLockedOn(false);
             lockonEnemy = nullptr;
             float closestDistance = FLT_MAX;
             CharacterManager& manager = CharacterManager::Instance();
@@ -756,6 +694,7 @@ void Player::UpdateCameraState(float elapsedTime)
             // 探せるなら新しい敵をロック
             if (lockonEnemy)
             {
+                lockonEnemy->SetLockedOn(true);
                 MessageData::CAMERACHANGELOCKONMODEDATA p = { position, lockonEnemy->GetPosition() };
                 Messenger::Instance().SendData(MessageData::CAMERACHANGELOCKONMODE, &p);
             }
@@ -799,14 +738,17 @@ void Player::UpdateCameraState(float elapsedTime)
     }
     //  死亡した時のカメラ
     case State::Death:
-        //MessageData::CAMERACHANGEMOTIONMODEDATA p;
-        //float vx = sinf(angle.y) * 6;
-        //float vz = cosf(angle.y) * 6;
-        //p.data.push_back({ 0, { position.x + vx, position.y + 3, position.z + vz }, position });
-        //p.data.push_back({ 90, { position.x + vx, position.y + 15, position.z + vz }, position });
-        //Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
+    {
+        MessageData::CAMERACHANGEMOTIONMODEDATA p;
+        float vx = sinf(angle.y) * 6;
+        float vz = cosf(angle.y) * 6;
+        p.data.push_back({ 0, { position.x + vx, position.y + 3, position.z + vz }, position });
+        p.data.push_back({ 90, { position.x + vx, position.y + 10, position.z + vz }, position });
+        Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
         break;
+    }
     case State::Grab:
+    {
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
         float vx = sinf(angle.y) * 5;
         float vz = -cosf(angle.y) * 5;
@@ -814,9 +756,10 @@ void Player::UpdateCameraState(float elapsedTime)
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
         break;
     }
-
-
+    
+    }
 }
+
 
 //  発射ステートべの遷移
 void Player::TransitionShotingState()
@@ -933,7 +876,7 @@ void Player::CollisionProjectileVsEnemies()
                     //エフェクト生成
                     {
                         DirectX::XMFLOAT3 e = enemy->GetPosition();
-                        e.y += enemy->GetHeight() * 0.5f;
+                        e.y += enemy->GetHeight() * 1.5f;
                         hitEffect->Play(e);
                     }
                     //弾丸破棄
