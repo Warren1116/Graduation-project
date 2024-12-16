@@ -69,70 +69,49 @@ void CameraController::ShakeCamera(float intensity, float duration)
 
 void CameraController::FreeCamera(float elapsedTime)
 {
-#if 1
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     float ax = (mouse.GetPositionX() - mouse.GetOldPositionX());
     float ay = (mouse.GetPositionY() - mouse.GetOldPositionY());
 
-    //カメラの回転速度
+    float stickX = gamePad.GetAxisRX(); 
+    float stickY = -gamePad.GetAxisRY(); 
+
+    float stickSensitivity = 0.008f; 
+    ax += stickX * stickSensitivity * Graphics::Instance().GetScreenWidth();
+    ay += stickY * stickSensitivity * Graphics::Instance().GetScreenHeight();
+
     float speed = rollSpeed * elapsedTime;
 
-    //もしシェイクの時間が終わってないなら、シェイクを行う
     if (shakeTime > 0.0f)
     {
         float shakeX = (rand() % 100 - 50) / 50.0f * shakeIntensity;
         float shakeY = (rand() % 100 - 50) / 50.0f * shakeIntensity;
-
-        //カメラに応用
         angle.x += shakeX;
         angle.y += shakeY;
-
-        //シェイクの時間更新
         shakeTime -= elapsedTime;
-
-        //シェイクの強さを減らす
         shakeIntensity *= 0.9f;
     }
     else
     {
-        //スティックの入力値に合わせてX軸とY軸を回転
         angle.x += ay * speed;
         angle.y += ax * speed;
     }
 
-    //カメラ回転を回転行列に変換
-    DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
+    if (angle.x > maxAngle) angle.x = maxAngle;
+    if (angle.x < minAngle) angle.x = minAngle;
+    if (angle.y < -DirectX::XM_PI) angle.y += DirectX::XM_2PI;
+    if (angle.y > DirectX::XM_PI) angle.y -= DirectX::XM_2PI;
 
-    //回転行列から前方向ベクトルを取り出す
+    DirectX::XMMATRIX Transform = DirectX::XMMatrixRotationRollPitchYaw(angle.x, angle.y, angle.z);
     DirectX::XMVECTOR Front = Transform.r[2];
     DirectX::XMFLOAT3 front;
     DirectX::XMStoreFloat3(&front, Front);
 
-    //注視点から後ろベクトル方向に一定距離離れたカメラ視点を求める
     newPosition.x = target.x - front.x * range;
     newPosition.y = target.y - front.y * range;
     newPosition.z = target.z - front.z * range;
-
-    if (angle.x > maxAngle)
-    {
-        angle.x = maxAngle;
-    }
-    if (angle.x < minAngle)
-    {
-        angle.x = minAngle;
-    }
-    if (angle.y < -DirectX::XM_PI)
-    {
-        angle.y += DirectX::XM_2PI;
-    }
-    if (angle.y > DirectX::XM_PI)
-    {
-        angle.y -= DirectX::XM_2PI;
-    }
-
-#endif
 }
 
 void CameraController::LockonCamera(float elapsedTime)

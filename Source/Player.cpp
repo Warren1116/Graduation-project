@@ -50,6 +50,7 @@ Player::Player(bool flag)
     punch2 = Audio::Instance().LoadAudioSource("Data/Audio/punch2.wav");
     kick = Audio::Instance().LoadAudioSource("Data/Audio/kick.wav");
 
+    skillTime = 5.0f;
 
     // 待機ステートへ遷移
     TransitionIdleState();
@@ -78,6 +79,7 @@ Player::Player(bool flag)
             if (model->GetCurrentAnimationIndex())
                 model->PlayAnimation(d->index, d->loop, d->blendSecond);
         });
+
 
 
 }
@@ -433,6 +435,7 @@ void Player::TransitionGrabState()
     state = State::Grab;
     model->PlayAnimation(Anim_GrabAndDrop, false);
     webTimer = 0.0f;
+    skillTime -= 1.0f;
 
 }
 
@@ -572,7 +575,7 @@ void Player::UpdateCameraState(float elapsedTime)
     case State::Swing:
     case State::Dodge:
     {
-        if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_TAB)
+        if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_TAB || Input::Instance().GetGamePad().GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
         {
             // Tabキーを押すと、ロック判定
             if (!tabPressed)
@@ -756,7 +759,7 @@ void Player::UpdateCameraState(float elapsedTime)
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
         break;
     }
-    
+
     }
 }
 
@@ -782,7 +785,7 @@ bool Player::InputProjectile()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    if (gamePad.GetButtonDown() & GamePad::BTN_X)
+    if (gamePad.GetButtonDown() & GamePad::BTN_Y)
     {
         DirectX::XMFLOAT3 dir;
         if (lockonEnemy)    //　もしカメラロックしてる場合は敵を向かて発射
@@ -892,8 +895,9 @@ void Player::CollisionProjectileVsEnemies()
 // 攻撃入力処理
 bool Player::InputAttack()
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
     Mouse& mouse = Input::Instance().GetMouse();
-    if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
+    if (mouse.GetButtonDown() & Mouse::BTN_LEFT || gamePad.GetButtonDown() & GamePad::BTN_X)
     {
         attacking = true;
         if (attackCount < attackLimit && attacking)
@@ -915,7 +919,7 @@ bool Player::InputDodge()
 {
     // ボタン入力でジャンプ
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
+    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         return true;
     }
@@ -988,10 +992,11 @@ void Player::UpdateIdleState(float elapsedTime)
             TransitionAttackState();
         }
     }
-    if (lockonEnemy)
+    if (lockonEnemy && skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
-        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT)
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
         {
             IsUseGrab = true;
             TransitionGrabState();
@@ -1022,7 +1027,7 @@ void Player::UpdateMoveState(float elapsedTime)
     HitResult hit;
     //if (FindWallSwingPoint(position, 5.0f, hit))
     //{
-    if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime) && firstSwing)
+    if ((gamePad.GetButton() & GamePad::BTN_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime) && firstSwing)
     {
         lastState = state;
         TransitionSwingState();
@@ -1084,15 +1089,16 @@ void Player::UpdateJumpState(float elapsedTime)
 
     //  ジャンブ中移動とSHIFTキー同時に押すと
     HitResult hit;
-    if (FindWallSwingPoint(position, 5.0f, hit))
-    {
-        if (gamePad.GetButton() & GamePad::BTN_SHIFT && InputMove(elapsedTime))
+    //if (FindWallSwingPoint(position, 5.0f, hit))
+    //{
+        if ((gamePad.GetButton() & GamePad::BTN_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime))
         {
             lastState = state;
             //  スイングステートへの遷移
             TransitionSwingState();
         }
-    }
+    //}
+    
     //  もしクライミング中なら、クライミング状態をキャンセルする
     if (onClimb)
     {
@@ -1321,7 +1327,7 @@ bool Player::InputJump()
 {
     // ボタン入力でジャンプ
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
+    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         //ジャンプ入力した
         Jump(jumpSpeed);
@@ -1352,7 +1358,10 @@ void Player::TransitionLandState()
     //  最初の判定がないと、無限に飛び続けるので
     firstSwing = true;
     state = State::Land;
+
     model->PlayAnimation(Anim_Landing, false);
+
+
 
 }
 
@@ -1511,7 +1520,7 @@ void Player::UpdateSwingState(float elapsedTime)
         steps = max(steps, 5);
         HitResult hit;
 
-        const int raySamples = 5;
+        const int raySamples = 3;
         float angleStep = DirectX::XM_2PI / raySamples;
 
         //簡易版のスフィアキャストを作る
@@ -1521,8 +1530,8 @@ void Player::UpdateSwingState(float elapsedTime)
 
             for (int i = 0; i < raySamples; ++i) {
                 float angle = i * angleStep;
-                float offsetX = radius * cosf(angle);
-                float offsetZ = radius * sinf(angle);
+                float offsetX = radius * 0.5f * cosf(angle);
+                float offsetZ = radius * 0.5f * sinf(angle);
 
                 DirectX::XMFLOAT3 offsetPoint;
                 DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
@@ -1551,8 +1560,10 @@ void Player::UpdateSwingState(float elapsedTime)
         position = end;
     }
 
+    InputMove(elapsedTime);
+
     //連続スイングのモーション
-    if (!model->IsPlayAnimation())
+    if (!model->IsPlayAnimation() && InputMove(elapsedTime))
     {
         SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
         SceneGame& sceneGame = SceneGame::Instance();
@@ -1564,11 +1575,7 @@ void Player::UpdateSwingState(float elapsedTime)
         }
     }
 
-    DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-    const float swingAdjustSpeed = 2.0f;
-    swingPoint.x += moveVec.x * swingAdjustSpeed * elapsedTime;
-    swingPoint.z += moveVec.z * swingAdjustSpeed * elapsedTime;
 
     //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
@@ -1595,8 +1602,6 @@ void Player::UpdateSwingState(float elapsedTime)
     {
         float correctionFactor = (currentLength - ropeLength) * 0.5f;
         DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-        //Q = DirectX::XMVectorAdd(Q, correction);
-
         DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
 
         float smoothFactor = 0.1f;
@@ -1614,10 +1619,10 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
     //もし最高点に着いたら、連続スイングを行う
     float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
-    if (dotProduct <= 0)
-    {
-        TransitionSwingState();
-    }
+    //if (dotProduct <= 0)
+    //{
+    //    TransitionSwingState();
+    //}
 
 
     //位置更新
@@ -1631,7 +1636,7 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMStoreFloat3(&front, swingDir);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
+    if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
     {
         TransitionIdleState();
         velocity = { 0,0,0 };

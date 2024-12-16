@@ -77,6 +77,7 @@ public:
 	void SetLockedOn(bool lockStatus) { IsLockedOn = lockStatus; }
 
 
+
 private:
 
 	// ‚’¼‘¬—ÍXVˆ—@

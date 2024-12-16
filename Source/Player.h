@@ -123,6 +123,7 @@ public:
 	const State& GetState() const { return state; }
 	const State& GetAttackState() const { return State::Attack; }
 
+	float GetSkillTime() const { return skillTime; }
 
 protected:
 
@@ -334,6 +335,7 @@ private:
 	DirectX::XMFLOAT3 previousSwingPoint;
 	// 糸のタイマー
 	float webTimer;
+	float skillTime;
 
 private:
 	// メッセージキー

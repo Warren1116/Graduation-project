@@ -22,7 +22,9 @@ void UI::Initialize()
 
     HpBox = std::make_unique<Sprite>("Data/Sprite/HpBox1.png");
     Number = std::make_unique<Sprite>("Data/Sprite/Numbers.png");
-    HpBar = std::make_unique<Sprite>("Data/Sprite/HpBar.png");
+
+    HpBar = std::make_unique<Sprite>();
+    SkillBar = std::make_unique<Sprite>();
 
     ShiftKey = std::make_unique<Sprite>("Data/Sprite/ShiftKey.png");
     TutorialCounter = 0;
@@ -107,22 +109,37 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
 
         //  HPバー下の枠
         HpBar->Render(dc,
-            30 + 100, 35,
-            5*15*5, 25,
+            130, 35,
+            375, 25,
             0, 0,
-            static_cast<int>(HpBar->GetTextureWidth()), static_cast<int>(HpBar->GetTextureHeight()),
+            250, 20,
             1.5f,
             1, 1, 1, 0.5f);
 
         // HPバー
         HpBar->Render(dc,
-            30 + 100, 35,
+            130, 35,
             gaugeWidth, 25,
             0, 0, 
-            static_cast<int>(HpBar->GetTextureWidth()), static_cast<int>(HpBar->GetTextureHeight()),
+            250, 20,
             1.5f,
             1, 1, 1, 1);
     }
+
+    //スキルバー
+    {
+        float gaugeWidth = Player::Instance().GetSkillTime() * 10.0f;
+
+        //  スキルバー下の枠
+        SkillBar->Render(dc,
+            130, 75,
+            gaugeWidth, 25,
+            0, 0,
+            250, 20,
+            1.5f,
+            1, 1, 1, 0.5f);
+    }
+
     if (Player::Instance().GetHealth() == 0)
     {
         TextFont->textout(dc, "Right Click To Go Back Title", 1280 * 0.3f, 720 * 0.5f, 20, 20, {1,1,1,1});

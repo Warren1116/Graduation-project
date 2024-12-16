@@ -51,6 +51,7 @@ private:
     std::unique_ptr<Sprite> HpBox;
     std::unique_ptr<Sprite> Number;
     std::unique_ptr<Sprite> HpBar;
+    std::unique_ptr<Sprite> SkillBar;
 
     float alpha = 1.0f;
     float alphaColor = 0.3f;

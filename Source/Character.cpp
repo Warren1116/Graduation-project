@@ -306,7 +306,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
             {
                 hitWall = true;
                 GamePad& gamePad = Input::Instance().GetGamePad();
-                if (gamePad.GetButtonDown() & GamePad::BTN_SPACE)
+                if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
                 {
                     //  クライミングに入ります
                     onClimb = true;
