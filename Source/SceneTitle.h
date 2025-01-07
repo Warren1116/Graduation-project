@@ -46,7 +46,7 @@ private:
 	std::unique_ptr<Sprite> Start;
 	std::unique_ptr<Sprite> Quit;
 
-
+    // ƒ{ƒ^ƒ“‚Ì“§–¾“x
 	float alpha = 1.0f;
 	float alphaSpeed = 0.02f;
 	bool increasingAlpha = false;

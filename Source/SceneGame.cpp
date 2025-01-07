@@ -178,6 +178,14 @@ void SceneGame::Initialize()
 
     meta = make_unique<Meta>(player.get(), &enemyManager);
 
+    Pause = std::make_unique<Sprite>();
+    PauseBackGround = std::make_unique<Sprite>();
+    ToTitle = std::make_unique<Sprite>("Data/Sprite/ToTitle.png");
+    ControlWay = std::make_unique<Sprite>("Data/Sprite/Control Way.png");
+    ControllerPicture = std::make_unique<Sprite>("Data/Sprite/Controller.png");
+    ControllerFont = std::make_unique<Sprite>("Data/Sprite/Controller_Font.png");
+    KeyBoardFont = std::make_unique<Sprite>("Data/Sprite/KeyBoard_Font.png");
+
     //  UIの初期化
     UI::Instance().Initialize();
 
@@ -233,6 +241,77 @@ void SceneGame::Update(float elapsedTime)
     //  UI更新処理
     UI::Instance().Update(elapsedTime);
 
+    if (increasingAlpha)
+    {
+        alpha += alphaSpeed * 0.7f;
+        if (alpha >= 1.0f)
+        {
+            alpha = 1.0f;
+            increasingAlpha = false;
+        }
+    }
+    else
+    {
+        alpha -= alphaSpeed * 0.7f;
+        if (alpha <= 0.3f)
+        {
+            alpha = 0.3f;
+            increasingAlpha = true;
+        }
+    }
+
+
+    //Pauseの処理
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (gamePad.GetButtonDown() & GamePad::BTN_ESC)
+    {
+        isPaused = !isPaused;
+    }
+    if (isPaused)
+    {
+        Mouse& mouse = Input::Instance().GetMouse();
+        float screenWidth = static_cast<float>(graphics.GetScreenWidth());
+        float screenHeight = static_cast<float>(graphics.GetScreenHeight());
+
+        if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 250
+            && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170
+            && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+        {
+            isTutorial = !isTutorial;
+            ControllerButton = true;
+            KeyBoardButton = false;
+        }
+
+        if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 300
+            && mouse.GetPositionY() > screenHeight * 0.4f + 50 && mouse.GetPositionY() < screenHeight * 0.4f + 170
+            && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+        {
+            SceneManager::Instance().ChangeScene(new SceneTitle);
+        }
+
+        if (isTutorial)
+        {
+            if (mouse.GetPositionX() > screenWidth * 0.35f && mouse.GetPositionX() < screenWidth * 0.35f + 250
+                && mouse.GetPositionY() > screenHeight * 0.1f + 50 && mouse.GetPositionY() < screenHeight * 0.1f + 170
+                && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+            {
+                ControllerButton = true;
+                KeyBoardButton = false;
+            }
+
+            if (mouse.GetPositionX() > screenWidth * 0.65f && mouse.GetPositionX() < screenWidth * 0.65f + 300
+                && mouse.GetPositionY() > screenHeight * 0.1f + 50 && mouse.GetPositionY() < screenHeight * 0.1f + 170
+                && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+            {
+                KeyBoardButton = true;
+                ControllerButton = false;
+            }
+
+
+        }
+
+        return;
+    }
 #ifdef TUTORIAL
     //  チュトリアルのタイマー
     tutorialTimer += elapsedTime;
@@ -249,7 +328,6 @@ void SceneGame::Update(float elapsedTime)
         return;
     }
 #endif // TUTORIAL
-
 
     // ステージ更新処理
     StageManager::Instance().Update(elapsedTime);
@@ -272,21 +350,22 @@ void SceneGame::Update(float elapsedTime)
     cameraController->Update(elapsedTime);
 
 #ifdef DEBUG
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_E)
-    {
-        isPaused = !isPaused;
-    }
+    //GamePad& gamePad = Input::Instance().GetGamePad();
+    //if (gamePad.GetButtonDown() & GamePad::BTN_ESC)
+    //{
+    //    isPaused = !isPaused;
+    //}
 
     if (gamePad.GetButton() & GamePad::BTN_SHIFT && gamePad.GetButton() & GamePad::BTN_R)
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
     }
-    if (isPaused)
-    {
-        return;
-    }
+    //if (isPaused)
+    //{
+    //    return;
+    //}
 #endif // 
+
 
 
 }
@@ -333,6 +412,79 @@ void SceneGame::Render()
     //2Dスプライト描画
     {
         UI::Instance().DrawUI(dc, rc.view, rc.projection);
+
+        float screenWidth = static_cast<float>(graphics.GetScreenWidth());
+        float screenHeight = static_cast<float>(graphics.GetScreenHeight());
+
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        if (isPaused)
+        {
+            //  ポーズ背景色の描画
+            Pause->Render(dc, 0, 0, screenWidth, screenHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0.5f);
+
+            Mouse& mouse = Input::Instance().GetMouse();
+            //  操作方法ボタンの描画
+            if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 250
+                && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170)
+            {
+                ControlWay->Render(dc, screenWidth * 0.1f, screenHeight * 0.2f, 350, 350, 0, 0, static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
+                    , 0, 1, 1, 1, 1);
+            }
+            else
+            {
+                ControlWay->Render(dc, screenWidth * 0.1f, screenHeight * 0.2f, 250, 250, 0, 0, static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
+                    , 0, 1, 1, 1, 1);
+            }
+
+            //  タイトル画面へ戻るボタンの描画
+            if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 300
+                && mouse.GetPositionY() > screenHeight * 0.4f + 50 && mouse.GetPositionY() < screenHeight * 0.4f + 170)
+            {
+                ToTitle->Render(dc, screenWidth * 0.1f, screenHeight * 0.4f, 350, 350, 0, 0, static_cast<float>(ToTitle->GetTextureWidth()), static_cast<float>(ToTitle->GetTextureHeight())
+                    , 0, 1, 1, 1, 1);
+            }
+            else
+            {
+                ToTitle->Render(dc, screenWidth * 0.1f, screenHeight * 0.4f, 250, 250, 0, 0, static_cast<float>(ToTitle->GetTextureWidth()), static_cast<float>(ToTitle->GetTextureHeight())
+                    , 0, 1, 1, 1, 1);
+            }
+
+            //  操作方法ボタン内
+            if (isTutorial)
+            {
+                //  操作方法枠の描画
+                PauseBackGround->Render(dc, 450, 170, 950, 600, 0, 0, 0, 0, 0, 0.2f, 0.4f, 0.8f, 0.5f);
+
+                //  コントローラー説明の描画
+                if (ControllerButton)
+                {
+                    ControllerFont->Render(dc, screenWidth * 0.35f, screenHeight * 0.1f, 350, 350, 0, 0, static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
+                        , 0, 1, 1, 1, alpha);
+
+                    ControllerPicture->Render(dc, screenWidth * 0.4f, screenHeight * 0.25f, 650, 650, 0, 0, static_cast<float>(ControllerPicture->GetTextureWidth()), static_cast<float>(ControllerPicture->GetTextureHeight())
+                        , 0, 1, 1, 1, 1);
+                }
+                else
+                {
+                    ControllerFont->Render(dc, screenWidth * 0.35f, screenHeight * 0.1f, 250, 250, 0, 0, static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
+                        , 0, 1, 1, 1, 1);
+                }
+
+                //  キーボード説明の描画
+                if (KeyBoardButton)
+                {
+                    KeyBoardFont->Render(dc, screenWidth * 0.65f, screenHeight * 0.1f, 350, 350, 0, 0, static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
+                        , 0, 1, 1, 1, alpha);
+                }
+                else
+                {
+                    KeyBoardFont->Render(dc, screenWidth * 0.65f, screenHeight * 0.1f, 250, 250, 0, 0, static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
+                        , 0, 1, 1, 1, 1);
+                }
+
+            }
+
+        }
 
         //headUpDisplay->Render(dc);
 

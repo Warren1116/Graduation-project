@@ -60,7 +60,7 @@ void SceneTitle::Initialize()
 
     player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-125), 0));
-    player->SetPosition({ 62.5f,73.0f,27.0f });
+    player->SetPosition({ 62.5f,72.0f,27.0f });
 
 
 
@@ -134,6 +134,7 @@ void SceneTitle::Update(float elapsedTime)
             increasingAlpha = true;
         }
     }
+
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
     
@@ -216,9 +217,6 @@ void SceneTitle::Render()
             1, 1, 1, 1);
 
         Mouse& mouse = Input::Instance().GetMouse();
-        mouse.GetPositionX();
-        mouse.GetPositionY();
-
         if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600)
         {
             Start->Render(dc,

@@ -28,8 +28,8 @@ Framework::Framework(HWND hWnd)
 	EffectManager::Instance().Initialize();
 
 	// シーン初期化
-	//SceneManager::Instance().ChangeScene(new SceneGame);
-	SceneManager::Instance().ChangeScene(new SceneTitle);
+	SceneManager::Instance().ChangeScene(new SceneGame);
+	//SceneManager::Instance().ChangeScene(new SceneTitle);
 
 	cameraController = new CameraController();
 }
@@ -170,7 +170,7 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
 		if (wParam == VK_ESCAPE)
 		{
             //　ESCキーでアプリケーション終了
-			PostMessage(hWnd, WM_CLOSE, 0, 0);
+			//PostMessage(hWnd, WM_CLOSE, 0, 0);
 		}
 		break;
 	case WM_ENTERSIZEMOVE:

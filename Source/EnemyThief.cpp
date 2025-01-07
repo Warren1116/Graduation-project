@@ -116,7 +116,7 @@ void EnemyThief::Update(float elapsedTime)
 
     }
 
-    if (!Player::Instance().GetIsUseGrab())
+    if (!Player::Instance().GetIsUseGrab() || health > 0)
     {
         stateMachine->Update(elapsedTime);
     }
@@ -126,7 +126,6 @@ void EnemyThief::Update(float elapsedTime)
 
     // 無敵時間更新
     UpdateInvincibleTimer(elapsedTime);
-
 
     // オブジェクト行列更新
     UpdateTransform();
@@ -163,6 +162,7 @@ void EnemyThief::UpdateDeathState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
     {
+        isAlive = false;
         Destroy();
         SceneGame::Instance().UnregisterRenderModel(model.get());
     }

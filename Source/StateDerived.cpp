@@ -87,6 +87,7 @@ void IdleState::Exit()
 // 追跡ステートに入った時のメソッド
 void PursuitState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
     // 各種Enter関数の内容は各Transition○○State関数を参考に
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));

@@ -29,6 +29,7 @@ public:
 	static const GamePadButton BTN_TAB				= (1 << 20);
 	static const GamePadButton BTN_SHIFT			= (1 << 21);
 	static const GamePadButton BTN_E				= (1 << 22);
+	static const GamePadButton BTN_ESC				= (1 << 23);
 
 public:
 	GamePad() {}

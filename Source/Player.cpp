@@ -502,7 +502,7 @@ void Player::UpdateGrabState(float elapsedTime)
             }
         }
 
-        lockonEnemy->ApplyDamage(1.0, 1.0);
+        lockonEnemy->ApplyDamage(10.0, 1.0);
     }
 
 }

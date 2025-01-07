@@ -65,6 +65,10 @@ public:
 
     bool GetIsPaused() { return isPaused; }
 
+    bool isTutorial = false;
+   
+    
+
     TutorialState GetTutorialState() { return tutorialState; }
     void SetTutorialState(TutorialState newstate) { tutorialState = newstate; }
     void UnpauseGame();
@@ -99,7 +103,20 @@ private:
     std::unique_ptr<Player> player;
     std::unique_ptr<CameraController> cameraController;
     HeadUpDisplay* headUpDisplay = nullptr;
+    std::unique_ptr<Sprite> Pause;
+    std::unique_ptr<Sprite> PauseBackGround;
+    std::unique_ptr<Sprite> ToTitle;
+    std::unique_ptr<Sprite> ControlWay;
+    std::unique_ptr<Sprite> ControllerPicture;
+    std::unique_ptr<Sprite> ControllerFont;
+    std::unique_ptr<Sprite> KeyBoardFont;
+    bool ControllerButton = false;
+    bool KeyBoardButton = false;
 
+    // ボタンの透明度
+    float alpha = 1.0f;
+    float alphaSpeed = 0.08f;
+    bool increasingAlpha = false;
 
     //  オフスクリーンレンダリング用描画ターゲット
     std::unique_ptr<RenderTarget> renderTarget;
