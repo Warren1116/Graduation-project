@@ -128,16 +128,59 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
 
     //スキルバー
     {
-        float gaugeWidth = Player::Instance().GetSkillTime() * 10.0f;
+        float skillTime = Player::Instance().GetSkillTime();
+        int maxSkillTime = 5; // 最大スキルタイムを5と仮定
+        float cellWidth = 40.0f; // 各格子の幅
+        float cellHeight = 25.0f; // 各格子の高さ
+        float startX = 130.0f; // スキルバーの開始位置X
+        float startY = 75.0f; // スキルバーの開始位置Y
 
-        //  スキルバー下の枠
-        SkillBar->Render(dc,
-            130, 75,
-            gaugeWidth, 25,
-            0, 0,
-            250, 20,
-            1.5f,
-            1, 1, 1, 0.5f);
+        for (int i = 0; i < maxSkillTime; ++i)
+        {
+            if (i < static_cast<int>(skillTime))
+            {
+                // スキルタイムが残っている場合は明るい色で描画
+                SkillBar->Render(dc,
+                    startX + i * (cellWidth + 5.0f), startY,
+                    cellWidth, cellHeight,
+                    0, 0,
+                    250, 20,
+                    1.5f,
+                    1, 1, 1, 1);
+            }
+            else if (i == static_cast<int>(skillTime))
+            {
+                // スキルタイムが部分的に残っている場合は部分的に描画
+                float partialWidth = (skillTime - static_cast<int>(skillTime)) * cellWidth;
+                SkillBar->Render(dc,
+                    startX + i * (cellWidth + 5.0f), startY,
+                    partialWidth, cellHeight,
+                    0, 0,
+                    250, 20,
+                    1.5f,
+                    1, 1, 1, 1);
+
+                // 残りの部分を暗い色で描画
+                SkillBar->Render(dc,
+                    startX + i * (cellWidth + 5.0f) + partialWidth, startY,
+                    cellWidth - partialWidth, cellHeight,
+                    0, 0,
+                    250, 20,
+                    1.5f,
+                    0.5f, 0.5f, 0.5f, 0.5f);
+            }
+            else
+            {
+                // スキルタイムが残っていない場合は暗い色で描画
+                SkillBar->Render(dc,
+                    startX + i * (cellWidth + 5.0f), startY,
+                    cellWidth, cellHeight,
+                    0, 0,
+                    250, 20,
+                    1.5f,
+                    0.5f, 0.5f, 0.5f, 0.5f);
+            }
+        }
     }
 
     if (Player::Instance().GetHealth() == 0)

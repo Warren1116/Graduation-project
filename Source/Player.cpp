@@ -202,6 +202,10 @@ void Player::Update(float elapsedTime)
         {
             attackTimer++;
         }
+        if (skillTime < 5)
+        {
+            skillTime += elapsedTime * 0.01f;
+        }
     }
 }
 
@@ -502,7 +506,7 @@ void Player::UpdateGrabState(float elapsedTime)
             }
         }
 
-        lockonEnemy->ApplyDamage(10.0, 1.0);
+        lockonEnemy->ApplyDamage(5.0, 1.0);
     }
 
 }
