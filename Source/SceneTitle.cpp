@@ -136,7 +136,7 @@ void SceneTitle::Update(float elapsedTime)
     }
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
-
+    
 
     if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600 && mouse.GetButtonDown() & Mouse::BTN_LEFT)
     {
@@ -151,6 +151,8 @@ void SceneTitle::Update(float elapsedTime)
 
     EnemyManager::Instance().Update(elapsedTime);
 }
+
+
 
 //•`‰æˆ—
 void SceneTitle::Render()

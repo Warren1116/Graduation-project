@@ -13,7 +13,6 @@
 #include<ctime>
 
 
-
 // 垂直同期間隔設定
 static const int syncInterval = 1;
 
@@ -168,7 +167,11 @@ LRESULT CALLBACK Framework::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LP
 	case WM_CREATE:
 		break;
 	case WM_KEYDOWN:
-		if (wParam == VK_ESCAPE) PostMessage(hWnd, WM_CLOSE, 0, 0);
+		if (wParam == VK_ESCAPE)
+		{
+            //　ESCキーでアプリケーション終了
+			PostMessage(hWnd, WM_CLOSE, 0, 0);
+		}
 		break;
 	case WM_ENTERSIZEMOVE:
 		// WM_EXITSIZEMOVE is sent when the user grabs the resize bars.
