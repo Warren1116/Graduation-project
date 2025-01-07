@@ -33,8 +33,24 @@ Player::Player(bool flag)
     model = std::make_unique<Model>("Data/Model/Spider-man/spider-man.mdl");
     model->GetNodePoses(nodePoses);
 
-
     radius = 0.5f;
+
+    Model::Node* RightHandPos = model->FindNode("mixamorig:RightHand");
+    DirectX::XMFLOAT3 pos = {};
+    pos.x = RightHandPos->worldTransform._41;
+    pos.y = RightHandPos->worldTransform._42;
+    pos.z = RightHandPos->worldTransform._43;
+
+
+    // ジョイント初期化
+    for (int i = 0; i < _countof(joints); ++i)
+    {
+        Joint& joint = joints[i];
+        joint.position.x = pos.x + i;
+        joint.position.y = pos.y;
+        joint.position.z = pos.z ;
+        joint.oldPosition = joint.position;
+    }
 
     // モデルが大きいのでスケーリング
     if (!flag)
@@ -444,6 +460,7 @@ void Player::UpdateGrabState(float elapsedTime)
     webTimer += elapsedTime;
     if (!model->IsPlayAnimation())
     {
+        IsUseGrab = false;
         TransitionIdleState();
     }
 
@@ -933,7 +950,6 @@ void Player::TransitionIdleState()
     state = State::Idle;
     onSwing = false;
     firstSwing = true;
-    IsUseGrab = false;
 
     //　クライミング中なら別の待機モーション
     if (onClimb)
@@ -1284,6 +1300,8 @@ void Player::DrawDebugPrimitive()
 
     projectileManager.DrawDebugPrimitive();
 
+
+
     if (attackCollisionFlag)
     {
         if (attackCount == 1)
@@ -1407,31 +1425,6 @@ void Player::TransitionSwingState()
             //}
 
         }
-
-        //  スイング糸の貼り付けるのPosition(仮空中)
-        //  プレイヤーの前方上に設定
-
-        //DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
-        //DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
-        ////DirectX::XMVECTOR rightVec = DirectX::XMLoadFloat3(&GetRight());
-
-        //forwardVec = DirectX::XMVector3Normalize(forwardVec);
-        //upVec = DirectX::XMVector3Normalize(upVec);
-        ////rightVec = DirectX::XMVector3Normalize(rightVec);
-
-        //forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
-        //upVec = DirectX::XMVectorScale(upVec, 11.0f);
-        ////rightVec = DirectX::XMVectorScale(rightVec, 5.0f);
-
-        //SwingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
-        ////SwingwebDirection = DirectX::XMVectorAdd(SwingwebDirection, rightVec);
-
-        //DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
-        //SwingPoint = DirectX::XMVectorAdd(SwingPoint, SwingwebDirection);
-
-        //previousSwingPoint = swingPoint;
-        //DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
-
         HitResult hit;
         FindWallSwingPoint(position, 5, hit);
 
@@ -1467,23 +1460,6 @@ void Player::TransitionSwingState()
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
         }
-        //  スイング糸の貼り付けるのPosition(仮空中)
-        //  プレイヤーの前方上に設定
-        //DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
-        //DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
-        //forwardVec = DirectX::XMVector3Normalize(forwardVec);
-        //upVec = DirectX::XMVector3Normalize(upVec);
-
-        //forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
-        //upVec = DirectX::XMVectorScale(upVec, 9.5f);
-
-        //SwingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
-
-        //DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
-        //SwingPoint = DirectX::XMVectorAdd(SwingPoint, SwingwebDirection);
-
-        //previousSwingPoint = swingPoint;
-        //DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
 
         HitResult hit;
         FindWallSwingPoint(position, 5, hit);
@@ -1540,12 +1516,14 @@ void Player::UpdateSwingState(float elapsedTime)
                 if (StageManager::Instance().RayCast(position, offsetPoint, hit))
                 {
                     DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
+                    hitNormal = DirectX::XMVector3Normalize(hitNormal);
+                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.3f);
 
-                    float backOffset = -0.5f;
                     DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
-                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorSubtract(hitPosition, DirectX::XMVectorScale(hitNormal, backOffset));
+                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
 
                     DirectX::XMStoreFloat3(&position, adjustedPosition);
+
 
                     //当たったらクライミングステートへの変更
                     onClimb = true;
@@ -1560,10 +1538,8 @@ void Player::UpdateSwingState(float elapsedTime)
         position = end;
     }
 
-    InputMove(elapsedTime);
-
     //連続スイングのモーション
-    if (!model->IsPlayAnimation() && InputMove(elapsedTime))
+    if (!model->IsPlayAnimation())
     {
         SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
         SceneGame& sceneGame = SceneGame::Instance();
@@ -1574,7 +1550,6 @@ void Player::UpdateSwingState(float elapsedTime)
             model->PlayAnimation(Anim_Swinging, true);
         }
     }
-
 
 
     //スイング位置
@@ -1602,6 +1577,8 @@ void Player::UpdateSwingState(float elapsedTime)
     {
         float correctionFactor = (currentLength - ropeLength) * 0.5f;
         DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
+        //Q = DirectX::XMVectorAdd(Q, correction);
+
         DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
 
         float smoothFactor = 0.1f;
@@ -1619,10 +1596,10 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
     //もし最高点に着いたら、連続スイングを行う
     float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
-    //if (dotProduct <= 0)
-    //{
-    //    TransitionSwingState();
-    //}
+    if (dotProduct <= 0)
+    {
+        TransitionSwingState();
+    }
 
 
     //位置更新
@@ -1644,62 +1621,13 @@ void Player::UpdateSwingState(float elapsedTime)
     }
 }
 
-//void Player::UpdateSwingState(float elapsedTime) {
-//    DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
-//    DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
-//    DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
-//    float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
-//    const float ropeLength = 10.0f;
-//
-//    DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
-//
-//    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-//    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -9.8f, 0.0f, 0.0f);
-//    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
-//
-//    const float dragCoefficient = 0.002f;
-//    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
-//
-//    if (currentLength > ropeLength) {
-//        float stretchFactor = currentLength - ropeLength;
-//        DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -stretchFactor * 0.3f);
-//        velocityVec = DirectX::XMVectorAdd(velocityVec, correction);
-//    }
-//
-//    DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(
-//        velocityVec,
-//        DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection)
-//    );
-//
-//    DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&GetFront());
-//    DirectX::XMVECTOR adjustedDirection = DirectX::XMVectorLerp(ropeDirection, frontVec, 0.9f);
-//    tangentVelocity = DirectX::XMVectorLerp(tangentVelocity, adjustedDirection, 0.5f);
-//
-//    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
-//    DirectX::XMStoreFloat3(&position, newPosition);
-//    DirectX::XMStoreFloat3(&velocity, tangentVelocity);
-//
-//    float swingEndThreshold = 2.0f; 
-//    if (DirectX::XMVectorGetY(velocityVec) < 0.0f && currentLength > ropeLength - swingEndThreshold) {
-//        DirectX::XMFLOAT3 nextPoint;
-//        HitResult hitResult; 
-//        if (FindSwingPoint(swingPoint, velocity, 15.0f, hitResult)) { 
-//            previousSwingPoint = swingPoint;
-//        }
-//    }
-//        GamePad& gamePad = Input::Instance().GetGamePad();
-//    if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT)
-//    {
-//        TransitionIdleState();
-//        velocity = { 0,0,0 };
-//        firstSwing = true;
-//    }
-//}
-
 
 //スイングポイントを探す
 bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistance, HitResult& result) {
     using namespace DirectX;
+
+    DirectX::XMFLOAT3 moveVec = GetMoveVec();
+
 
     DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
     DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
@@ -1713,6 +1641,7 @@ bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistanc
     upVec = DirectX::XMVectorScale(upVec, 11.0f);
     rightVec = DirectX::XMVectorScale(rightVec, 5.0f);
 
+
     SwingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
     DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
     SwingPoint = DirectX::XMVectorAdd(SwingPoint, SwingwebDirection);
@@ -1721,12 +1650,11 @@ bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistanc
 
     previousSwingPoint = swingPoint;
 
-
+    
+        
 
     return false;
 }
-
-
 
 
 // デバッグ用GUI描画

@@ -125,6 +125,13 @@ public:
 
 	float GetSkillTime() const { return skillTime; }
 
+	struct Joint
+	{
+		DirectX::XMFLOAT3	position;
+		DirectX::XMFLOAT3	oldPosition;
+	};
+	Joint		joints[5];
+
 protected:
 
 	// ƒ_ƒ[ƒW‚ğó‚¯‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é

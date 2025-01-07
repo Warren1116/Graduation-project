@@ -8,6 +8,7 @@
 #include "Renderer\ShadowmapRenderer.h"
 #include "Renderer/SceneRenderer.h"
 #include "Renderer\PostprocessingRenderer.h"
+#include "Player.h"
 
 
 // タイトルシーン
@@ -29,6 +30,9 @@ public:
 	// 描画処理
 	void Render() override;
 
+	void RegisterRenderModel(Model* model);
+	void UnregisterRenderModel(Model* model);
+
 
 private:
 	std::unique_ptr<CameraController> cameraController;
@@ -42,5 +46,9 @@ private:
 	float alpha = 1.0f;
 	float alphaSpeed = 0.02f;
 	bool increasingAlpha = false;
+
+	std::unique_ptr<Player> player;
+	DirectX::XMFLOAT3 cameraPos = { 66,75,28 };
+	DirectX::XMFLOAT3 cameraAngle = { 2,50,1 };
 };
 

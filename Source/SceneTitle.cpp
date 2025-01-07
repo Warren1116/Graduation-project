@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "Graphics\LightManager.h"
 #include "StageMain.h"
+#include "StageManager.h"
 
 // 初期化
 void SceneTitle::Initialize()
@@ -36,10 +37,46 @@ void SceneTitle::Initialize()
 
     }
 
+    // カメラ初期設定
+    Camera& camera = Camera::Instance();
+    camera.SetLookAt(
+        cameraPos,
+        cameraAngle,
+        DirectX::XMFLOAT3(0, 1, 0)
+    );
+    camera.SetPerspectiveFov(
+        DirectX::XMConvertToRadians(45),
+        graphics.GetScreenWidth() / graphics.GetScreenHeight(),
+        0.1f,
+        1000.0f
+    );
+    // ステージ初期化
+    StageManager& stageManager = StageManager::Instance();
+
+    StageMain* stageMain = new StageMain();
+    stageManager.Register(stageMain);
+
+    //　プレイヤー生成
+    player = std::make_unique<Player>(true);
+    player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-125), 0));
+    player->SetPosition({ 62.5f,73.0f,27.0f });
+
+
+    //	モデルを各レンダラーに登録
+    Model* list[] =
+    {
+        stageMain->GetModel(),
+        player->model.get(),
+    };
+    for (Model* model : list)
+    {
+        RegisterRenderModel(model);
+    }
+
     // 平行光源を追加
     {
         Light* light = new Light(LightType::Directional);
-        light->SetDirection({ 0, 1, -1 });
+        light->SetDirection({ -0.4f, -0.7f, -0.4f });
         light->SetColor({ 1,1,1,1 });
         light->SetPosition({ 0,0,0 });
         LightManager::Instance().Register(light);
@@ -59,12 +96,19 @@ void SceneTitle::Finalize()
 
     LightManager::Instance().Clear();
 
+    shadowmapRenderer->ClearRenderModel();
+    sceneRenderer->ClearRenderModel();
 
 }
 
 //更新処理
 void SceneTitle::Update(float elapsedTime)
 {
+    // カメラコントローラー更新処理
+    Camera::Instance().SetLookAt(cameraPos, cameraAngle, DirectX::XMFLOAT3(0, 1, 0));
+    // プレイヤー更新処理
+    player->Update(elapsedTime);
+
     if (increasingAlpha)
     {
         alpha += alphaSpeed * 0.3f;
@@ -85,10 +129,10 @@ void SceneTitle::Update(float elapsedTime)
     }
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
-    {
-        SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
-    }
+    //if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
+    //{
+    //    SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
+    //}
 
     if (mouse.GetButtonDown() & Mouse::BTN_RIGHT)
     {
@@ -120,8 +164,17 @@ void SceneTitle::Render()
 
     // カメラパラメータ設定
     Camera& camera = Camera::Instance();
+    rc.viewPosition.x = camera.GetEye().x;
+    rc.viewPosition.y = camera.GetEye().y;
+    rc.viewPosition.z = camera.GetEye().z;
+    rc.viewPosition.w = 1;
     rc.view = camera.GetView();
     rc.projection = camera.GetProjection();
+
+    ////// カメラパラメータ設定
+    //Camera& camera = Camera::Instance();
+    //rc.view = camera.GetView();
+    //rc.projection = camera.GetProjection();
 
     float screenWidth = static_cast<float>(graphics.GetScreenWidth());
     float screenHeight = static_cast<float>(graphics.GetScreenHeight());
@@ -134,6 +187,7 @@ void SceneTitle::Render()
         //シーンの描画
         sceneRenderer->SetShadowmapData(shadowmapRenderer->GetShadowMapData());
         sceneRenderer->Render(dc);
+
         postprocessingRenderer->Render(dc);
 
 
@@ -151,6 +205,34 @@ void SceneTitle::Render()
             0,
             1, 1, 1, alpha);
     }
+    
+    // デバッグ情報の表示
+    {
+        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+
+        if (ImGui::Begin("cameraPos", nullptr, ImGuiWindowFlags_None))
+        {
+            ImGui::SliderFloat3("cameraPos", &cameraPos.x,0.0f,100.0f);
+            ImGui::SliderFloat3("cameraAngle", &cameraAngle.x,0.0f,50.0f);
+
+        }
+        ImGui::End();
+
+        LightManager::Instance().DrawDebugGUI();
+    }
 
 }
 
+//  モデルをレンダラーに登録
+void SceneTitle::RegisterRenderModel(Model* model)
+{
+    shadowmapRenderer->RegisterRenderModel(model);
+    sceneRenderer->RegisterRenderModel(model);
+    const ModelResource* resource = model->GetResource();
+    for (const ModelResource::Material& material : resource->GetMaterials())
+    {
+        ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
+        mat.shaderId = static_cast<int>(ModelShaderId::Phong);
+    }
+}

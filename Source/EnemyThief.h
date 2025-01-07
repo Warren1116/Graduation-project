@@ -93,12 +93,6 @@ private:
 	// 死亡ステート更新処理
 	void UpdateDeathState(float elapsedTime);
 
-	// 投げられたステートへ遷移
-	void TransitionGetThrowState();
-
-	// 投げられたステート更新処理
-	void UpdateGetThrowState(float elapsedTime);
-
 
 protected:
 	void OnDead();
@@ -112,7 +106,6 @@ public:
 		// MetaAIからメッセージを受信したときのステートを追加
 		Recieve,
 		Dead,
-		GetThrow,
 	};
 
 	enum class Search

@@ -60,7 +60,6 @@ void EnemyThief::Update(float elapsedTime)
 {
     if (Player::Instance().GetIsUseGrab() && IsLockedOn)
     {
-        //TransitionGetThrowState();
         ThrowFlag = true;
     }
 
@@ -117,14 +116,6 @@ void EnemyThief::Update(float elapsedTime)
 
     }
 
-
-    switch (state)
-    {
-    case EnemyThief::State::GetThrow:
-        UpdateGetThrowState(elapsedTime);
-        break;
-    }
-
     if (!Player::Instance().GetIsUseGrab())
     {
         stateMachine->Update(elapsedTime);
@@ -175,71 +166,6 @@ void EnemyThief::UpdateDeathState(float elapsedTime)
         Destroy();
         SceneGame::Instance().UnregisterRenderModel(model.get());
     }
-}
-
-void EnemyThief::TransitionGetThrowState()
-{
-    state = State::GetThrow;
-    model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
-    ThrowFlag = true;
-}
-
-void EnemyThief::UpdateGetThrowState(float elapsedTime)
-{
-    //if (ThrowFlag)
-    //{
-    //    webTimer += elapsedTime;
-
-    //    if (webTimer > 3.0f)
-    //    {
-    //        DirectX::XMVECTOR pointA, pointB;
-
-    //        DirectX::XMVECTOR DirectionVec;
-    //        //DirectX::XMVECTOR playerBack = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&Camera::Instance().GetFront()), -1.0f);
-    //        DirectX::XMVECTOR playerBack = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&Player::Instance().GetFront()), -1.0f);
-    //        //DirectX::XMVECTOR playerFront = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&Camera::Instance().GetFront()),-1.0);
-    //        DirectX::XMVECTOR playerUp = DirectX::XMLoadFloat3(&Player::Instance().GetUp());
-
-    //        playerBack = DirectX::XMVector3Normalize(playerBack);
-    //        //playerFront = DirectX::XMVector3Normalize(playerFront);
-    //        playerUp = DirectX::XMVector3Normalize(playerUp);
-    //        playerBack = DirectX::XMVectorScale(playerBack, 5.0f);
-    //        //playerFront = DirectX::XMVectorScale(playerFront, 2.0f);
-    //        playerUp = DirectX::XMVectorScale(playerUp, 3.0f);
-
-    //        DirectionVec = DirectX::XMVectorAdd(playerBack, playerUp);
-
-    //        pointA = DirectX::XMLoadFloat3(&position);
-    //        pointB = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Player::Instance().GetPosition()), DirectionVec);
-
-    //        DirectX::XMFLOAT3 directionVec;
-    //        DirectX::XMStoreFloat3(&directionVec, DirectionVec);
-
-    //        velocity = directionVec;
-
-    //        float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectionVec));
-
-    //        float speed = 10.0f;
-    //        DirectX::XMVECTOR Velocity = DirectX::XMLoadFloat3(&velocity);
-
-    //        float gravity = 1.0f;
-
-    //        static float timeElapsed = 0.0f;
-    //        timeElapsed += elapsedTime;
-
-    //        DirectX::XMVECTOR newPosition = pointA;
-    //        newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorScale(Velocity, timeElapsed));
-    //        newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorSet(0.0f, -0.5f * gravity * timeElapsed * timeElapsed, 0.0f, 0.0f));
-
-    //        position = DirectX::XMFLOAT3(DirectX::XMVectorGetX(newPosition), DirectX::XMVectorGetY(newPosition), DirectX::XMVectorGetZ(newPosition));
-    //    }
-    //}
-
-    //if (!model->IsPlayAnimation())
-    //{
-    //    webTimer = 0;
-    //    ThrowFlag = false;
-    //}
 }
 
 // Ž€–S‚µ‚½Žž‚ÉŒÄ‚Î‚ê‚é
