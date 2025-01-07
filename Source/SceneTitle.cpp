@@ -57,9 +57,11 @@ void SceneTitle::Initialize()
     stageManager.Register(stageMain);
 
     //　プレイヤー生成
+
     player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-125), 0));
     player->SetPosition({ 62.5f,73.0f,27.0f });
+
 
 
     //	モデルを各レンダラーに登録
@@ -87,6 +89,10 @@ void SceneTitle::Initialize()
     Font = std::make_unique<Sprite>("Data/Sprite/Font3.png");
     TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
 
+    Title = std::make_unique<Sprite>("Data/Sprite/Title.png");
+    Start = std::make_unique<Sprite>("Data/Sprite/Start.png");
+    Quit = std::make_unique<Sprite>("Data/Sprite/Quit.png");
+
 }
 
 // 終了化
@@ -104,6 +110,7 @@ void SceneTitle::Finalize()
 //更新処理
 void SceneTitle::Update(float elapsedTime)
 {
+
     // カメラコントローラー更新処理
     Camera::Instance().SetLookAt(cameraPos, cameraAngle, DirectX::XMFLOAT3(0, 1, 0));
     // プレイヤー更新処理
@@ -129,12 +136,15 @@ void SceneTitle::Update(float elapsedTime)
     }
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
-    //if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
-    //{
-    //    SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
-    //}
 
-    if (mouse.GetButtonDown() & Mouse::BTN_RIGHT)
+
+    if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600 && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+    {
+        SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
+    }
+
+
+    if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 600 && mouse.GetPositionY() < 750 && mouse.GetButtonDown() & Mouse::BTN_LEFT)
     {
         PostQuitMessage(1);
     }
@@ -195,17 +205,71 @@ void SceneTitle::Render()
 
     // 2D
     {
-        TextFont->textout(dc, "Spider X", screenWidth / 3, screenHeight / 3, 50, 50, {1,1,1,1});
-
-        Font->Render(dc,
-            screenWidth / 2, screenHeight / 2,
-            180.0f, 180.0f,
+        Title->Render(dc,
+            screenWidth / 3.5f, -100,
+            650.0f, 650.0f,
             0, 0,
-            static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()),
+            static_cast<float>(Title->GetTextureWidth()), static_cast<float>(Title->GetTextureHeight()),
             0,
-            1, 1, 1, alpha);
+            1, 1, 1, 1);
+
+        Mouse& mouse = Input::Instance().GetMouse();
+        mouse.GetPositionX();
+        mouse.GetPositionY();
+
+        if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600)
+        {
+            Start->Render(dc,
+                150, 450,
+                200.0f, 200.0f,
+                0, 0,
+                static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
+                0,
+                1, 1, 1, alpha);
+        }
+        else
+        {
+            Start->Render(dc,
+                150, 450,
+                150.0f, 150.0f,
+                0, 0,
+                static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
+                0,
+                1, 1, 1, 1);
+        }
+
+        if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 600 && mouse.GetPositionY() < 750)
+        {
+            Quit->Render(dc,
+                150, 600,
+                200.0f, 200.0f,
+                0, 0,
+                static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
+                0,
+                1, 1, 1, alpha);
+        }
+        else
+        {
+            Quit->Render(dc,
+                150, 600,
+                150.0f, 150.0f,
+                0, 0,
+                static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
+                0,
+                1, 1, 1, 1);
+        }
+
+        //TextFont->textout(dc, "Spider X", screenWidth / 3, screenHeight / 3, 50, 50, {1,1,1,1});
+
+        //Font->Render(dc,
+        //    screenWidth / 2, screenHeight / 2,
+        //    180.0f, 180.0f,
+        //    0, 0,
+        //    static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()),
+        //    0,
+        //    1, 1, 1, alpha);
     }
-    
+
     // デバッグ情報の表示
     {
         ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
@@ -213,8 +277,8 @@ void SceneTitle::Render()
 
         if (ImGui::Begin("cameraPos", nullptr, ImGuiWindowFlags_None))
         {
-            ImGui::SliderFloat3("cameraPos", &cameraPos.x,0.0f,100.0f);
-            ImGui::SliderFloat3("cameraAngle", &cameraAngle.x,0.0f,50.0f);
+            ImGui::SliderFloat3("cameraPos", &cameraPos.x, 0.0f, 100.0f);
+            ImGui::SliderFloat3("cameraAngle", &cameraAngle.x, 0.0f, 50.0f);
 
         }
         ImGui::End();

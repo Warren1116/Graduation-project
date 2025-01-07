@@ -91,8 +91,9 @@ void SceneGame::Initialize()
     //　プレイヤー生成
     player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
-    //player->SetPosition({ 0,0,25 });
     player->SetPosition({ 66,0,42 });
+    player->SetIdleState();
+
     // エネミー初期化
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();

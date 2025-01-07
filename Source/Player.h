@@ -97,6 +97,8 @@ public:
 
 	float GetWebTimer() const { return webTimer; }
 
+    void SetIdleState() { return TransitionIdleState(); }
+
 	// ステート
 	enum class State
 	{
@@ -114,6 +116,9 @@ public:
 		Shot,
 		ClimbTop,
 		Grab,
+		CrouchIdle,
+		TitleIdle,
+		SwingToKick,
 
 		EventMode,
 	};
@@ -243,6 +248,17 @@ private:
 	bool FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistance, HitResult& result);
 
 
+    //Titleステート用
+    void TransitionTitleIdleState();
+    void UpdateTitleIdleState(float elapsedTime);
+
+    void TransitionCrouchIdleState();
+    void UpdateCrouchIdleState(float elapsedTime);
+
+    void TransitionSwingToKick();
+    void UpdateSwingToKick(float elapsedTime);
+
+
 private:
 	//アニメーション
 	enum Animation
@@ -268,6 +284,10 @@ private:
 		Anim_ClimbDown,
 		Anim_SwingToLand,
 		Anim_GrabAndDrop,
+		Anim_CrouchIdle,
+		Anim_TitleIdle,
+		Anim_SwingToKick,
+		Anim_Crouch,
 	};
 
 
@@ -293,6 +313,7 @@ private:
 	std::unique_ptr<AudioSource> punch = nullptr;
 	std::unique_ptr<AudioSource> punch2 = nullptr;
 	std::unique_ptr<AudioSource> kick = nullptr;
+
 
 	// ステート
 	State state = State::Idle;

@@ -48,7 +48,7 @@ Player::Player(bool flag)
         Joint& joint = joints[i];
         joint.position.x = pos.x + i;
         joint.position.y = pos.y;
-        joint.position.z = pos.z ;
+        joint.position.z = pos.z;
         joint.oldPosition = joint.position;
     }
 
@@ -69,7 +69,9 @@ Player::Player(bool flag)
     skillTime = 5.0f;
 
     // 待機ステートへ遷移
-    TransitionIdleState();
+    //TransitionIdleState();
+    TransitionCrouchIdleState();
+    //TransitionTitleIdleState();
 
     EventModeIndex = Messenger::Instance().AddReceiver(MessageData::EVENTMODEEVENT, [&](void* data) { TransitionIdleState(); state = State::EventMode; });
     GameModeIndex = Messenger::Instance().AddReceiver(MessageData::GAMEMODEEVENT, [&](void* data) { state = State::Idle; });
@@ -97,7 +99,6 @@ Player::Player(bool flag)
         });
 
 
-
 }
 
 
@@ -118,80 +119,89 @@ void Player::Update(float elapsedTime)
     //  カメラステートの更新処理
     UpdateCameraState(elapsedTime);
 
-    // ステート毎の処理
-    switch (state)
+    // タイトルの場合
     {
-    case State::Idle:
-        UpdateIdleState(elapsedTime);
-        break;
-    case State::Move:
-        UpdateMoveState(elapsedTime);
-        break;
-    case State::Jump:
-        UpdateJumpState(elapsedTime);
-        break;
-    case State::Land:
-        UpdateLandState(elapsedTime);
-        break;
-    case State::Attack:
-        UpdateAttackState(elapsedTime);
-        break;
-    case State::Damage:
-        UpdateDamageState(elapsedTime);
-        break;
-    case State::Death:
-        UpdateDeathState(elapsedTime);
-        break;
-    case State::Climb:
-        UpdateClimbWallState(elapsedTime);
-        break;
-    case State::Swing:
-        UpdateSwingState(elapsedTime);
-        break;
-    case State::Shot:
-        UpdateShotingState(elapsedTime);
-        break;
-    case State::Dodge:
-        UpdateDodgeState(elapsedTime);
-        break;
-    case State::ClimbTop:
-        UpdateClimbTopState(elapsedTime);
-        break;
-    case State::Grab:
-        UpdateGrabState(elapsedTime);
-        break;
-    }
+        // ステート毎の処理
+        switch (state)
+        {
+        case State::Idle:
+            UpdateIdleState(elapsedTime);
+            break;
+        case State::Move:
+            UpdateMoveState(elapsedTime);
+            break;
+        case State::Jump:
+            UpdateJumpState(elapsedTime);
+            break;
+        case State::Land:
+            UpdateLandState(elapsedTime);
+            break;
+        case State::Attack:
+            UpdateAttackState(elapsedTime);
+            break;
+        case State::Damage:
+            UpdateDamageState(elapsedTime);
+            break;
+        case State::Death:
+            UpdateDeathState(elapsedTime);
+            break;
+        case State::Climb:
+            UpdateClimbWallState(elapsedTime);
+            break;
+        case State::Swing:
+            UpdateSwingState(elapsedTime);
+            break;
+        case State::Shot:
+            UpdateShotingState(elapsedTime);
+            break;
+        case State::Dodge:
+            UpdateDodgeState(elapsedTime);
+            break;
+        case State::ClimbTop:
+            UpdateClimbTopState(elapsedTime);
+            break;
+        case State::Grab:
+            UpdateGrabState(elapsedTime);
+            break;
+        case State::CrouchIdle:
+            UpdateCrouchIdleState(elapsedTime);
+            break;
+        case State::TitleIdle:
+            UpdateTitleIdleState(elapsedTime);
+            break;
+        }
 
-    //弾丸更新処理
-    projectileManager.Update(elapsedTime);
-    brokenprojectileManager.Update(elapsedTime);
+        //弾丸更新処理
+        projectileManager.Update(elapsedTime);
+        brokenprojectileManager.Update(elapsedTime);
 
-    // 速度処理更新
-    UpdateVelocity(elapsedTime);
+        // 速度処理更新
+        UpdateVelocity(elapsedTime);
 
-    // 無敵時間更新処理
-    UpdateInvincibleTimer(elapsedTime);
+        // 無敵時間更新処理
+        UpdateInvincibleTimer(elapsedTime);
 
-    // プレイヤーとエネミーとの衝突処理
-    CollisionPlayerVsEnemies();
-    CollisionProjectileVsEnemies();
+        // プレイヤーとエネミーとの衝突処理
+        CollisionPlayerVsEnemies();
+        CollisionProjectileVsEnemies();
 
-    // イベントスクリプトポイントクリア
-    EventPointManager::Instance().CheckPoint(position, radius);
+        // イベントスクリプトポイントクリア
+        EventPointManager::Instance().CheckPoint(position, radius);
 
 
-    // オブジェクト行列を更新
-    UpdateTransform();
+        // オブジェクト行列を更新
+        UpdateTransform();
 
-    // アニメーション更新
-    model->UpdateAnimation(elapsedTime);
+        // アニメーション更新
+        model->UpdateAnimation(elapsedTime);
 
-    // モデル行列更新
-    model->UpdateTransform(transform);
+        // モデル行列更新
+        model->UpdateTransform(transform);
 
-    if (attacking)
-    {
-        attackTimer++;
+        if (attacking)
+        {
+            attackTimer++;
+        }
     }
 }
 
@@ -1107,14 +1117,14 @@ void Player::UpdateJumpState(float elapsedTime)
     HitResult hit;
     //if (FindWallSwingPoint(position, 5.0f, hit))
     //{
-        if ((gamePad.GetButton() & GamePad::BTN_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime))
-        {
-            lastState = state;
-            //  スイングステートへの遷移
-            TransitionSwingState();
-        }
+    if ((gamePad.GetButton() & GamePad::BTN_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime))
+    {
+        lastState = state;
+        //  スイングステートへの遷移
+        TransitionSwingState();
+    }
     //}
-    
+
     //  もしクライミング中なら、クライミング状態をキャンセルする
     if (onClimb)
     {
@@ -1650,10 +1660,44 @@ bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistanc
 
     previousSwingPoint = swingPoint;
 
-    
-        
+
+
 
     return false;
+}
+
+void Player::TransitionTitleIdleState()
+{
+    state = State::TitleIdle;
+    model->PlayAnimation(Anim_Crouch, false);
+}
+
+void Player::UpdateTitleIdleState(float elapsedTime)
+{
+
+}
+
+void Player::TransitionCrouchIdleState()
+{
+    state = State::CrouchIdle;
+    model->PlayAnimation(Anim_CrouchIdle, false);
+
+}
+
+void Player::UpdateCrouchIdleState(float elapsedTime)
+{
+    if (!model->IsPlayAnimation())
+    {
+        TransitionTitleIdleState();
+    }
+}
+
+void Player::TransitionSwingToKick()
+{
+}
+
+void Player::UpdateSwingToKick(float elapsedTime)
+{
 }
 
 

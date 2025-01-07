@@ -73,6 +73,7 @@ public:
     void RegisterRenderModel(Model* model);
     void UnregisterRenderModel(Model* model);
 
+
     Light* GetLight() { return mainDirectionalLight; }
 
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;

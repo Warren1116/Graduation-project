@@ -42,6 +42,10 @@ private:
 
 	std::unique_ptr<Sprite> Font;
 	std::unique_ptr<Sprite> TextFont;
+	std::unique_ptr<Sprite> Title;
+	std::unique_ptr<Sprite> Start;
+	std::unique_ptr<Sprite> Quit;
+
 
 	float alpha = 1.0f;
 	float alphaSpeed = 0.02f;
