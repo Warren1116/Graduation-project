@@ -193,3 +193,13 @@ void GamePad::Update()
 		buttonUp = ~newButtonState & buttonState[1];	// 離した瞬間
 	}
 }
+
+// ゲームパッドの振動設定
+void GamePad::SetVibration(float leftMotor, float rightMotor)
+{
+    XINPUT_VIBRATION vibration;
+    ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+    vibration.wLeftMotorSpeed = static_cast<WORD>(leftMotor * 65535.0f);
+    vibration.wRightMotorSpeed = static_cast<WORD>(rightMotor * 65535.0f);
+    XInputSetState(slot, &vibration);
+}

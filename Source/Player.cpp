@@ -506,7 +506,7 @@ void Player::UpdateGrabState(float elapsedTime)
             }
         }
 
-        lockonEnemy->ApplyDamage(5.0, 1.0);
+        lockonEnemy->ApplyDamage(20.0, 1.0);
     }
 
 }
@@ -1265,6 +1265,11 @@ void Player::TransitionDamageState()
 
     // ダメージアニメーション再生
     model->PlayAnimation(Anim_GetHit1, false);
+
+    // ダメージ時の振動
+    //GamePad& gamePad = Input::Instance().GetGamePad();
+    //gamePad.SetVibration(0.5f, 0.5f);
+
 }
 
 // ダメージステート更新処理
@@ -1273,6 +1278,10 @@ void Player::UpdateDamageState(float elapsedTime)
     // ダメージアニメーションが終わったら待機ステートへ遷移
     if (!model->IsPlayAnimation())
     {
+        // 振動停止
+        //GamePad& gamePad = Input::Instance().GetGamePad();
+        //gamePad.StopVibration();
+
         TransitionIdleState();
     }
 }

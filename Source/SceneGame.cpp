@@ -98,19 +98,22 @@ void SceneGame::Initialize()
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
-    // 敵を初期化
-    EnemyThief* thief = new EnemyThief();
-    thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
-    thief->SetTerritory(thief->GetPosition(), 10.0f);
-    thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
-    enemyManager.Register(thief);
 
-    ////	通信相手用に１匹増やす
-    EnemyThief* thief2 = new EnemyThief();
-    thief2->SetPosition(DirectX::XMFLOAT3(41.0f, 0.0f, 39.0f));
-    thief2->SetTerritory(thief2->GetPosition(), 10.0f);
-    thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
-    enemyManager.Register(thief2);
+    StartNextWave();
+
+    //// 敵を初期化
+    //EnemyThief* thief = new EnemyThief();
+    //thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+    //thief->SetTerritory(thief->GetPosition(), 10.0f);
+    //thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+    //enemyManager.Register(thief);
+
+    //////	通信相手用に１匹増やす
+    //EnemyThief* thief2 = new EnemyThief();
+    //thief2->SetPosition(DirectX::XMFLOAT3(41.0f, 0.0f, 39.0f));
+    //thief2->SetTerritory(thief2->GetPosition(), 10.0f);
+    //thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+    //enemyManager.Register(thief2);
 
     //EnemyThief* thief3 = new EnemyThief();
     //thief3->SetPosition(DirectX::XMFLOAT3(38.0f, 0.0f, 44.0f));
@@ -136,8 +139,8 @@ void SceneGame::Initialize()
     {
         player->model.get(),
         stageMain->GetModel(),
-        thief->GetModel(),
-        thief2->GetModel(),
+        //thief->GetModel(),
+        //thief2->GetModel(),
         //thief3->GetModel(),
         //thief4->GetModel(),
         //thief5->GetModel(),
@@ -158,10 +161,10 @@ void SceneGame::Initialize()
         // カメラコントローラー初期化
         cameraController = std::make_unique<CameraController>();
 
-        //// エネミー初期化
-        for (int i = 0; i < enemyManager.GetEnemyCount(); i++) {
-            characterManager.Register(enemyManager.GetEnemy(i));
-        }
+        ////// エネミー初期化
+        //for (int i = 0; i < enemyManager.GetEnemyCount(); i++) {
+        //    characterManager.Register(enemyManager.GetEnemy(i));
+        //}
 
     }
 
@@ -234,6 +237,8 @@ void SceneGame::Finalize()
 void SceneGame::Update(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
+
+    CheckWaveClear();
 
     //// イベントスクリプト初期化
     //EventScripter::Instance().Update(elapsedTime);
@@ -675,6 +680,133 @@ void SceneGame::UnregisterRenderModel(Model* model)
     shadowmapRenderer->UnregisterRenderModel(model);
     sceneRenderer->UnregisterRenderModel(model);
 
+}
+
+void SceneGame::SpawnEnemiesForWave(int wave)
+{
+    EnemyManager& enemyManager = EnemyManager::Instance();
+
+    switch (wave)
+    {
+    case 1:
+    {
+        // 敵を初期化
+        EnemyThief* thief = new EnemyThief();
+        thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+        thief->SetTerritory(thief->GetPosition(), 10.0f);
+        thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+        enemyManager.Register(thief);
+
+        ////	通信相手用に１匹増やす
+        EnemyThief* thief2 = new EnemyThief();
+        thief2->SetPosition(DirectX::XMFLOAT3(41.0f, 0.0f, 39.0f));
+        thief2->SetTerritory(thief2->GetPosition(), 10.0f);
+        thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+        enemyManager.Register(thief2);
+
+        //	モデルを各レンダラーに登録
+        Model* list[] =
+        {
+            thief->GetModel(),
+            thief2->GetModel(),
+
+        };
+        for (Model* model : list)
+        {
+            RegisterRenderModel(model);
+        }
+
+        // キャラクター生成処理
+        CharacterManager& characterManager = CharacterManager::Instance();
+        {
+            //// エネミー初期化
+            characterManager.Register(thief);
+            characterManager.Register(thief2);
+
+
+        }
+
+    }
+    break;
+    case 2:
+    {
+        EnemyThief* thief = new EnemyThief();
+        thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+        thief->SetTerritory(thief->GetPosition(), 10.0f);
+        thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+        enemyManager.Register(thief);
+
+        //	モデルを各レンダラーに登録
+        Model* list[] =
+        {
+            thief->GetModel(),
+
+        };
+        for (Model* model : list)
+        {
+            RegisterRenderModel(model);
+        }
+
+        // キャラクター生成処理
+        CharacterManager& characterManager = CharacterManager::Instance();
+        {
+            characterManager.Register(thief);
+
+        }
+    }
+
+    break;
+    case 3:
+    {
+        EnemyThief* thief = new EnemyThief();
+        thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+        thief->SetTerritory(thief->GetPosition(), 10.0f);
+        thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+        enemyManager.Register(thief);
+
+        //	モデルを各レンダラーに登録
+        Model* list[] =
+        {
+            thief->GetModel(),
+
+        };
+        for (Model* model : list)
+        {
+            RegisterRenderModel(model);
+        }
+        // キャラクター生成処理
+        CharacterManager& characterManager = CharacterManager::Instance();
+        {
+            characterManager.Register(thief);
+
+        }
+    }
+
+    break;
+
+    }
+
+}
+
+void SceneGame::StartNextWave()
+{
+    if (currentWave < totalWaves)
+    {
+        currentWave++;
+        waveInProgress = true;
+        SpawnEnemiesForWave(currentWave);
+    }
+
+
+}
+
+void SceneGame::CheckWaveClear()
+{
+    if (waveInProgress && EnemyManager::Instance().GetEnemyCount() == 0)
+    {
+        waveInProgress = false;
+        StartNextWave();
+    }
 }
 
 

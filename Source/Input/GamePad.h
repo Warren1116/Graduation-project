@@ -68,6 +68,12 @@ public:
 	// 右トリガー入力状態の取得
 	float GetTriggerR() const { return triggerR; }
 
+	// 振動を設定するメソッド
+	void SetVibration(float leftMotor, float rightMotor);
+
+    // 振動を停止するメソッド
+    void StopVibration() { SetVibration(0.0f, 0.0f); }
+
 private:
 	GamePadButton		buttonState[2] = { 0 };
 	GamePadButton		buttonDown = 0;

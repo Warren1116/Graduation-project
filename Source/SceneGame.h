@@ -121,7 +121,24 @@ private:
     //  オフスクリーンレンダリング用描画ターゲット
     std::unique_ptr<RenderTarget> renderTarget;
 
+    //  メインライト
     Light* mainDirectionalLight = nullptr;
+
+private:
+    //  ウェーブのカウンター
+    int currentWave = 0;
+    //  ウェーブの最大数
+    int totalWaves = 3;
+    //  ウェーブ進行中かどうか
+    bool waveInProgress = false;
+
+    //  ウェーブの敵を生成する
+    void SpawnEnemiesForWave(int wave);
+    //  次のウェーブを開始する
+    void StartNextWave();
+    //  ウェーブのクリアチェック
+    void CheckWaveClear();
+
 
 private:
     static SceneGame* instance;
