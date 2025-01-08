@@ -14,6 +14,8 @@
 #include "Renderer/PostprocessingRenderer.h"
 #include "MetaAI.h"
 #include "HeadUpDisplay.h"
+#include "EnemyThief.h"
+#include "Enemy.h"
 
 
 // ゲームシーン
@@ -67,8 +69,7 @@ public:
 
     bool isTutorial = false;
    
-    
-
+    //  チュトリアル
     TutorialState GetTutorialState() { return tutorialState; }
     void SetTutorialState(TutorialState newstate) { tutorialState = newstate; }
     void UnpauseGame();
@@ -139,6 +140,8 @@ private:
     //  ウェーブのクリアチェック
     void CheckWaveClear();
 
+    void RegisterEnemy(Enemy* enemy);
+    void RegisterEnemies(const std::vector<EnemyThief*>& enemies);
 
 private:
     static SceneGame* instance;
