@@ -138,7 +138,7 @@ Graphics::Graphics(HWND hWnd)
 
 	// モデルシェーダー
 	{
-		modelShaders[static_cast<int>(ModelShaderId::Lambert)] = std::make_unique<LambertShader>(device.Get());
+		//modelShaders[static_cast<int>(ModelShaderId::Lambert)] = std::make_unique<LambertShader>(device.Get());
 		modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
 		modelShaders[static_cast<int>(ModelShaderId::ShadowmapCaster)] = std::make_unique<ShadowmapCasterShader>(device.Get());
 

@@ -151,10 +151,17 @@ void ShadowmapCasterShader::SetBuffers(const RenderContext& rc, const std::vecto
 	{
 		for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
 		{
-			DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
-			DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-			DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-			DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
+			if (i < mesh.nodeIndices.size() && mesh.nodeIndices.at(i) < nodes.size()) {
+				DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+				DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+				DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
+				DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
+			}
+
+			//DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+			//DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+			//DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
+			//DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
 		}
 	}
 	else
