@@ -19,6 +19,7 @@ enum class EnemyAnimation
 	GetHit,
 	AttackPunch,
 	GetThrow,
+	HoldGun
 };
 
 class StateMachine;

@@ -452,7 +452,7 @@ void StandbyState::Enter()
     }
 
     Player::Instance().SetgetAttackSoon(false);
-    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Idle), false);
+    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::HoldGun), false);
     attackCooldownTimer = Mathf::RandomRange(2.5f, 4.0f);
 
 }
