@@ -264,27 +264,25 @@ void PhongShader::SetBuffers(const RenderContext& rc, const std::vector<Model::N
     // メッシュ用定数バッファ更新
     CbMesh cbMesh;
     ::memset(&cbMesh, 0, sizeof(cbMesh));
-    if (mesh.nodeIndices.size() > 0)
+
+    if (!mesh.nodeIndices.empty())
     {
         for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
         {
-            if (i < mesh.nodeIndices.size() && mesh.nodeIndices.at(i) < nodes.size()) {
+            if (mesh.nodeIndices.at(i) < nodes.size() && i < mesh.offsetTransforms.size())
+            {
                 DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
                 DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
                 DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
                 DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
             }
-
-            //DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
-            //DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-            //DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-            //DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
         }
     }
-    else
+    else if (mesh.nodeIndex < nodes.size())
     {
         cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
     }
+
     rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
 
     UINT stride = sizeof(ModelResource::Vertex);
@@ -292,6 +290,30 @@ void PhongShader::SetBuffers(const RenderContext& rc, const std::vector<Model::N
     rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
     rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
     rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+    //if (mesh.nodeIndices.size() > 0)
+    //{
+    //    for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
+    //    {
+    //        DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
+    //        DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
+    //        DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
+    //        DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
+    //    }
+    //}
+    //else
+    //{
+    //    cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
+    //}
+    //rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+
+    //UINT stride = sizeof(ModelResource::Vertex);
+    //UINT offset = 0;
+    //rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
+    //rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    //rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 }
 
 // サブセット単位で描画

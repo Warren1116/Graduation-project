@@ -4,9 +4,7 @@
 #include <string>
 #include <map>
 
-// メッセンジャークラス
-// クラス間のつながりを考えるのがめんどくさかったのでサボるために実装
-// 作りもテキトー
+
 class Messenger
 {
 public:

@@ -30,27 +30,28 @@ Player::Player(bool flag)
     instance = this;
 
     // モデル読み込み
+    //model = std::make_unique<Model>("Data/Model/Jammo/jammo.mdl");
     model = std::make_unique<Model>("Data/Model/Spider-man/spider-man.mdl");
     model->GetNodePoses(nodePoses);
 
     radius = 0.5f;
 
-    Model::Node* RightHandPos = model->FindNode("mixamorig:RightHand");
-    DirectX::XMFLOAT3 pos = {};
-    pos.x = RightHandPos->worldTransform._41;
-    pos.y = RightHandPos->worldTransform._42;
-    pos.z = RightHandPos->worldTransform._43;
+    //Model::Node* RightHandPos = model->FindNode("mixamorig:RightHand");
+    //DirectX::XMFLOAT3 pos = {};
+    //pos.x = RightHandPos->worldTransform._41;
+    //pos.y = RightHandPos->worldTransform._42;
+    //pos.z = RightHandPos->worldTransform._43;
 
 
-    // ジョイント初期化
-    for (int i = 0; i < _countof(joints); ++i)
-    {
-        Joint& joint = joints[i];
-        joint.position.x = pos.x + i;
-        joint.position.y = pos.y;
-        joint.position.z = pos.z;
-        joint.oldPosition = joint.position;
-    }
+    //// ジョイント初期化
+    //for (int i = 0; i < _countof(joints); ++i)
+    //{
+    //    Joint& joint = joints[i];
+    //    joint.position.x = pos.x + i;
+    //    joint.position.y = pos.y;
+    //    joint.position.z = pos.z;
+    //    joint.oldPosition = joint.position;
+    //}
 
     // モデルが大きいのでスケーリング
     if (!flag)
@@ -73,30 +74,32 @@ Player::Player(bool flag)
     TransitionCrouchIdleState();
     //TransitionTitleIdleState();
 
-    EventModeIndex = Messenger::Instance().AddReceiver(MessageData::EVENTMODEEVENT, [&](void* data) { TransitionIdleState(); state = State::EventMode; });
-    GameModeIndex = Messenger::Instance().AddReceiver(MessageData::GAMEMODEEVENT, [&](void* data) { state = State::Idle; });
+    //// メッセージ受信登録
+    //EventModeIndex = Messenger::Instance().AddReceiver(MessageData::EVENTMODEEVENT, [&](void* data) { TransitionIdleState(); state = State::EventMode; });
+    //GameModeIndex = Messenger::Instance().AddReceiver(MessageData::GAMEMODEEVENT, [&](void* data) { state = State::Idle; });
 
-    SetPositionIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERSETPOSITIONEVENT,
-        [&](void* data)
-        {
-            MessageData::PLAYERSETPOSITIONDATA* d = static_cast<MessageData::PLAYERSETPOSITIONDATA*>(data);
-            position = d->position;
-        });
-    MoveIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERMOVEEVENT,
-        [&](void* data)
-        {
-            MessageData::PLAYERMOVEDATA* d = static_cast<MessageData::PLAYERMOVEDATA*>(data);
-            moveData.moveVec = d->moveVec;
-            moveData.moveSpeed = d->moveSpeed;
-            moveData.turnSpeed = d->turnSpeed;
-        });
-    MotionIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERMOTIONEVENT,
-        [&](void* data)
-        {
-            MessageData::PLAYERMOTIONDATA* d = static_cast<MessageData::PLAYERMOTIONDATA*>(data);
-            if (model->GetCurrentAnimationIndex())
-                model->PlayAnimation(d->index, d->loop, d->blendSecond);
-        });
+    //// イベントの情報登録
+    //SetPositionIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERSETPOSITIONEVENT,
+    //    [&](void* data)
+    //    {
+    //        MessageData::PLAYERSETPOSITIONDATA* d = static_cast<MessageData::PLAYERSETPOSITIONDATA*>(data);
+    //        position = d->position;
+    //    });
+    //MoveIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERMOVEEVENT,
+    //    [&](void* data)
+    //    {
+    //        MessageData::PLAYERMOVEDATA* d = static_cast<MessageData::PLAYERMOVEDATA*>(data);
+    //        moveData.moveVec = d->moveVec;
+    //        moveData.moveSpeed = d->moveSpeed;
+    //        moveData.turnSpeed = d->turnSpeed;
+    //    });
+    //MotionIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERMOTIONEVENT,
+    //    [&](void* data)
+    //    {
+    //        MessageData::PLAYERMOTIONDATA* d = static_cast<MessageData::PLAYERMOTIONDATA*>(data);
+    //        if (model->GetCurrentAnimationIndex())
+    //            model->PlayAnimation(d->index, d->loop, d->blendSecond);
+    //    });
 
 
 }
@@ -105,12 +108,12 @@ Player::Player(bool flag)
 // デストラクタ
 Player::~Player()
 {
-    Messenger::Instance().RemoveReceiver(EventModeIndex);
-    Messenger::Instance().RemoveReceiver(GameModeIndex);
+    //Messenger::Instance().RemoveReceiver(EventModeIndex);
+    //Messenger::Instance().RemoveReceiver(GameModeIndex);
 
-    Messenger::Instance().RemoveReceiver(SetPositionIndex);
-    Messenger::Instance().RemoveReceiver(MoveIndex);
-    Messenger::Instance().RemoveReceiver(MotionIndex);
+    //Messenger::Instance().RemoveReceiver(SetPositionIndex);
+    //Messenger::Instance().RemoveReceiver(MoveIndex);
+    //Messenger::Instance().RemoveReceiver(MotionIndex);
 }
 
 // 更新処理
@@ -185,8 +188,8 @@ void Player::Update(float elapsedTime)
         CollisionPlayerVsEnemies();
         CollisionProjectileVsEnemies();
 
-        // イベントスクリプトポイントクリア
-        EventPointManager::Instance().CheckPoint(position, radius);
+        //// イベントスクリプトポイントクリア
+        //EventPointManager::Instance().CheckPoint(position, radius);
 
 
         // オブジェクト行列を更新
@@ -575,7 +578,7 @@ void Player::UpdateCameraState(float elapsedTime)
     for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
     {
         Character* character = manager.GetCharacter(ii);
-        if (character != this && character->GetHealth() > 0)
+        if (character != nullptr && character != this && character->GetHealth() > 0)
         {
             enemyCount++;
             break;

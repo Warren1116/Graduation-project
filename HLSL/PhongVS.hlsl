@@ -10,7 +10,7 @@ float4 boneWeights : WEIGHTS,
 uint4 boneIndices : BONES
 )
 {
-    boneWeights /= dot(boneWeights, float4(1, 1, 1, 1));
+    //boneWeights /= dot(boneWeights, float4(1, 1, 1, 1));
 
     float3 p = { 0, 0, 0 };
     float3 n = { 0, 0, 0 };
