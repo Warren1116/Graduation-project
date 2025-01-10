@@ -49,16 +49,16 @@ private:
 
 	struct CbShadowMap
 	{
-		DirectX::XMFLOAT4X4 lightViewProjection;  //ライトビュープロジェクション行列
-		DirectX::XMFLOAT3 shadowColor;            //影の色
-		float shadowBias;                         //深度比較用のオフセット値
+		//DirectX::XMFLOAT4X4 lightViewProjection;  //ライトビュープロジェクション行列
+		//DirectX::XMFLOAT3 shadowColor;            //影の色
+		//float shadowBias;                         //深度比較用のオフセット値
 
 
 
-		//DirectX::XMFLOAT4X4	lightViewProjection[ShadowmapCount];	//	ライトビュープロジェクション行列
-		//DirectX::XMFLOAT4	shadowBias;				//	深度比較用のオフセット値
-		//DirectX::XMFLOAT3	shadowColor;			//	影の色
-		//float				dummy;
+		DirectX::XMFLOAT4X4	lightViewProjection[ShadowmapCount];	//	ライトビュープロジェクション行列
+		DirectX::XMFLOAT4	shadowBias;				//	深度比較用のオフセット値
+		DirectX::XMFLOAT3	shadowColor;			//	影の色
+		float				dummy;
 	};
 
 

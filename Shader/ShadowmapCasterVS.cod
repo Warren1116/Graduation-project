@@ -38,7 +38,7 @@
 // TEXCOORD                 0   xy          3     NONE   float       
 // COLOR                    0   xyzw        4     NONE   float       
 // WEIGHTS                  0   xyzw        5     NONE   float   xyzw
-// BONES                    0   xyzw        6     NONE   float   xyzw
+// BONES                    0   xyzw        6     NONE    uint   xyzw
 //
 //
 // Output signature:
@@ -52,7 +52,11 @@ dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_immediateConstantBuffer { { 1.000000, 0, 0, 0},
                               { 0, 1.000000, 0, 0},
                               { 0, 0, 1.000000, 0},
-                              { 0, 0, 0, 1.000000} }
+                              { 0, 0, 0, 1.000000},
+                              { -1, 0, 0, 0},
+                              { 0, -1, 0, 0},
+                              { 0, 0, -1, 0},
+                              { 0, 0, 0, -1} }
 dcl_constantbuffer CB0[4], immediateIndexed
 dcl_constantbuffer CB1[512], dynamicIndexed
 dcl_input v0.xyzw
@@ -89,8 +93,9 @@ loop
 
 #line 18
   dp4 r3.x, r0.xyzw, icb[r2.w + 0].xyzw
-  dp4 r3.y, v6.xyzw, icb[r2.w + 0].xyzw
-  ftou r3.y, r3.y
+  and r4.xyzw, v6.xyzw, icb[r2.w + 4].xyzw
+  or r3.yz, r4.yywy, r4.xxzx
+  or r3.y, r3.z, r3.y
   imul null, r3.y, r3.y, l(4)
   mul r4.xyz, v0.xxxx, cb1[r3.y + 0].xyzx
   mul r5.xyz, v0.yyyy, cb1[r3.y + 1].xyzx
@@ -102,7 +107,7 @@ loop
   mul r3.xyz, r3.yzwy, r3.xxxx
   add r2.xyz, r2.xyzx, r3.xyzx
 
-#line 20
+#line 19
   iadd r2.w, r2.w, l(1)
 endloop 
 
@@ -115,4 +120,4 @@ add r0.xyzw, r0.xyzw, r1.xyzw
 mul r1.xyzw, cb0[3].xyzw, l(1.000000, 1.000000, 1.000000, 1.000000)
 add o0.xyzw, r0.xyzw, r1.xyzw
 ret 
-// Approximately 33 instruction slots used
+// Approximately 34 instruction slots used

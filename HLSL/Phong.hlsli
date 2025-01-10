@@ -13,8 +13,9 @@ struct VS_OUT
     float3 binormal : BINORMAL; //従法線
     float2 texcoord : TEXCOORD; //法線
     float4 color : COLOR;
-    float3 shadowTexcoord : TEXCOORD1; //シャドウマップから情報を取得するためのUV座標＋深度値
-    //float3 shadowTexcoord[ShadowmapCount] : TEXCOORD1; //シャドウマップから情報を取得するためのUV座標＋深度値
+    
+    //float3 shadowTexcoord : TEXCOORD1; //シャドウマップから情報を取得するためのUV座標＋深度値
+    float3 shadowTexcoord[ShadowmapCount] : TEXCOORD1; //シャドウマップから情報を取得するためのUV座標＋深度値
 
 };
 
@@ -44,13 +45,14 @@ cbuffer CbSubset : register(b2)
 
 cbuffer CbShadowmap : register(b3)
 {
-    row_major float4x4 lightViewProjection; //ライトビュープロジェクション行列
-    float3 shadowColor; //影の色
-    float shadowBias; //深度値比較時のオフセット
-
-    //row_major float4x4 lightViewProjection[ShadowmapCount]; //ライトビュープロジェクション行列
-    //float4 shadowBias; //深度値比較時のオフセット
+    //row_major float4x4 lightViewProjection; //ライトビュープロジェクション行列
     //float3 shadowColor; //影の色
-    //float dummy;
+    //float shadowBias; //深度値比較時のオフセット
+
+    row_major float4x4 lightViewProjection[ShadowmapCount]; //ライトビュープロジェクション行列
+    float4 shadowBias; //深度値比較時のオフセット
+    float3 shadowColor; //影の色
+    
+    float dummy;
 
 }

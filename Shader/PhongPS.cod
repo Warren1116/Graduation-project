@@ -39,9 +39,10 @@
 // cbuffer CbShadowmap
 // {
 //
-//   row_major float4x4 lightViewProjection;// Offset:    0 Size:    64 [unused]
-//   float3 shadowColor;                // Offset:   64 Size:    12
-//   float shadowBias;                  // Offset:   76 Size:     4
+//   row_major float4x4 lightViewProjection[4];// Offset:    0 Size:   256 [unused]
+//   float4 shadowBias;                 // Offset:  256 Size:    16
+//   float3 shadowColor;                // Offset:  272 Size:    12
+//   float dummy;                       // Offset:  284 Size:     4 [unused]
 //
 // }
 //
@@ -54,7 +55,10 @@
 // shadowMapSamplerState             sampler      NA          NA             s1      1 
 // diffuseMap                        texture  float4          2d             t0      1 
 // normalMap                         texture  float4          2d             t1      1 
-// shadowMap                         texture  float4          2d             t2      1 
+// shadowMap[0]                      texture  float4          2d             t2      1 
+// shadowMap[1]                      texture  float4          2d             t3      1 
+// shadowMap[2]                      texture  float4          2d             t4      1 
+// shadowMap[3]                      texture  float4          2d             t5      1 
 // CbScene                           cbuffer      NA          NA            cb0      1 
 // CbShadowmap                       cbuffer      NA          NA            cb3      1 
 //
@@ -72,6 +76,9 @@
 // TEXCOORD                 0   xy          5     NONE   float   xy  
 // COLOR                    0   xyzw        6     NONE   float   xyzw
 // TEXCOORD                 1   xyz         7     NONE   float   xyz 
+// TEXCOORD                 2   xyz         8     NONE   float   xyz 
+// TEXCOORD                 3   xyz         9     NONE   float   xyz 
+// TEXCOORD                 4   xyz        10     NONE   float   xyz 
 //
 //
 // Output signature:
@@ -83,12 +90,15 @@
 ps_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB0[41], dynamicIndexed
-dcl_constantbuffer CB3[5], immediateIndexed
+dcl_constantbuffer CB3[18], immediateIndexed
 dcl_sampler s0, mode_default
 dcl_sampler s1, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_resource_texture2d (float,float,float,float) t1
 dcl_resource_texture2d (float,float,float,float) t2
+dcl_resource_texture2d (float,float,float,float) t3
+dcl_resource_texture2d (float,float,float,float) t4
+dcl_resource_texture2d (float,float,float,float) t5
 dcl_input_ps linear v1.xyz
 dcl_input_ps linear v2.xyz
 dcl_input_ps linear v3.xyz
@@ -96,6 +106,9 @@ dcl_input_ps linear v4.xyz
 dcl_input_ps linear v5.xy
 dcl_input_ps linear v6.xyzw
 dcl_input_ps linear v7.xyz
+dcl_input_ps linear v8.xyz
+dcl_input_ps linear v9.xyz
+dcl_input_ps linear v10.xyz
 dcl_output o0.xyzw
 dcl_temps 15
 //
@@ -107,18 +120,21 @@ dcl_temps 15
 //   v4.x <- pin.binormal.x; v4.y <- pin.binormal.y; v4.z <- pin.binormal.z; 
 //   v5.x <- pin.texcoord.x; v5.y <- pin.texcoord.y; 
 //   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
-//   v7.x <- pin.shadowTexcoord.x; v7.y <- pin.shadowTexcoord.y; v7.z <- pin.shadowTexcoord.z; 
+//   v7.x <- pin.shadowTexcoord[0].x; v7.y <- pin.shadowTexcoord[0].y; v7.z <- pin.shadowTexcoord[0].z; 
+//   v8.x <- pin.shadowTexcoord[1].x; v8.y <- pin.shadowTexcoord[1].y; v8.z <- pin.shadowTexcoord[1].z; 
+//   v9.x <- pin.shadowTexcoord[2].x; v9.y <- pin.shadowTexcoord[2].y; v9.z <- pin.shadowTexcoord[2].z; 
+//   v10.x <- pin.shadowTexcoord[3].x; v10.y <- pin.shadowTexcoord[3].y; v10.z <- pin.shadowTexcoord[3].z; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 15 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
+#line 16 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v5.xyxx, t0.xyzw, s0
 mul r0.xyzw, r0.xyzw, v6.xyzw  // r0.x <- diffuseColor.x; r0.y <- diffuseColor.y; r0.z <- diffuseColor.z; r0.w <- diffuseColor.w
 
-#line 18
+#line 19
 sample_indexable(texture2d)(float,float,float,float) r1.xyz, v5.xyxx, t1.xyzw, s0
 mov r1.xyz, r1.xyzx  // r1.x <- normal.x; r1.y <- normal.y; r1.z <- normal.z
 
-#line 24
+#line 25
 dp3 r1.w, v3.xyzx, v3.xyzx
 rsq r1.w, r1.w
 mul r2.xyz, r1.wwww, v3.xyzx
@@ -138,7 +154,7 @@ mov r4.x, r2.z  // r4.x <- CM._m02
 mov r4.y, r3.z  // r4.y <- CM._m12
 mov r4.z, r4.z  // r4.z <- CM._m22
 
-#line 28
+#line 29
 mul r1.xyz, r1.xyzx, l(2.000000, 2.000000, 2.000000, 0.000000)
 mov r2.xyz, l(-1.000000,-1.000000,-1.000000,-0.000000)
 add r1.xyz, r1.xyzx, r2.xyzx
@@ -149,34 +165,34 @@ dp3 r1.x, r2.xyzx, r2.xyzx
 rsq r1.x, r1.x
 mul r1.xyz, r1.xxxx, r2.xyzx  // r1.x <- N.x; r1.y <- N.y; r1.z <- N.z
 
-#line 30
+#line 31
 dp3 r1.w, cb0[6].xyzx, cb0[6].xyzx
 rsq r1.w, r1.w
 mul r2.xyz, r1.wwww, cb0[6].xyzx  // r2.x <- L.x; r2.y <- L.y; r2.z <- L.z
 
-#line 31
+#line 32
 mov r3.xyz, -v1.xyzx
 add r3.xyz, r3.xyzx, cb0[0].xyzx
 dp3 r1.w, r3.xyzx, r3.xyzx
 rsq r1.w, r1.w
 mul r3.xyz, r1.wwww, r3.xyzx  // r3.x <- E.x; r3.y <- E.y; r3.z <- E.z
 
-#line 34
+#line 35
 itof r4.xyz, l(1, 1, 1, 0)  // r4.x <- ka.x; r4.y <- ka.y; r4.z <- ka.z
 
-#line 35
+#line 36
 itof r5.xyz, l(1, 1, 1, 0)  // r5.x <- kd.x; r5.y <- kd.y; r5.z <- kd.z
 
-#line 36
+#line 37
 itof r6.xyz, l(1, 1, 1, 0)  // r6.x <- ks.x; r6.y <- ks.y; r6.z <- ks.z
 
-#line 37
+#line 38
 itof r1.w, l(128)  // r1.w <- shiness
 
-#line 41
+#line 42
 mul r4.xyz, r4.xyzx, cb0[5].xyzx  // r4.x <- ambient.x; r4.y <- ambient.y; r4.z <- ambient.z
 
-#line 49
+#line 50
 nop 
 mov r1.xyz, r1.xyzx
 mov r2.xyz, r2.xyzx
@@ -193,10 +209,10 @@ min r2.w, r2.w, l(1.000000)  // r2.w <- d
 mul r7.xyz, r2.wwww, r7.xyzx
 mul r7.xyz, r5.xyzx, r7.xyzx  // r7.x <- <CalcLambertDiffuse return value>.x; r7.y <- <CalcLambertDiffuse return value>.y; r7.z <- <CalcLambertDiffuse return value>.z
 
-#line 49 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
+#line 50 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
 mov r7.xyz, r7.xyzx  // r7.x <- diffuse.x; r7.y <- diffuse.y; r7.z <- diffuse.z
 
-#line 50
+#line 51
 nop 
 mov r1.xyz, r1.xyzx
 mov r2.xyz, r2.xyzx
@@ -226,90 +242,215 @@ exp r2.x, r2.x  // r2.x <- d
 mul r2.xyz, r2.xxxx, r8.xyzx
 mul r2.xyz, r6.xyzx, r2.xyzx  // r2.x <- <CalcPhongSpecular return value>.x; r2.y <- <CalcPhongSpecular return value>.y; r2.z <- <CalcPhongSpecular return value>.z
 
-#line 50 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
+#line 51 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
 mov r2.xyz, r2.xyzx  // r2.x <- specular.x; r2.y <- specular.y; r2.z <- specular.z
 
-#line 53
-nop 
-nop 
-nop 
-mov r8.xyz, v7.xyzx
-mov r9.xyz, cb3[4].xyzx
-mov r2.w, cb3[4].w
+#line 56
+itof r8.xyz, l(1, 1, 1, 0)  // r8.x <- shadow.x; r8.y <- shadow.y; r8.z <- shadow.z
 
-#line 58 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ShadowmapFunctions.hlsli"
-resinfo_indexable(texture2d)(float,float,float,float)_uint r10.xy, l(0), t2.xyzw
-mov r10.x, r10.x  // r10.x <- width
-mov r10.y, r10.y  // r10.y <- height
+#line 59
+mov r9.xyz, v7.xyzx  // r9.x <- shadowTexcoord.x; r9.y <- shadowTexcoord.y; r9.z <- shadowTexcoord.z
 
 #line 61
-utof r3.w, r10.x
-div r11.x, l(1.000000), r3.w  // r11.x <- texelSize.x
-utof r3.w, r10.y
-div r11.y, l(1.000000), r3.w  // r11.y <- texelSize.y
-
-#line 64
-itof r3.w, l(0)  // r3.w <- factor
+itof r2.w, l(0)
+ge r2.w, r9.z, r2.w
+itof r3.w, l(1)
+ge r3.w, r3.w, r9.z
+and r2.w, r2.w, r3.w
+itof r3.w, l(0)
+ge r3.w, r9.x, r3.w
+and r2.w, r2.w, r3.w
+itof r3.w, l(1)
+ge r3.w, r3.w, r9.x
+and r2.w, r2.w, r3.w
+itof r3.w, l(0)
+ge r3.w, r9.y, r3.w
+and r2.w, r2.w, r3.w
+itof r3.w, l(1)
+ge r3.w, r3.w, r9.y
+and r2.w, r2.w, r3.w
+if_nz r2.w
 
 #line 66
-mov r4.w, l(-2)  // r4.w <- x
-mov r5.w, r3.w  // r5.w <- factor
-mov r6.w, r4.w  // r6.w <- x
-loop 
-  ige r7.w, l(2), r6.w
-  breakc_z r7.w
+  sample_indexable(texture2d)(float,float,float,float) r3.w, v7.xyxx, t2.yzwx, s1  // r3.w <- depth
 
 #line 68
-  mov r7.w, l(-2)  // r7.w <- y
-  mov r8.w, r5.w  // r8.w <- factor
-  mov r9.w, r7.w  // r9.w <- y
-  loop 
-    ige r10.x, l(2), r9.w
-    breakc_z r10.x
+  mov r3.w, -r3.w
+  add r3.w, r3.w, r9.z
+  lt r3.w, cb3[16].x, r3.w
+  if_nz r3.w
+
+#line 69
+    mov r8.xyz, cb3[17].xyzx
+  endif 
 
 #line 71
-    itof r10.x, r6.w
-    itof r10.y, r9.w
-    mul r10.xy, r10.xyxx, r11.xyxx
-    add r10.xy, r8.xyxx, r10.xyxx
-    sample_indexable(texture2d)(float,float,float,float) r10.x, r10.xyxx, t2.xyzw, s1
-    mov r10.x, r10.x  // r10.x <- depth
+endif 
+
+#line 57
+not r3.w, r2.w
+not r3.w, r3.w
+or r2.w, r2.w, r3.w
+if_z r2.w
+
+#line 59
+  mov r9.xyz, v8.xyzx
+
+#line 61
+  if_z r2.w
+    itof r3.w, l(0)
+    ge r3.w, r9.z, r3.w
+    itof r4.w, l(1)
+    ge r4.w, r4.w, r9.z
+    and r3.w, r3.w, r4.w
+    itof r4.w, l(0)
+    ge r4.w, r9.x, r4.w
+    and r3.w, r3.w, r4.w
+    itof r4.w, l(1)
+    ge r4.w, r4.w, r9.x
+    and r3.w, r3.w, r4.w
+    itof r4.w, l(0)
+    ge r4.w, r9.y, r4.w
+    and r3.w, r3.w, r4.w
+    itof r4.w, l(1)
+    ge r4.w, r4.w, r9.y
+    and r3.w, r3.w, r4.w
+    if_nz r3.w
+
+#line 66
+      sample_indexable(texture2d)(float,float,float,float) r4.w, v8.xyxx, t3.yzwx, s1  // r4.w <- depth
+
+#line 68
+      mov r4.w, -r4.w
+      add r4.w, r4.w, r9.z
+      lt r4.w, cb3[16].y, r4.w
+      if_nz r4.w
+
+#line 69
+        mov r8.xyz, cb3[17].xyzx
+      endif 
+
+#line 71
+    endif 
+  else 
+    mov r3.w, l(-1)
+  endif 
+  or r2.w, r2.w, r3.w
+
+#line 57
+  not r3.w, r2.w
+  not r3.w, r3.w
+  or r2.w, r2.w, r3.w
 
 #line 72
-    mov r10.x, -r10.x
-    add r10.x, r8.z, r10.x
-    ge r10.x, r2.w, r10.x
-    movc r10.x, r10.x, l(1.000000), l(0)
-    add r8.w, r8.w, r10.x
+else 
+  mov r2.w, l(-1)
+endif 
 
-#line 73
-    iadd r9.w, r9.w, l(1)
-  endloop 
-  mov r5.w, r8.w  // r5.w <- factor
+#line 57
+if_z r2.w
+
+#line 59
+  mov r9.xyz, v9.xyzx
+
+#line 61
+  itof r2.w, l(0)
+  ge r2.w, r9.z, r2.w
+  itof r3.w, l(1)
+  ge r3.w, r3.w, r9.z
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(0)
+  ge r3.w, r9.x, r3.w
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(1)
+  ge r3.w, r3.w, r9.x
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(0)
+  ge r3.w, r9.y, r3.w
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(1)
+  ge r3.w, r3.w, r9.y
+  and r2.w, r2.w, r3.w
+  if_nz r2.w
+
+#line 66
+    sample_indexable(texture2d)(float,float,float,float) r3.w, v9.xyxx, t4.yzwx, s1  // r3.w <- depth
+
+#line 68
+    mov r3.w, -r3.w
+    add r3.w, r3.w, r9.z
+    lt r3.w, cb3[16].z, r3.w
+    if_nz r3.w
+
+#line 69
+      mov r8.xyz, cb3[17].xyzx
+    endif 
+
+#line 71
+  endif 
+
+#line 57
+  not r3.w, r2.w
+  not r3.w, r3.w
+  or r2.w, r2.w, r3.w
+
+#line 72
+else 
+  mov r2.w, l(-1)
+endif 
+
+#line 57
+if_z r2.w
+
+#line 59
+  mov r9.xyz, v10.xyzx
+
+#line 61
+  itof r2.w, l(0)
+  ge r2.w, r9.z, r2.w
+  itof r3.w, l(1)
+  ge r3.w, r3.w, r9.z
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(0)
+  ge r3.w, r9.x, r3.w
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(1)
+  ge r3.w, r3.w, r9.x
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(0)
+  ge r3.w, r9.y, r3.w
+  and r2.w, r2.w, r3.w
+  itof r3.w, l(1)
+  ge r3.w, r3.w, r9.y
+  and r2.w, r2.w, r3.w
+  if_nz r2.w
+
+#line 66
+    sample_indexable(texture2d)(float,float,float,float) r2.w, v10.xyxx, t5.yzwx, s1  // r2.w <- depth
+
+#line 68
+    mov r2.w, -r2.w
+    add r2.w, r2.w, r9.z
+    lt r2.w, cb3[16].w, r2.w
+    if_nz r2.w
+
+#line 69
+      mov r8.xyz, cb3[17].xyzx
+    endif 
+
+#line 71
+  endif 
+
+#line 72
+endif 
 
 #line 74
-  iadd r6.w, r6.w, l(1)
-endloop 
-
-#line 76
-itof r8.xyz, l(1, 1, 1, 0)
-itof r2.w, l(25)
-div r2.w, r5.w, r2.w
-mov r10.xyz, -r9.xyzx
-add r8.xyz, r8.xyzx, r10.xyzx
-mul r8.xyz, r2.wwww, r8.xyzx
-add r8.xyz, r8.xyzx, r9.xyzx  // r8.x <- <CalcShadowColorPCFFilter return value>.x; r8.y <- <CalcShadowColorPCFFilter return value>.y; r8.z <- <CalcShadowColorPCFFilter return value>.z
-
-#line 53 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
-mov r8.xyz, r8.xyzx  // r8.x <- shadow.x; r8.y <- shadow.y; r8.z <- shadow.z
-
-#line 73
 mul r7.xyz, r7.xyzx, r8.xyzx
 
-#line 74
+#line 75
 mul r2.xyz, r2.xyzx, r8.xyzx
 
-#line 77
+#line 78
 mov r2.w, l(0)  // r2.w <- i
 mov r8.xyz, r7.xyzx  // r8.x <- diffuse.x; r8.y <- diffuse.y; r8.z <- diffuse.z
 mov r9.xyz, r2.xyzx  // r9.x <- specular.x; r9.y <- specular.y; r9.z <- specular.z
@@ -318,26 +459,26 @@ loop
   ilt r4.w, r3.w, cb0[40].x
   breakc_z r4.w
 
-#line 80
+#line 81
   imul null, r4.w, r3.w, l(4)
   mov r10.xyz, -cb0[r4.w + 8].xyzx
   add r10.xyz, r10.xyzx, v1.xyzx  // r10.x <- lightVector.x; r10.y <- lightVector.y; r10.z <- lightVector.z
 
-#line 83
+#line 84
   dp3 r4.w, r10.xyzx, r10.xyzx
   sqrt r4.w, r4.w  // r4.w <- lightLength
 
-#line 85
+#line 86
   imul null, r5.w, r3.w, l(4)
   ge r5.w, r4.w, cb0[r5.w + 11].x
   if_nz r5.w
 
-#line 86
+#line 87
     iadd r3.w, r3.w, l(1)
     continue 
   endif 
 
-#line 89
+#line 90
   imul null, r5.w, r3.w, l(4)
   div r4.w, r4.w, cb0[r5.w + 11].x
   mov r4.w, -r4.w
@@ -345,27 +486,27 @@ loop
   max r4.w, r4.w, l(0.000000)
   min r4.w, r4.w, l(1.000000)  // r4.w <- attenuate
 
-#line 91
+#line 92
   dp3 r5.w, r10.xyzx, r10.xyzx
   rsq r5.w, r5.w
   mul r10.xyz, r5.wwww, r10.xyzx
 
-#line 94
+#line 95
   imul null, r5.w, r3.w, l(4)
   dp3 r6.w, cb0[r5.w + 9].xyzx, cb0[r5.w + 9].xyzx
   rsq r6.w, r6.w
   mul r11.xyz, r6.wwww, cb0[r5.w + 9].xyzx  // r11.x <- spotDirection.x; r11.y <- spotDirection.y; r11.z <- spotDirection.z
 
-#line 95
+#line 96
   dp3 r5.w, r11.xyzx, r10.xyzx  // r5.w <- angle
 
-#line 96
+#line 97
   imul null, r6.w, r3.w, l(4)
   imul null, r7.w, r3.w, l(4)
   mov r7.w, -cb0[r7.w + 11].w
   add r6.w, r7.w, cb0[r6.w + 11].z  // r6.w <- area
 
-#line 97
+#line 98
   imul null, r7.w, r3.w, l(4)
   mov r5.w, -r5.w
   add r5.w, r5.w, cb0[r7.w + 11].z
@@ -376,7 +517,7 @@ loop
   min r5.w, r5.w, l(1.000000)
   mul r4.w, r4.w, r5.w
 
-#line 99
+#line 100
   nop 
   mov r11.xyz, r1.xyzx
   mov r10.xyz, r10.xyzx
@@ -394,11 +535,11 @@ loop
   mul r11.xyz, r5.wwww, r12.xyzx
   mul r11.xyz, r13.xyzx, r11.xyzx  // r11.x <- <CalcLambertDiffuse return value>.x; r11.y <- <CalcLambertDiffuse return value>.y; r11.z <- <CalcLambertDiffuse return value>.z
 
-#line 99 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
+#line 100 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
   mul r11.xyz, r4.wwww, r11.xyzx
   add r8.xyz, r8.xyzx, r11.xyzx
 
-#line 101
+#line 102
   nop 
   mov r11.xyz, r1.xyzx
   mov r10.xyz, r10.xyzx
@@ -429,20 +570,20 @@ loop
   mul r10.xyz, r5.wwww, r12.xyzx
   mul r10.xyz, r14.xyzx, r10.xyzx  // r10.x <- <CalcPhongSpecular return value>.x; r10.y <- <CalcPhongSpecular return value>.y; r10.z <- <CalcPhongSpecular return value>.z
 
-#line 101 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
+#line 102 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
   mul r10.xyz, r4.wwww, r10.xyzx
   add r9.xyz, r9.xyzx, r10.xyzx
 
-#line 77
+#line 78
   iadd r3.w, r3.w, l(1)
 
-#line 104
+#line 105
 endloop 
 
-#line 106
+#line 107
 add r1.xyz, r4.xyzx, r8.xyzx
 mul r0.xyz, r0.xyzx, r1.xyzx
 add o0.xyz, r9.xyzx, r0.xyzx
 mov o0.w, r0.w
 ret 
-// Approximately 218 instruction slots used
+// Approximately 301 instruction slots used

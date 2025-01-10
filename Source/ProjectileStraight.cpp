@@ -36,11 +36,17 @@ void ProjectileStraight::Update(float elapsedTime)
     if (lifeTimer <= 0.0f)
     {
         SceneGame& sceneGame = SceneGame::Instance();
-        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        //{
+        //    sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
+        //    sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
+        //}
+        if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
         {
-            sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
+            sceneGame.shadowmapCasterRenderer->UnregisterRenderModel(model.get());
             sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
         }
+
         Destroy();
     }
 
@@ -70,14 +76,26 @@ void ProjectileStraight::Update(float elapsedTime)
         position.z = hit.position.z;
 
         SceneGame& sceneGame = SceneGame::Instance();
-        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+        //{
+        //    sceneGame.UnregisterRenderModel(model.get());
+
+
+        //    ProjectileWall* WallWeb = new ProjectileWall(&Player::Instance().GetBrokenProjectileManager());
+        //    WallWeb->SetPosition(hit.position);
+        //    WallWeb->SetDirection({hit.normal});
+        //    sceneGame.RegisterRenderModel(WallWeb->GetModel());
+
+        //}
+
+        if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
         {
             sceneGame.UnregisterRenderModel(model.get());
 
 
             ProjectileWall* WallWeb = new ProjectileWall(&Player::Instance().GetBrokenProjectileManager());
             WallWeb->SetPosition(hit.position);
-            WallWeb->SetDirection({hit.normal});
+            WallWeb->SetDirection({ hit.normal });
             sceneGame.RegisterRenderModel(WallWeb->GetModel());
 
         }

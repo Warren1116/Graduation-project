@@ -16,7 +16,7 @@
 #include "HeadUpDisplay.h"
 #include "EnemyThief.h"
 #include "Enemy.h"
-
+#include "Renderer\ShadowmapCasterRenderer.h"
 
 // ゲームシーン
 class SceneGame : public Scene
@@ -81,24 +81,25 @@ public:
 
     Light* GetLight() { return mainDirectionalLight; }
 
-    std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
+    //std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
+    std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
 
 
-    std::unique_ptr<DepthStencil> shadowmapDepthStencil;	//シャドウマップ用深度ステンシルバッファ
-    DirectX::XMFLOAT4X4 lightViewProjection;				//ライトビュープロジェクション行列
-    DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };		//影の色
-    float shadowBias = 0.001f;								//深度比較用のオフセット値
+    //std::unique_ptr<DepthStencil> shadowmapDepthStencil;	//シャドウマップ用深度ステンシルバッファ
+    //DirectX::XMFLOAT4X4 lightViewProjection;				//ライトビュープロジェクション行列
+    //DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };		//影の色
+    //float shadowBias = 0.001f;								//深度比較用のオフセット値
 
-    ////	シャドウマップ用深度ステンシルバッファ
-    //std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
-    ////	ライトビュープロジェクション行列
-    //DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
-    ////	深度比較用のオフセット値
-    //float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
-    ////	影の色
-    //DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
+    //	シャドウマップ用深度ステンシルバッファ
+    std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
+    //	ライトビュープロジェクション行列
+    DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
+    //	深度比較用のオフセット値
+    float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
+    //	影の色
+    DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
 private:
     std::unique_ptr<Player> player;

@@ -2,13 +2,14 @@
 
 Texture2D diffuseMap : register(t0);
 Texture2D normalMap : register(t1); //法線マップ
-Texture2D shadowMap : register(t2); //シャドウマップ
+//Texture2D shadowMap : register(t2); //シャドウマップ
 
-//Texture2D shadowMap[ShadowmapCount] : register(t2); //シャドウマップ(配列にしているのでShadowmapCount分
+Texture2D shadowMap[ShadowmapCount] : register(t2); //シャドウマップ(配列にしているのでShadowmapCount分
 //レジスターを利用していると考えてください。ShadowmapCount = 4　の場合はt2,t3,t4,t5まで使われています)
 
 SamplerState diffuseMapSamplerState : register(s0);
 SamplerState shadowMapSamplerState : register(s1);
+
 
 float4 main(VS_OUT pin) : SV_TARGET
 {
@@ -50,25 +51,25 @@ float4 main(VS_OUT pin) : SV_TARGET
     float3 specular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks);
 
     // 平行光源の影なので、平行光源に対して影を適応
-    float3 shadow = CalcShadowColorPCFFilter(shadowMap, shadowMapSamplerState, pin.shadowTexcoord, shadowColor, shadowBias);
+    //float3 shadow = CalcShadowColorPCFFilter(shadowMap, shadowMapSamplerState, pin.shadowTexcoord, shadowColor, shadowBias);
 
-    //float3 shadow = 1;
-    //for (int j = 0; j < ShadowmapCount; ++j)
-    //{
-    //    float3 shadowTexcoord = pin.shadowTexcoord[j];
-    //    //シャドウマップのUV範囲内か、深度値が範囲内か判定する
-    //    if (shadowTexcoord.z >= 0 && shadowTexcoord.z <= 1 &&
-    //        shadowTexcoord.x >= 0 && shadowTexcoord.x <= 1 &&
-    //        shadowTexcoord.y >= 0 && shadowTexcoord.y <= 1)
-    //    {
-    //        //シャドウマップから深度値取得
-    //        float depth = shadowMap[j].Sample(shadowMapSamplerState, shadowTexcoord.xy).r;
-    //        //深度値を比較して影かどうかを判定する
-    //        if (shadowTexcoord.z - depth > shadowBias[j])
-    //            shadow = shadowColor;
-    //        break;
-    //    }
-    //}
+    float3 shadow = 1;
+    for (int j = 0; j < ShadowmapCount; ++j)
+    {
+        float3 shadowTexcoord = pin.shadowTexcoord[j];
+        //シャドウマップのUV範囲内か、深度値が範囲内か判定する
+        if (shadowTexcoord.z >= 0 && shadowTexcoord.z <= 1 &&
+            shadowTexcoord.x >= 0 && shadowTexcoord.x <= 1 &&
+            shadowTexcoord.y >= 0 && shadowTexcoord.y <= 1)
+        {
+            //シャドウマップから深度値取得
+            float depth = shadowMap[j].Sample(shadowMapSamplerState, shadowTexcoord.xy).r;
+            //深度値を比較して影かどうかを判定する
+            if (shadowTexcoord.z - depth > shadowBias[j])
+                shadow = shadowColor;
+            break;
+        }
+    }
     
     diffuse *= shadow;
     specular *= shadow;

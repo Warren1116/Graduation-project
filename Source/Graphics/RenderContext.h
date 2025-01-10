@@ -85,16 +85,16 @@ static const int ShadowmapCount = 4;
 //シャドウマップ用情報
 struct ShadowMapData
 {
-    ID3D11ShaderResourceView* shadowMap;		//シャドウマップテクスチャ
-    DirectX::XMFLOAT4X4 lightViewProjection;	//ライトビュープロジェクション行列
-    DirectX::XMFLOAT3 shadowColor;				//影の色
-    float shadowBias;							//深度比較用のオフセット値
+    //ID3D11ShaderResourceView* shadowMap;		//シャドウマップテクスチャ
+    //DirectX::XMFLOAT4X4 lightViewProjection;	//ライトビュープロジェクション行列
+    //DirectX::XMFLOAT3 shadowColor;				//影の色
+    //float shadowBias;							//深度比較用のオフセット値
 
 
-    //ID3D11ShaderResourceView* shadowMap[ShadowmapCount];				//	シャドウマップテクスチャ
-    //DirectX::XMFLOAT4X4			lightViewProjection[ShadowmapCount];	//	ライトビュープロジェクション行列
-    //DirectX::XMFLOAT3			shadowColor;			//	影の色
-    //float						shadowBias[ShadowmapCount];				//	深度比較用のオフセット値
+    ID3D11ShaderResourceView* shadowMap[ShadowmapCount];				//	シャドウマップテクスチャ
+    DirectX::XMFLOAT4X4			lightViewProjection[ShadowmapCount];	//	ライトビュープロジェクション行列
+    DirectX::XMFLOAT3			shadowColor;			//	影の色
+    float						shadowBias[ShadowmapCount];				//	深度比較用のオフセット値
 };
 
 struct SkyboxData

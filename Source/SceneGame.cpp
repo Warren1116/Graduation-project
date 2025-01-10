@@ -39,7 +39,9 @@ void SceneGame::Initialize()
 
     //シャドウマップ用に深度ステンシルの生成
     {
-        shadowmapDepthStencil = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+
+        //shadowmapDepthStencil = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+        shadowmapDepthStencil[ShadowmapCount] = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
     }
 
     // イベントスクリプト初期化
@@ -55,8 +57,8 @@ void SceneGame::Initialize()
         UINT height = static_cast<UINT>(graphics.GetScreenHeight());
 
         //	シャドウマップレンダラー
-        shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
-
+        //shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
+        shadowmapCasterRenderer = std::make_unique<ShadowmapCasterRenderer>(2048);
         //	シーンレンダラー
         sceneRenderer = std::make_unique<SceneRenderer>(width, height);
 
@@ -186,7 +188,9 @@ void SceneGame::Finalize()
     EffectManager::Instance().Finalize();
     instance = nullptr;
 
-    shadowmapRenderer->ClearRenderModel();
+    shadowmapCasterRenderer->ClearRenderModel();
+
+    //shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
 
     mainDirectionalLight = nullptr;
@@ -361,9 +365,12 @@ void SceneGame::Render()
     // 描画処理
     RenderContext rc;
     rc.deviceContext = dc;
-    rc.shadowMapData = shadowmapRenderer->GetShadowMapData();
+    //rc.shadowMapData = shadowmapRenderer->GetShadowMapData();
+
+    rc.shadowMapData = shadowmapCasterRenderer->GetShadowMapData();
     // シャドウマップの描画
-    shadowmapRenderer->Render(rc.deviceContext);
+   // shadowmapRenderer->Render(rc.deviceContext);
+    shadowmapCasterRenderer->Render(rc.deviceContext);
 
     // シーンの描画
     sceneRenderer->SetShadowmapData(rc.shadowMapData);
@@ -523,7 +530,8 @@ void SceneGame::Render()
         ImGui::Separator();
         LightManager::Instance().DrawDebugGUI();
         ImGui::Separator();
-        shadowmapRenderer->DrawDebugGUI();
+        //shadowmapRenderer->DrawDebugGUI();
+        shadowmapCasterRenderer->DrawDebugGUI();
         ImGui::Separator();
         sceneRenderer->DrawDebugGUI();
         ImGui::Separator();
@@ -632,7 +640,8 @@ void SceneGame::PauseGame()
 //  モデルをレンダラーに登録
 void SceneGame::RegisterRenderModel(Model* model)
 {
-    shadowmapRenderer->RegisterRenderModel(model);
+    //shadowmapRenderer->RegisterRenderModel(model);
+    shadowmapCasterRenderer->RegisterRenderModel(model);
     sceneRenderer->RegisterRenderModel(model);
     const ModelResource* resource = model->GetResource();
     for (const ModelResource::Material& material : resource->GetMaterials())
@@ -645,7 +654,8 @@ void SceneGame::RegisterRenderModel(Model* model)
 //  モデルをレンダラーに削除
 void SceneGame::UnregisterRenderModel(Model* model)
 {
-    shadowmapRenderer->UnregisterRenderModel(model);
+    //shadowmapRenderer->UnregisterRenderModel(model);
+    shadowmapCasterRenderer->UnregisterRenderModel(model);
     sceneRenderer->UnregisterRenderModel(model);
 
 }
