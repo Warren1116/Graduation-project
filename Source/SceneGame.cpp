@@ -41,7 +41,10 @@ void SceneGame::Initialize()
     {
 
         //shadowmapDepthStencil = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
-        shadowmapDepthStencil[ShadowmapCount] = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+        for (auto& it : shadowmapDepthStencil)
+        {
+            it = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
+        }
     }
 
     // イベントスクリプト初期化
@@ -57,8 +60,8 @@ void SceneGame::Initialize()
         UINT height = static_cast<UINT>(graphics.GetScreenHeight());
 
         //	シャドウマップレンダラー
-        //shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
-        shadowmapCasterRenderer = std::make_unique<ShadowmapCasterRenderer>(2048);
+        shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
+        //shadowmapCasterRenderer = std::make_unique<ShadowmapCasterRenderer>(2048);
         //	シーンレンダラー
         sceneRenderer = std::make_unique<SceneRenderer>(width, height);
 
@@ -93,8 +96,8 @@ void SceneGame::Initialize()
     //　プレイヤー生成
     player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
-    //player->SetPosition({ 66,0,42 });
-    player->SetPosition({ 0,0,0 });
+    player->SetPosition({ 66,0,42 });
+    //player->SetPosition({ 0,0,0 });
     player->SetIdleState();
 
     // エネミー初期化
@@ -142,7 +145,7 @@ void SceneGame::Initialize()
     // 平行光源を追加
     {
         mainDirectionalLight = new Light(LightType::Directional);
-        mainDirectionalLight->SetDirection({ -0.5, -1, -1 });
+        mainDirectionalLight->SetDirection({ -0.3, -0.8, -0.3 });
         mainDirectionalLight->SetColor({ 1,1,1,1 });
         mainDirectionalLight->SetPosition({ 0,3,0 });
         LightManager::Instance().Register(mainDirectionalLight);
@@ -188,9 +191,8 @@ void SceneGame::Finalize()
     EffectManager::Instance().Finalize();
     instance = nullptr;
 
-    shadowmapCasterRenderer->ClearRenderModel();
-
-    //shadowmapRenderer->ClearRenderModel();
+    //shadowmapCasterRenderer->ClearRenderModel();
+    shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
 
     mainDirectionalLight = nullptr;
@@ -365,12 +367,12 @@ void SceneGame::Render()
     // 描画処理
     RenderContext rc;
     rc.deviceContext = dc;
-    //rc.shadowMapData = shadowmapRenderer->GetShadowMapData();
+    rc.shadowMapData = shadowmapRenderer->GetShadowMapData();
+    //rc.shadowMapData = shadowmapCasterRenderer->GetShadowMapData();
 
-    rc.shadowMapData = shadowmapCasterRenderer->GetShadowMapData();
     // シャドウマップの描画
-   // shadowmapRenderer->Render(rc.deviceContext);
-    shadowmapCasterRenderer->Render(rc.deviceContext);
+    shadowmapRenderer->Render(rc.deviceContext);
+    //shadowmapCasterRenderer->Render(rc.deviceContext);
 
     // シーンの描画
     sceneRenderer->SetShadowmapData(rc.shadowMapData);
@@ -530,8 +532,8 @@ void SceneGame::Render()
         ImGui::Separator();
         LightManager::Instance().DrawDebugGUI();
         ImGui::Separator();
-        //shadowmapRenderer->DrawDebugGUI();
-        shadowmapCasterRenderer->DrawDebugGUI();
+        shadowmapRenderer->DrawDebugGUI();
+        //shadowmapCasterRenderer->DrawDebugGUI();
         ImGui::Separator();
         sceneRenderer->DrawDebugGUI();
         ImGui::Separator();
@@ -640,8 +642,8 @@ void SceneGame::PauseGame()
 //  モデルをレンダラーに登録
 void SceneGame::RegisterRenderModel(Model* model)
 {
-    //shadowmapRenderer->RegisterRenderModel(model);
-    shadowmapCasterRenderer->RegisterRenderModel(model);
+    shadowmapRenderer->RegisterRenderModel(model);
+    //shadowmapCasterRenderer->RegisterRenderModel(model);
     sceneRenderer->RegisterRenderModel(model);
     const ModelResource* resource = model->GetResource();
     for (const ModelResource::Material& material : resource->GetMaterials())
@@ -654,8 +656,8 @@ void SceneGame::RegisterRenderModel(Model* model)
 //  モデルをレンダラーに削除
 void SceneGame::UnregisterRenderModel(Model* model)
 {
-    //shadowmapRenderer->UnregisterRenderModel(model);
-    shadowmapCasterRenderer->UnregisterRenderModel(model);
+    shadowmapRenderer->UnregisterRenderModel(model);
+    //shadowmapCasterRenderer->UnregisterRenderModel(model);
     sceneRenderer->UnregisterRenderModel(model);
 
 }
@@ -664,107 +666,107 @@ void SceneGame::SpawnEnemiesForWave(int wave)
 {
     EnemyManager& enemyManager = EnemyManager::Instance();
 
-    //switch (wave)
-    //{
-    //case 1:
-    //{
-    //    // 敵を初期化
-    //    EnemyThief* thief = new EnemyThief();
-    //    thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
-    //    thief->SetTerritory(thief->GetPosition(), 10.0f);
-    //    thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
-    //    EnemyManager::Instance().Register(thief);
-    //    ////	通信相手用に１匹増やす
-    //    EnemyThief* thief2 = new EnemyThief();
-    //    thief2->SetPosition(DirectX::XMFLOAT3(41.0f, 0.0f, 39.0f));
-    //    thief2->SetTerritory(thief2->GetPosition(), 10.0f);
-    //    thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
-    //    EnemyManager::Instance().Register(thief2);
+    switch (wave)
+    {
+    case 1:
+    {
+        // 敵を初期化
+        EnemyThief* thief = new EnemyThief();
+        thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+        thief->SetTerritory(thief->GetPosition(), 10.0f);
+        thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+        EnemyManager::Instance().Register(thief);
+        ////	通信相手用に１匹増やす
+        EnemyThief* thief2 = new EnemyThief();
+        thief2->SetPosition(DirectX::XMFLOAT3(41.0f, 0.0f, 39.0f));
+        thief2->SetTerritory(thief2->GetPosition(), 10.0f);
+        thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+        EnemyManager::Instance().Register(thief2);
 
-    //    //	モデルを各レンダラーに登録
-    //    Model* list[] =
-    //    {
-    //        thief->GetModel(),
-    //        thief2->GetModel(),
+        //	モデルを各レンダラーに登録
+        Model* list[] =
+        {
+            thief->GetModel(),
+            thief2->GetModel(),
 
-    //    };
-    //    for (Model* model : list)
-    //    {
-    //        RegisterRenderModel(model);
-    //    }
+        };
+        for (Model* model : list)
+        {
+            RegisterRenderModel(model);
+        }
 
-    //    // キャラクター生成処理
-    //    CharacterManager& characterManager = CharacterManager::Instance();
-    //    {
-    //        characterManager.Register(thief);
-    //        characterManager.Register(thief2);
+        // キャラクター生成処理
+        CharacterManager& characterManager = CharacterManager::Instance();
+        {
+            characterManager.Register(thief);
+            characterManager.Register(thief2);
 
-    //    }
-    //    //RegisterEnemies({ thief, thief2 });
+        }
+        //RegisterEnemies({ thief, thief2 });
 
-    //}
-    //break;
-    //case 2:
-    //{
-    //    EnemyThief* thief = new EnemyThief();
-    //    thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
-    //    thief->SetTerritory(thief->GetPosition(), 10.0f);
-    //    thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
-    //    EnemyManager::Instance().Register(thief);
+    }
+    break;
+    case 2:
+    {
+        EnemyThief* thief = new EnemyThief();
+        thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+        thief->SetTerritory(thief->GetPosition(), 10.0f);
+        thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+        EnemyManager::Instance().Register(thief);
 
-    //    //	モデルを各レンダラーに登録
-    //    Model* list[] =
-    //    {
-    //        thief->GetModel(),
+        //	モデルを各レンダラーに登録
+        Model* list[] =
+        {
+            thief->GetModel(),
 
-    //    };
-    //    for (Model* model : list)
-    //    {
-    //        RegisterRenderModel(model);
-    //    }
+        };
+        for (Model* model : list)
+        {
+            RegisterRenderModel(model);
+        }
 
-    //    // キャラクター生成処理
-    //    CharacterManager& characterManager = CharacterManager::Instance();
-    //    {
-    //        characterManager.Register(thief);
+        // キャラクター生成処理
+        CharacterManager& characterManager = CharacterManager::Instance();
+        {
+            characterManager.Register(thief);
 
-    //    }
+        }
 
-    //    //RegisterEnemies({ thief });
-    //}
+        //RegisterEnemies({ thief });
+    }
 
-    //break;
-    //case 3:
-    //{
-    //    EnemyThief* thief = new EnemyThief();
-    //    thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
-    //    thief->SetTerritory(thief->GetPosition(), 10.0f);
-    //    thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
-    //    EnemyManager::Instance().Register(thief);
-    //    //	モデルを各レンダラーに登録
-    //    Model* list[] =
-    //    {
-    //        thief->GetModel(),
+    break;
+    case 3:
+    {
+        EnemyThief* thief = new EnemyThief();
+        thief->SetPosition(DirectX::XMFLOAT3(40.0f, 0.0f, 40.0f));
+        thief->SetTerritory(thief->GetPosition(), 10.0f);
+        thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+        EnemyManager::Instance().Register(thief);
+        //	モデルを各レンダラーに登録
+        Model* list[] =
+        {
+            thief->GetModel(),
 
-    //    };
-    //    for (Model* model : list)
-    //    {
-    //        RegisterRenderModel(model);
-    //    }
+        };
+        for (Model* model : list)
+        {
+            RegisterRenderModel(model);
+        }
 
-    //    // キャラクター生成処理
-    //    CharacterManager& characterManager = CharacterManager::Instance();
-    //    {
-    //        characterManager.Register(thief);
+        // キャラクター生成処理
+        CharacterManager& characterManager = CharacterManager::Instance();
+        {
+            characterManager.Register(thief);
 
-    //    }
+        }
 
-    //    //RegisterEnemies({thief});
-    //}
+        //RegisterEnemies({thief});
+    }
 
-    //break;
+    break;
 
-    //}
+    }
 
 }
 

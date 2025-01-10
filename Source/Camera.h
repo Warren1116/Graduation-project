@@ -62,8 +62,8 @@ private:
 
 	DirectX::XMFLOAT3 up;
 	DirectX::XMFLOAT3 front;
-	DirectX::XMFLOAT3 right;
-
+	//DirectX::XMFLOAT3 right;
+	DirectX::XMFLOAT3		right{ 1, 0, 0 };
 	float fovY;
 	float aspect;
 	float nearZ;

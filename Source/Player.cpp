@@ -502,16 +502,16 @@ void Player::UpdateGrabState(float elapsedTime)
             // Ž…‚Ì“o˜^
             SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
             SceneGame& sceneGame = SceneGame::Instance();
-            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
-            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-            //}
-            if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
                 //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
+            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            //{
+            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
+            //}
         }
 
         lockonEnemy->ApplyDamage(20.0, 1.0);
@@ -856,16 +856,16 @@ bool Player::InputProjectile()
 
         //  ƒ‚ƒfƒ‹‚ðƒŒƒ“ƒ_ƒ‰[‚É“o˜^
         SceneGame& sceneGame = SceneGame::Instance();
-        //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-        //{
-        //    sceneGame.RegisterRenderModel(projectile->GetModel());
-
-        //}
-        if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
-            //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
             sceneGame.RegisterRenderModel(projectile->GetModel());
+
         }
+        //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+        //{
+        //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+        //    sceneGame.RegisterRenderModel(projectile->GetModel());
+        //}
         return true;
     }
     return false;
@@ -1443,16 +1443,16 @@ void Player::TransitionSwingState()
             //  ƒXƒCƒ“ƒOƒ‚ƒfƒ‹iŒ»Ý‰¼AGeometric‚É•ÏX—\’èj
             SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
             SceneGame& sceneGame = SceneGame::Instance();
-            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
-            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-            //}
-            if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
                 //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
+            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            //{
+            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
+            //}
         }
         else
         {
@@ -1481,16 +1481,16 @@ void Player::TransitionSwingState()
             //  ƒXƒCƒ“ƒOƒ‚ƒfƒ‹iŒ»Ý‰¼AGeometric‚É•ÏX—\’èj
             SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
             SceneGame& sceneGame = SceneGame::Instance();
-            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
-            //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
-            //}
-            if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
                 //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
                 sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
             }
+            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            //{
+            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+            //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+            //}
 
         }
         //@‰‰ñƒXƒCƒ“ƒO‚Ìƒ‚[ƒVƒ‡ƒ“  
@@ -1500,16 +1500,16 @@ void Player::TransitionSwingState()
             //  ƒXƒCƒ“ƒOƒ‚ƒfƒ‹iŒ»Ý‰¼AGeometric‚É•ÏX—\’èj
             SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
             SceneGame& sceneGame = SceneGame::Instance();
-            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
-            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-            //}
-            if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
                 //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
+            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            //{
+            //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
+            //}
         }
 
         HitResult hit;
@@ -1594,18 +1594,18 @@ void Player::UpdateSwingState(float elapsedTime)
     {
         SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
         SceneGame& sceneGame = SceneGame::Instance();
-        //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-        //{
-        //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
-        //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
-        //    model->PlayAnimation(Anim_Swinging, true);
-        //}
-        if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
             //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
             sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
             model->PlayAnimation(Anim_Swinging, true);
         }
+        //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+        //{
+        //    //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+        //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+        //    model->PlayAnimation(Anim_Swinging, true);
+        //}
     }
 
 

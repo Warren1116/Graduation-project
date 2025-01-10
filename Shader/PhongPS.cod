@@ -39,10 +39,10 @@
 // cbuffer CbShadowmap
 // {
 //
-//   row_major float4x4 lightViewProjection[4];// Offset:    0 Size:   256 [unused]
-//   float4 shadowBias;                 // Offset:  256 Size:    16
-//   float3 shadowColor;                // Offset:  272 Size:    12
-//   float dummy;                       // Offset:  284 Size:     4 [unused]
+//   row_major float4x4 lightViewProjection;// Offset:    0 Size:    64 [unused]
+//   float3 shadowColor;                // Offset:   64 Size:    12
+//   float shadowBias;                  // Offset:   76 Size:     4
+//   float dummy;                       // Offset:   80 Size:     4 [unused]
 //
 // }
 //
@@ -55,10 +55,7 @@
 // shadowMapSamplerState             sampler      NA          NA             s1      1 
 // diffuseMap                        texture  float4          2d             t0      1 
 // normalMap                         texture  float4          2d             t1      1 
-// shadowMap[0]                      texture  float4          2d             t2      1 
-// shadowMap[1]                      texture  float4          2d             t3      1 
-// shadowMap[2]                      texture  float4          2d             t4      1 
-// shadowMap[3]                      texture  float4          2d             t5      1 
+// shadowMap                         texture  float4          2d             t2      1 
 // CbScene                           cbuffer      NA          NA            cb0      1 
 // CbShadowmap                       cbuffer      NA          NA            cb3      1 
 //
@@ -76,9 +73,6 @@
 // TEXCOORD                 0   xy          5     NONE   float   xy  
 // COLOR                    0   xyzw        6     NONE   float   xyzw
 // TEXCOORD                 1   xyz         7     NONE   float   xyz 
-// TEXCOORD                 2   xyz         8     NONE   float   xyz 
-// TEXCOORD                 3   xyz         9     NONE   float   xyz 
-// TEXCOORD                 4   xyz        10     NONE   float   xyz 
 //
 //
 // Output signature:
@@ -90,15 +84,12 @@
 ps_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer CB0[41], dynamicIndexed
-dcl_constantbuffer CB3[18], immediateIndexed
+dcl_constantbuffer CB3[5], immediateIndexed
 dcl_sampler s0, mode_default
 dcl_sampler s1, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_resource_texture2d (float,float,float,float) t1
 dcl_resource_texture2d (float,float,float,float) t2
-dcl_resource_texture2d (float,float,float,float) t3
-dcl_resource_texture2d (float,float,float,float) t4
-dcl_resource_texture2d (float,float,float,float) t5
 dcl_input_ps linear v1.xyz
 dcl_input_ps linear v2.xyz
 dcl_input_ps linear v3.xyz
@@ -106,9 +97,6 @@ dcl_input_ps linear v4.xyz
 dcl_input_ps linear v5.xy
 dcl_input_ps linear v6.xyzw
 dcl_input_ps linear v7.xyz
-dcl_input_ps linear v8.xyz
-dcl_input_ps linear v9.xyz
-dcl_input_ps linear v10.xyz
 dcl_output o0.xyzw
 dcl_temps 15
 //
@@ -120,10 +108,7 @@ dcl_temps 15
 //   v4.x <- pin.binormal.x; v4.y <- pin.binormal.y; v4.z <- pin.binormal.z; 
 //   v5.x <- pin.texcoord.x; v5.y <- pin.texcoord.y; 
 //   v6.x <- pin.color.x; v6.y <- pin.color.y; v6.z <- pin.color.z; v6.w <- pin.color.w; 
-//   v7.x <- pin.shadowTexcoord[0].x; v7.y <- pin.shadowTexcoord[0].y; v7.z <- pin.shadowTexcoord[0].z; 
-//   v8.x <- pin.shadowTexcoord[1].x; v8.y <- pin.shadowTexcoord[1].y; v8.z <- pin.shadowTexcoord[1].z; 
-//   v9.x <- pin.shadowTexcoord[2].x; v9.y <- pin.shadowTexcoord[2].y; v9.z <- pin.shadowTexcoord[2].z; 
-//   v10.x <- pin.shadowTexcoord[3].x; v10.y <- pin.shadowTexcoord[3].y; v10.z <- pin.shadowTexcoord[3].z; 
+//   v7.x <- pin.shadowTexcoord.x; v7.y <- pin.shadowTexcoord.y; v7.z <- pin.shadowTexcoord.z; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
 #line 16 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
@@ -245,204 +230,79 @@ mul r2.xyz, r6.xyzx, r2.xyzx  // r2.x <- <CalcPhongSpecular return value>.x; r2.
 #line 51 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
 mov r2.xyz, r2.xyzx  // r2.x <- specular.x; r2.y <- specular.y; r2.z <- specular.z
 
-#line 56
-itof r8.xyz, l(1, 1, 1, 0)  // r8.x <- shadow.x; r8.y <- shadow.y; r8.z <- shadow.z
+#line 54
+nop 
+nop 
+nop 
+mov r8.xyz, v7.xyzx
+mov r9.xyz, cb3[4].xyzx
+mov r2.w, cb3[4].w
 
-#line 59
-mov r9.xyz, v7.xyzx  // r9.x <- shadowTexcoord.x; r9.y <- shadowTexcoord.y; r9.z <- shadowTexcoord.z
+#line 55 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ShadowmapFunctions.hlsli"
+resinfo_indexable(texture2d)(float,float,float,float)_uint r10.xy, l(0), t2.xyzw
+mov r10.x, r10.x  // r10.x <- width
+mov r10.y, r10.y  // r10.y <- height
 
-#line 61
-itof r2.w, l(0)
-ge r2.w, r9.z, r2.w
-itof r3.w, l(1)
-ge r3.w, r3.w, r9.z
-and r2.w, r2.w, r3.w
-itof r3.w, l(0)
-ge r3.w, r9.x, r3.w
-and r2.w, r2.w, r3.w
-itof r3.w, l(1)
-ge r3.w, r3.w, r9.x
-and r2.w, r2.w, r3.w
-itof r3.w, l(0)
-ge r3.w, r9.y, r3.w
-and r2.w, r2.w, r3.w
-itof r3.w, l(1)
-ge r3.w, r3.w, r9.y
-and r2.w, r2.w, r3.w
-if_nz r2.w
-
-#line 66
-  sample_indexable(texture2d)(float,float,float,float) r3.w, v7.xyxx, t2.yzwx, s1  // r3.w <- depth
-
-#line 68
-  mov r3.w, -r3.w
-  add r3.w, r3.w, r9.z
-  lt r3.w, cb3[16].x, r3.w
-  if_nz r3.w
-
-#line 69
-    mov r8.xyz, cb3[17].xyzx
-  endif 
-
-#line 71
-endif 
-
-#line 57
-not r3.w, r2.w
-not r3.w, r3.w
-or r2.w, r2.w, r3.w
-if_z r2.w
-
-#line 59
-  mov r9.xyz, v8.xyzx
+#line 58
+utof r3.w, r10.x
+div r11.x, l(1.000000), r3.w  // r11.x <- texelSize.x
+utof r3.w, r10.y
+div r11.y, l(1.000000), r3.w  // r11.y <- texelSize.y
 
 #line 61
-  if_z r2.w
-    itof r3.w, l(0)
-    ge r3.w, r9.z, r3.w
-    itof r4.w, l(1)
-    ge r4.w, r4.w, r9.z
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(0)
-    ge r4.w, r9.x, r4.w
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(1)
-    ge r4.w, r4.w, r9.x
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(0)
-    ge r4.w, r9.y, r4.w
-    and r3.w, r3.w, r4.w
-    itof r4.w, l(1)
-    ge r4.w, r4.w, r9.y
-    and r3.w, r3.w, r4.w
-    if_nz r3.w
+itof r3.w, l(0)  // r3.w <- factor
 
-#line 66
-      sample_indexable(texture2d)(float,float,float,float) r4.w, v8.xyxx, t3.yzwx, s1  // r4.w <- depth
+#line 63
+mov r4.w, l(-2)  // r4.w <- x
+mov r5.w, r3.w  // r5.w <- factor
+mov r6.w, r4.w  // r6.w <- x
+loop 
+  ige r7.w, l(2), r6.w
+  breakc_z r7.w
+
+#line 65
+  mov r7.w, l(-2)  // r7.w <- y
+  mov r8.w, r5.w  // r8.w <- factor
+  mov r9.w, r7.w  // r9.w <- y
+  loop 
+    ige r10.x, l(2), r9.w
+    breakc_z r10.x
 
 #line 68
-      mov r4.w, -r4.w
-      add r4.w, r4.w, r9.z
-      lt r4.w, cb3[16].y, r4.w
-      if_nz r4.w
+    itof r10.x, r6.w
+    itof r10.y, r9.w
+    mul r10.xy, r10.xyxx, r11.xyxx
+    add r10.xy, r8.xyxx, r10.xyxx
+    sample_indexable(texture2d)(float,float,float,float) r10.x, r10.xyxx, t2.xyzw, s1
+    mov r10.x, r10.x  // r10.x <- depth
 
 #line 69
-        mov r8.xyz, cb3[17].xyzx
-      endif 
+    mov r10.x, -r10.x
+    add r10.x, r8.z, r10.x
+    ge r10.x, r2.w, r10.x
+    movc r10.x, r10.x, l(1.000000), l(0)
+    add r8.w, r8.w, r10.x
+
+#line 70
+    iadd r9.w, r9.w, l(1)
+  endloop 
+  mov r5.w, r8.w  // r5.w <- factor
 
 #line 71
-    endif 
-  else 
-    mov r3.w, l(-1)
-  endif 
-  or r2.w, r2.w, r3.w
+  iadd r6.w, r6.w, l(1)
+endloop 
 
-#line 57
-  not r3.w, r2.w
-  not r3.w, r3.w
-  or r2.w, r2.w, r3.w
+#line 73
+itof r8.xyz, l(1, 1, 1, 0)
+itof r2.w, l(25)
+div r2.w, r5.w, r2.w
+mov r10.xyz, -r9.xyzx
+add r8.xyz, r8.xyzx, r10.xyzx
+mul r8.xyz, r2.wwww, r8.xyzx
+add r8.xyz, r8.xyzx, r9.xyzx  // r8.x <- <CalcShadowColorPCFFilter return value>.x; r8.y <- <CalcShadowColorPCFFilter return value>.y; r8.z <- <CalcShadowColorPCFFilter return value>.z
 
-#line 72
-else 
-  mov r2.w, l(-1)
-endif 
-
-#line 57
-if_z r2.w
-
-#line 59
-  mov r9.xyz, v9.xyzx
-
-#line 61
-  itof r2.w, l(0)
-  ge r2.w, r9.z, r2.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.z
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.x, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.x
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.y, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.y
-  and r2.w, r2.w, r3.w
-  if_nz r2.w
-
-#line 66
-    sample_indexable(texture2d)(float,float,float,float) r3.w, v9.xyxx, t4.yzwx, s1  // r3.w <- depth
-
-#line 68
-    mov r3.w, -r3.w
-    add r3.w, r3.w, r9.z
-    lt r3.w, cb3[16].z, r3.w
-    if_nz r3.w
-
-#line 69
-      mov r8.xyz, cb3[17].xyzx
-    endif 
-
-#line 71
-  endif 
-
-#line 57
-  not r3.w, r2.w
-  not r3.w, r3.w
-  or r2.w, r2.w, r3.w
-
-#line 72
-else 
-  mov r2.w, l(-1)
-endif 
-
-#line 57
-if_z r2.w
-
-#line 59
-  mov r9.xyz, v10.xyzx
-
-#line 61
-  itof r2.w, l(0)
-  ge r2.w, r9.z, r2.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.z
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.x, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.x
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(0)
-  ge r3.w, r9.y, r3.w
-  and r2.w, r2.w, r3.w
-  itof r3.w, l(1)
-  ge r3.w, r3.w, r9.y
-  and r2.w, r2.w, r3.w
-  if_nz r2.w
-
-#line 66
-    sample_indexable(texture2d)(float,float,float,float) r2.w, v10.xyxx, t5.yzwx, s1  // r2.w <- depth
-
-#line 68
-    mov r2.w, -r2.w
-    add r2.w, r2.w, r9.z
-    lt r2.w, cb3[16].w, r2.w
-    if_nz r2.w
-
-#line 69
-      mov r8.xyz, cb3[17].xyzx
-    endif 
-
-#line 71
-  endif 
-
-#line 72
-endif 
+#line 54 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongPS.hlsl"
+mov r8.xyz, r8.xyzx  // r8.x <- shadow.x; r8.y <- shadow.y; r8.z <- shadow.z
 
 #line 74
 mul r7.xyz, r7.xyzx, r8.xyzx
@@ -586,4 +446,4 @@ mul r0.xyz, r0.xyzx, r1.xyzx
 add o0.xyz, r9.xyzx, r0.xyzx
 mov o0.w, r0.w
 ret 
-// Approximately 301 instruction slots used
+// Approximately 218 instruction slots used

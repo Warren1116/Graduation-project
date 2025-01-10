@@ -53,10 +53,10 @@
 // cbuffer CbShadowmap
 // {
 //
-//   row_major float4x4 lightViewProjection[4];// Offset:    0 Size:   256
-//   float4 shadowBias;                 // Offset:  256 Size:    16 [unused]
-//   float3 shadowColor;                // Offset:  272 Size:    12 [unused]
-//   float dummy;                       // Offset:  284 Size:     4 [unused]
+//   row_major float4x4 lightViewProjection;// Offset:    0 Size:    64
+//   float3 shadowColor;                // Offset:   64 Size:    12 [unused]
+//   float shadowBias;                  // Offset:   76 Size:     4 [unused]
+//   float dummy;                       // Offset:   80 Size:     4 [unused]
 //
 // }
 //
@@ -97,9 +97,6 @@
 // TEXCOORD                 0   xy          5     NONE   float   xy  
 // COLOR                    0   xyzw        6     NONE   float   xyzw
 // TEXCOORD                 1   xyz         7     NONE   float   xyz 
-// TEXCOORD                 2   xyz         8     NONE   float   xyz 
-// TEXCOORD                 3   xyz         9     NONE   float   xyz 
-// TEXCOORD                 4   xyz        10     NONE   float   xyz 
 //
 vs_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
@@ -114,7 +111,7 @@ dcl_immediateConstantBuffer { { 1.000000, 0, 0, 0},
 dcl_constantbuffer CB0[5], immediateIndexed
 dcl_constantbuffer CB1[512], dynamicIndexed
 dcl_constantbuffer CB2[1], immediateIndexed
-dcl_constantbuffer CB3[16], immediateIndexed
+dcl_constantbuffer CB3[4], immediateIndexed
 dcl_input v0.xyzw
 dcl_input v1.xyz
 dcl_input v2.xyz
@@ -130,10 +127,7 @@ dcl_output o4.xyz
 dcl_output o5.xy
 dcl_output o6.xyzw
 dcl_output o7.xyz
-dcl_output o8.xyz
-dcl_output o9.xyz
-dcl_output o10.xyz
-dcl_temps 15
+dcl_temps 12
 //
 // Initial variable locations:
 //   v0.x <- position.x; v0.y <- position.y; v0.z <- position.z; v0.w <- position.w; 
@@ -143,10 +137,7 @@ dcl_temps 15
 //   v4.x <- color.x; v4.y <- color.y; v4.z <- color.z; v4.w <- color.w; 
 //   v5.x <- boneWeights.x; v5.y <- boneWeights.y; v5.z <- boneWeights.z; v5.w <- boneWeights.w; 
 //   v6.x <- boneIndices.x; v6.y <- boneIndices.y; v6.z <- boneIndices.z; v6.w <- boneIndices.w; 
-//   o10.x <- <main return value>.shadowTexcoord[3].x; o10.y <- <main return value>.shadowTexcoord[3].y; o10.z <- <main return value>.shadowTexcoord[3].z; 
-//   o9.x <- <main return value>.shadowTexcoord[2].x; o9.y <- <main return value>.shadowTexcoord[2].y; o9.z <- <main return value>.shadowTexcoord[2].z; 
-//   o8.x <- <main return value>.shadowTexcoord[1].x; o8.y <- <main return value>.shadowTexcoord[1].y; o8.z <- <main return value>.shadowTexcoord[1].z; 
-//   o7.x <- <main return value>.shadowTexcoord[0].x; o7.y <- <main return value>.shadowTexcoord[0].y; o7.z <- <main return value>.shadowTexcoord[0].z; 
+//   o7.x <- <main return value>.shadowTexcoord.x; o7.y <- <main return value>.shadowTexcoord.y; o7.z <- <main return value>.shadowTexcoord.z; 
 //   o6.x <- <main return value>.color.x; o6.y <- <main return value>.color.y; o6.z <- <main return value>.color.z; o6.w <- <main return value>.color.w; 
 //   o5.x <- <main return value>.texcoord.x; o5.y <- <main return value>.texcoord.y; 
 //   o4.x <- <main return value>.binormal.x; o4.y <- <main return value>.binormal.y; o4.z <- <main return value>.binormal.z; 
@@ -170,13 +161,13 @@ itof r2.xyz, l(0, 0, 0, 0)  // r2.x <- n.x; r2.y <- n.y; r2.z <- n.z
 itof r3.xyz, l(0, 0, 0, 0)  // r3.x <- t.x; r3.y <- t.y; r3.z <- t.z
 
 #line 18
-mov r1.w, l(0)
+mov r1.w, l(0)  // r1.w <- i
 mov r4.xyz, r2.xyzx  // r4.x <- n.x; r4.y <- n.y; r4.z <- n.z
 mov r5.xyz, r3.xyzx  // r5.x <- t.x; r5.y <- t.y; r5.z <- t.z
 mov r6.x, r1.x  // r6.x <- p.x
 mov r6.y, r1.y  // r6.y <- p.y
 mov r6.z, r1.z  // r6.z <- p.z
-mov r2.w, r1.w
+mov r2.w, r1.w  // r2.w <- i
 loop 
   ilt r3.w, r2.w, l(4)
   breakc_z r3.w
@@ -274,7 +265,7 @@ dp3 r1.w, r5.xyzx, r5.xyzx
 rsq r1.w, r1.w
 mul r5.xyz, r1.wwww, r5.xyzx  // r5.x <- vout.binormal.x; r5.y <- vout.binormal.y; r5.z <- vout.binormal.z
 
-#line 39
+#line 35
 nop 
 mov r6.x, r6.x
 mov r6.y, r6.y
@@ -318,145 +309,10 @@ add r7.xy, r4.zwzz, l(0.500000, 0.500000, 0.000000, 0.000000)  // r7.y <- worldV
 mov r7.xy, r7.xyxx  // r7.x <- <CalcShadowTexcoord return value>.x; r7.y <- <CalcShadowTexcoord return value>.y
 mov r7.z, r7.z  // r7.z <- <CalcShadowTexcoord return value>.z
 
-#line 39 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongVS.hlsl"
-mov r7.xyz, r7.xyzx  // r7.x <- vout.shadowTexcoord[0].x; r7.y <- vout.shadowTexcoord[0].y; r7.z <- vout.shadowTexcoord[0].z
-nop 
-mov r6.x, r6.x
-mov r6.y, r6.y
-mov r6.z, r6.z
-mov r8.x, cb3[4].x  // r8.x <- lightViewProjection._m00
-mov r9.x, cb3[4].y  // r9.x <- lightViewProjection._m01
-mov r10.x, cb3[4].z  // r10.x <- lightViewProjection._m02
-mov r11.x, cb3[4].w  // r11.x <- lightViewProjection._m03
-mov r8.y, cb3[5].x  // r8.y <- lightViewProjection._m10
-mov r9.y, cb3[5].y  // r9.y <- lightViewProjection._m11
-mov r10.y, cb3[5].z  // r10.y <- lightViewProjection._m12
-mov r11.y, cb3[5].w  // r11.y <- lightViewProjection._m13
-mov r8.z, cb3[6].x  // r8.z <- lightViewProjection._m20
-mov r9.z, cb3[6].y  // r9.z <- lightViewProjection._m21
-mov r10.z, cb3[6].z  // r10.z <- lightViewProjection._m22
-mov r11.z, cb3[6].w  // r11.z <- lightViewProjection._m23
-mov r12.xyzw, cb3[7].xyzw  // r12.x <- lightViewProjection._m30; r12.y <- lightViewProjection._m31; r12.z <- lightViewProjection._m32; r12.w <- lightViewProjection._m33
+#line 35 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongVS.hlsl"
+mov r7.xyz, r7.xyzx  // r7.x <- vout.shadowTexcoord.x; r7.y <- vout.shadowTexcoord.y; r7.z <- vout.shadowTexcoord.z
 
-#line 10 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ShadowmapFunctions.hlsli"
-itof r6.w, l(1)
-mov r8.w, r12.x
-dp4 r8.x, r6.xyzw, r8.xyzw  // r8.x <- worldViewProjectionPosition.x
-mov r9.w, r12.y
-dp4 r8.y, r6.xyzw, r9.xyzw  // r8.y <- worldViewProjectionPosition.y
-mov r10.w, r12.z
-dp4 r8.z, r6.xyzw, r10.xyzw  // r8.z <- worldViewProjectionPosition.z
-mov r11.w, r12.w
-dp4 r1.w, r6.xyzw, r11.xyzw
-
-#line 13
-div r8.xyz, r8.xyzx, r1.wwww
-
-#line 17
-mov r8.w, -r8.y  // r8.w <- worldViewProjectionPosition.y
-
-#line 18
-mul r4.zw, r8.xxxw, l(0.000000, 0.000000, 0.500000, 0.500000)
-add r8.xy, r4.zwzz, l(0.500000, 0.500000, 0.000000, 0.000000)  // r8.y <- worldViewProjectionPosition.y
-
-#line 19
-mov r8.xy, r8.xyxx  // r8.x <- <CalcShadowTexcoord return value>.x; r8.y <- <CalcShadowTexcoord return value>.y
-mov r8.z, r8.z  // r8.z <- <CalcShadowTexcoord return value>.z
-
-#line 39 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongVS.hlsl"
-mov r8.xyz, r8.xyzx  // r8.x <- vout.shadowTexcoord[1].x; r8.y <- vout.shadowTexcoord[1].y; r8.z <- vout.shadowTexcoord[1].z
-nop 
-mov r6.x, r6.x
-mov r6.y, r6.y
-mov r6.z, r6.z
-mov r9.x, cb3[8].x  // r9.x <- lightViewProjection._m00
-mov r10.x, cb3[8].y  // r10.x <- lightViewProjection._m01
-mov r11.x, cb3[8].z  // r11.x <- lightViewProjection._m02
-mov r12.x, cb3[8].w  // r12.x <- lightViewProjection._m03
-mov r9.y, cb3[9].x  // r9.y <- lightViewProjection._m10
-mov r10.y, cb3[9].y  // r10.y <- lightViewProjection._m11
-mov r11.y, cb3[9].z  // r11.y <- lightViewProjection._m12
-mov r12.y, cb3[9].w  // r12.y <- lightViewProjection._m13
-mov r9.z, cb3[10].x  // r9.z <- lightViewProjection._m20
-mov r10.z, cb3[10].y  // r10.z <- lightViewProjection._m21
-mov r11.z, cb3[10].z  // r11.z <- lightViewProjection._m22
-mov r12.z, cb3[10].w  // r12.z <- lightViewProjection._m23
-mov r13.xyzw, cb3[11].xyzw  // r13.x <- lightViewProjection._m30; r13.y <- lightViewProjection._m31; r13.z <- lightViewProjection._m32; r13.w <- lightViewProjection._m33
-
-#line 10 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ShadowmapFunctions.hlsli"
-itof r6.w, l(1)
-mov r9.w, r13.x
-dp4 r9.x, r6.xyzw, r9.xyzw  // r9.x <- worldViewProjectionPosition.x
-mov r10.w, r13.y
-dp4 r9.y, r6.xyzw, r10.xyzw  // r9.y <- worldViewProjectionPosition.y
-mov r11.w, r13.z
-dp4 r9.z, r6.xyzw, r11.xyzw  // r9.z <- worldViewProjectionPosition.z
-mov r12.w, r13.w
-dp4 r1.w, r6.xyzw, r12.xyzw
-
-#line 13
-div r9.xyz, r9.xyzx, r1.wwww
-
-#line 17
-mov r9.w, -r9.y  // r9.w <- worldViewProjectionPosition.y
-
-#line 18
-mul r4.zw, r9.xxxw, l(0.000000, 0.000000, 0.500000, 0.500000)
-add r9.xy, r4.zwzz, l(0.500000, 0.500000, 0.000000, 0.000000)  // r9.y <- worldViewProjectionPosition.y
-
-#line 19
-mov r9.xy, r9.xyxx  // r9.x <- <CalcShadowTexcoord return value>.x; r9.y <- <CalcShadowTexcoord return value>.y
-mov r9.z, r9.z  // r9.z <- <CalcShadowTexcoord return value>.z
-
-#line 39 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongVS.hlsl"
-mov r9.xyz, r9.xyzx  // r9.x <- vout.shadowTexcoord[2].x; r9.y <- vout.shadowTexcoord[2].y; r9.z <- vout.shadowTexcoord[2].z
-nop 
-mov r6.x, r6.x
-mov r6.y, r6.y
-mov r6.z, r6.z
-mov r10.x, cb3[12].x  // r10.x <- lightViewProjection._m00
-mov r11.x, cb3[12].y  // r11.x <- lightViewProjection._m01
-mov r12.x, cb3[12].z  // r12.x <- lightViewProjection._m02
-mov r13.x, cb3[12].w  // r13.x <- lightViewProjection._m03
-mov r10.y, cb3[13].x  // r10.y <- lightViewProjection._m10
-mov r11.y, cb3[13].y  // r11.y <- lightViewProjection._m11
-mov r12.y, cb3[13].z  // r12.y <- lightViewProjection._m12
-mov r13.y, cb3[13].w  // r13.y <- lightViewProjection._m13
-mov r10.z, cb3[14].x  // r10.z <- lightViewProjection._m20
-mov r11.z, cb3[14].y  // r11.z <- lightViewProjection._m21
-mov r12.z, cb3[14].z  // r12.z <- lightViewProjection._m22
-mov r13.z, cb3[14].w  // r13.z <- lightViewProjection._m23
-mov r14.xyzw, cb3[15].xyzw  // r14.x <- lightViewProjection._m30; r14.y <- lightViewProjection._m31; r14.z <- lightViewProjection._m32; r14.w <- lightViewProjection._m33
-
-#line 10 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ShadowmapFunctions.hlsli"
-itof r6.w, l(1)
-mov r10.w, r14.x
-dp4 r10.x, r6.xyzw, r10.xyzw  // r10.x <- worldViewProjectionPosition.x
-mov r11.w, r14.y
-dp4 r10.y, r6.xyzw, r11.xyzw  // r10.y <- worldViewProjectionPosition.y
-mov r12.w, r14.z
-dp4 r10.z, r6.xyzw, r12.xyzw  // r10.z <- worldViewProjectionPosition.z
-mov r13.w, r14.w
-dp4 r1.w, r6.xyzw, r13.xyzw
-
-#line 13
-div r10.xyz, r10.xyzx, r1.wwww
-
-#line 17
-mov r10.w, -r10.y  // r10.w <- worldViewProjectionPosition.y
-
-#line 18
-mul r4.zw, r10.xxxw, l(0.000000, 0.000000, 0.500000, 0.500000)
-add r10.xy, r4.zwzz, l(0.500000, 0.500000, 0.000000, 0.000000)  // r10.y <- worldViewProjectionPosition.y
-
-#line 19
-mov r10.xy, r10.xyxx  // r10.x <- <CalcShadowTexcoord return value>.x; r10.y <- <CalcShadowTexcoord return value>.y
-mov r10.z, r10.z  // r10.z <- <CalcShadowTexcoord return value>.z
-
-#line 39 "C:\Users\2220012\Desktop\Graduation-project\HLSL\PhongVS.hlsl"
-mov r10.xyz, r10.xyzx  // r10.x <- vout.shadowTexcoord[3].x; r10.y <- vout.shadowTexcoord[3].y; r10.z <- vout.shadowTexcoord[3].z
-
-#line 41
+#line 40
 mov o0.xyzw, r0.xyzw
 mov o6.xyzw, r3.xyzw
 mov o1.xyz, r6.xyzx
@@ -464,9 +320,6 @@ mov o2.xyz, r1.xyzx
 mov o3.xyz, r2.xyzx
 mov o4.xyz, r5.xyzx
 mov o7.xyz, r7.xyzx
-mov o8.xyz, r8.xyzx
-mov o9.xyz, r9.xyzx
-mov o10.xyz, r10.xyzx
 mov o5.xy, r4.xyxx
 ret 
-// Approximately 231 instruction slots used
+// Approximately 129 instruction slots used

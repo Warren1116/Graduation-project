@@ -37,10 +37,10 @@ public:
 
 private:
 	std::unique_ptr<CameraController> cameraController;
-	//std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
 	std::unique_ptr<SceneRenderer>			sceneRenderer;
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
-    std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
+	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
+    //std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
 
 	std::unique_ptr<Sprite> Font;
 	std::unique_ptr<Sprite> TextFont;

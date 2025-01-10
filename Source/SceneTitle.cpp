@@ -24,8 +24,8 @@ void SceneTitle::Initialize()
         UINT height = static_cast<UINT>(graphics.GetScreenHeight());
 
         //	シャドウマップレンダラー
-        //shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
-        shadowmapCasterRenderer = std::make_unique<ShadowmapCasterRenderer>(2048);
+        shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
+        //shadowmapCasterRenderer = std::make_unique<ShadowmapCasterRenderer>(2048);
 
         //	シーンレンダラー
         sceneRenderer = std::make_unique<SceneRenderer>(width, height);
@@ -103,8 +103,8 @@ void SceneTitle::Finalize()
 
     LightManager::Instance().Clear();
 
-    //shadowmapRenderer->ClearRenderModel();
-    shadowmapCasterRenderer->ClearRenderModel();
+    shadowmapRenderer->ClearRenderModel();
+    //shadowmapCasterRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
 
 }
@@ -197,12 +197,12 @@ void SceneTitle::Render()
     // 3D
     {
         //シャドウマップの描画
-        //shadowmapRenderer->Render(dc);
-        shadowmapCasterRenderer->Render(dc);
+        shadowmapRenderer->Render(dc);
+        //shadowmapCasterRenderer->Render(dc);
 
         //シーンの描画
-        //sceneRenderer->SetShadowmapData(shadowmapRenderer->GetShadowMapData());
-        sceneRenderer->SetShadowmapData(shadowmapCasterRenderer->GetShadowMapData());
+        sceneRenderer->SetShadowmapData(shadowmapRenderer->GetShadowMapData());
+        //sceneRenderer->SetShadowmapData(shadowmapCasterRenderer->GetShadowMapData());
         sceneRenderer->Render(dc);
 
         postprocessingRenderer->Render(dc);
@@ -295,8 +295,8 @@ void SceneTitle::Render()
 //  モデルをレンダラーに登録
 void SceneTitle::RegisterRenderModel(Model* model)
 {
-    shadowmapCasterRenderer->RegisterRenderModel(model);
-    //shadowmapRenderer->RegisterRenderModel(model);
+    //shadowmapCasterRenderer->RegisterRenderModel(model);
+    shadowmapRenderer->RegisterRenderModel(model);
     sceneRenderer->RegisterRenderModel(model);
     const ModelResource* resource = model->GetResource();
     for (const ModelResource::Material& material : resource->GetMaterials())

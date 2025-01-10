@@ -165,15 +165,12 @@ void ShadowmapCasterShader::SetBuffers(const RenderContext& rc, const std::vecto
 	//{
 	//	cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
 	//}
-
 	//rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
-
 	//UINT stride = sizeof(ModelResource::Vertex);
 	//UINT offset = 0;
 	//rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
 	//rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	//rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 
 	if (mesh.nodeIndices.size() > 0)
 	{

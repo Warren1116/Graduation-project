@@ -42,10 +42,10 @@ void Camera::SetPerspectiveFov(float fovY, float aspect, float nearZ, float farZ
 		DirectX::XMMatrixPerspectiveFovLH(fovY, aspect, nearZ, farZ);
 	DirectX::XMStoreFloat4x4(&projection, Projection);
 
-	//this->fovY = fovY;
-	//this->aspect = aspect;
-	//this->nearZ = nearZ;
-	//this->farZ = farZ;
+	this->fovY = fovY;
+	this->aspect = aspect;
+	this->nearZ = nearZ;
+	this->farZ = farZ;
 }
 
 

@@ -81,13 +81,14 @@ public:
 
     Light* GetLight() { return mainDirectionalLight; }
 
-    //std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
+    std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
-    std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
+    //std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
 
-
+    //	シャドウマップ用情報
     //std::unique_ptr<DepthStencil> shadowmapDepthStencil;	//シャドウマップ用深度ステンシルバッファ
+    //float shadowDrawRect = 500.0f;
     //DirectX::XMFLOAT4X4 lightViewProjection;				//ライトビュープロジェクション行列
     //DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };		//影の色
     //float shadowBias = 0.001f;								//深度比較用のオフセット値
@@ -100,6 +101,9 @@ public:
     float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
     //	影の色
     DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
+
+    float shadowDrawRect = 500.0f;
+
 
 private:
     std::unique_ptr<Player> player;

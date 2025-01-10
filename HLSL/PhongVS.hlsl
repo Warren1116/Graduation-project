@@ -32,11 +32,10 @@ uint4 boneIndices : BONES
     //外積をして算出する
     vout.binormal = normalize(cross(vout.normal, vout.tangent));
     // シャドウマップで使用する情報を算出
-    //vout.shadowTexcoord = CalcShadowTexcoord(p, lightViewProjection);
-    
-    for (int i = 0; i < ShadowmapCount; ++i)
-    {
-        vout.shadowTexcoord[i] = CalcShadowTexcoord(p, lightViewProjection[i]);
-    }
+    vout.shadowTexcoord = CalcShadowTexcoord(p, lightViewProjection);
+    //for (int i = 0; i < ShadowmapCount; ++i)
+    //{
+    //    vout.shadowTexcoord[i] = CalcShadowTexcoord(p, lightViewProjection[i]);
+    //}
     return vout;
 }

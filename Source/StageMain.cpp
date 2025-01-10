@@ -33,9 +33,9 @@ StageMain::StageMain()
 
     instance = this;
     // ステージモデルの読み込み
-    //model = std::make_unique<Model>("Data/Model/ExampleStage/a.mdl");
+    model = std::make_unique<Model>("Data/Model/ExampleStage/a.mdl");
 
-    model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
+    //model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
 

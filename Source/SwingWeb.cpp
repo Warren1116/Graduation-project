@@ -47,16 +47,16 @@ void SwingWeb::Update(float elapsedTime)
         if (player.GetState() != Player::State::Swing)
         {
             SceneGame& sceneGame = SceneGame::Instance();
-            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            //{
-            //    Destroy();
-            //    sceneGame.UnregisterRenderModel(model.get());
-            //}
-            if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
                 Destroy();
                 sceneGame.UnregisterRenderModel(model.get());
             }
+            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            //{
+            //    Destroy();
+            //    sceneGame.UnregisterRenderModel(model.get());
+            //}
             
         }
 
@@ -106,17 +106,17 @@ void SwingWeb::Update(float elapsedTime)
             // ロックオン中の敵が存在しない場合、適切な処理を行う
             // 例えば、糸を消すなど
             SceneGame& sceneGame = SceneGame::Instance();
-            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            //{
-            //    Destroy();
-            //    sceneGame.UnregisterRenderModel(model.get());
-            //}
-
-            if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
                 Destroy();
                 sceneGame.UnregisterRenderModel(model.get());
             }
+
+            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
+            //{
+            //    Destroy();
+            //    sceneGame.UnregisterRenderModel(model.get());
+            //}
         }
     }
 
