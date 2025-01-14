@@ -145,8 +145,6 @@ private:
     //  ウェーブのクリアチェック
     void CheckWaveClear();
 
-    void RegisterEnemy(Enemy* enemy);
-    void RegisterEnemies(const std::vector<EnemyThief*>& enemies);
 
 private:
     static SceneGame* instance;

@@ -207,7 +207,8 @@ void PunchState::Enter()
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackPunch), false);
         Player::Instance().ApplyDamage(1, 2.0f);
-        CameraController::Instance().ShakeCamera(0.1f, 0.3f);
+        //MessageData::CAMERASHAKEDATA	p = { 0.1f, 2.0f };
+        //Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
     }
 }
 
@@ -279,7 +280,7 @@ void ShotState::Enter()
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackShot), false);
         Player::Instance().ApplyDamage(1, 2.0f);
-        CameraController::Instance().ShakeCamera(0.1f, 0.3f);
+        /*CameraController::Instance().ShakeCamera(0.1f, 0.3f);*/
     }
 }
 

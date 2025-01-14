@@ -15,6 +15,7 @@ CameraController::CameraController()
     CAMERACHANGEFREEMODEKEY = Messenger::Instance().AddReceiver(MessageData::CAMERACHANGEFREEMODE, [&](void* data) { OnFreeMode(data); });
     CAMERACHANGELOCKONMODEKEY = Messenger::Instance().AddReceiver(MessageData::CAMERACHANGELOCKONMODE, [&](void* data) { OnLockonMode(data); });
     CAMERACHANGEMOTIONMODEKEY = Messenger::Instance().AddReceiver(MessageData::CAMERACHANGEMOTIONMODE, [&](void* data) { OnMotionMode(data); });
+    CAMERASHAKEKEY = Messenger::Instance().AddReceiver(MessageData::CAMERASHAKE, [&](void* data) { OnShake(data); });
 
 }
 
@@ -23,6 +24,7 @@ CameraController::~CameraController()
     Messenger::Instance().RemoveReceiver(CAMERACHANGEFREEMODEKEY);
     Messenger::Instance().RemoveReceiver(CAMERACHANGELOCKONMODEKEY);
     Messenger::Instance().RemoveReceiver(CAMERACHANGEMOTIONMODEKEY);
+    Messenger::Instance().RemoveReceiver(CAMERASHAKEKEY);
 }
 
 void CameraController::Update(float elapsedTime)
@@ -33,6 +35,15 @@ void CameraController::Update(float elapsedTime)
     case	Mode::FreeCamera:	FreeCamera(elapsedTime);	break;
     case	Mode::LockonCamera:	LockonCamera(elapsedTime);	break;
     case	Mode::MotionCamera:	MotionCamera(elapsedTime);	break;
+    }
+
+    // カメラ揺れ
+    if (shakeTimer > 0)
+    {
+        newPosition.x += (rand() % 3 - 1) * shakePower;
+        newPosition.y += (rand() % 3 - 1) * shakePower;
+        newPosition.z += (rand() % 3 - 1) * shakePower;
+        shakeTimer -= elapsedTime;
     }
 
     // 地形との当たり判定を行う
@@ -60,12 +71,12 @@ void CameraController::Update(float elapsedTime)
 }
 
 
-void CameraController::ShakeCamera(float intensity, float duration)
-{
-	shakeTime = duration;
-	shakeIntensity = intensity;
-
-}
+//void CameraController::ShakeCamera(float intensity, float duration)
+//{
+//	shakeTime = duration;
+//	shakeIntensity = intensity;
+//
+//}
 
 void CameraController::FreeCamera(float elapsedTime)
 {
@@ -84,16 +95,7 @@ void CameraController::FreeCamera(float elapsedTime)
 
     float speed = rollSpeed * elapsedTime;
 
-    if (shakeTime > 0.0f)
-    {
-        float shakeX = (rand() % 100 - 50) / 50.0f * shakeIntensity;
-        float shakeY = (rand() % 100 - 50) / 50.0f * shakeIntensity;
-        angle.x += shakeX;
-        angle.y += shakeY;
-        shakeTime -= elapsedTime;
-        shakeIntensity *= 0.9f;
-    }
-    else
+
     {
         angle.x += ay * speed;
         angle.y += ax * speed;
@@ -238,6 +240,13 @@ void CameraController::OnMotionMode(void* data)
     this->mode = Mode::MotionCamera;
     motionData.clear();
     motionData = p->data;
+}
+
+void CameraController::OnShake(void* data)
+{
+    MessageData::CAMERASHAKEDATA* p = static_cast<MessageData::CAMERASHAKEDATA*>(data);
+    shakeTimer = p->shakeTimer;
+    shakePower = p->shakePower;
 }
 
 

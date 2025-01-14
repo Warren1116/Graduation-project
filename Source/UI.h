@@ -59,4 +59,5 @@ private:
     bool increasingAlpha = false;
     bool fadeOut = true;
     int TutorialCounter;
+
 };

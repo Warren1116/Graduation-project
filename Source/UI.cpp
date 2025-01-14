@@ -2,6 +2,8 @@
 #include "Player.h"
 #include "SceneGame.h"
 #include "Graphics\Graphics.h"
+#include "Input\GamePad.h"
+#include "Input\Input.h"
 
 #define TUTORIAL
 
@@ -28,6 +30,7 @@ void UI::Initialize()
 
     ShiftKey = std::make_unique<Sprite>("Data/Sprite/ShiftKey.png");
     TutorialCounter = 0;
+
 }
 
 void UI::Update(float elapsedtime)
@@ -103,7 +106,7 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
             static_cast<float>(HpBox->GetTextureWidth()), static_cast<float>(HpBox->GetTextureHeight()),
             1.5f,
             1, 1, 1, 0.8f);
-        Number->RenderNumber(dc, Player::Instance().GetHealth(),50,30,25,25, 1, 1, 1, 1);
+        Number->RenderNumber(dc, Player::Instance().GetHealth(), 50, 30, 25, 25, 1, 1, 1, 1);
 
         float gaugeWidth = Player::Instance().GetMaxHealth() * Player::Instance().GetHealth() * 5.0f;
 
@@ -120,7 +123,7 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
         HpBar->Render(dc,
             130, 35,
             gaugeWidth, 25,
-            0, 0, 
+            0, 0,
             250, 20,
             1.5f,
             1, 1, 1, 1);
@@ -185,7 +188,7 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
 
     if (Player::Instance().GetHealth() == 0)
     {
-        TextFont->textout(dc, "Right Click To Go Back Title", 1280 * 0.3f, 720 * 0.5f, 20, 20, {1,1,1,1});
+        TextFont->textout(dc, "Right Click To Go Back Title", 1280 * 0.3f, 720 * 0.5f, 20, 20, { 1,1,1,1 });
     }
 
 }
@@ -385,16 +388,17 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
 
     }
 
-    if (Player::Instance().GetState() == Player::State::Swing && TutorialCounter ==0)
+    if (Player::Instance().GetState() == Player::State::Swing && TutorialCounter == 0)
     {
         TutorialCounter++;
         SceneGame::Instance().SetTutorialState(SceneGame::TutorialState::Climb);
     }
-    if (Player::Instance().GetState() == Player::State::Climb && TutorialCounter ==1)
+    if (Player::Instance().GetState() == Player::State::Climb && TutorialCounter == 1)
     {
         TutorialCounter++;
         SceneGame::Instance().SetTutorialState(SceneGame::TutorialState::Finish);
     }
+
 
 
     D3D11_VIEWPORT viewport;

@@ -101,11 +101,15 @@ void SceneTitle::Finalize()
 {
     EnemyManager::Instance().Clear();
 
+    // ステージ終了化
+    StageManager::Instance().Clear();
+
     LightManager::Instance().Clear();
 
     shadowmapRenderer->ClearRenderModel();
     //shadowmapCasterRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
+
 
 }
 
@@ -139,7 +143,7 @@ void SceneTitle::Update(float elapsedTime)
 
     Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
-    
+
 
     if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600 && mouse.GetButtonDown() & Mouse::BTN_LEFT)
     {
@@ -304,4 +308,14 @@ void SceneTitle::RegisterRenderModel(Model* model)
         ModelResource::Material& mat = const_cast<ModelResource::Material&>(material);
         mat.shaderId = static_cast<int>(ModelShaderId::Phong);
     }
+}
+
+//  モデルをレンダラーに削除
+void SceneTitle::UnregisterRenderModel(Model* model)
+{
+    shadowmapRenderer->UnregisterRenderModel(model);
+    //shadowmapCasterRenderer->UnregisterRenderModel(model);
+    sceneRenderer->UnregisterRenderModel(model);
+
+
 }

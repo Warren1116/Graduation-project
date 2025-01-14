@@ -36,8 +36,8 @@ public:
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
 
-	//
-	void ShakeCamera(float intensity, float duration);
+	////
+	//void ShakeCamera(float intensity, float duration);
 
 private:
 	// フリーカメラ更新処理
@@ -57,6 +57,9 @@ private:
 
 	// モーションカメラ
 	void OnMotionMode(void* data);
+
+	// カメラ揺れ
+	void OnShake(void* data);
 
 	// 横軸のズレ方向算出
 	float CalcSide(DirectX::XMFLOAT3 p1, DirectX::XMFLOAT3 p2);
@@ -82,8 +85,8 @@ private:
 	float				motionTimer = 0;
 	std::vector<CameraMotionData>	motionData;
 	//カメラシェイク
-	float shakeTime = 0;
-	float shakeIntensity = 0;
+	float				shakeTimer = 0;
+	float				shakePower = 1;
 
 
 	// メッセージキー

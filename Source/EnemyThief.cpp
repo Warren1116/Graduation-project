@@ -116,7 +116,7 @@ void EnemyThief::Update(float elapsedTime)
 
     }
 
-    if (!Player::Instance().GetIsUseGrab() || health > 0)
+    if (!Player::Instance().GetIsUseGrab())
     {
         stateMachine->Update(elapsedTime);
     }

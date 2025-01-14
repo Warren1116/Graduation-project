@@ -791,6 +791,7 @@ void Player::UpdateCameraState(float elapsedTime)
     }
     case State::Grab:
     {
+
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
         float vx = sinf(angle.y) * 5;
         float vz = -cosf(angle.y) * 5;
@@ -824,7 +825,7 @@ bool Player::InputProjectile()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    if (gamePad.GetButtonDown() & GamePad::BTN_Y)
+    if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
     {
         DirectX::XMFLOAT3 dir;
         if (lockonEnemy)    //　もしカメラロックしてる場合は敵を向かて発射
@@ -1039,7 +1040,7 @@ void Player::UpdateIdleState(float elapsedTime)
     {
         Mouse& mouse = Input::Instance().GetMouse();
         GamePad& gamePad = Input::Instance().GetGamePad();
-        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
+        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
         {
             IsUseGrab = true;
             TransitionGrabState();
@@ -1279,9 +1280,12 @@ void Player::TransitionDamageState()
     // ダメージアニメーション再生
     model->PlayAnimation(Anim_GetHit1, false);
 
-    // ダメージ時の振動
-    //GamePad& gamePad = Input::Instance().GetGamePad();
-    //gamePad.SetVibration(0.5f, 0.5f);
+    MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
+    Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
+
+    // ダメージ時コントローラー振動
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    gamePad.SetVibration(0.5f, 0.5f);
 
 }
 
@@ -1291,9 +1295,10 @@ void Player::UpdateDamageState(float elapsedTime)
     // ダメージアニメーションが終わったら待機ステートへ遷移
     if (!model->IsPlayAnimation())
     {
-        // 振動停止
-        //GamePad& gamePad = Input::Instance().GetGamePad();
-        //gamePad.StopVibration();
+
+        // コントローラー振動停止
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        gamePad.StopVibration();
 
         TransitionIdleState();
     }

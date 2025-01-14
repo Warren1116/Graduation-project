@@ -791,19 +791,5 @@ void SceneGame::CheckWaveClear()
     }
 }
 
-void SceneGame::RegisterEnemy(Enemy* enemy)
-{
-    EnemyManager::Instance().Register(enemy);
-    RegisterRenderModel(enemy->GetModel());
-    CharacterManager::Instance().Register(enemy);
-}
-
-void SceneGame::RegisterEnemies(const std::vector<EnemyThief*>& enemies)
-{
-    for (EnemyThief* enemy : enemies)
-    {
-        RegisterEnemy(enemy);
-    }
-}
 
 
