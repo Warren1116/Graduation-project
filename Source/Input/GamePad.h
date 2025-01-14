@@ -1,6 +1,7 @@
 #pragma once
 
 using GamePadButton = unsigned int;
+using KeyBoardButton = unsigned int;
 
 // ゲームパッド
 class GamePad
@@ -22,14 +23,17 @@ public:
 	static const GamePadButton BTN_RIGHT_SHOULDER	= (1 << 13);
 	static const GamePadButton BTN_LEFT_TRIGGER		= (1 << 14);
 	static const GamePadButton BTN_RIGHT_TRIGGER	= (1 << 15);
-	static const GamePadButton BTN_SPACE			= (1 << 16);
-	static const GamePadButton BTN_F				= (1 << 17);
-	static const GamePadButton BTN_R				= (1 << 18);
-	static const GamePadButton BTN_P				= (1 << 19);
-	static const GamePadButton BTN_TAB				= (1 << 20);
-	static const GamePadButton BTN_SHIFT			= (1 << 21);
-	static const GamePadButton BTN_E				= (1 << 22);
-	static const GamePadButton BTN_ESC				= (1 << 23);
+
+	static const GamePadButton BTN_KEYBOARD_SPACE	= (1 << 16);
+	static const GamePadButton BTN_KEYBOARD_F		= (1 << 17);
+	static const GamePadButton BTN_KEYBOARD_R		= (1 << 18);
+	static const GamePadButton BTN_KEYBOARD_P		= (1 << 19);
+	static const GamePadButton BTN_KEYBOARD_TAB		= (1 << 20);
+	static const GamePadButton BTN_KEYBOARD_SHIFT	= (1 << 21);
+	static const GamePadButton BTN_KEYBOARD_E		= (1 << 22);
+	static const GamePadButton BTN_KEYBOARD_ESC		= (1 << 23);
+	static const GamePadButton BTN_KEYBOARD_C		= (1 << 24);
+	static const GamePadButton BTN_KEYBOARD_V		= (1 << 25);
 
 public:
 	GamePad() {}

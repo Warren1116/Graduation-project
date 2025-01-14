@@ -11,6 +11,7 @@
 #include "StageMain.h"
 #include "StageManager.h"
 
+
 // 初期化
 void SceneTitle::Initialize()
 {
@@ -68,7 +69,8 @@ void SceneTitle::Initialize()
     //	モデルを各レンダラーに登録
     Model* list[] =
     {
-        stageMain->GetModel(),
+        stageMain->GetCityModel(),
+        stageMain->GetGroundModel(),
         player->model.get(),
     };
     for (Model* model : list)
@@ -93,6 +95,9 @@ void SceneTitle::Initialize()
     Title = std::make_unique<Sprite>("Data/Sprite/Title.png");
     Start = std::make_unique<Sprite>("Data/Sprite/Start.png");
     Quit = std::make_unique<Sprite>("Data/Sprite/Quit.png");
+
+    UseController = false;
+    controllerPos = { 245,540 };
 
 }
 
@@ -141,20 +146,58 @@ void SceneTitle::Update(float elapsedTime)
         }
     }
 
-    Mouse& mouse = Input::Instance().GetMouse();
     GamePad& gamePad = Input::Instance().GetGamePad();
+    const GamePadButton controllerButton =
+        GamePad::BTN_UP
+        | GamePad::BTN_DOWN
+        | GamePad::BTN_LEFT
+        | GamePad::BTN_RIGHT
+        | GamePad::BTN_X
+        | GamePad::BTN_Y
+        | GamePad::BTN_A
+        | GamePad::BTN_B
+        ;
 
+    if (gamePad.GetButtonDown() & controllerButton)
+    {
+        UseController = true;
+    }
 
-    if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600 && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+    Mouse& mouse = Input::Instance().GetMouse();
+    float mouseLength = sqrtf((mouse.GetPositionX() - mouse.GetOldPositionX()) * (mouse.GetPositionX() - mouse.GetOldPositionX()) + (mouse.GetPositionY() - mouse.GetOldPositionY()) * (mouse.GetPositionY() - mouse.GetOldPositionY()));
+
+    if (mouseLength > 0.0f)
+    {
+        UseController = false;
+    }
+
+    if (UseController)
+    {
+        if (gamePad.GetButtonDown() & GamePad::BTN_UP)
+        {
+            controllerPos.y = 540;
+        }
+        if (gamePad.GetButtonDown() & GamePad::BTN_DOWN)
+        {
+            controllerPos.y = 690;
+        }
+
+    }
+
+    if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600 && mouse.GetButtonDown() & Mouse::BTN_LEFT ||
+        controllerPos.y == 540 && gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
     }
 
 
-    if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 600 && mouse.GetPositionY() < 750 && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+    if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 600 && mouse.GetPositionY() < 750 && mouse.GetButtonDown() & Mouse::BTN_LEFT ||
+        controllerPos.y == 690 && gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         PostQuitMessage(1);
     }
+
+
 
     EnemyManager::Instance().Update(elapsedTime);
 }
@@ -224,58 +267,101 @@ void SceneTitle::Render()
             0,
             1, 1, 1, 1);
 
-        Mouse& mouse = Input::Instance().GetMouse();
-        if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600)
+
+        if (!UseController)
         {
-            Start->Render(dc,
-                150, 450,
-                200.0f, 200.0f,
-                0, 0,
-                static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
-                0,
-                1, 1, 1, alpha);
+            Mouse& mouse = Input::Instance().GetMouse();
+            if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600)
+            {
+                Start->Render(dc,
+                    150, 450,
+                    200.0f, 200.0f,
+                    0, 0,
+                    static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
+                    0,
+                    1, 1, 1, alpha);
+            }
+            else
+            {
+                Start->Render(dc,
+                    150, 450,
+                    150.0f, 150.0f,
+                    0, 0,
+                    static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
+                    0,
+                    1, 1, 1, 1);
+            }
+
+            if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 600 && mouse.GetPositionY() < 750)
+            {
+                Quit->Render(dc,
+                    150, 600,
+                    200.0f, 200.0f,
+                    0, 0,
+                    static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
+                    0,
+                    1, 1, 1, alpha);
+            }
+            else
+            {
+                Quit->Render(dc,
+                    150, 600,
+                    150.0f, 150.0f,
+                    0, 0,
+                    static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
+                    0,
+                    1, 1, 1, 1);
+            }
         }
         else
         {
-            Start->Render(dc,
-                150, 450,
-                150.0f, 150.0f,
-                0, 0,
-                static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
+            if (controllerPos.y == 540)
+            {
+                Start->Render(dc,
+                    150, 450,
+                    200.0f, 200.0f,
+                    0, 0,
+                    static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
+                    0,
+                    1, 1, 1, alpha);
+            }
+            else
+            {
+                Start->Render(dc,
+                    150, 450,
+                    150.0f, 150.0f,
+                    0, 0,
+                    static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
+                    0,
+                    1, 1, 1, 1);
+            }
+
+            if (controllerPos.y == 690)
+            {
+                Quit->Render(dc,
+                    150, 600,
+                    200.0f, 200.0f,
+                    0, 0,
+                    static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
+                    0,
+                    1, 1, 1, alpha);
+            }
+            else
+            {
+                Quit->Render(dc,
+                    150, 600,
+                    150.0f, 150.0f,
+                    0, 0,
+                    static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
+                    0,
+                    1, 1, 1, 1);
+            }
         }
 
-        if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 600 && mouse.GetPositionY() < 750)
-        {
-            Quit->Render(dc,
-                150, 600,
-                200.0f, 200.0f,
-                0, 0,
-                static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
-                0,
-                1, 1, 1, alpha);
-        }
-        else
-        {
-            Quit->Render(dc,
-                150, 600,
-                150.0f, 150.0f,
-                0, 0,
-                static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
-        }
 
-        //TextFont->textout(dc, "Spider X", screenWidth / 3, screenHeight / 3, 50, 50, {1,1,1,1});
 
-        //Font->Render(dc,
-        //    screenWidth / 2, screenHeight / 2,
-        //    180.0f, 180.0f,
-        //    0, 0,
-        //    static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()),
-        //    0,
-        //    1, 1, 1, alpha);
+
+
     }
 
     // デバッグ情報の表示
@@ -287,7 +373,6 @@ void SceneTitle::Render()
         {
             ImGui::SliderFloat3("cameraPos", &cameraPos.x, 0.0f, 100.0f);
             ImGui::SliderFloat3("cameraAngle", &cameraAngle.x, 0.0f, 50.0f);
-
         }
         ImGui::End();
 

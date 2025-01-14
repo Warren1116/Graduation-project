@@ -2,6 +2,7 @@
 
 #include "Input/GamePad.h"
 #include "Input/Mouse.h"
+#include "Input\KeyBoard.h"
 
 // インプット
 class Input
@@ -23,8 +24,11 @@ public:
 	// マウス取得
 	Mouse& GetMouse() { return mouse; }
 
+    // キーボード取得
+    KeyBoard& GetKeyBoard() { return keyBoard; }
 private:
 	static Input*		instance;
 	GamePad				gamePad;
 	Mouse				mouse;
+    KeyBoard            keyBoard;
 };

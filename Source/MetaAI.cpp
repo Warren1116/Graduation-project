@@ -13,6 +13,7 @@ void Meta::Update()
 {
 	// ここで自発的にメタAIが監視している処理があれば記載する
 	// 今課題ではメタAIのイベントトリガーはメッセージを受信したときのため記述する処理は無し
+
 }
 
 // メッセージ受信したときの処理
@@ -46,6 +47,7 @@ bool Meta::OnMessage(const Telegram& telegram)
 		for (int i = 0; i < enemyCount; ++i)
 		{
 			Enemy* enemy = enemyManager->GetEnemy(i);
+            if (!enemy->GetAlive()) continue;
 			DirectX::XMFLOAT3 position = enemy->GetPosition();
 			DirectX::XMFLOAT3 targetPosition = player->GetPosition();
 			float vx = targetPosition.x - position.x;

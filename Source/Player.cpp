@@ -478,6 +478,7 @@ void Player::UpdateGrabState(float elapsedTime)
     if (!model->IsPlayAnimation())
     {
         IsUseGrab = false;
+        lockonEnemy->ApplyDamage(20.0, 1.0);
         TransitionIdleState();
     }
 
@@ -514,7 +515,6 @@ void Player::UpdateGrabState(float elapsedTime)
             //}
         }
 
-        lockonEnemy->ApplyDamage(20.0, 1.0);
     }
 
 }
@@ -614,7 +614,8 @@ void Player::UpdateCameraState(float elapsedTime)
     case State::Swing:
     case State::Dodge:
     {
-        if (Input::Instance().GetGamePad().GetButton() & GamePad::BTN_TAB || Input::Instance().GetGamePad().GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        if (gamePad.GetButton() & GamePad::BTN_KEYBOARD_TAB || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
         {
             // Tabキーを押すと、ロック判定
             if (!tabPressed)
@@ -825,7 +826,7 @@ bool Player::InputProjectile()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER)
+    if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_C)
     {
         DirectX::XMFLOAT3 dir;
         if (lockonEnemy)    //　もしカメラロックしてる場合は敵を向かて発射
@@ -964,7 +965,7 @@ bool Player::InputDodge()
 {
     // ボタン入力でジャンプ
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
+    if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         return true;
     }
@@ -1071,7 +1072,7 @@ void Player::UpdateMoveState(float elapsedTime)
     HitResult hit;
     //if (FindWallSwingPoint(position, 5.0f, hit))
     //{
-    if ((gamePad.GetButton() & GamePad::BTN_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime) && firstSwing)
+    if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime) && firstSwing)
     {
         lastState = state;
         TransitionSwingState();
@@ -1135,7 +1136,7 @@ void Player::UpdateJumpState(float elapsedTime)
     HitResult hit;
     //if (FindWallSwingPoint(position, 5.0f, hit))
     //{
-    if ((gamePad.GetButton() & GamePad::BTN_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime))
+    if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime))
     {
         lastState = state;
         //  スイングステートへの遷移
@@ -1386,7 +1387,7 @@ bool Player::InputJump()
 {
     // ボタン入力でジャンプ
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
+    if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         //ジャンプ入力した
         Jump(jumpSpeed);
@@ -1675,7 +1676,7 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMStoreFloat3(&front, swingDir);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonUp() & GamePad::BTN_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
+    if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
     {
         TransitionIdleState();
         velocity = { 0,0,0 };

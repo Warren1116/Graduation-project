@@ -57,7 +57,8 @@ public:
 	static int GetStageNum();
 	static void SetStageNum(int num);
 
-	Model* GetModel() { return model.get(); }
+	Model* GetCityModel() { return cityModel.get(); }
+	Model* GetGroundModel() { return groundModel.get(); }
 
 	CollisionMesh& GetCollisionMesh() { return collisionMesh; }
 
@@ -74,7 +75,8 @@ private:
 	}
 
 private:
-	std::unique_ptr<Model> model;
+	std::unique_ptr<Model> cityModel;
+	std::unique_ptr<Model> groundModel;
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 0.01f, 0.01f, 0.01f };

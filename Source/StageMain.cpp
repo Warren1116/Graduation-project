@@ -33,9 +33,9 @@ StageMain::StageMain()
 
     instance = this;
     // ステージモデルの読み込み
-    model = std::make_unique<Model>("Data/Model/ExampleStage/a.mdl");
+    cityModel = std::make_unique<Model>("Data/Model/ExampleStage/a.mdl");
+    groundModel = std::make_unique<Model>("Data/Model/ExampleStage/c.mdl");
 
-    //model = std::make_unique<Model>("Data/Model/ExampleStage/ExampleStage.mdl");
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
 
@@ -47,8 +47,8 @@ StageMain::StageMain()
     DirectX::XMVECTOR VolumeMin = DirectX::XMVectorReplicate(FLT_MAX);
     DirectX::XMVECTOR VolumeMax = DirectX::XMVectorReplicate(-FLT_MAX);
 
-    const ModelResource* resource = model->GetResource();
-    const std::vector<Model::Node>& nodes = model->GetNodes();
+    const ModelResource* resource = cityModel->GetResource();
+    const std::vector<Model::Node>& nodes = cityModel->GetNodes();
 
     // 頂点データをワールド空間変換し、三角形データを作成
     //for (const Model::Mesh& mesh : model->GetMeshes())
@@ -160,9 +160,12 @@ void StageMain::Update(float elapsedTime)
         clampedPos.x = std::clamp(playerPos.x, volumeMin.x, volumeMax.x);
         clampedPos.z = std::clamp(playerPos.z, volumeMin.z, volumeMax.z);
         Player::Instance().SetPosition(clampedPos);
+        Player::Instance().SetVelocity({ 0, 0, 0 });
     }
+
+    // モデル行列更新
     UpdateTransform();
-    model->UpdateTransform(transform);
+    cityModel->UpdateTransform(transform);
 }
 
 void StageMain::DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
@@ -191,6 +194,6 @@ void StageMain::DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLO
 // レイキャスト
 bool StageMain::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit)
 {
-    return Collision::IntersectRayVsModel(start, end, model.get(), hit);
+    return Collision::IntersectRayVsModel(start, end, cityModel.get(), hit);
 }
 

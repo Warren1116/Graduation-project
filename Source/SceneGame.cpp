@@ -28,8 +28,8 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 
-//#define TUTORIAL
-#define DEBUG
+#define TUTORIAL
+//#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -115,7 +115,8 @@ void SceneGame::Initialize()
     Model* list[] =
     {
         player->model.get(),
-        stageMain->GetModel(),
+        stageMain->GetCityModel(),
+        stageMain->GetGroundModel(),
 
 
     };
@@ -168,6 +169,8 @@ void SceneGame::Initialize()
     // HUD生成
     //headUpDisplay = new HeadUpDisplay();
 
+    UseController = false;
+    controllerPos = { 245,540 };
 
 }
 
@@ -239,22 +242,59 @@ void SceneGame::Update(float elapsedTime)
         }
     }
 
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    const GamePadButton controllerButton =
+        GamePad::BTN_UP
+        | GamePad::BTN_DOWN
+        | GamePad::BTN_LEFT
+        | GamePad::BTN_RIGHT
+        | GamePad::BTN_X
+        | GamePad::BTN_Y
+        | GamePad::BTN_A
+        | GamePad::BTN_B
+        ;
+
+    if (gamePad.GetButtonDown() & controllerButton)
+    {
+        UseController = true;
+    }
+    Mouse& mouse = Input::Instance().GetMouse();
+    float mouseLength = sqrtf((mouse.GetPositionX() - mouse.GetOldPositionX()) * (mouse.GetPositionX() - mouse.GetOldPositionX()) + (mouse.GetPositionY() - mouse.GetOldPositionY()) * (mouse.GetPositionY() - mouse.GetOldPositionY()));
+
+    if (mouseLength > 0.0f)
+    {
+        UseController = false;
+    }
+
 
     //Pauseの処理
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_ESC)
+    if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_ESC || gamePad.GetButtonDown() & GamePad::BTN_START)
     {
         isPaused = !isPaused;
     }
     if (isPaused)
     {
+        if (UseController)
+        {
+            if (gamePad.GetButtonDown() & GamePad::BTN_UP)
+            {
+                controllerPos.y = 300;
+            }
+            if (gamePad.GetButtonDown() & GamePad::BTN_DOWN)
+            {
+                controllerPos.y = 490;
+            }
+
+        }
+
         Mouse& mouse = Input::Instance().GetMouse();
         float screenWidth = static_cast<float>(graphics.GetScreenWidth());
         float screenHeight = static_cast<float>(graphics.GetScreenHeight());
 
         if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 250
             && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170
-            && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+            && mouse.GetButtonDown() & Mouse::BTN_LEFT ||
+            controllerPos.y == 300 && gamePad.GetButtonDown() & GamePad::BTN_A)
         {
             isTutorial = !isTutorial;
             ControllerButton = true;
@@ -263,7 +303,8 @@ void SceneGame::Update(float elapsedTime)
 
         if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 300
             && mouse.GetPositionY() > screenHeight * 0.4f + 50 && mouse.GetPositionY() < screenHeight * 0.4f + 170
-            && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+            && mouse.GetButtonDown() & Mouse::BTN_LEFT ||
+            controllerPos.y == 490 && gamePad.GetButtonDown() & GamePad::BTN_A)
         {
             SceneManager::Instance().ChangeScene(new SceneTitle);
         }
@@ -272,7 +313,8 @@ void SceneGame::Update(float elapsedTime)
         {
             if (mouse.GetPositionX() > screenWidth * 0.35f && mouse.GetPositionX() < screenWidth * 0.35f + 250
                 && mouse.GetPositionY() > screenHeight * 0.1f + 50 && mouse.GetPositionY() < screenHeight * 0.1f + 170
-                && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+                && mouse.GetButtonDown() & Mouse::BTN_LEFT ||
+                UseController && gamePad.GetButtonDown() & GamePad::BTN_LEFT)
             {
                 ControllerButton = true;
                 KeyBoardButton = false;
@@ -280,7 +322,8 @@ void SceneGame::Update(float elapsedTime)
 
             if (mouse.GetPositionX() > screenWidth * 0.65f && mouse.GetPositionX() < screenWidth * 0.65f + 300
                 && mouse.GetPositionY() > screenHeight * 0.1f + 50 && mouse.GetPositionY() < screenHeight * 0.1f + 170
-                && mouse.GetButtonDown() & Mouse::BTN_LEFT)
+                && mouse.GetButtonDown() & Mouse::BTN_LEFT ||
+                UseController && gamePad.GetButtonDown() & GamePad::BTN_RIGHT)
             {
                 KeyBoardButton = true;
                 ControllerButton = false;
@@ -302,7 +345,7 @@ void SceneGame::Update(float elapsedTime)
 
     UpdateTutorialState(elapsedTime);
 
-    if (isPaused)
+    if (tutorialPause)
     {
         return;
     }
@@ -335,7 +378,7 @@ void SceneGame::Update(float elapsedTime)
     //    isPaused = !isPaused;
     //}
 
-    if (gamePad.GetButton() & GamePad::BTN_SHIFT && gamePad.GetButton() & GamePad::BTN_R)
+    if (gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT && gamePad.GetButton() & GamePad::BTN_KEYBOARD_R)
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
     }
@@ -404,10 +447,12 @@ void SceneGame::Render()
             //  ポーズ背景色の描画
             Pause->Render(dc, 0, 0, screenWidth, screenHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0.5f);
 
+
             Mouse& mouse = Input::Instance().GetMouse();
             //  操作方法ボタンの描画
             if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 250
-                && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170)
+                && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170 || 
+                UseController && controllerPos.y == 300)
             {
                 ControlWay->Render(dc, screenWidth * 0.1f, screenHeight * 0.2f, 350, 350, 0, 0, static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
@@ -420,7 +465,8 @@ void SceneGame::Render()
 
             //  タイトル画面へ戻るボタンの描画
             if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 300
-                && mouse.GetPositionY() > screenHeight * 0.4f + 50 && mouse.GetPositionY() < screenHeight * 0.4f + 170)
+                && mouse.GetPositionY() > screenHeight * 0.4f + 50 && mouse.GetPositionY() < screenHeight * 0.4f + 170 ||
+                UseController && controllerPos.y == 490)
             {
                 ToTitle->Render(dc, screenWidth * 0.1f, screenHeight * 0.4f, 350, 350, 0, 0, static_cast<float>(ToTitle->GetTextureWidth()), static_cast<float>(ToTitle->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
@@ -488,7 +534,6 @@ void SceneGame::Render()
         if (ImGui::Begin("Tutorial", nullptr, ImGuiWindowFlags_None))
         {
             ImGui::InputFloat("Tutorial", &tutorialTimer);
-
             std::string str = "";
             switch (tutorialState)
             {
@@ -549,62 +594,67 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
+    //  チュトリアルの進行
     switch (tutorialState)
     {
+        //  移動のチュトリアル
     case SceneGame::TutorialState::Move:
         CheckTutorialTimeout(0.0f);
         if (Player::Instance().InputMove(elapsedTime) && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Jump);
         break;
-
+        //  ジャンプのチュトリアル
     case SceneGame::TutorialState::Jump:
         CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputJump() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Attack);
         break;
-
+        //  攻撃のチュトリアル
     case SceneGame::TutorialState::Attack:
         CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputAttack() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Shot);
         break;
-
+        //  弾丸のチュトリアル
     case SceneGame::TutorialState::Shot:
         CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputProjectile() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::CameraLock);
         break;
-
+        //  カメラロックのチュトリアル
     case SceneGame::TutorialState::CameraLock:
         CheckTutorialTimeout(3.5f);
-        if (gamePad.GetButtonDown() & GamePad::BTN_TAB && canAcceptInput)
+        if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_TAB || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::LockAttack);
         break;
-
+        //  ロックオン攻撃のチュトリアル
     case SceneGame::TutorialState::LockAttack:
         CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputAttack() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::LockShot);
         break;
-
+        //  ロックオン弾丸のチュトリアル
     case SceneGame::TutorialState::LockShot:
         CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputProjectile() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Swing);
         break;
+        //  スイングのチュトリアル
     case SceneGame::TutorialState::Swing:
         tutorialTimer = 0;
         break;
+        //  クライミングのチュトリアル
     case SceneGame::TutorialState::Climb:
         tutorialTimer = 0;
-
         break;
+        //  チュトリアル終了
     case SceneGame::TutorialState::Finish:
         tutorialTimer = 0;
         break;
     }
 }
 
+//  チュトリアル始まる時にの設定
 void SceneGame::StartTutorial(TutorialState newState)
 {
     PauseGame();
@@ -612,6 +662,7 @@ void SceneGame::StartTutorial(TutorialState newState)
     tutorialTimer = 0;
 }
 
+//  チュトリアルステートの変更
 void SceneGame::AdvanceTutorialState(TutorialState newState)
 {
     UnpauseGame();
@@ -619,6 +670,7 @@ void SceneGame::AdvanceTutorialState(TutorialState newState)
     tutorialTimer = 0;
 }
 
+//  チュトリアルのタイマーチェック
 void SceneGame::CheckTutorialTimeout(float timeout)
 {
     if (tutorialTimer > timeout)
@@ -628,15 +680,17 @@ void SceneGame::CheckTutorialTimeout(float timeout)
     }
 }
 
+//  チュトリアルの再開
 void SceneGame::UnpauseGame()
 {
-    isPaused = false;
+    tutorialPause = false;
     canAcceptInput = false;
 }
 
+//  チュトリアルの一時停止
 void SceneGame::PauseGame()
 {
-    isPaused = true;
+    tutorialPause = true;
 }
 
 //  モデルをレンダラーに登録
@@ -662,10 +716,12 @@ void SceneGame::UnregisterRenderModel(Model* model)
 
 }
 
+//  Waveによって敵を生成
 void SceneGame::SpawnEnemiesForWave(int wave)
 {
     EnemyManager& enemyManager = EnemyManager::Instance();
 
+    //    敵の生成
     switch (wave)
     {
     case 1:
@@ -734,7 +790,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
 
         //RegisterEnemies({ thief });
     }
-
     break;
     case 3:
     {
@@ -760,8 +815,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
             characterManager.Register(thief);
 
         }
-
-        //RegisterEnemies({thief});
     }
 
     break;
@@ -770,6 +823,7 @@ void SceneGame::SpawnEnemiesForWave(int wave)
 
 }
 
+//  次のWaveを開始
 void SceneGame::StartNextWave()
 {
     if (currentWave < totalWaves)
@@ -782,6 +836,7 @@ void SceneGame::StartNextWave()
 
 }
 
+//  Waveがクリアされたかどうかのチェック
 void SceneGame::CheckWaveClear()
 {
     if (waveInProgress && EnemyManager::Instance().GetEnemyCount() == 0)

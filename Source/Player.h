@@ -99,6 +99,9 @@ public:
 
     void SetIdleState() { return TransitionIdleState(); }
 
+    void SetVelocity(const DirectX::XMFLOAT3& velocity) { this->velocity = velocity; }
+
+
 	// ステート
 	enum class State
 	{

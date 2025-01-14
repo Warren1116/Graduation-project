@@ -35,7 +35,7 @@ void UI::Initialize()
 
 void UI::Update(float elapsedtime)
 {
-    if (SceneGame::Instance().GetIsPaused())
+    if (SceneGame::Instance().GetIsTutorialPaused())
     {
         if (increasingAlpha)
         {
@@ -250,7 +250,7 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
     float screenHeight = Graphics::Instance().GetScreenHeight();
 
     //  ç≈èâÇÃÉ`ÉÖÉgÉäÉAÉã
-    if (SceneGame::Instance().GetIsPaused())
+    if (SceneGame::Instance().GetIsTutorialPaused())
     {
         switch (SceneGame::Instance().GetTutorialState())
         {

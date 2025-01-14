@@ -16,10 +16,6 @@
 class SceneTitle : public Scene
 {
 public:
-	enum class InputDevice {
-		KeyboardMouse,
-		Controller
-	};
 
 	SceneTitle() {}
 	~SceneTitle() override {}
@@ -38,7 +34,6 @@ public:
 
 	void RegisterRenderModel(Model* model);
 	void UnregisterRenderModel(Model* model);
-
 
 
 private:
@@ -63,5 +58,7 @@ private:
 	DirectX::XMFLOAT3 cameraPos = { 66,75,28 };
 	DirectX::XMFLOAT3 cameraAngle = { 2,50,1 };
 
+    DirectX::XMFLOAT2 controllerPos;
+    bool UseController;
 };
 

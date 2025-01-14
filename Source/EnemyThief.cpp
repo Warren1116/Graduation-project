@@ -107,7 +107,7 @@ void EnemyThief::Update(float elapsedTime)
             newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorSet(0.0f, -0.5f * gravity * timeElapsed * timeElapsed, 0.0f, 0.0f));
 
             position = DirectX::XMFLOAT3(DirectX::XMVectorGetX(newPosition), DirectX::XMVectorGetY(newPosition), DirectX::XMVectorGetZ(newPosition));
-            //model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
+            model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
 
             webTimer = 0;
             ThrowFlag = false;
@@ -116,7 +116,7 @@ void EnemyThief::Update(float elapsedTime)
 
     }
 
-    if (!Player::Instance().GetIsUseGrab())
+    if (!Player::Instance().GetIsUseGrab() && health >= 0)
     {
         stateMachine->Update(elapsedTime);
     }
@@ -156,6 +156,8 @@ void EnemyThief::TransitionDeathState()
         model->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
     }
     SetAttackFlg(false);
+
+
 }
 
 void EnemyThief::UpdateDeathState(float elapsedTime)

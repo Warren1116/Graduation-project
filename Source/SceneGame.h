@@ -54,8 +54,9 @@ public:
     void Render() override;
 
 
-    //　チュトリアル用判定
-    bool isPaused = false;
+    //　チュトリアル時用の判定
+    bool tutorialPause = false;
+    bool GetIsTutorialPaused() { return tutorialPause; }
     //  チュトリアルステートの更新処理
     void UpdateTutorialState(float elapsedTime);
     //  チュトリアル始まる時にの設定
@@ -65,19 +66,24 @@ public:
     //  チュトリアルのタイマーチェック
     void SceneGame::CheckTutorialTimeout(float timeout);
 
-    bool GetIsPaused() { return isPaused; }
-
-    bool isTutorial = false;
-   
     //  チュトリアル
     TutorialState GetTutorialState() { return tutorialState; }
     void SetTutorialState(TutorialState newstate) { tutorialState = newstate; }
     void UnpauseGame();
     void PauseGame();
 
+
+    //  pause中の操作方法
+    bool isTutorial = false;
+    //  pause
+    bool isPaused = false;
+
+    //  コントローラーの使用判定
+    bool GetIsUseController() { return UseController; }
+
+    //モテルの登録
     void RegisterRenderModel(Model* model);
     void UnregisterRenderModel(Model* model);
-
 
     Light* GetLight() { return mainDirectionalLight; }
 
@@ -103,6 +109,7 @@ public:
     DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
     float shadowDrawRect = 500.0f;
+
 
 
 private:
@@ -149,7 +156,6 @@ private:
 private:
     static SceneGame* instance;
     Light* spotLights[3];
-    std::unique_ptr<Sprite>		renderSplite;
 
     //  MetaAIオブジェクト追加
     std::unique_ptr<Meta> meta = nullptr;
@@ -159,5 +165,8 @@ private:
     float  tutorialTimer;
     bool canAcceptInput;
 
+    //pause時コントローラーの選択判定
+    DirectX::XMFLOAT2 controllerPos;
+    bool UseController;
 
 };

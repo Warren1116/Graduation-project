@@ -203,7 +203,7 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 void SceneRenderer::DrawDebugGUI()
 {
 	GamePad& gamePad = Input::Instance().GetGamePad();
-	if (gamePad.GetButtonDown() & GamePad::BTN_P)
+	if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_P)
 		drawDebugPrimitive = !drawDebugPrimitive;
 
 	if (ImGui::TreeNode("Scene Rendering"))

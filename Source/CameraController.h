@@ -36,9 +36,6 @@ public:
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
 
-	////
-	//void ShakeCamera(float intensity, float duration);
-
 private:
 	// フリーカメラ更新処理
 	void FreeCamera(float elapsedTime);

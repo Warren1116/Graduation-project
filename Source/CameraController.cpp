@@ -70,14 +70,6 @@ void CameraController::Update(float elapsedTime)
 
 }
 
-
-//void CameraController::ShakeCamera(float intensity, float duration)
-//{
-//	shakeTime = duration;
-//	shakeIntensity = intensity;
-//
-//}
-
 void CameraController::FreeCamera(float elapsedTime)
 {
     Mouse& mouse = Input::Instance().GetMouse();
