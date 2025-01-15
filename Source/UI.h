@@ -28,6 +28,9 @@ public:
 
     void RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection); 
 
+    void RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX = 0.0f, float offsetY = 0.0f);
+
+
     void Clear();
 
     int GetTutorialCounter() { return TutorialCounter; }

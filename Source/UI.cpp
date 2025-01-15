@@ -228,7 +228,7 @@ void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
 
     spiderSense->Render(dc,
         screenPosition.x - 55.0f, screenPosition.y - 40.0f,
-        100.0f, 70.0f,
+        120.0f, 75.0f,
         0, 0,
         static_cast<float>(spiderSense->GetTextureWidth()), static_cast<float>(spiderSense->GetTextureHeight()),
         0,
@@ -236,7 +236,7 @@ void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
 
     spiderSense2->Render(dc,
         screenPosition.x - 55.0f, screenPosition.y - 40.0f,
-        100.0f, 70.0f,
+        120.0f, 75.0f,
         0, 0,
         static_cast<float>(spiderSense2->GetTextureWidth()), static_cast<float>(spiderSense2->GetTextureHeight()),
         0,
@@ -244,293 +244,75 @@ void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
 
 }
 
+
+void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX, float offsetY )
+{
+    float x = screenWidth - 200.0f + offsetX;
+    float y = screenHeight - 500.0f + offsetY;
+    float width = 180.0f;
+    float height = 180.0f;
+    float srcX = isController ? sprite->GetTextureWidth() * 0.5f : 0.0f;
+    float srcY = 0.0f;
+    float srcWidth = sprite->GetTextureWidth() * 0.5f;
+    float srcHeight = sprite->GetTextureHeight();
+
+    sprite->Render(dc, x, y, width, height, srcX, srcY, srcWidth, srcHeight, 0, 1, 1, 1, alpha);
+}
+
 void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     float screenWidth = Graphics::Instance().GetScreenWidth();
     float screenHeight = Graphics::Instance().GetScreenHeight();
+    bool isController = SceneGame::Instance().GetIsUseController();
 
     //  最初のチュトリアル
     if (SceneGame::Instance().GetIsTutorialPaused())
     {
-        if (SceneGame::Instance().GetIsUseController())
+        switch (SceneGame::Instance().GetTutorialState())
         {
-            switch (SceneGame::Instance().GetTutorialState())
-            {
-                //移動のチュトリアル
-            case SceneGame::TutorialState::Move:
-                TutorialMove->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialMove->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ジャンブのチュトリアル
-            case SceneGame::TutorialState::Jump:
-                TutorialJump->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialJump->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //攻撃のチュトリアル
-            case SceneGame::TutorialState::Attack:
-                TutorialAttack->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialAttack->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ショットのチュトリアル
-            case SceneGame::TutorialState::Shot:
-                TutorialShot->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialShot->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //カメラロックのチュトリアル
-            case SceneGame::TutorialState::CameraLock:
-                TutorialCameraLock->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialCameraLock->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ロックオンの攻撃チュトリアル
-            case SceneGame::TutorialState::LockAttack:
-                TutorialAttack->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialAttack->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ロックオンのショットチュトリアル
-            case SceneGame::TutorialState::LockShot:
-                TutorialShot->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialShot->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-            }
-        }
-        else
-        {
-            switch (SceneGame::Instance().GetTutorialState())
-            {
-                //移動のチュトリアル
-            case SceneGame::TutorialState::Move:
-                TutorialMove->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    0, 0,
-                    static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialMove->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ジャンブのチュトリアル
-            case SceneGame::TutorialState::Jump:
-                TutorialJump->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    0, 0,
-                    static_cast<float>(TutorialJump->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialJump->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //攻撃のチュトリアル
-            case SceneGame::TutorialState::Attack:
-                TutorialAttack->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    0, 0,
-                    static_cast<float>(TutorialAttack->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialAttack->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ショットのチュトリアル
-            case SceneGame::TutorialState::Shot:
-                TutorialShot->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    0, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialShot->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //カメラロックのチュトリアル
-            case SceneGame::TutorialState::CameraLock:
-                TutorialCameraLock->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    0, 0,
-                    static_cast<float>(TutorialCameraLock->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialCameraLock->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ロックオンの攻撃チュトリアル
-            case SceneGame::TutorialState::LockAttack:
-                TutorialAttack->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    0, 0,
-                    static_cast<float>(TutorialAttack->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialAttack->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-                //ロックオンのショットチュトリアル
-            case SceneGame::TutorialState::LockShot:
-                TutorialShot->Render(dc,
-                    screenWidth - 200.0f, screenHeight - 500.0f,
-                    180.0f, 180.0f,
-                    0, 0,
-                    static_cast<float>(TutorialShot->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialShot->GetTextureHeight()),
-                    0,
-                    1, 1, 1, alpha);
-                break;
-            }
+        case SceneGame::TutorialState::Move:
+            RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, alpha, isController);
+            break;
+        case SceneGame::TutorialState::Jump:
+            RenderTutorialSprite(TutorialJump, dc, screenWidth, screenHeight, alpha, isController);
+            break;
+        case SceneGame::TutorialState::Attack:
+            RenderTutorialSprite(TutorialAttack, dc, screenWidth, screenHeight, alpha, isController);
+            break;
+        case SceneGame::TutorialState::Shot:
+            RenderTutorialSprite(TutorialShot, dc, screenWidth, screenHeight, alpha, isController);
+            break;
+        case SceneGame::TutorialState::CameraLock:
+            RenderTutorialSprite(TutorialCameraLock, dc, screenWidth, screenHeight, alpha, isController);
+            break;
+        case SceneGame::TutorialState::LockAttack:
+            RenderTutorialSprite(TutorialAttack, dc, screenWidth, screenHeight, alpha, isController);
+            break;
+        case SceneGame::TutorialState::LockShot:
+            RenderTutorialSprite(TutorialShot, dc, screenWidth, screenHeight, alpha, isController);
+            break;
         }
     }
+
     //スイングのチュトリアル
     if (SceneGame::Instance().GetTutorialState() == SceneGame::TutorialState::Swing)
     {
-        if (SceneGame::Instance().GetIsUseController())
-        {
-            Font->Render(dc,
-                screenWidth - 300.0f, screenHeight - 600.0f,
-                180.0f, 180.0f,
-                0, 0,
-                static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
+        Font->Render(dc, screenWidth - 300.0f, screenHeight - 600.0f, 180.0f, 180.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
+        TextFont->textout(dc, "Hold", screenWidth - 365.0f, screenHeight - 480.0f, 30, 30, { 0,0,0,1 });
 
-            TextFont->textout(dc, "Hold", screenWidth - 365.0f, screenHeight - 480.0f, 30, 30, { 0,0,0,1 });
+        ShiftKey->Render(dc, screenWidth - 400.0f, screenHeight - 500.0f, 180.0f, 180.0f, isController ? ShiftKey->GetTextureWidth() * 0.5f : 0, 0, ShiftKey->GetTextureWidth() * 0.5f, ShiftKey->GetTextureHeight(), 0, 1, 1, 1, 1);
+        TextFont->textout(dc, "+", screenWidth - 250.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
 
-            ShiftKey->Render(dc,
-                screenWidth - 400.0f, screenHeight - 500.0f,
-                180.0f, 180.0f,
-                static_cast<float>(ShiftKey->GetTextureWidth()) * 0.5f, 0,
-                static_cast<float>(ShiftKey->GetTextureWidth()) * 0.5f, static_cast<float>(ShiftKey->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
-
-            TextFont->textout(dc, "+", screenWidth - 250.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-
-            TutorialMove->Render(dc,
-                screenWidth - 200.0f, screenHeight - 500.0f,
-                180.0f, 180.0f,
-                static_cast<float>(ShiftKey->GetTextureWidth()) * 0.5f, 110,
-                static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialMove->GetTextureHeight()) - 110,
-                0,
-                1, 1, 1, 1);
-
-        }
-        else
-        {
-            Font->Render(dc,
-                screenWidth - 300.0f, screenHeight - 600.0f,
-                180.0f, 180.0f,
-                0, 0,
-                static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
-
-            TextFont->textout(dc, "Hold", screenWidth - 365.0f, screenHeight - 480.0f, 30, 30, { 0,0,0,1 });
-
-            ShiftKey->Render(dc,
-                screenWidth - 400.0f, screenHeight - 500.0f,
-                180.0f, 180.0f,
-                0, 0,
-                static_cast<float>(ShiftKey->GetTextureWidth()) * 0.5f, static_cast<float>(ShiftKey->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
-
-            TextFont->textout(dc, "+", screenWidth - 250.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-
-            TutorialMove->Render(dc,
-                screenWidth - 200.0f, screenHeight - 500.0f,
-                180.0f, 180.0f,
-                0, 110,
-                static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialMove->GetTextureHeight()) - 110,
-                0,
-                1, 1, 1, 1);
-        }
+        RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, 1.0f, isController, 0.0f, 0.0f);
     }
+
     //クライミングのチュトリアル
     if (SceneGame::Instance().GetTutorialState() == SceneGame::TutorialState::Climb)
     {
-        if (SceneGame::Instance().GetIsUseController())
-        {
-            Font2->Render(dc,
-                screenWidth - 300.0f, screenHeight - 600.0f,
-                180.0f, 180.0f,
-                0, 0,
-                static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
-
-            TutorialMove->Render(dc,
-                screenWidth - 400.0f, screenHeight - 500.0f,
-                180.0f, 180.0f,
-                static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 110,
-                static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialMove->GetTextureHeight()) - 110,
-                0,
-                1, 1, 1, 1);
-
-            TextFont->textout(dc, "+", screenWidth - 230.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-
-            TutorialJump->Render(dc,
-                screenWidth - 200.0f, screenHeight - 480.0f,
-                180.0f, 180.0f,
-                static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, 160,
-                static_cast<float>(TutorialJump->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialJump->GetTextureHeight() - 160),
-                0,
-                1, 1, 1, 1);
-        }
-        else
-        {
-            Font2->Render(dc,
-                screenWidth - 300.0f, screenHeight - 600.0f,
-                180.0f, 180.0f,
-                0, 0,
-                static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()),
-                0,
-                1, 1, 1, 1);
-
-            TutorialMove->Render(dc,
-                screenWidth - 400.0f, screenHeight - 500.0f,
-                180.0f, 180.0f,
-                0, 110,
-                static_cast<float>(TutorialMove->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialMove->GetTextureHeight()) - 110,
-                0,
-                1, 1, 1, 1);
-
-            TextFont->textout(dc, "+", screenWidth - 230.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-
-            TutorialJump->Render(dc,
-                screenWidth - 200.0f, screenHeight - 480.0f,
-                180.0f, 180.0f,
-                0, 160,
-                static_cast<float>(TutorialJump->GetTextureWidth()) * 0.5f, static_cast<float>(TutorialJump->GetTextureHeight() - 160),
-                0,
-                1, 1, 1, 1);
-
-        }
-
+        Font2->Render(dc, screenWidth - 300.0f, screenHeight - 600.0f, 180.0f, 180.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
+        RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, 1.0f, isController, -200.0f, 0.0f);
+        TextFont->textout(dc, "+", screenWidth - 230.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
+        RenderTutorialSprite(TutorialJump, dc, screenWidth, screenHeight, 1.0f, isController, 0.0f, -20.0f);
     }
 
     if (Player::Instance().GetState() == Player::State::Swing && TutorialCounter == 0)
@@ -543,8 +325,6 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         TutorialCounter++;
         SceneGame::Instance().SetTutorialState(SceneGame::TutorialState::Finish);
     }
-
-
 
     D3D11_VIEWPORT viewport;
     UINT numViewports = 1;
@@ -586,9 +366,9 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
             static_cast<float>(LockOnScope->GetTextureWidth()), static_cast<float>(LockOnScope->GetTextureHeight()),
             0,
             1, 1, 1, 1);
-
     }
 }
+
 
 
 void UI::Clear()
