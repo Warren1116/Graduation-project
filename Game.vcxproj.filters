@@ -321,9 +321,7 @@
     <ClInclude Include="Source\PrimitiveRenderer.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Input\KeyBoard.h">
-      <Filter>Source\Input</Filter>
-    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -572,9 +570,6 @@
     <ClCompile Include="Source\PrimitiveRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Input\KeyBoard.cpp">
-      <Filter>Source\Input</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Debug.hlsli">
@@ -723,5 +718,15 @@
     <FxCompile Include="HLSL\PrimitiveRendererVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game.rc">
+      <Filter>External</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Data\Icon\spider-man_icon.ico">
+      <Filter>External</Filter>
+    </Image>
   </ItemGroup>
 </Project>

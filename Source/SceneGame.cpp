@@ -159,8 +159,9 @@ void SceneGame::Initialize()
     PauseBackGround = std::make_unique<Sprite>();
     ToTitle = std::make_unique<Sprite>("Data/Sprite/ToTitle.png");
     ControlWay = std::make_unique<Sprite>("Data/Sprite/Control Way.png");
-    ControllerPicture = std::make_unique<Sprite>("Data/Sprite/Controller.png");
+    ControllerPicture = std::make_unique<Sprite>("Data/Sprite/Controller1.png");
     ControllerFont = std::make_unique<Sprite>("Data/Sprite/Controller_Font.png");
+    KeyBoardPicture = std::make_unique<Sprite>("Data/Sprite/KeyBoard.png");
     KeyBoardFont = std::make_unique<Sprite>("Data/Sprite/KeyBoard_Font.png");
 
     //  UI‚Ì‰Šú‰»
@@ -489,7 +490,8 @@ void SceneGame::Render()
                     ControllerFont->Render(dc, screenWidth * 0.35f, screenHeight * 0.1f, 350, 350, 0, 0, static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
                         , 0, 1, 1, 1, alpha);
 
-                    ControllerPicture->Render(dc, screenWidth * 0.4f, screenHeight * 0.25f, 650, 650, 0, 0, static_cast<float>(ControllerPicture->GetTextureWidth()), static_cast<float>(ControllerPicture->GetTextureHeight())
+                    ControllerPicture->Render(dc,
+                        screenWidth * 0.35f, screenHeight * 0.25f, 750, 650, 0, 0, static_cast<float>(ControllerPicture->GetTextureWidth()), static_cast<float>(ControllerPicture->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
                 else
@@ -503,6 +505,10 @@ void SceneGame::Render()
                 {
                     KeyBoardFont->Render(dc, screenWidth * 0.65f, screenHeight * 0.1f, 350, 350, 0, 0, static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
                         , 0, 1, 1, 1, alpha);
+
+                    KeyBoardPicture->Render(dc,
+                        screenWidth * 0.35f, screenHeight * 0.32f, 870, 480, 0, 0, static_cast<float>(KeyBoardPicture->GetTextureWidth()), static_cast<float>(KeyBoardPicture->GetTextureHeight())
+                        , 0, 1, 1, 1, 1);
                 }
                 else
                 {

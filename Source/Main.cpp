@@ -2,6 +2,8 @@
 #include <memory>
 #include <assert.h>
 #include <tchar.h>
+#include "../resource.h"
+
 
 #include "Framework.h"
 
@@ -33,6 +35,9 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = _T("Game");
 	wcex.hIconSm = 0;
+	wcex.hIcon = LoadIcon(instance, MAKEINTRESOURCE(IDI_ICON1));
+	wcex.hIconSm = LoadIcon(instance, MAKEINTRESOURCE(IDI_ICON1));
+
 	RegisterClassEx(&wcex);
 
 	////Å@Windowóp

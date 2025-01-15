@@ -122,6 +122,7 @@ private:
     std::unique_ptr<Sprite> ControlWay;
     std::unique_ptr<Sprite> ControllerPicture;
     std::unique_ptr<Sprite> ControllerFont;
+    std::unique_ptr<Sprite> KeyBoardPicture;
     std::unique_ptr<Sprite> KeyBoardFont;
     bool ControllerButton = false;
     bool KeyBoardButton = false;

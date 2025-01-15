@@ -121,7 +121,6 @@ void SceneTitle::Finalize()
 //更新処理
 void SceneTitle::Update(float elapsedTime)
 {
-
     // カメラコントローラー更新処理
     Camera::Instance().SetLookAt(cameraPos, cameraAngle, DirectX::XMFLOAT3(0, 1, 0));
     // プレイヤー更新処理

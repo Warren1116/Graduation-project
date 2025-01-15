@@ -230,7 +230,7 @@ void Character::UpdateHorizontalVelocity(float elapsedFrame)
             }
             else
             {
-                velocity.y += acceleration * moveVecY;
+                velocity.y += acceleration * moveVecY * 1.5f;
             }
 
             // ç≈ëÂë¨ìxêßå¿

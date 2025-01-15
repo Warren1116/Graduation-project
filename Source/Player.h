@@ -362,6 +362,7 @@ private:
 	DirectX::XMVECTOR SwingwebDirection;
 	//	初回のスイングを判定
 	bool firstSwing = true;
+	float SwingCounter;
 	//	前回のスイングポイントを記録
 	DirectX::XMFLOAT3 previousSwingPoint;
 	// 糸のタイマー

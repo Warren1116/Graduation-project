@@ -30,18 +30,10 @@ Player::Player(bool flag)
     instance = this;
 
     // モデル読み込み
-    //model = std::make_unique<Model>("Data/Model/Jammo/jammo.mdl");
     model = std::make_unique<Model>("Data/Model/Spider-man/spider-man.mdl");
     model->GetNodePoses(nodePoses);
 
     radius = 0.5f;
-
-    //Model::Node* RightHandPos = model->FindNode("mixamorig:RightHand");
-    //DirectX::XMFLOAT3 pos = {};
-    //pos.x = RightHandPos->worldTransform._41;
-    //pos.y = RightHandPos->worldTransform._42;
-    //pos.z = RightHandPos->worldTransform._43;
-
 
     //// ジョイント初期化
     //for (int i = 0; i < _countof(joints); ++i)
@@ -74,6 +66,8 @@ Player::Player(bool flag)
     TransitionCrouchIdleState();
     //TransitionTitleIdleState();
 
+
+    //  Event用
     //// メッセージ受信登録
     //EventModeIndex = Messenger::Instance().AddReceiver(MessageData::EVENTMODEEVENT, [&](void* data) { TransitionIdleState(); state = State::EventMode; });
     //GameModeIndex = Messenger::Instance().AddReceiver(MessageData::GAMEMODEEVENT, [&](void* data) { state = State::Idle; });
@@ -108,6 +102,7 @@ Player::Player(bool flag)
 // デストラクタ
 Player::~Player()
 {
+    //  チュートリアルのEvent用
     //Messenger::Instance().RemoveReceiver(EventModeIndex);
     //Messenger::Instance().RemoveReceiver(GameModeIndex);
 
@@ -1116,6 +1111,17 @@ void Player::UpdateMoveState(float elapsedTime)
     {
         TransitionAttackState();
     }
+
+    if (lockonEnemy && skillTime >= 1)
+    {
+        Mouse& mouse = Input::Instance().GetMouse();
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+        {
+            IsUseGrab = true;
+            TransitionGrabState();
+        }
+    }
 }
 
 //  ジャンブステート
@@ -1244,7 +1250,7 @@ void Player::UpdateAttackState(float elapsedTime)
             DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
             DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
 
-            float moveDistance = 0.04f;
+            float moveDistance = 0.075f;
             DirectX::XMVECTOR moveVector = DirectX::XMVectorScale(directionToEnemy, moveDistance);
 
             DirectX::XMStoreFloat3(&lockDirection, directionToEnemy);
@@ -1462,7 +1468,8 @@ void Player::TransitionSwingState()
         }
         else
         {
-            //model->PlayAnimation(Anim_Swinging, false);
+
+            model->PlayAnimation(Anim_Swinging, false);
             //SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
             //SceneGame& sceneGame = SceneGame::Instance();
             //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
@@ -1595,25 +1602,6 @@ void Player::UpdateSwingState(float elapsedTime)
         position = end;
     }
 
-    //連続スイングのモーション
-    if (!model->IsPlayAnimation())
-    {
-        SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
-        SceneGame& sceneGame = SceneGame::Instance();
-        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-        {
-            //  レンダラーに登録
-            sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
-            model->PlayAnimation(Anim_Swinging, true);
-        }
-        //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-        //{
-        //    //  レンダラーに登録
-        //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
-        //    model->PlayAnimation(Anim_Swinging, true);
-        //}
-    }
-
 
     //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
@@ -1648,6 +1636,7 @@ void Player::UpdateSwingState(float elapsedTime)
         Q = DirectX::XMVectorLerp(Q, targetPosition, smoothFactor);
     }
 
+    //速度の修正
     DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(
         velocityVec,
         DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
@@ -1659,10 +1648,19 @@ void Player::UpdateSwingState(float elapsedTime)
     DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
     //もし最高点に着いたら、連続スイングを行う
     float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    //  自動で連続スイングする
     if (dotProduct <= 0)
     {
         TransitionSwingState();
     }
+
+    //  キーボードで連続スイングする
+    //if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_TRIGGER)
+    //{
+    //    TransitionSwingState();
+    //    return;
+    //}
 
 
     //位置更新
@@ -1675,17 +1673,16 @@ void Player::UpdateSwingState(float elapsedTime)
         DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
     DirectX::XMStoreFloat3(&front, swingDir);
 
-    GamePad& gamePad = Input::Instance().GetGamePad();
+    //  キーを押されてない時スイングをキャンセルする
     if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
     {
         TransitionIdleState();
         velocity = { 0,0,0 };
-        firstSwing = true;
     }
 }
 
 
-//スイングポイントを探す
+//スイングポイントを探す（仮）
 bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistance, HitResult& result) {
     using namespace DirectX;
 
@@ -1713,10 +1710,8 @@ bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistanc
 
     previousSwingPoint = swingPoint;
 
-
-
-
     return false;
+
 }
 
 void Player::TransitionTitleIdleState()

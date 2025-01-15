@@ -276,6 +276,17 @@ void ShotState::Enter()
     // 攻撃権があればモーション再生開始
     if (owner->GetAttackFlg())
     {
+        // プレイヤーに向けて弾を発射
+        DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
+        DirectX::XMFLOAT3 ownerPosition = owner->GetPosition();
+        DirectX::XMVECTOR toPlayer = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&playerPosition), DirectX::XMLoadFloat3(&ownerPosition));
+        toPlayer = DirectX::XMVector3Normalize(toPlayer);
+
+        // 新しい向きを計算
+        float angleY = atan2f(DirectX::XMVectorGetX(toPlayer), DirectX::XMVectorGetZ(toPlayer));
+        owner->SetAngle(DirectX::XMFLOAT3(0, angleY, 0));
+
+
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackShot), false);
         Player::Instance().ApplyDamage(1, 2.0f);
     }
@@ -458,8 +469,15 @@ void StandbyState::Enter()
 // 戦闘待機ステートで実行するメソッド
 void StandbyState::Execute(float elapsedTime)
 {
-    //AttackType randomType = static_cast<AttackType>(Mathf::RandomRange(1, 2));
-    //randomType = static_cast<AttackType>(2);
+    // プレイヤーに向けて
+    DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
+    DirectX::XMFLOAT3 ownerPosition = owner->GetPosition();
+    DirectX::XMVECTOR toPlayer = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&playerPosition), DirectX::XMLoadFloat3(&ownerPosition));
+    toPlayer = DirectX::XMVector3Normalize(toPlayer);
+    // 新しい向きを計算
+    float angleY = atan2f(DirectX::XMVectorGetX(toPlayer), DirectX::XMVectorGetZ(toPlayer));
+    owner->SetAngle(DirectX::XMFLOAT3(0, angleY, 0));
+
 
     if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) {
         Player::Instance().SetgetAttackSoon(true);
