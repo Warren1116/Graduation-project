@@ -164,6 +164,7 @@ void SceneGame::Initialize()
     KeyBoardPicture = std::make_unique<Sprite>("Data/Sprite/KeyBoard.png");
     KeyBoardFont = std::make_unique<Sprite>("Data/Sprite/KeyBoard_Font.png");
 
+
     //  UI‚Ì‰Šú‰»
     UI::Instance().Initialize();
 
@@ -372,6 +373,7 @@ void SceneGame::Update(float elapsedTime)
 
     cameraController->Update(elapsedTime);
 
+
 #ifdef DEBUG
     //GamePad& gamePad = Input::Instance().GetGamePad();
     //if (gamePad.GetButtonDown() & GamePad::BTN_ESC)
@@ -388,8 +390,6 @@ void SceneGame::Update(float elapsedTime)
     //    return;
     //}
 #endif // 
-
-
 
 }
 
@@ -721,6 +721,7 @@ void SceneGame::UnregisterRenderModel(Model* model)
     sceneRenderer->UnregisterRenderModel(model);
 
 }
+
 
 //  Wave‚É‚æ‚Á‚Ä“G‚ğ¶¬
 void SceneGame::SpawnEnemiesForWave(int wave)

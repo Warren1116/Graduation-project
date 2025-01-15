@@ -73,7 +73,6 @@ public:
 		std::string			textureFilename;
 		int					shaderId = 0;
 		DirectX::XMFLOAT4	color = { 0.8f, 0.8f, 0.8f, 1.0f };
-
 		struct Phong
 		{
 			DirectX::XMFLOAT4 ka = DirectX::XMFLOAT4(1, 1, 1, 1);
@@ -82,7 +81,6 @@ public:
 			float shiness;
 			Phong() {}
 		} phong;
-
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuse_map;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normal_map;
 

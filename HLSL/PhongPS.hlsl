@@ -105,11 +105,5 @@ float4 main(VS_OUT pin) : SV_TARGET
     }
         
     return float4((diffuseColor.rgb * (ambient + diffuse) + specular), diffuseColor.a);
-
-    //float4 color = float4(ambient, diffuseColor.a);
-    //color.rgb += diffuseColor.rgb * (diffuse);
-    //color.rgb += specular;
-    ////color.rgb += CalcRimLight(N, E, L, directionalLightData.color.rgb);
-    //return color;
     
 }

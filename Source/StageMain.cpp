@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Player.h"
 #include <algorithm>
+#include "SceneGame.h"
 
 
 static  StageMain* instance = nullptr;
@@ -35,6 +36,9 @@ StageMain::StageMain()
     // ステージモデルの読み込み
     cityModel = std::make_unique<Model>("Data/Model/ExampleStage/a.mdl");
     groundModel = std::make_unique<Model>("Data/Model/ExampleStage/c.mdl");
+
+    warningArea = std::make_unique<Effect>("Data/Effect/warningArea.efk");
+    warningArea2 = std::make_unique<Effect>("Data/Effect/warningArea2.efk");
 
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
@@ -163,10 +167,28 @@ void StageMain::Update(float elapsedTime)
         Player::Instance().SetVelocity({ 0, 0, 0 });
     }
 
+    // タイマーを更新
+    warningAreaTimer += elapsedTime;
+    warningArea2Timer += elapsedTime;
+
+    if ((playerPos.x < volumeMin.x || playerPos.x > volumeMax.x) && warningAreaTimer >= warningAreaCooldown)
+    {
+        warningArea->Play(playerPos);
+        warningAreaTimer = 0.0f;
+    }
+    if ((playerPos.z < volumeMin.z || playerPos.z > volumeMax.z) && warningArea2Timer >= warningAreaCooldown)
+    {
+        warningArea2->Play(playerPos);
+        warningArea2Timer = 0.0f;
+    }
+
     // モデル行列更新
     UpdateTransform();
     cityModel->UpdateTransform(transform);
+
+
 }
+
 
 void StageMain::DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {

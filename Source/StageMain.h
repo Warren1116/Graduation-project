@@ -3,6 +3,8 @@
 #include "Graphics/Model.h"
 #include "Stage.h"
 #include "WayPoint.h"
+#include "EffectManager.h"
+#include "Effect.h"
 
 
 // ステージ
@@ -85,5 +87,12 @@ private:
 
 	DirectX::XMFLOAT3 volumeMin, volumeMax;
 
+
+	float warningAreaTimer = 0.0f; // warningAreaのタイマー
+	float warningArea2Timer = 0.0f; // warningArea2のタイマー
+	const float warningAreaCooldown = 1.5f; // 3秒のクールダウン
+
+	std::unique_ptr<Effect> warningArea = nullptr;
+	std::unique_ptr<Effect> warningArea2 = nullptr;
 
 };

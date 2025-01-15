@@ -1,5 +1,6 @@
 #include "Misc.h"
 #include "PhongShader.h"
+#include "SceneGame.h"
 
 PhongShader::PhongShader(ID3D11Device* device)
 {

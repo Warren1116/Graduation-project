@@ -87,6 +87,7 @@ public:
 
     Light* GetLight() { return mainDirectionalLight; }
 
+
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
@@ -169,5 +170,7 @@ private:
     //pause時コントローラーの選択判定
     DirectX::XMFLOAT2 controllerPos;
     bool UseController;
+
+
 
 };

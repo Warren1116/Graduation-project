@@ -44,7 +44,7 @@ private:
 		DirectX::XMFLOAT4	kd;
 		DirectX::XMFLOAT4	ks;
 		float				shiness;
-		DirectX::XMFLOAT3	dummy2;
+		DirectX::XMFLOAT3	dummy;
 	};
 
 	struct CbShadowMap

@@ -41,6 +41,7 @@ cbuffer CbMesh : register(b1)
 cbuffer CbSubset : register(b2)
 {
     float4 materialColor;
+    
 }
 
 cbuffer CbShadowmap : register(b3)
