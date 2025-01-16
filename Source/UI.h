@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include "Renderer\PostprocessingRenderer.h"
 
 class UI
 {
@@ -62,5 +63,8 @@ private:
     bool increasingAlpha = false;
     bool fadeOut = true;
     int TutorialCounter;
+
+    std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
+    float radialblurRadius = 0.0f;
 
 };

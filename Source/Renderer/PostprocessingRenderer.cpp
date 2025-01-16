@@ -2,6 +2,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/LightManager.h"
 #include "Camera.h"
+#include "Player.h"
 
 PostprocessingRenderer::PostprocessingRenderer(UINT width, UINT height)
 {
@@ -75,6 +76,7 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
 
 		//ラジアルブラー
         rc.radialblurData = radialblurData;
+		radialblurActive(Player::Instance().GetAttackSoon());
 
 		shader->Draw(rc, renderSprite.get());
 
@@ -125,5 +127,20 @@ void	PostprocessingRenderer::DrawDebugGUI()
 		}
 
 		ImGui::TreePop();
+	}
+}
+
+void PostprocessingRenderer::radialblurActive(bool active)
+{
+	if (active)
+	{
+		if (radialblurData.blur_radius < 50.0f)
+		{
+			radialblurData.blur_radius++;
+		}
+	}
+	else
+	{
+        radialblurData.blur_radius = 0.0f;
 	}
 }

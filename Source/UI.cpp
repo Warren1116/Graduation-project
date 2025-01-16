@@ -84,11 +84,13 @@ void UI::Update(float elapsedtime)
     }
 }
 
+
 void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     //  UŒ‚‚ğó‚¯‚é‚ÉSpiderSense‚ğ•`‰æ‚·‚é
     if (Player::Instance().GetAttackSoon())
     {
+
         RenderSpiderSense(dc, view, projection);
     }
 

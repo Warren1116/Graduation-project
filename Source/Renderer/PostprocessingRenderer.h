@@ -33,6 +33,9 @@ public:
 	//	デバッグ情報の表示
 	void	DrawDebugGUI();
 
+    void	radialblurActive(bool active);
+
+
 private:
 	// シーン描画データ
 	ShaderResourceViewData			sceneData;
