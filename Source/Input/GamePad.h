@@ -34,6 +34,7 @@ public:
 	static const GamePadButton BTN_KEYBOARD_ESC		= (1 << 23);
 	static const GamePadButton BTN_KEYBOARD_C		= (1 << 24);
 	static const GamePadButton BTN_KEYBOARD_V		= (1 << 25);
+	static const GamePadButton BTN_KEYBOARD_CTLR	= (1 << 26);
 
 public:
 	GamePad() {}

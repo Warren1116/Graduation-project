@@ -4,6 +4,7 @@
 #include "Graphics\Graphics.h"
 #include "Input\GamePad.h"
 #include "Input\Input.h"
+#include "EnemyManager.h"
 
 #define TUTORIAL
 
@@ -90,7 +91,6 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
     //  UŒ‚‚ğó‚¯‚é‚ÉSpiderSense‚ğ•`‰æ‚·‚é
     if (Player::Instance().GetAttackSoon())
     {
-
         RenderSpiderSense(dc, view, projection);
     }
 

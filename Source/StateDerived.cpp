@@ -11,6 +11,8 @@
 // 徘徊ステートに入った時のメソッド
 void WanderState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
+
     owner->SetRandomTargetPosition();
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Walk), true);
 }
@@ -18,6 +20,8 @@ void WanderState::Enter()
 // 徘徊ステートで実行するメソッド
 void WanderState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
+
     // 目的地点までのXZ平面での距離判定
     DirectX::XMFLOAT3 position = owner->GetPosition();
     DirectX::XMFLOAT3 targetPosition = owner->GetTargetPosition();
@@ -55,6 +59,8 @@ void WanderState::Exit()
 // 待機ステートに入った時のメソッド
 void IdleState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
+
     // 各種Enter関数の内容は各Transition○○State関数を参考に
     // タイマーをランダム設定
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Idle), true);
@@ -64,6 +70,8 @@ void IdleState::Enter()
 // 待機ステートで実行するメソッド
 void IdleState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
+
     // 各種Execute関数の内容は各Update○○State関数を参考に
     // タイマー処理
     owner->SetStateTimer(owner->GetStateTimer() - elapsedTime);
@@ -88,6 +96,7 @@ void IdleState::Exit()
 void PursuitState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
+
     // 各種Enter関数の内容は各Transition○○State関数を参考に
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
@@ -104,6 +113,7 @@ void PursuitState::Enter()
 // 追跡ステートで実行するメソッド
 void PursuitState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
 
     if (!owner->IsThrown())
     {
@@ -145,6 +155,8 @@ void PursuitState::Exit()
 // 攻撃ステートに入った時のメソッド
 void AttackState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
+
     randomType = static_cast<AttackType>(Mathf::RandomRange(1, 2));
 
     if (randomType == AttackType::Punch)
@@ -162,6 +174,8 @@ void AttackState::Enter()
 // 攻撃ステートで実行するメソッド
 void AttackState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
+
     owner->SetTargetPosition(Player::Instance().GetPosition());
 
     // 目的地点へ移動
@@ -192,6 +206,8 @@ void AttackState::Exit()
 // パンチステートに入った時のメソッド
 void PunchState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
+
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
     {
@@ -213,6 +229,8 @@ void PunchState::Enter()
 // パンチステートで実行するメソッド
 void PunchState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
+
     owner->SetTargetPosition(Player::Instance().GetPosition());
 
     // 目的地点へ移動
@@ -263,6 +281,8 @@ void PunchState::Exit()
 // シュートステートに入った時のメソッド
 void ShotState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
+
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
     {
@@ -295,6 +315,8 @@ void ShotState::Enter()
 // シュートステートで実行するメソッド
 void ShotState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
+
     // 攻撃権があるとき
     if (owner->GetAttackFlg())
     {
@@ -419,6 +441,8 @@ void RecieveState::Exit()
 // TODO 05_03 他のエネミーから呼ばれたときのステートを追加
 void CalledState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
+
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(5.0f);
 }
@@ -426,6 +450,8 @@ void CalledState::Enter()
 // コールドステートで実行するメソッド
 void CalledState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
+
     // タイマー処理
     float timer = owner->GetStateTimer();
     timer -= elapsedTime;
@@ -449,6 +475,8 @@ void CalledState::Exit()
 // 戦闘待機ステートに入った時のメソッド
 void StandbyState::Enter()
 {
+    if (owner->GetHealth() <= 0)return;
+
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
     {
@@ -469,6 +497,8 @@ void StandbyState::Enter()
 // 戦闘待機ステートで実行するメソッド
 void StandbyState::Execute(float elapsedTime)
 {
+    if (owner->GetHealth() <= 0)return;
+
     // プレイヤーに向けて
     DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
     DirectX::XMFLOAT3 ownerPosition = owner->GetPosition();

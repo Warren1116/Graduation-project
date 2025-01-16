@@ -89,12 +89,13 @@ void SceneTitle::Initialize()
 
     StageMain& stage = StageMain::Instance();
 
-    Font = std::make_unique<Sprite>("Data/Sprite/Font3.png");
-    TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
+    //Font = std::make_unique<Sprite>("Data/Sprite/Font3.png");
+    //TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
 
     Title = std::make_unique<Sprite>("Data/Sprite/Title.png");
     Start = std::make_unique<Sprite>("Data/Sprite/Start.png");
     Quit = std::make_unique<Sprite>("Data/Sprite/Quit.png");
+    A_Button = std::make_unique<Sprite>("Data/Sprite/A_Button.png");
 
     UseController = false;
     controllerPos = { 245,540 };
@@ -323,6 +324,14 @@ void SceneTitle::Render()
                     static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
                     0,
                     1, 1, 1, alpha);
+
+                A_Button->Render(dc,
+                    300, 510,
+                    80.0f, 80.0f,
+                    0, 0,
+                    static_cast<float>(A_Button->GetTextureWidth()), static_cast<float>(A_Button->GetTextureHeight()),
+                    0,
+                    1, 1, 1, 1);
             }
             else
             {
@@ -344,6 +353,14 @@ void SceneTitle::Render()
                     static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
                     0,
                     1, 1, 1, alpha);
+
+                A_Button->Render(dc,
+                    300, 660,
+                    80.0f, 80.0f,
+                    0, 0,
+                    static_cast<float>(A_Button->GetTextureWidth()), static_cast<float>(A_Button->GetTextureHeight()),
+                    0,
+                    1, 1, 1, 1);
             }
             else
             {

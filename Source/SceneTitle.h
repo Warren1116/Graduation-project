@@ -43,11 +43,12 @@ private:
 	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     //std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
 
-	std::unique_ptr<Sprite> Font;
-	std::unique_ptr<Sprite> TextFont;
+	//std::unique_ptr<Sprite> Font;
+	//std::unique_ptr<Sprite> TextFont;
 	std::unique_ptr<Sprite> Title;
 	std::unique_ptr<Sprite> Start;
 	std::unique_ptr<Sprite> Quit;
+	std::unique_ptr<Sprite> A_Button;
 
     // ƒ{ƒ^ƒ“‚Ì“§–¾“x
 	float alpha = 1.0f;

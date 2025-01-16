@@ -341,6 +341,8 @@ private:
 	//投げ技
 	bool IsUseGrab = false;
 
+    DirectX::XMFLOAT3 dodgeDirection;
+
 	//カメラロック用
 	LockonState			lockonState = LockonState::NotLocked;
 	float				lockonTargetChangeTime = 0;

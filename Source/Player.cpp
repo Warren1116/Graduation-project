@@ -204,6 +204,11 @@ void Player::Update(float elapsedTime)
         {
             skillTime += elapsedTime * 0.01f;
         }
+
+        if (EnemyManager::Instance().GetEnemyCount() == 0)
+        {
+            getAttacksoon = false;
+        }
     }
 }
 
@@ -419,24 +424,41 @@ void Player::TransitionDodgeState()
 {
     state = State::Dodge;
     model->PlayAnimation(Anim_Dodge, false);
+
+    // GetMoveVec から移動ベクトルを取得
+    DirectX::XMFLOAT3 moveVec = GetMoveVec();
+
+    // 移動ベクトルがゼロの場合、後ろに移動
+    if (moveVec.x == 0 && moveVec.z == 0)
+    {
+        dodgeDirection = GetFront();
+        dodgeDirection.x = -dodgeDirection.x * 50.0f;
+        dodgeDirection.z = -dodgeDirection.z * 50.0f;
+    }
+    else
+    {
+        // y 軸の成分を無視して x, z 軸の成分のみを使用
+        moveVec.y = 0.0f;
+        dodgeDirection = moveVec;
+    }
 }
 
 void Player::UpdateDodgeState(float elapsedTime)
 {
+    //無敵時間
     invincibleTimer = 2.0f;
-    DirectX::XMVECTOR vel = DirectX::XMLoadFloat3(&velocity);
-    vel = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&GetFront()), -110.0f);
 
+    // ドッジの方向に基づいて移動
+    DirectX::XMVECTOR vel = DirectX::XMLoadFloat3(&velocity);
+    vel = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&dodgeDirection), 1.2f);
+
+    // プレイヤーの位置を更新
     DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
-    playerPos = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&position), DirectX::XMVectorScale(vel, elapsedTime));
+    playerPos = DirectX::XMVectorAdd(playerPos, DirectX::XMVectorScale(vel, elapsedTime));
 
     DirectX::XMStoreFloat3(&velocity, vel);
     DirectX::XMStoreFloat3(&position, playerPos);
 
-    if (InputMove(elapsedTime))
-    {
-        TransitionMoveState();
-    }
     if (!model->IsPlayAnimation())
     {
         TransitionIdleState();
@@ -464,6 +486,7 @@ void Player::TransitionGrabState()
     model->PlayAnimation(Anim_GrabAndDrop, false);
     webTimer = 0.0f;
     skillTime -= 1.0f;
+
 
 }
 
@@ -960,7 +983,7 @@ bool Player::InputDodge()
 {
     // ボタン入力でジャンプ
     GamePad& gamePad = Input::Instance().GetGamePad();
-    if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
+    if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_CTLR || gamePad.GetButtonDown() & GamePad::BTN_B)
     {
         return true;
     }
@@ -1007,12 +1030,12 @@ void Player::UpdateIdleState(float elapsedTime)
     }
 
     //ジャンプ入力処理
-    if (!GetAttackSoon() && InputJump())
+    if (InputJump())
     {
         TransitionJumpState();
 
     }
-    else if (GetAttackSoon() && InputDodge())
+    if (/*GetAttackSoon() && */InputDodge())
     {
         TransitionDodgeState();
     }
@@ -1041,6 +1064,7 @@ void Player::UpdateIdleState(float elapsedTime)
             IsUseGrab = true;
             TransitionGrabState();
         }
+
     }
 
 
@@ -1074,7 +1098,7 @@ void Player::UpdateMoveState(float elapsedTime)
     }
     //}
 
-    if (GetAttackSoon() && InputDodge())
+    if (/*GetAttackSoon() && */InputDodge())
     {
         TransitionDodgeState();
     }
@@ -1230,10 +1254,15 @@ void Player::UpdateAttackState(float elapsedTime)
     {
         TransitionIdleState();
     }
-
+    //　シュート入力処理
     if (InputProjectile())
     {
         TransitionShotingState();
+    }
+    //　Dodge入力処理
+    if (InputDodge())
+    {
+        TransitionDodgeState();
     }
 
 

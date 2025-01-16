@@ -157,7 +157,6 @@ void StageMain::Update(float elapsedTime)
     DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
 
     if (playerPos.x < volumeMin.x || playerPos.x > volumeMax.x
-        || playerPos.y < volumeMin.y || playerPos.y > volumeMax.y
         || playerPos.z < volumeMin.z || playerPos.z > volumeMax.z)
     {
         DirectX::XMFLOAT3 clampedPos = playerPos;
