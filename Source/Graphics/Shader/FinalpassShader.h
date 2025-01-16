@@ -45,7 +45,17 @@ private:
         float dummy;
     };
 
-    Microsoft::WRL::ComPtr<ID3D11Buffer>				finalpassConstantBuffer[2];
+    struct RadialBlurConstance
+    {
+        float blur_radius = 50.0f;
+        int blur_sampling_count = 10;
+        DirectX::XMFLOAT2 blur_center = { 0.5f,0.5f };
+        float blur_mask_radius = 0;		//	centerからの指定の範囲はブラーを適応しないようにする
+        DirectX::XMFLOAT3  blur_dummy;
+    };
+
+
+    Microsoft::WRL::ComPtr<ID3D11Buffer>				finalpassConstantBuffer[3];
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>			pixelShader;
@@ -58,5 +68,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D11SamplerState>			samplerState;
     Microsoft::WRL::ComPtr<ID3D11SamplerState>			shadowMapSamplerState;
     Microsoft::WRL::ComPtr<ID3D11SamplerState>			depthSamplerState;
-
+    Microsoft::WRL::ComPtr<ID3D11SamplerState>          radialblurSamplerState;
 };

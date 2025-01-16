@@ -73,6 +73,9 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
 		rc.finalpassData.depthMap = sceneData.depth.Get();
 		rc.colorGradingData = colorGradingData;
 
+		//ラジアルブラー
+        rc.radialblurData = radialblurData;
+
 		shader->Draw(rc, renderSprite.get());
 
 		shader->End(rc);
@@ -108,6 +111,16 @@ void	PostprocessingRenderer::DrawDebugGUI()
 			ImGui::SliderFloat("hueShift", &colorGradingData.hueShift, 0.0f, 360.0f);
 			ImGui::SliderFloat("saturation", &colorGradingData.saturation, 0.0f, 2.0f);
 			ImGui::SliderFloat("brightness", &colorGradingData.brightness, 0.0f, 2.0f);
+			ImGui::TreePop();
+		}
+
+		if (ImGui::TreeNode("radial blur"))
+		{
+			ImGui::SliderFloat2("center", &radialblurData.blur_center.x, 0, 1);
+			ImGui::SliderFloat("radius", &radialblurData.blur_radius, 0.001f, +100.0f);
+			ImGui::SliderInt("sampling count", &radialblurData.blur_sampling_count, 1, 100);
+			ImGui::SliderFloat("mask radius", &radialblurData.blur_mask_radius, 0, +300.0f);
+
 			ImGui::TreePop();
 		}
 

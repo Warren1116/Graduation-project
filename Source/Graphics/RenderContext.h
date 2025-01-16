@@ -67,6 +67,18 @@ struct FogData
 };
 
 
+// ラジアルブラー情報
+struct RadialBlurData
+{
+    float blur_radius = 0.0f;
+    int blur_sampling_count = 10;
+    DirectX::XMFLOAT2 blur_center = { 0.5f,0.5f };
+    float blur_mask_radius = 300;		//	centerからの指定の範囲はブラーを適応しないようにする
+    DirectX::XMFLOAT3  blur_dummy;
+};
+
+
+
 // ポストエフェクトの最終パス用情報
 struct FinalpassData
 {
@@ -78,6 +90,8 @@ struct FinalpassData
     ID3D11ShaderResourceView* depthMap;
 
 };
+
+
 
 //シャドウマップの情報
 static const int ShadowmapCount = 4;
@@ -134,5 +148,7 @@ struct RenderContext
     //	スカイボックス情報
     SkyboxData					skyboxData;
 
+    //ラジアルブラー情報
+    RadialBlurData            radialblurData;
 
 };

@@ -43,6 +43,8 @@ private:
 	// 色調補正データ
 	ColorGradingData				colorGradingData;
 
+	//ラジアルブラー
+	RadialBlurData					radialblurData;
 
 	//	高輝度抽出テクスチャ
 	std::unique_ptr<RenderTarget>	workRenderTarget[2];

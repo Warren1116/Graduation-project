@@ -62,6 +62,7 @@ FinalpassShader::FinalpassShader(ID3D11Device* device)
         // シーン用バッファ
         D3D11_BUFFER_DESC desc{};
         ::memset(&desc, 0, sizeof(desc));
+
         desc.ByteWidth = sizeof(CBFinalpassConstance);
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -72,6 +73,8 @@ FinalpassShader::FinalpassShader(ID3D11Device* device)
         HRESULT hr = device->CreateBuffer(&desc, 0, finalpassConstantBuffer[0].GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
+
+        // フォグ用バッファ
         desc.ByteWidth = sizeof(Fog);
         desc.Usage = D3D11_USAGE_DEFAULT;
         desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -81,6 +84,18 @@ FinalpassShader::FinalpassShader(ID3D11Device* device)
 
         hr = device->CreateBuffer(&desc, 0, finalpassConstantBuffer[1].GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+
+        desc.ByteWidth = sizeof(RadialBlurConstance);
+        desc.Usage = D3D11_USAGE_DEFAULT;
+        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        desc.CPUAccessFlags = 0;
+        desc.MiscFlags = 0;
+        desc.StructureByteStride = 0;
+
+        hr = device->CreateBuffer(&desc, 0, finalpassConstantBuffer[2].GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
 
     }
 
@@ -168,6 +183,25 @@ FinalpassShader::FinalpassShader(ID3D11Device* device)
 
         hr = device->CreateSamplerState(&desc, shadowMapSamplerState.GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+        //  ラジアルブラー用
+        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.MipLODBias = 0;
+        desc.MaxAnisotropy = 16;
+        desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+        desc.BorderColor[0] = FLT_MAX;
+        desc.BorderColor[1] = FLT_MAX;
+        desc.BorderColor[2] = FLT_MAX;
+        desc.BorderColor[3] = FLT_MAX;
+        desc.MinLOD = 0;
+        desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+        hr = device->CreateSamplerState(&desc, radialblurSamplerState.GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
     }
 }
 
@@ -185,6 +219,7 @@ void FinalpassShader::Begin(const RenderContext& rc)
     {
         finalpassConstantBuffer[0].Get(),
         finalpassConstantBuffer[1].Get(),
+        finalpassConstantBuffer[2].Get(),
     };
     rc.deviceContext->VSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
     rc.deviceContext->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
@@ -197,8 +232,9 @@ void FinalpassShader::Begin(const RenderContext& rc)
     ID3D11SamplerState* samplerStates[] =
     {
         samplerState.Get(),
-        shadowMapSamplerState.Get()
+        shadowMapSamplerState.Get(),
         //depthSamplerState.Get()
+        radialblurSamplerState.Get()
     };
     rc.deviceContext->PSSetSamplers(0, ARRAYSIZE(samplerStates), samplerStates);
 
@@ -224,6 +260,16 @@ void FinalpassShader::Draw(const RenderContext& rc, const Sprite* sprite)
     cbFinalpassConstances.brightness = rc.colorGradingData.brightness;
 
     rc.deviceContext->UpdateSubresource(finalpassConstantBuffer[0].Get(), 0, 0, &cbFinalpassConstances, 0, 0);
+
+
+    RadialBlurConstance radialBlur;
+    radialBlur.blur_radius = rc.radialblurData.blur_radius;
+    radialBlur.blur_sampling_count = rc.radialblurData.blur_sampling_count;
+    radialBlur.blur_center = rc.radialblurData.blur_center;
+    radialBlur.blur_mask_radius = rc.radialblurData.blur_mask_radius;
+
+    rc.deviceContext->UpdateSubresource(finalpassConstantBuffer[2].Get(), 0, 0, &radialBlur, 0, 0);
+
 
     UINT stride = sizeof(Sprite::Vertex);
     UINT offset = 0;

@@ -42,3 +42,13 @@ cbuffer CBFog : register(b1)
     float dummy;
 }
 
+
+// ラジアルブラー用の定数バッファ
+cbuffer RADIAL_BLUR_CONSTANT_BUFFER : register(b2)
+{
+    float blur_radius;
+    int blur_sampling_count;
+    float2 blur_center;
+    float blur_mask_radius;
+    float3 blur_dummy;
+}
