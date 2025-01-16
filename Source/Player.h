@@ -289,9 +289,8 @@ private:
 		Anim_GrabAndDrop,
 		Anim_CrouchIdle,
 		Anim_TitleIdle,
-		Anim_SwingToKick,
 		Anim_Crouch,
-		Anim_SwingToKick1,
+		Anim_SwingToKick,
 	};
 
 

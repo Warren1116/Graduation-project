@@ -663,7 +663,7 @@ void Player::UpdateCameraState(float elapsedTime)
                     for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
                     {
                         Character* character = manager.GetCharacter(ii);
-                        if (character == this || character->GetHealth() <= 0)
+                        if (character == this || character->GetHealth() <= 0 || character == nullptr)
                             continue;
 
                         if (lockonState != LockonState::NotLocked)
@@ -1801,7 +1801,7 @@ void Player::TransitionSwingToKickState()
         sceneGame.RegisterRenderModel(swingWebRight->GetModel());
     }
 
-    model->PlayAnimation(Anim_SwingToKick1, false);
+    model->PlayAnimation(Anim_SwingToKick, false);
 
 
 

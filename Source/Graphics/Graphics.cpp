@@ -1,5 +1,4 @@
 #include "Misc.h"
-#include "Graphics/Shader/LambertShader.h"
 #include "Graphics\Shader\PhongShader.h"
 #include "Graphics/Graphics.h"
 #include "Graphics\Shader\ShadowmapCasterShader.h"

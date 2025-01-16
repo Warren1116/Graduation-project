@@ -198,9 +198,6 @@
     <ClInclude Include="Source\StageManager.h">
       <Filter>Source\Stage</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\Shader\LambertShader.h">
-      <Filter>Source\Graphics\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\Shader\PhongShader.h">
       <Filter>Source\Graphics\Shader</Filter>
     </ClInclude>
@@ -450,9 +447,6 @@
     <ClCompile Include="Source\WayPoint.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\Shader\LambertShader.cpp">
-      <Filter>Source\Graphics\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\Shader\PhongShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
     </ClCompile>
@@ -578,9 +572,6 @@
     <None Include="HLSL\ImGui.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\Lambert.hlsli">
-      <Filter>HLSL</Filter>
-    </None>
     <None Include="HLSL\Line.hlsli">
       <Filter>HLSL</Filter>
     </None>
@@ -647,12 +638,6 @@
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\ImGuiVS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\LambertPS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\LambertVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\LineVS.hlsl">
