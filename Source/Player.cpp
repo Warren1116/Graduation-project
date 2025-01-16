@@ -487,7 +487,6 @@ void Player::TransitionGrabState()
     webTimer = 0.0f;
     skillTime -= 1.0f;
 
-
 }
 
 void Player::UpdateGrabState(float elapsedTime)
@@ -810,7 +809,6 @@ void Player::UpdateCameraState(float elapsedTime)
     }
     case State::Grab:
     {
-
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
         float vx = sinf(angle.y) * 5;
         float vz = -cosf(angle.y) * 5;
@@ -1727,7 +1725,7 @@ bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistanc
     rightVec = DirectX::XMVector3Normalize(rightVec);
 
     forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
-    upVec = DirectX::XMVectorScale(upVec, 11.0f);
+    upVec = DirectX::XMVectorScale(upVec, 12.0f);
     rightVec = DirectX::XMVectorScale(rightVec, 5.0f);
 
 
