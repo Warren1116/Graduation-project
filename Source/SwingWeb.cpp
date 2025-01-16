@@ -44,7 +44,7 @@ void SwingWeb::Update(float elapsedTime)
     Player& player = Player::Instance();
     if (!player.GetIsUseGrab())
     {
-        if (player.GetState() != Player::State::Swing)
+        if (player.GetState() != Player::State::Swing && player.GetState() != Player::State::SwingToKick)
         {
             SceneGame& sceneGame = SceneGame::Instance();
             if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)

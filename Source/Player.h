@@ -258,8 +258,8 @@ private:
     void TransitionCrouchIdleState();
     void UpdateCrouchIdleState(float elapsedTime);
 
-    void TransitionSwingToKick();
-    void UpdateSwingToKick(float elapsedTime);
+    void TransitionSwingToKickState();
+    void UpdateSwingToKickState(float elapsedTime);
 
 
 private:
@@ -291,6 +291,7 @@ private:
 		Anim_TitleIdle,
 		Anim_SwingToKick,
 		Anim_Crouch,
+		Anim_SwingToKick1,
 	};
 
 
