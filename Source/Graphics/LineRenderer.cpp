@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <memory>
 #include "Misc.h"
-#include "LineRenderer.h"
+#include "Graphics/LineRenderer.h"
 
-LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
-	: capacity(vertexCount)
+LineRenderer::LineRenderer(ID3D11Device* device)
 {
 	// 頂点シェーダー
 	{
@@ -30,8 +29,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		// 入力レイアウト
 		D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
 		{
-			{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 		hr = device->CreateInputLayout(inputElementDesc, ARRAYSIZE(inputElementDesc), csoData.get(), csoSize, inputLayout.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
@@ -54,7 +52,6 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		fread(csoData.get(), csoSize, 1, fp);
 		fclose(fp);
 
-
 		// ピクセルシェーダー生成
 		HRESULT hr = device->CreatePixelShader(csoData.get(), csoSize, nullptr, pixelShader.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
@@ -69,7 +66,7 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
-		desc.ByteWidth = sizeof(ConstantBuffer);
+		desc.ByteWidth = sizeof(CbMesh);
 		desc.StructureByteStride = 0;
 
 		HRESULT hr = device->CreateBuffer(&desc, 0, constantBuffer.GetAddressOf());
@@ -126,19 +123,18 @@ LineRenderer::LineRenderer(ID3D11Device* device, UINT vertexCount)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	// 頂点バッファ
+	//
 	{
-		D3D11_BUFFER_DESC desc;
-		desc.ByteWidth = sizeof(Vertex) * vertexCount;
+		D3D11_BUFFER_DESC desc = {};
 		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.ByteWidth = sizeof(DirectX::XMFLOAT3) * 2;
 		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
 
-		HRESULT hr = device->CreateBuffer(&desc, nullptr, vertexBuffer.GetAddressOf());
+		HRESULT hr = device->CreateBuffer(&desc, nullptr, lineVertexBuffer.GetAddressOf());
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
+
 }
 
 // 描画開始
@@ -159,57 +155,46 @@ void LineRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X
 	context->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	context->RSSetState(rasterizerState.Get());
 
-	// プリミティブ設定
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-
-	// 定数バッファ更新
+	// ビュープロジェクション行列作成
 	DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&view);
 	DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&projection);
 	DirectX::XMMATRIX VP = V * P;
-	ConstantBuffer data;
-	DirectX::XMStoreFloat4x4(&data.wvp, VP);
-	context->UpdateSubresource(constantBuffer.Get(), 0, 0, &data, 0, 0);
 
-	// 描画
-	UINT totalVertexCount = static_cast<UINT>(vertices.size());
-	UINT start = 0;
-	UINT count = (totalVertexCount < capacity) ? totalVertexCount : capacity;
+	// プリミティブ設定
+	UINT stride = sizeof(DirectX::XMFLOAT3);
+	UINT offset = 0;
+	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-	while (start < totalVertexCount)
+
+	// 線描画
+	context->IASetVertexBuffers(0, 1, lineVertexBuffer.GetAddressOf(), &stride, &offset);
+	for (const auto& line : lines)
 	{
-		D3D11_MAPPED_SUBRESOURCE mappedVB;
-		HRESULT hr = context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedVB);
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = context->Map(lineVertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-		memcpy(mappedVB.pData, &vertices[start], sizeof(Vertex) * count);
-
-		context->Unmap(vertexBuffer.Get(), 0);
-
-		context->Draw(count, 0);
-
-		start += count;
-		if ((start + count) > totalVertexCount)
+		if (SUCCEEDED(hr))
 		{
-			count = totalVertexCount - start;
+			DirectX::XMFLOAT3* vertexData = reinterpret_cast<DirectX::XMFLOAT3*>(mappedResource.pData);
+			vertexData[0] = line.start;
+			vertexData[1] = line.end;
+			context->Unmap(lineVertexBuffer.Get(), 0);
 		}
+
+		CbMesh cbMesh;
+		cbMesh.color = line.color;
+		DirectX::XMMATRIX identity = DirectX::XMMatrixIdentity();
+		DirectX::XMStoreFloat4x4(&cbMesh.wvp, identity * VP);
+		context->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+
+
+		context->Draw(2, 0);
 	}
-	vertices.clear();
+	lines.clear();
 }
 
-// 頂点追加
-void LineRenderer::AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color)
+void LineRenderer::DrawLine(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT4& color)
 {
-	Vertex v;
-	v.position = position;
-	v.color = color;
-	vertices.emplace_back(v);
+	lines.push_back({ start, end, color });
 }
 
-void LineRenderer::AddLine(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT4& color)
-{
-	AddVertex(start, color);
-	AddVertex(end, color);
-}

@@ -92,7 +92,10 @@ public:
 
 	bool GetAttackSoon() { return getAttacksoon; }
 	void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
-    void GetAttackEenemy(EnemyThief* enemy) { attackEnemy = enemy; }
+    bool GetShotSoon() { return getShotsoon; }
+    void SetgetShotSoon(bool getshot) { getShotsoon = getshot; }
+	EnemyThief* GetAttackEnemy() { return attackEnemy; }
+    void SetAttackEnemy(EnemyThief* enemy) { attackEnemy = enemy; }
 
 	bool GetIsUseGrab() { return IsUseGrab; }
 	std::unique_ptr<Model> model = nullptr;
@@ -340,6 +343,7 @@ private:
 	bool attacking = false;
 	//çUåÇó\ím
 	bool getAttacksoon = false;
+    bool getShotsoon = false;
     //	çUåÇëŒè€
     EnemyThief* attackEnemy = nullptr;
 

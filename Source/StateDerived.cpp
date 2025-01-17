@@ -168,6 +168,7 @@ void AttackState::Enter()
 
     if (randomType == AttackType::Shot)
     {
+        Player::Instance().SetgetShotSoon(true);
         owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
     }
 }
@@ -298,13 +299,6 @@ void ShotState::Enter()
     // 攻撃権があればモーション再生開始
     if (owner->GetAttackFlg())
     {
-        //Graphics& graphics = Graphics::Instance();
-        //ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-
-        //DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
-        //debugRender->DrawLine(owner->GetPosition(), Player::Instance().GetPosition(), DirectX::XMFLOAT4(1, 0, 0, 1));
-
-
         // プレイヤーに向けて弾を発射
         DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
         DirectX::XMFLOAT3 ownerPosition = owner->GetPosition();
@@ -356,6 +350,7 @@ void ShotState::Exit()
             static_cast<int>(Meta::Identity::Meta),
             MESSAGE_TYPE::MsgChangeAttackRight);
         Player::Instance().SetgetAttackSoon(false);
+        Player::Instance().SetgetShotSoon(false);
 
     }
 }
@@ -521,7 +516,7 @@ void StandbyState::Execute(float elapsedTime)
 
     if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) {
         Player::Instance().SetgetAttackSoon(true);
-        Player::Instance().GetAttackEenemy(owner);
+        Player::Instance().SetAttackEnemy(owner);
     }
 
     // 攻撃権があるとき

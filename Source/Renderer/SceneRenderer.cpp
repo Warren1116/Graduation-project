@@ -168,6 +168,11 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 
 	EffectManager::Instance().Render(rc.view, rc.projection);
 
+
+	// ラインレンダラ描画実行
+	graphics.GetLineRenderer()->Render(rc.deviceContext, rc.view, rc.projection);
+
+
 	//	デバッグプリミティブの表示
 	if (drawDebugPrimitive)
 	{
@@ -176,9 +181,6 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 
 		// ライトのデバッグプリミティブ描画
 		LightManager::Instance().DrawDebugPrimitive();
-
-		// ラインレンダラ描画実行
-		graphics.GetLineRenderer()->Render(rc.deviceContext, rc.view, rc.projection);
 
 		// デバッグレンダラ描画実行
 		graphics.GetDebugRenderer()->Render(rc.deviceContext, rc.view, rc.projection);

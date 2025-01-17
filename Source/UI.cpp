@@ -94,6 +94,22 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
         RenderSpiderSense(dc, view, projection);
     }
 
+    if (Player::Instance().GetShotSoon())
+    {
+        LineRenderer* lineRender = Graphics::Instance().GetLineRenderer();
+
+        auto enemyModel = Player::Instance().GetAttackEnemy()->GetModel();
+        Model::Node* GunPos = enemyModel->FindNode("slide");
+
+        DirectX::XMFLOAT3 attackEnemyPos = Player::Instance().GetAttackEnemy()->GetPosition();
+        DirectX::XMFLOAT3 position = Player::Instance().GetPosition();
+
+        lineRender->DrawLine({ GunPos->worldTransform._41 ,GunPos->worldTransform._42 ,GunPos->worldTransform._43 },
+            DirectX::XMFLOAT3(position.x, position.y + 1.0f, position.z), 
+            DirectX::XMFLOAT4(1, 0, 0, 1));
+
+    }
+
 #ifdef TUTORIAL
     //  ƒ`ƒ…ƒgƒŠƒAƒ‹‚Ì•`‰æ
     RenderTutorial(dc, view, projection);
