@@ -171,6 +171,7 @@ void AttackState::Enter()
         Player::Instance().SetgetShotSoon(true);
         owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
     }
+
 }
 
 // 攻撃ステートで実行するメソッド
@@ -547,6 +548,6 @@ void StandbyState::Execute(float elapsedTime)
 // 戦闘待機ステートから出ていくときのメソッド
 void StandbyState::Exit()
 {
-    Player::Instance().SetgetAttackSoon(false);
+
 }
 
