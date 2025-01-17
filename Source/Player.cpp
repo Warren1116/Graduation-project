@@ -1385,6 +1385,12 @@ void Player::DrawDebugPrimitive()
     debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
 
+    if (getAttacksoon)
+    {
+        DirectX::XMFLOAT3 attackEnemyPos = attackEnemy->GetPosition();
+        debugRender->DrawLine({ attackEnemyPos.x,attackEnemyPos.y + 2.0f,attackEnemyPos.z }, DirectX::XMFLOAT3(position.x, position.y + 2.0f, position.z), DirectX::XMFLOAT4(1, 0, 0, 1));
+    }
+
     projectileManager.DrawDebugPrimitive();
 
 

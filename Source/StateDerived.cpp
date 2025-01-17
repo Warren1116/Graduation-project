@@ -3,6 +3,7 @@
 #include "Mathf.h"
 #include "MetaAI.h"
 
+
 // Stateを基底クラスとして各種Stateクラスを用意する。
 // Wanderはサンプルとしてすでに記述済み
 // 各種Enter関数の内容は各Transition○○State関数を参考に
@@ -281,6 +282,7 @@ void PunchState::Exit()
 // シュートステートに入った時のメソッド
 void ShotState::Enter()
 {
+
     if (owner->GetHealth() <= 0)return;
 
     // 攻撃権がなければ
@@ -296,6 +298,13 @@ void ShotState::Enter()
     // 攻撃権があればモーション再生開始
     if (owner->GetAttackFlg())
     {
+        //Graphics& graphics = Graphics::Instance();
+        //ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+        //DebugRenderer* debugRender = Graphics::Instance().GetDebugRenderer();
+        //debugRender->DrawLine(owner->GetPosition(), Player::Instance().GetPosition(), DirectX::XMFLOAT4(1, 0, 0, 1));
+
+
         // プレイヤーに向けて弾を発射
         DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
         DirectX::XMFLOAT3 ownerPosition = owner->GetPosition();
@@ -347,6 +356,7 @@ void ShotState::Exit()
             static_cast<int>(Meta::Identity::Meta),
             MESSAGE_TYPE::MsgChangeAttackRight);
         Player::Instance().SetgetAttackSoon(false);
+
     }
 }
 
@@ -511,6 +521,7 @@ void StandbyState::Execute(float elapsedTime)
 
     if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) {
         Player::Instance().SetgetAttackSoon(true);
+        Player::Instance().GetAttackEenemy(owner);
     }
 
     // 攻撃権があるとき

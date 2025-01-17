@@ -136,6 +136,19 @@ DebugRenderer::DebugRenderer(ID3D11Device* device)
 	CreateBoxMesh(device, 1.0f, 1.0f, 1.0f);
 
 	CreateTriangleMesh(device);
+
+	//
+	{
+		D3D11_BUFFER_DESC desc = {};
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.ByteWidth = sizeof(DirectX::XMFLOAT3) * 2;
+		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+		HRESULT hr = device->CreateBuffer(&desc, nullptr, lineVertexBuffer.GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+	}
+
 }
 
 // •`‰æŠJŽn
@@ -282,6 +295,33 @@ void DebugRenderer::Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4
 		context->DrawIndexed(3, 0, 0);
 	}
 	triangles.clear();
+
+
+    // ü•`‰æ
+	context->IASetVertexBuffers(0, 1, lineVertexBuffer.GetAddressOf(), &stride, &offset);
+	for (const auto& line : lines)
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		HRESULT hr = context->Map(lineVertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+		if (SUCCEEDED(hr))
+		{
+			DirectX::XMFLOAT3* vertexData = reinterpret_cast<DirectX::XMFLOAT3*>(mappedResource.pData);
+			vertexData[0] = line.start;
+			vertexData[1] = line.end;
+			context->Unmap(lineVertexBuffer.Get(), 0);
+		}
+
+		CbMesh cbMesh;
+		cbMesh.color = line.color;
+		DirectX::XMMATRIX identity = DirectX::XMMatrixIdentity();
+		DirectX::XMStoreFloat4x4(&cbMesh.wvp, identity * VP);
+		context->UpdateSubresource(constantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
+
+
+		context->Draw(2, 0);
+	}
+	lines.clear();
 }
 
 // ‹…•`‰æ
@@ -336,6 +376,12 @@ void DebugRenderer::DrawTriangle(const DirectX::XMFLOAT3& v1, const DirectX::XMF
 
 	triangles.push_back(triangle);
 }
+
+void DebugRenderer::DrawLine(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT4& color)
+{
+	lines.push_back({ start, end, color });
+}
+
 
 
 

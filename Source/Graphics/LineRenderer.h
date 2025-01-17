@@ -18,6 +18,7 @@ public:
 	// ’¸“_’Ç‰Á
 	void AddVertex(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT4& color);
 
+	void AddLine(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT4& color);
 private:
 	struct ConstantBuffer
 	{

@@ -30,6 +30,9 @@ public:
     //三角形描画
     void DrawTriangle(const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2, const DirectX::XMFLOAT3& v3, const DirectX::XMFLOAT4& color);
 
+    void DrawLine(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, const DirectX::XMFLOAT4& color);
+
+
 private:
     // 球メッシュ作成
     void CreateSphereMesh(ID3D11Device* device, float radius, int slices, int stacks);
@@ -100,6 +103,13 @@ private:
     };
     std::vector<Triangle> triangles;
 
+    struct Line
+    {
+        DirectX::XMFLOAT3 start;
+        DirectX::XMFLOAT3 end;
+        DirectX::XMFLOAT4 color;
+    };
+
 
     Microsoft::WRL::ComPtr<ID3D11Buffer>			sphereVertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			cylinderVertexBuffer;
@@ -109,6 +119,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11Buffer>            triangleVertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>            triangleIndexBuffer;
     Microsoft::WRL::ComPtr<ID3D11Buffer>			constantBuffer;
+    Microsoft::WRL::ComPtr<ID3D11Buffer>			lineVertexBuffer;
 
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>		vertexShader;
@@ -124,6 +135,7 @@ private:
     std::vector<Square>		squares;
     std::vector<Arrow>		arrows;
     std::vector<Box>		boxs;
+    std::vector<Line>       lines;
 
     UINT	sphereVertexCount = 0;
     UINT	cylinderVertexCount = 0;

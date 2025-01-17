@@ -1,5 +1,6 @@
 #pragma once
 #include "StateBase.h"
+#include "Graphics\LineRenderer.h"
 
 
 
@@ -98,6 +99,7 @@ public:
     void Execute(float elapsedTime)override;
     //ステートから出ていくときのメソッド
     void Exit()override;
+
 };
 
 class SearchState : public HierarchicalState

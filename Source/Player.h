@@ -15,6 +15,7 @@
 #include "BrokenProjectileManager.h"
 #include <memory.h>
 #include "Enemy.h"
+#include "EnemyThief.h"
 
 
 // ƒvƒŒƒCƒ„[
@@ -91,6 +92,7 @@ public:
 
 	bool GetAttackSoon() { return getAttacksoon; }
 	void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
+    void GetAttackEenemy(EnemyThief* enemy) { attackEnemy = enemy; }
 
 	bool GetIsUseGrab() { return IsUseGrab; }
 	std::unique_ptr<Model> model = nullptr;
@@ -338,6 +340,9 @@ private:
 	bool attacking = false;
 	//UŒ‚—\’m
 	bool getAttacksoon = false;
+    //	UŒ‚‘ÎÛ
+    EnemyThief* attackEnemy = nullptr;
+
 	//“Š‚°‹Z
 	bool IsUseGrab = false;
 
