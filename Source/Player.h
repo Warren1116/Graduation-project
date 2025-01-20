@@ -90,16 +90,26 @@ public:
 	//	記録されたスイングポイントを取得
 	DirectX::XMFLOAT3 GetPreviousSwingPoint() { return previousSwingPoint; }
 
+    //	攻撃予知フラグを取る
 	bool GetAttackSoon() { return getAttacksoon; }
 	void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
+    //  攻撃予知フラグを取る(Shot)
     bool GetShotSoon() { return getShotsoon; }
     void SetgetShotSoon(bool getshot) { getShotsoon = getshot; }
+
+
+	//　今攻撃するの敵を取得する	
 	EnemyThief* GetAttackEnemy() { return attackEnemy; }
     void SetAttackEnemy(EnemyThief* enemy) { attackEnemy = enemy; }
 
+    //    投げ技フラグを取る
 	bool GetIsUseGrab() { return IsUseGrab; }
+    //    スイングキックフラグを取る
+    bool GetIsUseSwingKick() { return IsUseSwingKick; }
+
 	std::unique_ptr<Model> model = nullptr;
 
+	//  糸発射のタイマー
 	float GetWebTimer() const { return webTimer; }
 
     void SetIdleState() { return TransitionIdleState(); }
@@ -253,7 +263,7 @@ private:
 	bool IsNearWallTop();
 
 	//	スイングポイントを探す
-	bool FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistance, HitResult& result);
+	bool FindWallSwingPoint();
 
 
     //Titleステート用
@@ -341,14 +351,18 @@ private:
 	float attackTimer = 0;
 	//	攻撃判定
 	bool attacking = false;
-	//攻撃予知
+	//	攻撃予知
 	bool getAttacksoon = false;
     bool getShotsoon = false;
+
     //	攻撃対象
     EnemyThief* attackEnemy = nullptr;
 
-	//投げ技
+	//	投げ技
 	bool IsUseGrab = false;
+
+    //　スイングキック
+    bool IsUseSwingKick = false;
 
     DirectX::XMFLOAT3 dodgeDirection;
 

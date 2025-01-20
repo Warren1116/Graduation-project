@@ -151,6 +151,7 @@ void PursuitState::Execute(float elapsedTime)
 void PursuitState::Exit()
 {
     Player::Instance().SetgetAttackSoon(false);
+    Player::Instance().SetgetShotSoon(false);
 }
 
 // 攻撃ステートに入った時のメソッド
@@ -158,17 +159,16 @@ void AttackState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
-    randomType = static_cast<AttackType>(Mathf::RandomRange(1, 2));
+    //randomType = static_cast<AttackType>(Mathf::RandomRange(1, 2));
 
-    if (randomType == AttackType::Punch)
+    if (owner->randomType == EnemyThief::AttackType::Punch)
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
 
     }
 
-    if (randomType == AttackType::Shot)
+    if (owner->randomType == EnemyThief::AttackType::Shot)
     {
-        Player::Instance().SetgetShotSoon(true);
         owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
     }
 
@@ -225,6 +225,7 @@ void PunchState::Enter()
     if (owner->GetAttackFlg())
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackPunch), false);
+        Player::Instance().SetgetAttackSoon(false);
         Player::Instance().ApplyDamage(1, 2.0f);
     }
 }
@@ -275,7 +276,6 @@ void PunchState::Exit()
             owner->GetId(),
             static_cast<int>(Meta::Identity::Meta),
             MESSAGE_TYPE::MsgChangeAttackRight);
-        Player::Instance().SetgetAttackSoon(false);
     }
 }
 
@@ -312,6 +312,7 @@ void ShotState::Enter()
 
 
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackShot), false);
+        Player::Instance().SetgetAttackSoon(false);
         Player::Instance().ApplyDamage(1, 2.0f);
     }
 }
@@ -350,7 +351,6 @@ void ShotState::Exit()
             owner->GetId(),
             static_cast<int>(Meta::Identity::Meta),
             MESSAGE_TYPE::MsgChangeAttackRight);
-        Player::Instance().SetgetAttackSoon(false);
         Player::Instance().SetgetShotSoon(false);
 
     }
@@ -494,7 +494,8 @@ void StandbyState::Enter()
             MESSAGE_TYPE::MsgAskAttackRight);
     }
 
-    Player::Instance().SetgetAttackSoon(false);
+    owner->randomType = (static_cast<EnemyThief::AttackType>(Mathf::RandomRange(1, 2)));
+
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::HoldGun), false);
     attackCooldownTimer = Mathf::RandomRange(2.5f, 4.0f);
 
@@ -515,10 +516,20 @@ void StandbyState::Execute(float elapsedTime)
     owner->SetAngle(DirectX::XMFLOAT3(0, angleY, 0));
 
 
-    if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) {
+    if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) 
+    {
         Player::Instance().SetgetAttackSoon(true);
+        if (owner->randomType == EnemyThief::AttackType::Shot)
+        {
+            Player::Instance().SetgetShotSoon(true);
+
+        }
+
+
         Player::Instance().SetAttackEnemy(owner);
     }
+
+
 
     // 攻撃権があるとき
     if (owner->GetAttackFlg())
@@ -539,7 +550,6 @@ void StandbyState::Execute(float elapsedTime)
     float dist = sqrtf(vx * vx + vy * vy + vz * vz);
     if (dist > owner->GetAttackRange())
     {
-        Player::Instance().SetgetAttackSoon(false);
         // 攻撃範囲から出たら追跡ステートへ遷移
         owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Pursuit));
     }

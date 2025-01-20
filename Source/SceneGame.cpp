@@ -28,8 +28,8 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 
-//#define TUTORIAL
-#define DEBUG
+#define TUTORIAL
+//#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -97,13 +97,11 @@ void SceneGame::Initialize()
     player = std::make_unique<Player>(true);
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-90), 0));
     player->SetPosition({ 66,0,42 });
-    //player->SetPosition({ 0,0,0 });
     player->SetIdleState();
 
     // エネミー初期化
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
-
 
 
     // 敵を初期化
@@ -564,6 +562,9 @@ void SceneGame::Render()
             case TutorialState::LockShot:
                 str = "Tutorial LockShot";
                 break;
+            case TutorialState::Grab:
+                str = "Tutorial Grab";
+                break;
             case TutorialState::Swing:
                 str = "Tutorial Swing";
                 break;
@@ -599,7 +600,7 @@ void SceneGame::Render()
 void SceneGame::UpdateTutorialState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-
+    Mouse& mouse = Input::Instance().GetMouse();
     //  チュトリアルの進行
     switch (tutorialState)
     {
@@ -643,8 +644,14 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
     case SceneGame::TutorialState::LockShot:
         CheckTutorialTimeout(3.5f);
         if (Player::Instance().InputProjectile() && canAcceptInput)
+            AdvanceTutorialState(SceneGame::TutorialState::Grab);
+        break;
+    case SceneGame::TutorialState::Grab:
+        CheckTutorialTimeout(3.5f);
+        if (gamePad.GetButtonDown() & GamePad::BTN_Y || mouse.GetButtonDown() & Mouse::BTN_RIGHT && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Swing);
         break;
+
         //  スイングのチュトリアル
     case SceneGame::TutorialState::Swing:
         tutorialTimer = 0;

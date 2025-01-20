@@ -73,7 +73,7 @@ struct RadialBlurData
     float blur_radius = 0.0f;
     int blur_sampling_count = 10;
     DirectX::XMFLOAT2 blur_center = { 0.5f,0.5f };
-    float blur_mask_radius = 300;		//	centerからの指定の範囲はブラーを適応しないようにする
+    float blur_mask_radius = 500;		//	centerからの指定の範囲はブラーを適応しないようにする
     DirectX::XMFLOAT3  blur_dummy;
 };
 

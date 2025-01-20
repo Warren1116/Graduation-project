@@ -375,7 +375,6 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
 
                         enemy->AddImpulse(impulse);
                     }
-
                     // ヒットエフェクト再生
                     {
                         DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
@@ -490,6 +489,8 @@ void Player::TransitionGrabState()
     model->PlayAnimation(Anim_GrabAndDrop, false);
     webTimer = 0.0f;
     skillTime -= 1.0f;
+
+    getShotsoon = false;
 
 }
 
@@ -1528,8 +1529,8 @@ void Player::TransitionSwingState()
             //}
 
         }
-        HitResult hit;
-        FindWallSwingPoint(position, 5, hit);
+
+        FindWallSwingPoint();
 
         onSwing = true;
 
@@ -1574,8 +1575,8 @@ void Player::TransitionSwingState()
             //}
         }
 
-        HitResult hit;
-        FindWallSwingPoint(position, 5, hit);
+
+        FindWallSwingPoint();
 
 
         onSwing = true;
@@ -1650,7 +1651,6 @@ void Player::UpdateSwingState(float elapsedTime)
         }
         position = end;
     }
-
 
     //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
@@ -1732,30 +1732,22 @@ void Player::UpdateSwingState(float elapsedTime)
 
 
 //スイングポイントを探す（仮）
-bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistance, HitResult& result) {
-    using namespace DirectX;
-
-    DirectX::XMFLOAT3 moveVec = GetMoveVec();
-
-
+bool Player::FindWallSwingPoint() 
+{
     DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
     DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
-    DirectX::XMVECTOR rightVec = DirectX::XMLoadFloat3(&GetRight());
 
     forwardVec = DirectX::XMVector3Normalize(forwardVec);
     upVec = DirectX::XMVector3Normalize(upVec);
-    rightVec = DirectX::XMVector3Normalize(rightVec);
 
     forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
     upVec = DirectX::XMVectorScale(upVec, 12.0f);
-    rightVec = DirectX::XMVectorScale(rightVec, 5.0f);
 
 
     SwingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
     DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
     SwingPoint = DirectX::XMVectorAdd(SwingPoint, SwingwebDirection);
     DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
-
 
     previousSwingPoint = swingPoint;
 
@@ -1766,7 +1758,7 @@ bool Player::FindWallSwingPoint(const DirectX::XMFLOAT3& start, float maxDistanc
 void Player::TransitionTitleIdleState()
 {
     state = State::TitleIdle;
-    model->PlayAnimation(Anim_Crouch, false);
+    model->PlayAnimation(Anim_TitleIdle, false);
 }
 
 void Player::UpdateTitleIdleState(float elapsedTime)
@@ -1777,7 +1769,7 @@ void Player::UpdateTitleIdleState(float elapsedTime)
 void Player::TransitionCrouchIdleState()
 {
     state = State::CrouchIdle;
-    model->PlayAnimation(Anim_CrouchIdle, false);
+    model->PlayAnimation(Anim_TitleIdle, false);
 
 }
 
@@ -1793,7 +1785,6 @@ void Player::TransitionSwingToKickState()
 {
     state = State::SwingToKick;
 
-
     SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
     SceneGame& sceneGame = SceneGame::Instance();
     if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
@@ -1803,12 +1794,19 @@ void Player::TransitionSwingToKickState()
     }
 
     model->PlayAnimation(Anim_SwingToKick, false);
+    IsUseSwingKick = true;
 
-
-
-    HitResult hit;
-    FindWallSwingPoint(position, 5, hit);
-
+    if (lockonEnemy)
+    {
+        DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
+        DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 13.0f, 0.0f, 0.0f); // 上方に12.0fのオフセット
+        DirectX::XMVECTOR swingPointVec = DirectX::XMVectorAdd(enemyPos, upVec);
+        DirectX::XMStoreFloat3(&swingPoint, swingPointVec);
+    }
+    else
+    {
+        FindWallSwingPoint();
+    }
 
 }
 
@@ -1853,37 +1851,42 @@ void Player::UpdateSwingToKickState(float elapsedTime)
         DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
 
 
-
-    //スイング最高点の判定
     //前方のベクトルの取得
     DirectX::XMFLOAT3 front = GetFront();
     DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
-    //もし最高点に着いたら、連続スイングを行う
     float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
     GamePad& gamePad = Input::Instance().GetGamePad();
+
 
     //位置更新
     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
     DirectX::XMStoreFloat3(&position, newPosition);
     DirectX::XMStoreFloat3(&velocity, tangentVelocity);
 
+
     //キャラクターの向きを更新
-    DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
-        DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
-    DirectX::XMStoreFloat3(&front, swingDir);
+    if (lockonEnemy)
+    {
+        DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
+        DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
+        DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
+        DirectX::XMStoreFloat3(&front, directionToEnemy);
+        Turn(elapsedTime, front.x, front.z, turnSpeed);
+    
+    }
+    else
+    {
+        DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
+            DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
+        DirectX::XMStoreFloat3(&front, swingDir);
+    }
+    //DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
+    //    DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
+    //DirectX::XMStoreFloat3(&front, swingDir);
 
     // アニメーションの再生時間を取得
     float animationTime = model->GetCurrentAnimationSeconds();
 
-    // アニメーションの再生時間が 50.0f に達したときに下向きの速度を加える
-    //if (animationTime >= 50.0f)
-    //{
-    //    // 下向きの速度を加える
-    //    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -9.8f, 0.0f, 0.0f);
-    //    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-    //    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
-    //    DirectX::XMStoreFloat3(&velocity, velocityVec);
-    //}
 
     CollisionNodeVsEnemies("mixamorig:RightToeBase", attackRadius);
 
@@ -1891,6 +1894,7 @@ void Player::UpdateSwingToKickState(float elapsedTime)
     if (!model->IsPlayAnimation())
     {
         TransitionIdleState();
+        IsUseSwingKick = false;
     }
 }
 

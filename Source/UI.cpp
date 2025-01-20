@@ -16,6 +16,7 @@ void UI::Initialize()
     TutorialAttack = std::make_unique<Sprite>("Data/Sprite/Tutorial_Attack.png");
     TutorialShot = std::make_unique<Sprite>("Data/Sprite/Tutorial_Shot.png");
     TutorialCameraLock = std::make_unique<Sprite>("Data/Sprite/Tutorial_CameraLock.png");
+    TutorialGrab = std::make_unique<Sprite>("Data/Sprite/Tutorial_Grab.png");
     TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
     Font = std::make_unique<Sprite>("Data/Sprite/Font.png");
     Font2 = std::make_unique<Sprite>("Data/Sprite/Font2.png");
@@ -308,6 +309,9 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
             break;
         case SceneGame::TutorialState::LockShot:
             RenderTutorialSprite(TutorialShot, dc, screenWidth, screenHeight, alpha, isController);
+            break;
+        case SceneGame::TutorialState::Grab:
+            RenderTutorialSprite(TutorialGrab, dc, screenWidth, screenHeight, alpha, isController);
             break;
         }
     }

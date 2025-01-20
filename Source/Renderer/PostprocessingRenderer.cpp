@@ -121,7 +121,7 @@ void	PostprocessingRenderer::DrawDebugGUI()
 			ImGui::SliderFloat2("center", &radialblurData.blur_center.x, 0, 1);
 			ImGui::SliderFloat("radius", &radialblurData.blur_radius, 0.001f, +100.0f);
 			ImGui::SliderInt("sampling count", &radialblurData.blur_sampling_count, 1, 100);
-			ImGui::SliderFloat("mask radius", &radialblurData.blur_mask_radius, 0, +300.0f);
+			ImGui::SliderFloat("mask radius", &radialblurData.blur_mask_radius, 0, +500.0f);
 
 			ImGui::TreePop();
 		}

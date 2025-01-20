@@ -19,7 +19,8 @@ enum class EnemyAnimation
 	GetHit,
 	AttackPunch,
 	GetThrow,
-	HoldGun
+	HoldGun,
+	KickDown,
 };
 
 class StateMachine;
@@ -29,6 +30,16 @@ class EnemyThief :public Enemy
 public:
 	EnemyThief();
 	~EnemyThief()override;
+
+    // 攻撃タイプ
+	enum class AttackType
+	{
+		Null,
+		Punch,
+		Shot,
+	};
+	AttackType randomType = AttackType::Null;
+
 
 	// 更新処理
 	void Update(float elapsedTime)override;
@@ -94,6 +105,11 @@ private:
 	// 死亡ステート更新処理
 	void UpdateDeathState(float elapsedTime);
 
+	// ダメージステートへ遷移
+	void TransitionDamageState();
+    // ダメージステート更新処理
+    void UpdateDamageState(float elapsedTime);
+
 
 protected:
 	void OnDead();
@@ -107,6 +123,8 @@ public:
 		// MetaAIからメッセージを受信したときのステートを追加
 		Recieve,
 		Dead,
+
+		Damage,
 	};
 
 	enum class Search

@@ -21,13 +21,6 @@ public:
 protected:
     EnemyThief* owner;
 
-    enum class AttackType
-    {
-        Null,
-        Punch,
-        Shot,
-    };
-    AttackType randomType = AttackType::Null;
 
 };
 

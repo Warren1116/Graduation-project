@@ -43,9 +43,9 @@ private:
     std::unique_ptr<Sprite> TutorialAttack;
     std::unique_ptr<Sprite> TutorialShot;
     std::unique_ptr<Sprite> TutorialCameraLock;
+    std::unique_ptr<Sprite> TutorialGrab;
     std::unique_ptr<Sprite> TextFont;
-    std::unique_ptr<Sprite> KeyCapSmall;
-    std::unique_ptr<Sprite> KeyCapMiddle;
+
     std::unique_ptr<Sprite> ShiftKey;
     std::unique_ptr<Sprite> Font;
     std::unique_ptr<Sprite> Font2;

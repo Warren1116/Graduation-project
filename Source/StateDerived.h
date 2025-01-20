@@ -178,3 +178,15 @@ private:
     float attackWarningTime = 1.0f;
 };
 
+class  DamageState : public State
+{
+public:
+    DamageState(EnemyThief* enemy) : State(enemy) {};
+    ~DamageState() {}
+    // ステートに入ったときのメソッド
+    void Enter() override;
+    // ステートで実行するのメソッド
+    void Execute(float elapsedTime) override;
+    // ステートから出ていくときのメソッド
+    void Exit() override;
+};

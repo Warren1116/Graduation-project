@@ -113,7 +113,6 @@ void EnemyThief::Update(float elapsedTime)
             ThrowFlag = false;
         }
 
-
     }
 
     if (!Player::Instance().GetIsUseGrab() && health >= 0)
@@ -170,10 +169,12 @@ void EnemyThief::UpdateDeathState(float elapsedTime)
     }
 }
 
+
 // Ž€–S‚µ‚½Žž‚ÉŒÄ‚Î‚ê‚é
 void EnemyThief::OnDead()
 {
     TransitionDeathState();
+    Player::Instance().SetgetShotSoon(false);
 }
 
 void EnemyThief::DrawDebugPrimitive()

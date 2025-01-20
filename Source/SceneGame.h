@@ -36,6 +36,7 @@ public:
         CameraLock,
         LockAttack,
         LockShot,
+        Grab,
         Swing,
         Climb,
         Finish,
