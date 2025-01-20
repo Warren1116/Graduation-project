@@ -39,6 +39,7 @@ public:
         Grab,
         Swing,
         Climb,
+        Dodge,
         Finish,
     };
 
@@ -73,11 +74,11 @@ public:
     void UnpauseGame();
     void PauseGame();
 
-
     //  pause中の操作方法
     bool isTutorial = false;
     //  pause
     bool isPaused = false;
+
 
     //  コントローラーの使用判定
     bool GetIsUseController() { return UseController; }
@@ -167,6 +168,9 @@ private:
     TutorialState tutorialState = TutorialState::First;
     float  tutorialTimer;
     bool canAcceptInput;
+    bool firstTimeGetAttack = true;
+    TutorialState lastState;
+
 
     //pause時コントローラーの選択判定
     DirectX::XMFLOAT2 controllerPos;

@@ -72,6 +72,11 @@ public:
 	// スイングしてるフラグ
 	bool GetOnSwing() { return onSwing; }
 
+    // プレイヤー壁登りフラグ
+    bool GetOnClimb() { return onClimb; }
+
+    bool GetHitWall() { return hitWall; }
+
 	//ロックオンされているかどうか
 	bool GetIsLockedOn() const { return IsLockedOn; }
 	void SetLockedOn(bool lockStatus) { IsLockedOn = lockStatus; }

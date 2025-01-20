@@ -1769,7 +1769,7 @@ void Player::UpdateTitleIdleState(float elapsedTime)
 void Player::TransitionCrouchIdleState()
 {
     state = State::CrouchIdle;
-    model->PlayAnimation(Anim_TitleIdle, false);
+    model->PlayAnimation(Anim_Crouch, false);
 
 }
 

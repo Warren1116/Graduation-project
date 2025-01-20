@@ -450,7 +450,7 @@ void SceneGame::Render()
             Mouse& mouse = Input::Instance().GetMouse();
             //  操作方法ボタンの描画
             if (mouse.GetPositionX() > screenWidth * 0.1f && mouse.GetPositionX() < screenWidth * 0.1f + 250
-                && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170 || 
+                && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170 ||
                 UseController && controllerPos.y == 300)
             {
                 ControlWay->Render(dc, screenWidth * 0.1f, screenHeight * 0.2f, 350, 350, 0, 0, static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
@@ -601,12 +601,20 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
     Mouse& mouse = Input::Instance().GetMouse();
+
+    if (player->GetAttackSoon() && tutorialState != SceneGame::TutorialState::Dodge && firstTimeGetAttack)
+    {
+        lastState = tutorialState;
+        firstTimeGetAttack = false;
+        SetTutorialState(SceneGame::TutorialState::Dodge);
+    }
+
     //  チュトリアルの進行
     switch (tutorialState)
     {
         //  移動のチュトリアル
     case SceneGame::TutorialState::Move:
-        CheckTutorialTimeout(0.0f);
+        CheckTutorialTimeout(1.0f);
         if (Player::Instance().InputMove(elapsedTime) && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Jump);
         break;
@@ -636,29 +644,48 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         break;
         //  ロックオン攻撃のチュトリアル
     case SceneGame::TutorialState::LockAttack:
-        CheckTutorialTimeout(3.5f);
-        if (Player::Instance().InputAttack() && canAcceptInput)
-            AdvanceTutorialState(SceneGame::TutorialState::LockShot);
+        if (Player::Instance().GetLockonEnemy() != nullptr)
+        {
+            CheckTutorialTimeout(3.5f);
+            if (Player::Instance().InputAttack() && canAcceptInput)
+                AdvanceTutorialState(SceneGame::TutorialState::LockShot);
+        }
         break;
         //  ロックオン弾丸のチュトリアル
     case SceneGame::TutorialState::LockShot:
-        CheckTutorialTimeout(3.5f);
-        if (Player::Instance().InputProjectile() && canAcceptInput)
-            AdvanceTutorialState(SceneGame::TutorialState::Grab);
+        if (Player::Instance().GetLockonEnemy() != nullptr)
+        {
+            CheckTutorialTimeout(3.5f);
+            if (Player::Instance().InputProjectile() && canAcceptInput)
+                AdvanceTutorialState(SceneGame::TutorialState::Grab);
+        }
         break;
     case SceneGame::TutorialState::Grab:
-        CheckTutorialTimeout(3.5f);
-        if (gamePad.GetButtonDown() & GamePad::BTN_Y || mouse.GetButtonDown() & Mouse::BTN_RIGHT && canAcceptInput)
-            AdvanceTutorialState(SceneGame::TutorialState::Swing);
+        if (Player::Instance().GetLockonEnemy() != nullptr)
+        {
+            CheckTutorialTimeout(3.5f);
+            if (gamePad.GetButtonDown() & GamePad::BTN_Y || mouse.GetButtonDown() & Mouse::BTN_RIGHT && canAcceptInput)
+                AdvanceTutorialState(SceneGame::TutorialState::Swing);
+        }
         break;
-
         //  スイングのチュトリアル
     case SceneGame::TutorialState::Swing:
-        tutorialTimer = 0;
+        if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER))
+            AdvanceTutorialState(SceneGame::TutorialState::Climb);
         break;
         //  クライミングのチュトリアル
     case SceneGame::TutorialState::Climb:
-        tutorialTimer = 0;
+        if (player->GetHitWall() && player->GetOnClimb())
+            AdvanceTutorialState(SceneGame::TutorialState::Finish);
+        break;
+        //  回避のチュトリアル
+    case SceneGame::TutorialState::Dodge:
+        CheckTutorialTimeout(0.5f);
+        if (player->InputDodge())
+        {
+            AdvanceTutorialState(lastState);
+        }
+
         break;
         //  チュトリアル終了
     case SceneGame::TutorialState::Finish:
