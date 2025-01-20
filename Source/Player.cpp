@@ -605,10 +605,13 @@ void Player::UpdateCameraState(float elapsedTime)
     for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
     {
         Character* character = manager.GetCharacter(ii);
-        if (character != nullptr && character != this && character->GetHealth() > 0)
+        if (character != nullptr && character != this)
         {
-            enemyCount++;
-            break;
+            if (character->GetHealth() > 0)
+            {
+                enemyCount++;
+                break;
+            }
         }
     }
 
@@ -816,9 +819,19 @@ void Player::UpdateCameraState(float elapsedTime)
     case State::Grab:
     {
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
-        float vx = sinf(angle.y) * 5;
-        float vz = -cosf(angle.y) * 5;
+        float vx = sinf(angle.y) * -9;
+        float vz = -cosf(angle.y) *-9;
         p.data.push_back({ 0, { position.x + vx, position.y + 3, position.z + vz }, position });
+
+        vx = sinf(angle.y + DirectX::XM_PIDIV2) * -10;
+        vz = cosf(angle.y + DirectX::XM_PIDIV2) * -10;
+
+        p.data.push_back({ 180, { position.x + vx, position.y + 3, position.z + vz }, position });
+
+        vx = sinf(angle.y) * 7;
+        vz = -cosf(angle.y) * 7;
+        p.data.push_back({ 230, { position.x + vx, position.y + 3, position.z + vz }, position });
+
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
         break;
     }
@@ -1758,7 +1771,7 @@ bool Player::FindWallSwingPoint()
 void Player::TransitionTitleIdleState()
 {
     state = State::TitleIdle;
-    model->PlayAnimation(Anim_TitleIdle, false);
+    model->PlayAnimation(Anim_Crouch, false);
 }
 
 void Player::UpdateTitleIdleState(float elapsedTime)
@@ -1769,7 +1782,7 @@ void Player::UpdateTitleIdleState(float elapsedTime)
 void Player::TransitionCrouchIdleState()
 {
     state = State::CrouchIdle;
-    model->PlayAnimation(Anim_Crouch, false);
+    model->PlayAnimation(Anim_CrouchIdle, false);
 
 }
 

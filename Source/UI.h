@@ -43,16 +43,19 @@ private:
     std::unique_ptr<Sprite> TutorialShot;
     std::unique_ptr<Sprite> TutorialCameraLock;
     std::unique_ptr<Sprite> TutorialGrab;
+    std::unique_ptr<Sprite> TutorialDodge;
+    std::unique_ptr<Sprite> TutorialSwing;
     std::unique_ptr<Sprite> TextFont;
 
-    std::unique_ptr<Sprite> ShiftKey;
     std::unique_ptr<Sprite> Font;
     std::unique_ptr<Sprite> Font2;
+
     std::unique_ptr<Sprite> spiderSense;
     std::unique_ptr<Sprite> spiderSense2;
 
     std::unique_ptr<Sprite> HpBox;
     std::unique_ptr<Sprite> Number;
+
     std::unique_ptr<Sprite> HpBar;
     std::unique_ptr<Sprite> SkillBar;
 

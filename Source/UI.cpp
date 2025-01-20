@@ -17,6 +17,8 @@ void UI::Initialize()
     TutorialShot = std::make_unique<Sprite>("Data/Sprite/Tutorial_Shot.png");
     TutorialCameraLock = std::make_unique<Sprite>("Data/Sprite/Tutorial_CameraLock.png");
     TutorialGrab = std::make_unique<Sprite>("Data/Sprite/Tutorial_Grab.png");
+    TutorialDodge = std::make_unique<Sprite>("Data/Sprite/Tutorial_Dodge.png");
+    TutorialSwing = std::make_unique<Sprite>("Data/Sprite/Tutorial_Swing.png");
     TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
     Font = std::make_unique<Sprite>("Data/Sprite/Font.png");
     Font2 = std::make_unique<Sprite>("Data/Sprite/Font2.png");
@@ -30,7 +32,6 @@ void UI::Initialize()
     HpBar = std::make_unique<Sprite>();
     SkillBar = std::make_unique<Sprite>();
 
-    ShiftKey = std::make_unique<Sprite>("Data/Sprite/ShiftKey.png");
 
 }
 
@@ -313,7 +314,7 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
             RenderTutorialSprite(TutorialGrab, dc, screenWidth, screenHeight, alpha, isController);
             break;
         case SceneGame::TutorialState::Dodge:
-            TextFont->textout(dc, "Dodge", screenWidth - 365.0f, screenHeight - 480.0f, 30, 30, { 0,0,0,1 });
+            //RenderTutorialSprite(TutorialDodge, dc, screenWidth, screenHeight, alpha, isController);
             break;
 
         }
@@ -323,7 +324,7 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         case SceneGame::TutorialState::Swing:
             Font->Render(dc, screenWidth - 300.0f, screenHeight - 600.0f, 180.0f, 180.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
             TextFont->textout(dc, "Hold", screenWidth - 365.0f, screenHeight - 480.0f, 30, 30, { 0,0,0,1 });
-            ShiftKey->Render(dc, screenWidth - 400.0f, screenHeight - 500.0f, 180.0f, 180.0f, isController ? ShiftKey->GetTextureWidth() * 0.5f : 0, 0, ShiftKey->GetTextureWidth() * 0.5f, ShiftKey->GetTextureHeight(), 0, 1, 1, 1, 1);
+            TutorialSwing->Render(dc, screenWidth - 400.0f, screenHeight - 500.0f, 180.0f, 180.0f, isController ? TutorialSwing->GetTextureWidth() * 0.5f : 0, 0, TutorialSwing->GetTextureWidth() * 0.5f, TutorialSwing->GetTextureHeight(), 0, 1, 1, 1, 1);
             TextFont->textout(dc, "+", screenWidth - 250.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
             RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, 1.0f, isController, 0.0f, 0.0f);
             break;
