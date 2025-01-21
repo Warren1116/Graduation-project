@@ -19,6 +19,7 @@
 
 #include "SceneManager.h"
 #include "SceneTitle.h"
+#include "SceneLoading.h"
 
 #include "EnemyThief.h"
 Player* Player::instance = nullptr;
@@ -427,6 +428,7 @@ void Player::TransitionDodgeState()
 {
     state = State::Dodge;
     model->PlayAnimation(Anim_Dodge, false);
+    getAttacksoon = false;
 
     // GetMoveVec から移動ベクトルを取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
@@ -502,7 +504,7 @@ void Player::UpdateGrabState(float elapsedTime)
         IsUseGrab = false;
         lockonEnemy->ApplyDamage(20.0, 1.0);
         TransitionIdleState();
-   
+
     }
 
     //  カメラロック中の処理
@@ -1381,11 +1383,7 @@ void Player::UpdateDeathState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
     {
-        Mouse& mouse = Input::Instance().GetMouse();
-        if (mouse.GetButtonDown() & Mouse::BTN_LEFT)
-        {
-            SceneManager::Instance().ChangeScene(new SceneTitle);
-        }
+        SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
     }
 }
 
@@ -1841,6 +1839,64 @@ void Player::TransitionSwingToKickState()
 
 void Player::UpdateSwingToKickState(float elapsedTime)
 {
+    // スイング中壁にぶつかった時の処理
+    float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
+    if (velocityLengthXZ > 0.0f)
+    {
+        float mx = velocity.x * elapsedTime;
+        float mz = velocity.z * elapsedTime;
+
+        //レイを設定
+        DirectX::XMFLOAT3 start = position;
+        DirectX::XMFLOAT3 end = {
+            position.x + mx,
+            position.y,
+            position.z + mz
+        };
+        float distance = sqrtf(mx * mx + mz * mz);
+
+        //そして判定を精度を上げるため、レイを分割して判定を行う
+        int steps = static_cast<int>(distance / 0.5f);
+        steps = max(steps, 5);
+        HitResult hit;
+
+        const int raySamples = 3;
+        float angleStep = DirectX::XM_2PI / raySamples;
+
+        //簡易版のスフィアキャストを作る
+        for (int step = 0; step <= steps; ++step) {
+            float t = step / static_cast<float>(steps);
+            DirectX::XMVECTOR currentPoint = DirectX::XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
+
+            for (int i = 0; i < raySamples; ++i) {
+                float angle = i * angleStep;
+                float offsetX = radius * 0.5f * cosf(angle);
+                float offsetZ = radius * 0.5f * sinf(angle);
+
+                DirectX::XMFLOAT3 offsetPoint;
+                DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
+
+                //レイを飛ばす
+                if (StageManager::Instance().RayCast(position, offsetPoint, hit))
+                {
+                    DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
+                    hitNormal = DirectX::XMVector3Normalize(hitNormal);
+                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.3f);
+
+                    DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
+                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
+
+                    DirectX::XMStoreFloat3(&position, adjustedPosition);
+                                                          
+                    SetVelocity({ 0, 0, 0 });
+
+                    return;
+                }
+            }
+        }
+        position = end;
+    }
+
     //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
     DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);

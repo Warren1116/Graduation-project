@@ -205,10 +205,7 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
         }
     }
 
-    if (Player::Instance().GetHealth() == 0)
-    {
-        TextFont->textout(dc, "Right Click To Go Back Title", 1280 * 0.3f, 720 * 0.5f, 20, 20, { 1,1,1,1 });
-    }
+
 
 }
 
@@ -290,31 +287,31 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         switch (SceneGame::Instance().GetTutorialState())
         {
         case SceneGame::TutorialState::Move:
-            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight , alpha, isController, -100 , -300);
+            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.48f, screenHeight , alpha, isController, -100 , -300);
             break;
         case SceneGame::TutorialState::Jump:
-            RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.5f, screenHeight, alpha, isController, - 100, -300);
+            RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.48f, screenHeight, alpha, isController, - 100, -300);
             break;
         case SceneGame::TutorialState::Attack:
-            RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
+            RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Shot:
-            RenderTutorialSprite(TutorialShot, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
+            RenderTutorialSprite(TutorialShot, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::CameraLock:
-            RenderTutorialSprite(TutorialCameraLock, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
+            RenderTutorialSprite(TutorialCameraLock, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::LockAttack:
-            RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
+            RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::LockShot:
-            RenderTutorialSprite(TutorialShot, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
+            RenderTutorialSprite(TutorialShot, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Grab:
-            RenderTutorialSprite(TutorialGrab, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
+            RenderTutorialSprite(TutorialGrab, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Dodge:
-            RenderTutorialSprite(TutorialDodge, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
+            RenderTutorialSprite(TutorialDodge, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
 
         }
@@ -338,37 +335,6 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
             break;
     }
 
-    ////スイングのチュトリアル
-    //if (SceneGame::Instance().GetTutorialState() == SceneGame::TutorialState::Swing)
-    //{
-    //    Font->Render(dc, screenWidth - 300.0f, screenHeight - 600.0f, 180.0f, 180.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
-    //    TextFont->textout(dc, "Hold", screenWidth - 365.0f, screenHeight - 480.0f, 30, 30, { 0,0,0,1 });
-
-    //    ShiftKey->Render(dc, screenWidth - 400.0f, screenHeight - 500.0f, 180.0f, 180.0f, isController ? ShiftKey->GetTextureWidth() * 0.5f : 0, 0, ShiftKey->GetTextureWidth() * 0.5f, ShiftKey->GetTextureHeight(), 0, 1, 1, 1, 1);
-    //    TextFont->textout(dc, "+", screenWidth - 250.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-
-    //    RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, 1.0f, isController, 0.0f, 0.0f);
-    //}
-
-    ////クライミングのチュトリアル
-    //if (SceneGame::Instance().GetTutorialState() == SceneGame::TutorialState::Climb)
-    //{
-    //    Font2->Render(dc, screenWidth - 300.0f, screenHeight - 600.0f, 180.0f, 180.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
-    //    RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, 1.0f, isController, -200.0f, 0.0f);
-    //    TextFont->textout(dc, "+", screenWidth - 230.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-    //    RenderTutorialSprite(TutorialJump, dc, screenWidth, screenHeight, 1.0f, isController, 0.0f, -20.0f);
-    //}
-
-    //if (Player::Instance().GetState() == Player::State::Swing && TutorialCounter == 0)
-    //{
-    //    TutorialCounter++;
-    //    SceneGame::Instance().SetTutorialState(SceneGame::TutorialState::Climb);
-    //}
-    //if (Player::Instance().GetState() == Player::State::Climb && TutorialCounter == 1)
-    //{
-    //    TutorialCounter++;
-    //    SceneGame::Instance().SetTutorialState(SceneGame::TutorialState::Finish);
-    //}
 
     D3D11_VIEWPORT viewport;
     UINT numViewports = 1;

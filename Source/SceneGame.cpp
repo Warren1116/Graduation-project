@@ -338,7 +338,7 @@ void SceneGame::Update(float elapsedTime)
     //  チュトリアルのタイマー
     tutorialTimer += elapsedTime;
 
-    if (tutorialTimer > 5.0f && tutorialState == SceneGame::TutorialState::First)
+    if (tutorialTimer > 3.5f && tutorialState == SceneGame::TutorialState::First)
     {
         StartTutorial(SceneGame::TutorialState::Move);
     }
