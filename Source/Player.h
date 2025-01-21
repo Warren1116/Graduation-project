@@ -265,6 +265,8 @@ private:
 	//	スイングポイントを探す
 	bool FindWallSwingPoint();
 
+	bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);
+
 
     //Titleステート用
     void TransitionTitleIdleState();

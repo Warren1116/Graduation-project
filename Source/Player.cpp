@@ -509,6 +509,7 @@ void Player::UpdateGrabState(float elapsedTime)
     {
         if (webTimer <= 0.82)
         {
+            //プレイヤー向きを更新処理
             DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
             DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
             DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
@@ -522,19 +523,21 @@ void Player::UpdateGrabState(float elapsedTime)
 
         if (webTimer > 0.82f)
         {
-            // 糸の登録
-            SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
-            SceneGame& sceneGame = SceneGame::Instance();
-            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            {
-                //  レンダラーに登録
-                sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-            }
-            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  レンダラーに登録
-            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-            //}
+            //敵の位置を取得
+            auto enemyPos = Player::Instance().GetLockonEnemy()->GetPosition();
+            float animationProgress = (model->GetCurrentAnimationSeconds() / model->GetCurrentAnimationLength()) * 0.2f;
+            enemyPos.y += 1.0f;
+            enemyPos.y = enemyPos.y * (1.0f + animationProgress);
+
+            //手の位置を取得
+            Model::Node* RightHandPos = model->FindNode("mixamorig:RightHand");
+            DirectX::XMFLOAT3 pos;
+            pos.x = RightHandPos->worldTransform._41;
+            pos.y = RightHandPos->worldTransform._42;
+            pos.z = RightHandPos->worldTransform._43;
+            //糸を生成
+            ActiveGrabWeb(pos, enemyPos);
+
         }
 
     }
@@ -820,7 +823,7 @@ void Player::UpdateCameraState(float elapsedTime)
     {
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
         float vx = sinf(angle.y) * -9;
-        float vz = -cosf(angle.y) *-9;
+        float vz = -cosf(angle.y) * -9;
         p.data.push_back({ 0, { position.x + vx, position.y + 3, position.z + vz }, position });
 
         vx = sinf(angle.y + DirectX::XM_PIDIV2) * -10;
@@ -1745,7 +1748,7 @@ void Player::UpdateSwingState(float elapsedTime)
 
 
 //スイングポイントを探す（仮）
-bool Player::FindWallSwingPoint() 
+bool Player::FindWallSwingPoint()
 {
     DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
     DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
@@ -1766,6 +1769,19 @@ bool Player::FindWallSwingPoint()
 
     return false;
 
+}
+
+bool Player::ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos)
+{
+    if (IsUseGrab)
+    {
+        LineRenderer* lineRender = Graphics::Instance().GetLineRenderer();
+        lineRender->DrawLine({ startPos },
+            DirectX::XMFLOAT3(endPos),
+            DirectX::XMFLOAT4(1, 1, 1, 1));
+        return true;
+    }
+    return false;
 }
 
 void Player::TransitionTitleIdleState()
@@ -1885,7 +1901,7 @@ void Player::UpdateSwingToKickState(float elapsedTime)
         DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
         DirectX::XMStoreFloat3(&front, directionToEnemy);
         Turn(elapsedTime, front.x, front.z, turnSpeed);
-    
+
     }
     else
     {

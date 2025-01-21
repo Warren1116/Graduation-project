@@ -228,6 +228,15 @@ Model::Node* Model::FindNode(const char* name)
 	return nullptr;
 }
 
+float Model::GetCurrentAnimationLength() const
+{
+	if (currentAnimationIndex >= 0 && currentAnimationIndex < resource->GetAnimations().size())
+	{
+		return resource->GetAnimations()[currentAnimationIndex].secondsLength;
+	}
+	return 0.0f;
+}
+
 void Model::SetNodePoses(const std::vector<NodePose>& nodePoses)
 {
 	for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex)
