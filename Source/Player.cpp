@@ -502,6 +502,7 @@ void Player::UpdateGrabState(float elapsedTime)
         IsUseGrab = false;
         lockonEnemy->ApplyDamage(20.0, 1.0);
         TransitionIdleState();
+   
     }
 
     //  ƒJƒƒ‰ƒƒbƒN’†‚Ìˆ—
@@ -537,7 +538,6 @@ void Player::UpdateGrabState(float elapsedTime)
             pos.z = RightHandPos->worldTransform._43;
             //…‚ğ¶¬
             ActiveGrabWeb(pos, enemyPos);
-
         }
 
     }

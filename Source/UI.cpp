@@ -266,10 +266,10 @@ void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
 
 void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX, float offsetY )
 {
-    float x = screenWidth - 200.0f + offsetX;
-    float y = screenHeight - 500.0f + offsetY;
-    float width = 180.0f;
-    float height = 180.0f;
+    float x = screenWidth  + offsetX;
+    float y = screenHeight + offsetY;
+    float width = 250.0f;
+    float height = 250.0f;
     float srcX = isController ? sprite->GetTextureWidth() * 0.5f : 0.0f;
     float srcY = 0.0f;
     float srcWidth = sprite->GetTextureWidth() * 0.5f;
@@ -290,31 +290,31 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         switch (SceneGame::Instance().GetTutorialState())
         {
         case SceneGame::TutorialState::Move:
-            RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight , alpha, isController, -100 , -300);
             break;
         case SceneGame::TutorialState::Jump:
-            RenderTutorialSprite(TutorialJump, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.5f, screenHeight, alpha, isController, - 100, -300);
             break;
         case SceneGame::TutorialState::Attack:
-            RenderTutorialSprite(TutorialAttack, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Shot:
-            RenderTutorialSprite(TutorialShot, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialShot, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::CameraLock:
-            RenderTutorialSprite(TutorialCameraLock, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialCameraLock, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::LockAttack:
-            RenderTutorialSprite(TutorialAttack, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::LockShot:
-            RenderTutorialSprite(TutorialShot, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialShot, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Grab:
-            RenderTutorialSprite(TutorialGrab, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialGrab, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Dodge:
-            //RenderTutorialSprite(TutorialDodge, dc, screenWidth, screenHeight, alpha, isController);
+            RenderTutorialSprite(TutorialDodge, dc, screenWidth * 0.5f, screenHeight, alpha, isController, -100, -300);
             break;
 
         }
@@ -322,17 +322,19 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
     switch (SceneGame::Instance().GetTutorialState())
     {
         case SceneGame::TutorialState::Swing:
-            Font->Render(dc, screenWidth - 300.0f, screenHeight - 600.0f, 180.0f, 180.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
-            TextFont->textout(dc, "Hold", screenWidth - 365.0f, screenHeight - 480.0f, 30, 30, { 0,0,0,1 });
-            TutorialSwing->Render(dc, screenWidth - 400.0f, screenHeight - 500.0f, 180.0f, 180.0f, isController ? TutorialSwing->GetTextureWidth() * 0.5f : 0, 0, TutorialSwing->GetTextureWidth() * 0.5f, TutorialSwing->GetTextureHeight(), 0, 1, 1, 1, 1);
-            TextFont->textout(dc, "+", screenWidth - 250.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-            RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, 1.0f, isController, 0.0f, 0.0f);
+            Font->Render(dc, screenWidth * 0.43f, screenHeight * 0.8f, 220.0f, 220.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
+            RenderTutorialSprite(TutorialSwing, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
+
+            TextFont->textout(dc, "Hold", screenWidth * 0.38f, screenHeight * 0.68f, 30, 30, { 0,0,0,1 });
+            TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
+
+            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0,-300);
             break;
         case SceneGame::TutorialState::Climb:
-            Font2->Render(dc, screenWidth - 300.0f, screenHeight - 600.0f, 180.0f, 180.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
-            RenderTutorialSprite(TutorialMove, dc, screenWidth, screenHeight, 1.0f, isController, -200.0f, 0.0f);
-            TextFont->textout(dc, "+", screenWidth - 230.0f, screenHeight - 430.0f, 40, 40, { 1,1,1,1 });
-            RenderTutorialSprite(TutorialJump, dc, screenWidth, screenHeight, 1.0f, isController, 0.0f, -20.0f);
+            Font2->Render(dc, screenWidth * 0.43f, screenHeight * 0.8f, 220.0f, 220.0f, 0, 0, static_cast<float>(Font2->GetTextureWidth()), static_cast<float>(Font2->GetTextureHeight()), 0, 1, 1, 1, 1);
+            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
+            TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
+            RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0, -300);
             break;
     }
 
