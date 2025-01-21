@@ -11,6 +11,7 @@
 #include "StageMain.h"
 #include "StageManager.h"
 
+//#define DEBUG
 
 // 初期化
 void SceneTitle::Initialize()
@@ -98,7 +99,7 @@ void SceneTitle::Initialize()
     A_Button = std::make_unique<Sprite>("Data/Sprite/A_Button.png");
 
     UseController = false;
-    controllerPos = { 245,540 };
+    controllerPos = { 0,0 };
 
 }
 
@@ -374,12 +375,9 @@ void SceneTitle::Render()
             }
         }
 
-
-
-
-
     }
 
+#ifdef DEBUG    
     // デバッグ情報の表示
     {
         ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
@@ -394,6 +392,7 @@ void SceneTitle::Render()
 
         LightManager::Instance().DrawDebugGUI();
     }
+#endif
 
 }
 

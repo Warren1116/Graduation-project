@@ -392,6 +392,8 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                                 break;
                             case 3:
                                 kick->Play(false);
+                                MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
+                                Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
                                 break;
                             }
                             hitEffect->Play(enemyPos);
@@ -406,16 +408,17 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
 void Player::PlayAttackAnimation()
 {
     // 連撃のアニメーション
+    float attackAnimationSpeed = 1.5f; // アニメーション速度を速くするための倍率
     switch (attackCount)
     {
     case 1:
-        model->PlayAnimation(Anim_Attack, false, 0.1f);
+        model->PlayAnimation(Anim_Attack, false, 0.1f, attackAnimationSpeed);
         break;
     case 2:
-        model->PlayAnimation(Anim_Attack2, false, 0.1f);
+        model->PlayAnimation(Anim_Attack2, false, 0.1f, attackAnimationSpeed);
         break;
     case 3:
-        model->PlayAnimation(Anim_Kick, false, 0.1f);
+        model->PlayAnimation(Anim_Kick, false, 0.1f, attackAnimationSpeed);
         break;
     default:
         break;
@@ -427,7 +430,9 @@ void Player::PlayAttackAnimation()
 void Player::TransitionDodgeState()
 {
     state = State::Dodge;
-    model->PlayAnimation(Anim_Dodge, false);
+    float attackAnimationSpeed = 1.2f; // アニメーション速度を速くするための倍率
+
+    model->PlayAnimation(Anim_Dodge, false, 0.2, attackAnimationSpeed);
     getAttacksoon = false;
 
     // GetMoveVec から移動ベクトルを取得
@@ -1101,8 +1106,26 @@ void Player::TransitionMoveState()
         attackTimer = 0;
         attacking = false;
     }
+
+    // コントローラーの入力量を取得
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    float axisLX = gamePad.GetAxisLX();
+    float axisLY = gamePad.GetAxisLY();
+
+    // 移動量の絶対値を計算
+    float moveAmount = sqrtf(axisLX * axisLX + axisLY * axisLY);
+
     state = State::Move;
-    model->PlayAnimation(Anim_Running, true);
+    //// 移動量が小さい場合は歩行アニメーションを再生
+    //if (moveAmount < 0.6f)
+    //{
+    //    model->PlayAnimation(Anim_Walking, true);
+    //}
+    //// 移動量が大きい場合は走行アニメーションを再生
+    //else
+    {
+        model->PlayAnimation(Anim_Running, true);
+    }
 }
 
 // 移動ステート更新処理
@@ -1168,6 +1191,30 @@ void Player::UpdateMoveState(float elapsedTime)
             TransitionGrabState();
         }
     }
+
+    //// コントローラーの入力量を取得
+    //float axisLX = gamePad.GetAxisLX();
+    //float axisLY = gamePad.GetAxisLY();
+
+    //// 移動量の絶対値を計算
+    //float moveAmount = sqrtf(axisLX * axisLX + axisLY * axisLY);
+
+    //// 移動量が小さい場合は歩行アニメーションを再生
+    //if (moveAmount < 0.6f && moveAmount > 0)
+    //{
+    //    if (model->GetCurrentAnimationIndex() != Anim_Walking)
+    //    {
+    //        model->PlayAnimation(Anim_Walking, true);
+    //    }
+    //}
+    //// 移動量が大きい場合は走行アニメーションを再生
+    //else if (moveAmount >= 0.6f)
+    //{
+    //    if (model->GetCurrentAnimationIndex() != Anim_Running)
+    //    {
+    //        model->PlayAnimation(Anim_Running, true);
+    //    }
+    //}
 }
 
 //  ジャンブステート
@@ -1294,7 +1341,6 @@ void Player::UpdateAttackState(float elapsedTime)
         TransitionDodgeState();
     }
 
-
     float animationTime = model->GetCurrentAnimationSeconds();
     attackCollisionFlag = animationTime >= 0.3f && animationTime <= 1.0f;
 
@@ -1314,8 +1360,17 @@ void Player::UpdateAttackState(float elapsedTime)
             DirectX::XMStoreFloat3(&lockDirection, directionToEnemy);
             Turn(elapsedTime, lockDirection.x, lockDirection.z, turnSpeed);
 
-            playerPos = DirectX::XMVectorAdd(playerPos, moveVector);
-            DirectX::XMStoreFloat3(&position, playerPos);
+            if (attackCount <= 2)
+            {
+                playerPos = DirectX::XMVectorAdd(playerPos, moveVector);
+                DirectX::XMStoreFloat3(&position, playerPos);
+            }
+            else
+            {
+                float moveDistance = 0.1;
+                playerPos = DirectX::XMVectorAdd(playerPos, moveVector);
+                DirectX::XMStoreFloat3(&position, playerPos);
+            }
         }
 
         //  連撃によって、ノードとエネミーの衝突処理
@@ -1343,7 +1398,8 @@ void Player::TransitionDamageState()
     state = State::Damage;
 
     // ダメージアニメーション再生
-    model->PlayAnimation(Anim_GetHit1, false);
+    float attackAnimationSpeed = 1.5f; // アニメーション速度を速くするための倍率
+    model->PlayAnimation(Anim_GetHit1, false, 0.2f, attackAnimationSpeed);
 
     MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
     Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
@@ -1460,7 +1516,7 @@ bool Player::InputJump()
     if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_SPACE || gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         //ジャンプ入力した
-        Jump(jumpSpeed);
+        Jump(jumpSpeed * 1.1f);
         return true;
     }
     return false;
@@ -1534,13 +1590,13 @@ void Player::TransitionSwingState()
         {
 
             model->PlayAnimation(Anim_Swinging, false);
-            //SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
-            //SceneGame& sceneGame = SceneGame::Instance();
-            //if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  レンダラーに登録
-            //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
-            //}
+            SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
+            SceneGame& sceneGame = SceneGame::Instance();
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+            {
+                //  レンダラーに登録
+                sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
+            }
 
         }
 
@@ -1887,7 +1943,7 @@ void Player::UpdateSwingToKickState(float elapsedTime)
                     DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
 
                     DirectX::XMStoreFloat3(&position, adjustedPosition);
-                                                          
+
                     SetVelocity({ 0, 0, 0 });
 
                     return;
@@ -1974,7 +2030,6 @@ void Player::UpdateSwingToKickState(float elapsedTime)
 
 
     CollisionNodeVsEnemies("mixamorig:RightToeBase", attackRadius);
-
 
     if (!model->IsPlayAnimation())
     {

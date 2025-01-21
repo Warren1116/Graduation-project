@@ -145,7 +145,7 @@ public:
 	void UpdateAnimation(float elapsedTime);
 
 	// アニメーション再生
-	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f);
+	void PlayAnimation(int index, bool loop, float blendSeconds = 0.2f, float speed = 1.0f);
 
 	// アニメーション再生中か
 	bool IsPlayAnimation() const;
@@ -189,4 +189,5 @@ private:
 	bool animationEndFlag = false;
 	float animationBlendTime = 0.0f;
 	float animationBlendSeconds = 0.0f;
+	float animationSpeed = 1.0f;
 };

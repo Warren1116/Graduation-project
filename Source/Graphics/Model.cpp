@@ -177,7 +177,7 @@ void Model::UpdateAnimation(float elapsedTime)
 	}
 
 	// 経過時間
-	currentAnimationSeconds += elapsedTime;
+	currentAnimationSeconds += elapsedTime * animationSpeed;
 
 	// 再生時間が終端時間を超えたら
 	if (currentAnimationSeconds >= animation.secondsLength)
@@ -194,8 +194,10 @@ void Model::UpdateAnimation(float elapsedTime)
 	}
 }
 
+
+
 // アニメーション再生
-void Model::PlayAnimation(int index, bool loop, float blendSeconds)
+void Model::PlayAnimation(int index, bool loop, float blendSeconds, float speed)
 {
 	currentAnimationIndex = index;
 	currentAnimationSeconds = 0.0f;
@@ -203,6 +205,7 @@ void Model::PlayAnimation(int index, bool loop, float blendSeconds)
 	animationEndFlag = false;
 	animationBlendTime = 0.0f;
 	animationBlendSeconds = blendSeconds;
+    animationSpeed = speed;
 }
 
 // アニメーション再生中か

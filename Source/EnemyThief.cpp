@@ -48,6 +48,8 @@ EnemyThief::EnemyThief()
     // ステートをセット
     stateMachine->SetState(static_cast<int>(State::Search));
     ThrowFlag = false;
+
+
 }
 
 // デストラクタ
@@ -58,6 +60,18 @@ EnemyThief::~EnemyThief()
 
 void EnemyThief::Update(float elapsedTime)
 {
+    switch (state)
+    {
+    case EnemyThief::State::Damage:
+        UpdateDamageState(elapsedTime);
+        break;
+    }
+
+    if (Player::Instance().GetIsUseSwingKick() && IsLockedOn)
+    {
+        TransitionDamageState();
+    }
+
     if (Player::Instance().GetIsUseGrab() && IsLockedOn)
     {
         ThrowFlag = true;
@@ -162,6 +176,28 @@ void EnemyThief::TransitionDeathState()
 void EnemyThief::UpdateDeathState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
+    {
+        isAlive = false;
+        Destroy();
+        SceneGame::Instance().UnregisterRenderModel(model.get());
+    }
+}
+
+void EnemyThief::TransitionDamageState()
+{
+    state = State::Damage;
+    float attackAnimationSpeed = 1.5f; // アニメーション速度を速くするための倍率
+
+    model->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false, 0.2f, attackAnimationSpeed);
+}
+
+void EnemyThief::UpdateDamageState(float elapsedTime)
+{
+    if (!model->IsPlayAnimation() && health > 0)
+    {
+        stateMachine->ChangeState(static_cast<int>(EnemyThief::State::Battle));
+    }
+    else if (!model->IsPlayAnimation() && health < 1)
     {
         isAlive = false;
         Destroy();

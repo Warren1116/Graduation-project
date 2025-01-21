@@ -141,7 +141,7 @@ void PursuitState::Execute(float elapsedTime)
 
 
     //// UŒ‚”ÍˆÍ‚É“ü‚Á‚½‚Æ‚«UŒ‚ƒXƒe[ƒg‚Ö‘JˆÚ
-    if (owner->GetAttackRange() > dist)
+    if (owner->GetAttackRange() * 0.5f > dist)
     {
         owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Standby));
     }

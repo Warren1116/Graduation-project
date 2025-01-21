@@ -773,18 +773,47 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief->SetTerritory(thief->GetPosition(), 10.0f);
         thief->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
         EnemyManager::Instance().Register(thief);
-        ////	’ÊM‘ŠŽè—p‚É‚P•C‘‚â‚·
+        //	’ÊM‘ŠŽè—p‚É‚P•C‘‚â‚·
         EnemyThief* thief2 = new EnemyThief();
         thief2->SetPosition(DirectX::XMFLOAT3(41.0f, 0.0f, 39.0f));
         thief2->SetTerritory(thief2->GetPosition(), 10.0f);
         thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
         EnemyManager::Instance().Register(thief2);
 
+        //EnemyThief* thief3 = new EnemyThief();
+        //thief3->SetPosition(DirectX::XMFLOAT3(42.0f, 0.0f, 38.0f));
+        //thief3->SetTerritory(thief3->GetPosition(), 10.0f);
+        //thief3->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(180), 0));
+        //EnemyManager::Instance().Register(thief3);
+
+        //EnemyThief* thief4 = new EnemyThief();
+        //thief4->SetPosition(DirectX::XMFLOAT3(43.0f, 0.0f, 37.0f));
+        //thief4->SetTerritory(thief4->GetPosition(), 10.0f);
+        //thief4->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(270), 0));
+        //EnemyManager::Instance().Register(thief4);
+
+        //EnemyThief* thief5 = new EnemyThief();
+        //thief5->SetPosition(DirectX::XMFLOAT3(44.0f, 0.0f, 36.0f));
+        //thief5->SetTerritory(thief5->GetPosition(), 10.0f);
+        //thief5->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(0), 0));
+        //EnemyManager::Instance().Register(thief5);
+
+        //EnemyThief* thief6 = new EnemyThief();
+        //thief6->SetPosition(DirectX::XMFLOAT3(45.0f, 0.0f, 35.0f));
+        //thief6->SetTerritory(thief6->GetPosition(), 20.0f);
+        //thief6->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
+        //EnemyManager::Instance().Register(thief6);
+
+
         //	ƒ‚ƒfƒ‹‚ðŠeƒŒƒ“ƒ_ƒ‰[‚É“o˜^
         Model* list[] =
         {
             thief->GetModel(),
             thief2->GetModel(),
+            //thief3->GetModel(),
+            //thief4->GetModel(),
+            //thief5->GetModel(),
+            //thief6->GetModel(),
 
         };
         for (Model* model : list)
@@ -797,6 +826,10 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         {
             characterManager.Register(thief);
             characterManager.Register(thief2);
+            //characterManager.Register(thief3);
+            //characterManager.Register(thief4);
+            //characterManager.Register(thief5);
+            //characterManager.Register(thief6);
 
         }
         //RegisterEnemies({ thief, thief2 });

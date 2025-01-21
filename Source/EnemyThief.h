@@ -160,11 +160,11 @@ private:
 	DirectX::XMFLOAT3	targetPosition = { 0.0f,0.0f,0.0f };
 	DirectX::XMFLOAT3	territoryOrigin = { 0.0f,0.0f,0.0f };
 	float				territoryRange = 10.0f;
-	float				moveSpeed = 3.0f;
+	float				moveSpeed = 3.5f;
 	float				turnSpeed = DirectX::XMConvertToRadians(360);
 
-	float				searchRange = 5.0f;
-	float				attackRange = 5.0f;
+	float				searchRange = 7.0f;
+	float				attackRange = 10.0f;
 	float				punchRange = 1.5f;
 	StateMachine* stateMachine = nullptr;
 
