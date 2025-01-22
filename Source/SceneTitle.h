@@ -10,6 +10,7 @@
 #include "Renderer\PostprocessingRenderer.h"
 #include "Player.h"
 #include "Renderer\ShadowmapCasterRenderer.h"
+#include "Graphics\Light.h"
 
 
 // タイトルシーン
@@ -61,5 +62,9 @@ private:
 
     DirectX::XMFLOAT2 controllerPos;
     bool UseController;
+
+	//  メインライト
+	Light* mainDirectionalLight = nullptr;
+
 };
 

@@ -31,6 +31,7 @@ void UI::Initialize()
 
     HpBar = std::make_unique<Sprite>();
     SkillBar = std::make_unique<Sprite>();
+    WaveCounterBox = std::make_unique<Sprite>(("Data/Sprite/WaveCounterBox.png"));
 
 
 }
@@ -95,6 +96,7 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
         RenderSpiderSense(dc, view, projection);
     }
 
+    //  敵から銃撃を受ける時に狙いを
     if (Player::Instance().GetShotSoon())
     {
         LineRenderer* lineRender = Graphics::Instance().GetLineRenderer();
@@ -106,10 +108,12 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
         DirectX::XMFLOAT3 position = Player::Instance().GetPosition();
 
         lineRender->DrawLine({ GunPos->worldTransform._41 ,GunPos->worldTransform._42 ,GunPos->worldTransform._43 },
-            DirectX::XMFLOAT3(position.x, position.y + 1.0f, position.z), 
+            DirectX::XMFLOAT3(position.x, position.y + 1.0f, position.z),
             DirectX::XMFLOAT4(1, 0, 0, 1));
-
     }
+
+    // 　Waveカウンターの描画
+    RenderWaveCounter(dc, view, projection);
 
 #ifdef TUTORIAL
     //  チュトリアルの描画
@@ -261,9 +265,9 @@ void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
 }
 
 
-void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX, float offsetY )
+void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX, float offsetY)
 {
-    float x = screenWidth  + offsetX;
+    float x = screenWidth + offsetX;
     float y = screenHeight + offsetY;
     float width = 250.0f;
     float height = 250.0f;
@@ -273,6 +277,45 @@ void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceConte
     float srcHeight = sprite->GetTextureHeight();
 
     sprite->Render(dc, x, y, width, height, srcX, srcY, srcWidth, srcHeight, 0, 1, 1, 1, alpha);
+}
+
+void UI::RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    float screenWidth = Graphics::Instance().GetScreenWidth();
+    float screenHeight = Graphics::Instance().GetScreenHeight();
+
+    // ウェーブ数を取得
+    int wave = SceneGame::Instance().GetCurrentWave();
+    // 最大ウェーブ数を取得
+    int totalWaves = SceneGame::Instance().GetTotalWaves();
+    // ウェーブ数の文字列
+    std::string waveText = "Wave " + std::to_string(wave) + "/" + std::to_string(totalWaves);
+
+    // 次のウェーブの文字を表示
+    if (SceneGame::Instance().IsNextWave())
+    {
+        WaveCounterBox->Render(dc,
+            screenWidth * 0.06f, screenHeight * 0.215f,
+            180, 30,
+            0, 0,
+            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
+            0,
+            1.0f, 1.0f, 1.0f, 0.3f);
+        TextFont->textout(dc, waveText, screenWidth * 0.08f, screenHeight * 0.22f, 15, 18, { 1,1,1,1 });
+
+        if (SceneGame::Instance().GetCurrentWave() > 1)
+        {
+            WaveCounterBox->Render(dc,
+                screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
+                250, 65,
+                0, 0,
+                static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
+                0,
+                1.0f, 1.0f, 1.0f, 0.3f);
+            TextFont->textout(dc, "Next Wave", screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
+        }
+    }
+
 }
 
 void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
@@ -287,10 +330,10 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         switch (SceneGame::Instance().GetTutorialState())
         {
         case SceneGame::TutorialState::Move:
-            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.48f, screenHeight , alpha, isController, -100 , -300);
+            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Jump:
-            RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.48f, screenHeight, alpha, isController, - 100, -300);
+            RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
         case SceneGame::TutorialState::Attack:
             RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
@@ -318,21 +361,21 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
     }
     switch (SceneGame::Instance().GetTutorialState())
     {
-        case SceneGame::TutorialState::Swing:
-            Font->Render(dc, screenWidth * 0.43f, screenHeight * 0.8f, 220.0f, 220.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
-            RenderTutorialSprite(TutorialSwing, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
+    case SceneGame::TutorialState::Swing:
+        Font->Render(dc, screenWidth * 0.43f, screenHeight * 0.8f, 220.0f, 220.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
+        RenderTutorialSprite(TutorialSwing, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
 
-            TextFont->textout(dc, "Hold", screenWidth * 0.38f, screenHeight * 0.68f, 30, 30, { 0,0,0,1 });
-            TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
+        TextFont->textout(dc, "Hold", screenWidth * 0.38f, screenHeight * 0.68f, 30, 30, { 0,0,0,1 });
+        TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
 
-            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0,-300);
-            break;
-        case SceneGame::TutorialState::Climb:
-            Font2->Render(dc, screenWidth * 0.43f, screenHeight * 0.8f, 220.0f, 220.0f, 0, 0, static_cast<float>(Font2->GetTextureWidth()), static_cast<float>(Font2->GetTextureHeight()), 0, 1, 1, 1, 1);
-            RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
-            TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
-            RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0, -300);
-            break;
+        RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0, -300);
+        break;
+    case SceneGame::TutorialState::Climb:
+        Font2->Render(dc, screenWidth * 0.43f, screenHeight * 0.8f, 220.0f, 220.0f, 0, 0, static_cast<float>(Font2->GetTextureWidth()), static_cast<float>(Font2->GetTextureHeight()), 0, 1, 1, 1, 1);
+        RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
+        TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
+        RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0, -300);
+        break;
     }
 
 
@@ -341,7 +384,7 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
     dc->RSGetViewports(&numViewports, &viewport);
 
     //カメラロックする時のLockOnScope
-    if (Player::Instance().GetlockonState() == Player::LockonState::Locked)
+    if (Player::Instance().GetlockonState() == Player::LockonState::Locked && Player::Instance().GetLockonEnemy())
     {
         // 変換行列
         DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);

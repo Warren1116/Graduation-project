@@ -87,8 +87,14 @@ public:
     void RegisterRenderModel(Model* model);
     void UnregisterRenderModel(Model* model);
 
+    //  メインライトの取得
     Light* GetLight() { return mainDirectionalLight; }
 
+    //  ウェーブの取得
+    int GetCurrentWave() { return currentWave; }
+    bool GetWaveInProgress() { return waveInProgress; }
+    int GetTotalWaves() { return totalWaves; }
+    bool IsNextWave() const;
 
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
@@ -145,9 +151,11 @@ private:
     //  ウェーブのカウンター
     int currentWave = 0;
     //  ウェーブの最大数
-    int totalWaves = 3;
+    int totalWaves = 5;
     //  ウェーブ進行中かどうか
     bool waveInProgress = false;
+    //  次のウェーブのタイマー
+    float nextWaveTimer = 0.0f;
 
     //  ウェーブの敵を生成する
     void SpawnEnemiesForWave(int wave);

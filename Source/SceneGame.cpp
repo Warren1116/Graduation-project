@@ -28,8 +28,8 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 
-#define TUTORIAL
-//#define DEBUG
+//#define TUTORIAL
+#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -107,8 +107,6 @@ void SceneGame::Initialize()
     // 敵を初期化
     StartNextWave();
 
-
-
     //	モデルを各レンダラーに登録
     Model* list[] =
     {
@@ -139,7 +137,6 @@ void SceneGame::Initialize()
         //}
 
     }
-
 
     // 平行光源を追加
     {
@@ -208,6 +205,12 @@ void SceneGame::Finalize()
     //// イベントスクリプト終了化
     //EventScripter::Instance().Finalize();
 
+    LightManager::Instance().Clear();
+    shadowmapRenderer.reset();
+    sceneRenderer.reset();
+    postprocessingRenderer.reset();
+
+
 }
 
 // 更新処理
@@ -215,7 +218,16 @@ void SceneGame::Update(float elapsedTime)
 {
     Graphics& graphics = Graphics::Instance();
 
+    //  Waveの更新
     CheckWaveClear();
+    if (nextWaveTimer > 0.0f)
+    {
+        nextWaveTimer -= elapsedTime;
+        if (nextWaveTimer <= 0.0f)
+        {
+            nextWaveTimer = 0.0f;
+        }
+    }
 
     //// イベントスクリプト初期化
     //EventScripter::Instance().Update(elapsedTime);
@@ -453,12 +465,20 @@ void SceneGame::Render()
                 && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170 ||
                 UseController && controllerPos.y == 300)
             {
-                ControlWay->Render(dc, screenWidth * 0.1f, screenHeight * 0.2f, 350, 350, 0, 0, static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
+                ControlWay->Render(dc, 
+                    screenWidth * 0.08f, screenHeight * 0.15f,
+                    350, 350,
+                    0, 0, 
+                    static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
             }
             else
             {
-                ControlWay->Render(dc, screenWidth * 0.1f, screenHeight * 0.2f, 250, 250, 0, 0, static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
+                ControlWay->Render(dc, 
+                    screenWidth * 0.1f, screenHeight * 0.2f,
+                    250, 250,
+                    0, 0, 
+                    static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
             }
 
@@ -467,12 +487,20 @@ void SceneGame::Render()
                 && mouse.GetPositionY() > screenHeight * 0.4f + 50 && mouse.GetPositionY() < screenHeight * 0.4f + 170 ||
                 UseController && controllerPos.y == 490)
             {
-                ToTitle->Render(dc, screenWidth * 0.1f, screenHeight * 0.4f, 350, 350, 0, 0, static_cast<float>(ToTitle->GetTextureWidth()), static_cast<float>(ToTitle->GetTextureHeight())
+                ToTitle->Render(dc,
+                    screenWidth * 0.08f, screenHeight * 0.35f,
+                    350, 350,
+                    0, 0,
+                    static_cast<float>(ToTitle->GetTextureWidth()), static_cast<float>(ToTitle->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
             }
             else
             {
-                ToTitle->Render(dc, screenWidth * 0.1f, screenHeight * 0.4f, 250, 250, 0, 0, static_cast<float>(ToTitle->GetTextureWidth()), static_cast<float>(ToTitle->GetTextureHeight())
+                ToTitle->Render(dc,
+                    screenWidth * 0.1f, screenHeight * 0.4f,
+                    250, 250,
+                    0, 0,
+                    static_cast<float>(ToTitle->GetTextureWidth()), static_cast<float>(ToTitle->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
             }
 
@@ -485,32 +513,54 @@ void SceneGame::Render()
                 //  コントローラー説明の描画
                 if (ControllerButton)
                 {
-                    ControllerFont->Render(dc, screenWidth * 0.35f, screenHeight * 0.1f, 350, 350, 0, 0, static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
+                    ControllerFont->Render(dc,
+                        screenWidth * 0.35f, screenHeight * 0.1f,
+                        350, 350,
+                        0, 0, 
+                        static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
                         , 0, 1, 1, 1, alpha);
 
                     ControllerPicture->Render(dc,
-                        screenWidth * 0.35f, screenHeight * 0.25f, 750, 650, 0, 0, static_cast<float>(ControllerPicture->GetTextureWidth()), static_cast<float>(ControllerPicture->GetTextureHeight())
+                        screenWidth * 0.35f, screenHeight * 0.25f,
+                        750, 650,
+                        0, 0, 
+                        static_cast<float>(ControllerPicture->GetTextureWidth()), static_cast<float>(ControllerPicture->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
                 else
                 {
-                    ControllerFont->Render(dc, screenWidth * 0.35f, screenHeight * 0.1f, 250, 250, 0, 0, static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
+                    ControllerFont->Render(dc,
+                        screenWidth * 0.35f, screenHeight * 0.1f,
+                        250, 250,
+                        0, 0, 
+                        static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
 
                 //  キーボード説明の描画
                 if (KeyBoardButton)
                 {
-                    KeyBoardFont->Render(dc, screenWidth * 0.65f, screenHeight * 0.1f, 350, 350, 0, 0, static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
+                    KeyBoardFont->Render(dc,
+                        screenWidth * 0.65f, screenHeight * 0.1f,
+                        350, 350,
+                        0, 0,
+                        static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
                         , 0, 1, 1, 1, alpha);
 
                     KeyBoardPicture->Render(dc,
-                        screenWidth * 0.35f, screenHeight * 0.32f, 870, 480, 0, 0, static_cast<float>(KeyBoardPicture->GetTextureWidth()), static_cast<float>(KeyBoardPicture->GetTextureHeight())
+                        screenWidth * 0.35f, screenHeight * 0.32f,
+                        870, 480,
+                        0, 0, 
+                        static_cast<float>(KeyBoardPicture->GetTextureWidth()), static_cast<float>(KeyBoardPicture->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
                 else
                 {
-                    KeyBoardFont->Render(dc, screenWidth * 0.65f, screenHeight * 0.1f, 250, 250, 0, 0, static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
+                    KeyBoardFont->Render(dc,
+                        screenWidth * 0.65f, screenHeight * 0.1f,
+                        250, 250,
+                        0, 0, 
+                        static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
 
@@ -756,6 +806,11 @@ void SceneGame::UnregisterRenderModel(Model* model)
 
 }
 
+bool SceneGame::IsNextWave() const
+{
+    return nextWaveTimer > 0.0f;
+}
+
 
 //  Waveによって敵を生成
 void SceneGame::SpawnEnemiesForWave(int wave)
@@ -902,9 +957,10 @@ void SceneGame::StartNextWave()
 {
     if (currentWave < totalWaves)
     {
-        currentWave++;
-        waveInProgress = true;
-        SpawnEnemiesForWave(currentWave);
+        currentWave++;          //  Waveを進める
+        waveInProgress = true;  //  Waveが進行中
+        nextWaveTimer = 50.0f;   //  2秒のUI表示
+        SpawnEnemiesForWave(currentWave); //  Waveによって敵を生成
     }
 
 

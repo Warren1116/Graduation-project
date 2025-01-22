@@ -60,6 +60,7 @@ EnemyThief::~EnemyThief()
 
 void EnemyThief::Update(float elapsedTime)
 {
+
     switch (state)
     {
     case EnemyThief::State::Damage:

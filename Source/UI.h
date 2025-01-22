@@ -31,6 +31,7 @@ public:
 
     void RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX = 0.0f, float offsetY = 0.0f);
 
+    void RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     void Clear();
 
@@ -58,6 +59,7 @@ private:
 
     std::unique_ptr<Sprite> HpBar;
     std::unique_ptr<Sprite> SkillBar;
+    std::unique_ptr<Sprite> WaveCounterBox;
 
     float alpha = 1.0f;
     float alphaColor = 0.3f;
@@ -67,5 +69,6 @@ private:
 
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
     float radialblurRadius = 0.0f;
+
 
 };

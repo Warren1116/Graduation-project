@@ -214,6 +214,8 @@ void Player::Update(float elapsedTime)
         {
             getAttacksoon = false;
         }
+
+
     }
 }
 
@@ -326,6 +328,7 @@ void Player::CollisionPlayerVsEnemies()
 // ノードと敵の衝突処理
 void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
 {
+
     // ノード取得
     Model::Node* node = model->FindNode(nodeName);
 
@@ -361,7 +364,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                     // 吹き飛ばす
                     {
                         DirectX::XMFLOAT3 impulse;
-                        const float power = 10.0f;
+                        const float power = 8.0f;
                         const DirectX::XMFLOAT3& e = enemy->GetPosition();
                         const DirectX::XMFLOAT3& p = nodePosition;
                         float vx = e.x - p.x;
@@ -382,20 +385,6 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                         enemyPos.y += enemy->GetHeight() * 1.5f;
                         if (enemy->GetHealth() != 0)
                         {
-                            switch (attackCount)
-                            {
-                            case 1:
-                                punch->Play(false);
-                                break;
-                            case 2:
-                                punch2->Play(false);
-                                break;
-                            case 3:
-                                kick->Play(false);
-                                MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
-                                Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
-                                break;
-                            }
                             hitEffect->Play(enemyPos);
                         }
                     }
@@ -508,8 +497,24 @@ void Player::UpdateGrabState(float elapsedTime)
     {
         IsUseGrab = false;
         lockonEnemy->ApplyDamage(20.0, 1.0);
-        TransitionIdleState();
 
+        if (lockonEnemy)
+        {
+            lockonEnemy->ApplyDamage(20.0, 1.0);
+            // lockonEnemy が Character と等しい場合にクリア
+            CharacterManager& manager = CharacterManager::Instance();
+            for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
+            {
+                Character* character = manager.GetCharacter(ii);
+                if (character == lockonEnemy)
+                {
+                    manager.Remove(character);
+                    lockonEnemy = nullptr;
+                    break;
+                }
+            }
+        }
+        TransitionIdleState();
     }
 
     //  カメラロック中の処理
@@ -1318,7 +1323,7 @@ void Player::UpdateClimbWallState(float elapsedTime)
 void Player::TransitionAttackState()
 {
     state = State::Attack;
-
+    attacking = true;
     // 攻撃アニメーション再生
     PlayAttackAnimation();
 }
@@ -1326,9 +1331,26 @@ void Player::TransitionAttackState()
 // 攻撃ステート更新処理
 void Player::UpdateAttackState(float elapsedTime)
 {
+    //  
+    switch (attackCount)
+    {
+    case 1:
+        punch->Play(false);
+        break;
+    case 2:
+        punch2->Play(false);
+        break;
+    case 3:
+        kick->Play(false);
+        MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
+        Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
+        break;
+    }
+
     if (!model->IsPlayAnimation())
     {
         TransitionIdleState();
+        attacking = false;
     }
     //　シュート入力処理
     if (InputProjectile())

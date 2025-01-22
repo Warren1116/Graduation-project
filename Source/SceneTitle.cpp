@@ -10,6 +10,7 @@
 #include "Graphics\LightManager.h"
 #include "StageMain.h"
 #include "StageManager.h"
+#include "CharacterManager.h"
 
 //#define DEBUG
 
@@ -65,7 +66,11 @@ void SceneTitle::Initialize()
     player->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(-125), 0));
     player->SetPosition({ 62.5f,72.0f,27.0f });
 
-
+    CharacterManager& characterManager = CharacterManager::Instance();
+    {
+        // プレイヤー
+        characterManager.Register(player.get());
+    }
 
     //	モデルを各レンダラーに登録
     Model* list[] =
@@ -79,19 +84,19 @@ void SceneTitle::Initialize()
         RegisterRenderModel(model);
     }
 
+
     // 平行光源を追加
     {
-        Light* light = new Light(LightType::Directional);
-        light->SetDirection({ -0.4f, -0.7f, -0.4f });
-        light->SetColor({ 1,1,1,1 });
-        light->SetPosition({ 0,0,0 });
-        LightManager::Instance().Register(light);
+        mainDirectionalLight = new Light(LightType::Directional);
+        mainDirectionalLight->SetDirection({ -0.3, -0.8, -0.3 });
+        mainDirectionalLight->SetColor({ 1,1,1,1 });
+        mainDirectionalLight->SetPosition({ 0,3,0 });
+        LightManager::Instance().Register(mainDirectionalLight);
+        LightManager::Instance().SetShadowmapLight(mainDirectionalLight);
     }
 
     StageMain& stage = StageMain::Instance();
 
-    //Font = std::make_unique<Sprite>("Data/Sprite/Font3.png");
-    //TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
 
     Title = std::make_unique<Sprite>("Data/Sprite/Title.png");
     Start = std::make_unique<Sprite>("Data/Sprite/Start.png");
@@ -116,7 +121,6 @@ void SceneTitle::Finalize()
     shadowmapRenderer->ClearRenderModel();
     //shadowmapCasterRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
-
 
 }
 
@@ -275,7 +279,7 @@ void SceneTitle::Render()
             if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 450 && mouse.GetPositionY() < 600)
             {
                 Start->Render(dc,
-                    150, 450,
+                    125, 425,
                     200.0f, 200.0f,
                     0, 0,
                     static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
@@ -296,7 +300,7 @@ void SceneTitle::Render()
             if (mouse.GetPositionX() > 150 && mouse.GetPositionX() < 300 && mouse.GetPositionY() > 600 && mouse.GetPositionY() < 750)
             {
                 Quit->Render(dc,
-                    150, 600,
+                    125, 575,
                     200.0f, 200.0f,
                     0, 0,
                     static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
@@ -319,7 +323,7 @@ void SceneTitle::Render()
             if (controllerPos.y == 540)
             {
                 Start->Render(dc,
-                    150, 450,
+                    125, 425,
                     200.0f, 200.0f,
                     0, 0,
                     static_cast<float>(Start->GetTextureWidth()), static_cast<float>(Start->GetTextureHeight()),
@@ -348,7 +352,7 @@ void SceneTitle::Render()
             if (controllerPos.y == 690)
             {
                 Quit->Render(dc,
-                    150, 600,
+                    125, 575,
                     200.0f, 200.0f,
                     0, 0,
                     static_cast<float>(Quit->GetTextureWidth()), static_cast<float>(Quit->GetTextureHeight()),
