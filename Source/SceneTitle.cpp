@@ -103,6 +103,9 @@ void SceneTitle::Initialize()
     Quit = std::make_unique<Sprite>("Data/Sprite/Quit.png");
     A_Button = std::make_unique<Sprite>("Data/Sprite/A_Button.png");
 
+    Bgm = Audio::Instance().LoadAudioSource("Data/Audio/TitleBgm.wav");
+
+
     UseController = false;
     controllerPos = { 0,0 };
 
@@ -127,6 +130,7 @@ void SceneTitle::Finalize()
 //更新処理
 void SceneTitle::Update(float elapsedTime)
 {
+    Bgm->Play(true, 0.1f);
     // カメラコントローラー更新処理
     Camera::Instance().SetLookAt(cameraPos, cameraAngle, DirectX::XMFLOAT3(0, 1, 0));
     // プレイヤー更新処理

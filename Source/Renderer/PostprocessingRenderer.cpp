@@ -76,7 +76,6 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
 
 		//ラジアルブラー
         rc.radialblurData = radialblurData;
-		radialblurActive(Player::Instance().GetAttackSoon());
 
 		shader->Draw(rc, renderSprite.get());
 
@@ -122,7 +121,6 @@ void	PostprocessingRenderer::DrawDebugGUI()
 			ImGui::SliderFloat("radius", &radialblurData.blur_radius, 0.001f, +100.0f);
 			ImGui::SliderInt("sampling count", &radialblurData.blur_sampling_count, 1, 100);
 			ImGui::SliderFloat("mask radius", &radialblurData.blur_mask_radius, 0, +500.0f);
-
 			ImGui::TreePop();
 		}
 

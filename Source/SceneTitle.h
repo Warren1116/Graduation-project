@@ -66,5 +66,8 @@ private:
 	//  ƒƒCƒ“ƒ‰ƒCƒg
 	Light* mainDirectionalLight = nullptr;
 
+	//BGM
+	std::unique_ptr<AudioSource> Bgm = nullptr;
+
 };
 

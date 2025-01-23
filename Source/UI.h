@@ -66,9 +66,11 @@ private:
     float alphaSpeed = 0.02f;
     bool increasingAlpha = false;
     bool fadeOut = true;
+    
 
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
     float radialblurRadius = 0.0f;
+
 
 
 };

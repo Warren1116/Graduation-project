@@ -169,8 +169,10 @@ private:
 	StateMachine* stateMachine = nullptr;
 
 
-	float timeElapsed = 0.0f;;
+	float timeElapsed = 0.0f;
 	float totalFlightTime;
 	float webTimer;
 	bool ThrowFlag;
+
+
 };

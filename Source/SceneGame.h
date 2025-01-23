@@ -96,6 +96,10 @@ public:
     int GetTotalWaves() { return totalWaves; }
     bool IsNextWave() const;
 
+    void SetRadialBlurActive(bool active) { radialBlurActive = active; }
+    bool IsRadialBlurActive() const { return radialBlurActive; }
+
+
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
@@ -136,6 +140,10 @@ private:
     bool ControllerButton = false;
     bool KeyBoardButton = false;
 
+    //BGM
+    std::unique_ptr<AudioSource> Bgm = nullptr;
+
+
     // ボタンの透明度
     float alpha = 1.0f;
     float alphaSpeed = 0.08f;
@@ -149,7 +157,7 @@ private:
 
 private:
     //  ウェーブのカウンター
-    int currentWave = 0;
+    int currentWave = -1;
     //  ウェーブの最大数
     int totalWaves = 5;
     //  ウェーブ進行中かどうか
@@ -184,6 +192,8 @@ private:
     DirectX::XMFLOAT2 controllerPos;
     bool UseController;
 
+    //ラジアルブラー
+    bool radialBlurActive = false;
 
 
 };

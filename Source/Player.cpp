@@ -385,7 +385,22 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                         enemyPos.y += enemy->GetHeight() * 1.5f;
                         if (enemy->GetHealth() != 0)
                         {
+                            switch (attackCount)
+                            {
+                            case 1:
+                                punch->Play(false);
+                                break;
+                            case 2:
+                                punch2->Play(false);
+                                break;
+                            case 3:
+                                kick->Play(false);
+                                MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
+                                Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
+                                break;
+                            }
                             hitEffect->Play(enemyPos);
+                            skillTime += 0.1f;
                         }
                     }
                 }
@@ -500,7 +515,6 @@ void Player::UpdateGrabState(float elapsedTime)
 
         if (lockonEnemy)
         {
-            lockonEnemy->ApplyDamage(20.0, 1.0);
             // lockonEnemy が Character と等しい場合にクリア
             CharacterManager& manager = CharacterManager::Instance();
             for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
@@ -1112,14 +1126,6 @@ void Player::TransitionMoveState()
         attacking = false;
     }
 
-    // コントローラーの入力量を取得
-    GamePad& gamePad = Input::Instance().GetGamePad();
-    float axisLX = gamePad.GetAxisLX();
-    float axisLY = gamePad.GetAxisLY();
-
-    // 移動量の絶対値を計算
-    float moveAmount = sqrtf(axisLX * axisLX + axisLY * axisLY);
-
     state = State::Move;
     //// 移動量が小さい場合は歩行アニメーションを再生
     //if (moveAmount < 0.6f)
@@ -1196,30 +1202,9 @@ void Player::UpdateMoveState(float elapsedTime)
             TransitionGrabState();
         }
     }
+    float axisLX = gamePad.GetAxisLX();
+    float axisLY = gamePad.GetAxisLY();
 
-    //// コントローラーの入力量を取得
-    //float axisLX = gamePad.GetAxisLX();
-    //float axisLY = gamePad.GetAxisLY();
-
-    //// 移動量の絶対値を計算
-    //float moveAmount = sqrtf(axisLX * axisLX + axisLY * axisLY);
-
-    //// 移動量が小さい場合は歩行アニメーションを再生
-    //if (moveAmount < 0.6f && moveAmount > 0)
-    //{
-    //    if (model->GetCurrentAnimationIndex() != Anim_Walking)
-    //    {
-    //        model->PlayAnimation(Anim_Walking, true);
-    //    }
-    //}
-    //// 移動量が大きい場合は走行アニメーションを再生
-    //else if (moveAmount >= 0.6f)
-    //{
-    //    if (model->GetCurrentAnimationIndex() != Anim_Running)
-    //    {
-    //        model->PlayAnimation(Anim_Running, true);
-    //    }
-    //}
 }
 
 //  ジャンブステート
@@ -1331,21 +1316,7 @@ void Player::TransitionAttackState()
 // 攻撃ステート更新処理
 void Player::UpdateAttackState(float elapsedTime)
 {
-    //  
-    switch (attackCount)
-    {
-    case 1:
-        punch->Play(false);
-        break;
-    case 2:
-        punch2->Play(false);
-        break;
-    case 3:
-        kick->Play(false);
-        MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
-        Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
-        break;
-    }
+    
 
     if (!model->IsPlayAnimation())
     {

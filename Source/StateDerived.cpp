@@ -284,6 +284,7 @@ void PunchState::Exit()
 // シュートステートに入った時のメソッド
 void ShotState::Enter()
 {
+    Fire = Audio::Instance().LoadAudioSource("Data/Audio/Fire.wav");
 
     if (owner->GetHealth() <= 0)return;
 
@@ -300,6 +301,7 @@ void ShotState::Enter()
     // 攻撃権があればモーション再生開始
     if (owner->GetAttackFlg())
     {
+
         // プレイヤーに向けて弾を発射
         DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
         DirectX::XMFLOAT3 ownerPosition = owner->GetPosition();
@@ -310,7 +312,7 @@ void ShotState::Enter()
         float angleY = atan2f(DirectX::XMVectorGetX(toPlayer), DirectX::XMVectorGetZ(toPlayer));
         owner->SetAngle(DirectX::XMFLOAT3(0, angleY, 0));
 
-
+        Fire->Play(false);
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackShot), false);
         Player::Instance().SetgetAttackSoon(false);
         Player::Instance().ApplyDamage(1, 2.0f);

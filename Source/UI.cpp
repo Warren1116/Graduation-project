@@ -33,7 +33,6 @@ void UI::Initialize()
     SkillBar = std::make_unique<Sprite>();
     WaveCounterBox = std::make_unique<Sprite>(("Data/Sprite/WaveCounterBox.png"));
 
-
 }
 
 void UI::Update(float elapsedtime)
@@ -114,6 +113,8 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
 
     // 　Waveカウンターの描画
     RenderWaveCounter(dc, view, projection);
+
+
 
 #ifdef TUTORIAL
     //  チュトリアルの描画
@@ -303,19 +304,42 @@ void UI::RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
             1.0f, 1.0f, 1.0f, 0.3f);
         TextFont->textout(dc, waveText, screenWidth * 0.08f, screenHeight * 0.22f, 15, 18, { 1,1,1,1 });
 
-        if (SceneGame::Instance().GetCurrentWave() > 1)
+        if (wave > 1)
         {
-            WaveCounterBox->Render(dc,
-                screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
-                250, 65,
-                0, 0,
-                static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
-                0,
-                1.0f, 1.0f, 1.0f, 0.3f);
-            TextFont->textout(dc, "Next Wave", screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
+            waveText = "Next Wave";
         }
+        else if (wave == 1)
+        {
+            waveText = "Start Wave";
+        }
+        else if (wave == 0)
+        {
+            waveText = "Tutorial";
+        }
+
+
+        WaveCounterBox->Render(dc,
+            screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
+            250, 65,
+            0, 0,
+            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
+            0,
+            1.0f, 1.0f, 1.0f, 0.3f);
+        TextFont->textout(dc, waveText, screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
     }
 
+    if (EnemyManager::Instance().GetEnemyCount() == 0 && SceneGame::Instance().GetCurrentWave() == 5)
+    {
+        WaveCounterBox->Render(dc,
+            screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
+            250, 65,
+            0, 0,
+            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
+            0,
+            1.0f, 1.0f, 1.0f, 0.3f);
+        TextFont->textout(dc, "Complete", screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
+
+    }
 }
 
 void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)

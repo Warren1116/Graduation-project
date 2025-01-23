@@ -1,7 +1,7 @@
 #pragma once
 #include "StateBase.h"
 #include "Graphics\LineRenderer.h"
-
+#include "Audio/Audio.h"
 
 
 // 徘徊ステートオブジェクト
@@ -99,6 +99,8 @@ public:
     void Execute(float elapsedTime)override;
     //ステートから出ていくときのメソッド
     void Exit()override;
+    std::unique_ptr<AudioSource> Fire = nullptr;
+
 
 };
 

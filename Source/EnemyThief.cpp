@@ -171,6 +171,10 @@ void EnemyThief::TransitionDeathState()
     }
     SetAttackFlg(false);
 
+    Meta::Instance().SendMessaging(
+        GetId(),
+        static_cast<int>(Meta::Identity::Meta),
+        MESSAGE_TYPE::MsgChangeAttackRight);
 
 }
 
