@@ -163,10 +163,14 @@ public:
 	// ノード検索
 	Node* FindNode(const char* name);
 
-	//現在のアニメーション再生時間取得
+	// 現在のアニメーション再生時間取得
 	float GetCurrentAnimationSeconds() const { return currentAnimationSeconds; }
 
+    // 現在のアニメーション長さ取得
 	float GetCurrentAnimationLength() const;
+
+    // 現在のアニメーション速度取得
+	float GetCurrentAnimationSpeed() const;
 
 	// 現在のアニメーション番号
 	int GetCurrentAnimationIndex() const { return currentAnimationIndex; }

@@ -240,6 +240,11 @@ float Model::GetCurrentAnimationLength() const
 	return 0.0f;
 }
 
+float Model::GetCurrentAnimationSpeed() const
+{
+	return animationSpeed;
+}
+
 void Model::SetNodePoses(const std::vector<NodePose>& nodePoses)
 {
 	for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex)

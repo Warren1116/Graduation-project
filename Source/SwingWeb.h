@@ -27,5 +27,7 @@ private:
 	static SwingWeb* instance;
 
 	bool isLeftHand = true;
+
+
 };
 

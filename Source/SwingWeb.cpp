@@ -24,7 +24,6 @@ SwingWeb::SwingWeb(ProjectileManager* manager, bool leftHand) : Projectile(manag
 
     model = std::make_unique<Model>("Data/Model/SpiderWeb/SwingWeb.mdl");
 
-
     // 表示サイズ
     scale.x = scale.y = 0.0008f;
     scale.z = 0.5f;

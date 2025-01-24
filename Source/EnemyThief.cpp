@@ -50,6 +50,7 @@ EnemyThief::EnemyThief()
     ThrowFlag = false;
 
 
+
 }
 
 // デストラクタ
@@ -124,11 +125,11 @@ void EnemyThief::Update(float elapsedTime)
             position = DirectX::XMFLOAT3(DirectX::XMVectorGetX(newPosition), DirectX::XMVectorGetY(newPosition), DirectX::XMVectorGetZ(newPosition));
             model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
 
-            webTimer = 0;
             ThrowFlag = false;
         }
 
     }
+
 
     if (!Player::Instance().GetIsUseGrab() && health >= 0)
     {

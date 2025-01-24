@@ -56,9 +56,20 @@ Player::Player(bool flag)
 
     hitEffect = std::make_unique<Effect>("Data/Effect/hitEffect.efk");
 
+    // サウンド読み込み
+    // 攻撃音
     punch = Audio::Instance().LoadAudioSource("Data/Audio/punch.wav");
     punch2 = Audio::Instance().LoadAudioSource("Data/Audio/punch2.wav");
     kick = Audio::Instance().LoadAudioSource("Data/Audio/kick.wav");
+    // 落とす音
+    Fall = Audio::Instance().LoadAudioSource("Data/Audio/Fall.wav");
+    // スパイダーセンス
+    spiderSense = Audio::Instance().LoadAudioSource("Data/Audio/spiderSense.wav");
+    // シュート音
+    FirstSwing = Audio::Instance().LoadAudioSource("Data/Audio/FirstSwingWeb.wav");
+    Swing = Audio::Instance().LoadAudioSource("Data/Audio/SwingWeb.wav");
+    ShotWeb = Audio::Instance().LoadAudioSource("Data/Audio/ShotWeb.wav");
+
 
     skillTime = 5.0f;
 
@@ -215,7 +226,16 @@ void Player::Update(float elapsedTime)
             getAttacksoon = false;
         }
 
-
+        // spiderSenseの再生状態を管理
+        if (getAttacksoon && !spiderSensePlayed)
+        {
+            spiderSense->Play(false, 0.8f);
+            spiderSensePlayed = true;
+        }
+        else if (!getAttacksoon)
+        {
+            spiderSensePlayed = false;
+        }
     }
 }
 
@@ -388,13 +408,13 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                             switch (attackCount)
                             {
                             case 1:
-                                punch->Play(false);
+                                punch->Play(false, 0.4f);
                                 break;
                             case 2:
-                                punch2->Play(false);
+                                punch2->Play(false, 0.4f);
                                 break;
                             case 3:
-                                kick->Play(false);
+                                kick->Play(false, 0.4f);
                                 MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
                                 Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
                                 break;
@@ -508,8 +528,12 @@ void Player::TransitionGrabState()
 void Player::UpdateGrabState(float elapsedTime)
 {
     webTimer += elapsedTime;
+
     if (!model->IsPlayAnimation())
     {
+        shotWebPlayed = false;
+        fallSoundPlayed = false;
+
         IsUseGrab = false;
         lockonEnemy->ApplyDamage(20.0, 1.0);
 
@@ -563,9 +587,20 @@ void Player::UpdateGrabState(float elapsedTime)
             pos.y = RightHandPos->worldTransform._42;
             pos.z = RightHandPos->worldTransform._43;
             //糸を生成
-            ActiveGrabWeb(pos, enemyPos);
+            if (ActiveGrabWeb(pos, enemyPos) && !shotWebPlayed)
+            {
+                ShotWeb->Play(false, 0.8f);
+                shotWebPlayed = true;
+            }
+
+
         }
 
+        if (webTimer >= 3.8f && !fallSoundPlayed)
+        {
+            Fall->Play(false);
+            fallSoundPlayed = true; // 音声が再生されたことを記録
+        }
     }
 
 }
@@ -892,6 +927,8 @@ bool Player::InputProjectile()
 
     if (gamePad.GetButtonDown() & GamePad::BTN_RIGHT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_C)
     {
+        ShotWeb->Play(false, 0.8f);
+
         DirectX::XMFLOAT3 dir;
         if (lockonEnemy)    //　もしカメラロックしてる場合は敵を向かて発射
         {
@@ -927,11 +964,7 @@ bool Player::InputProjectile()
             sceneGame.RegisterRenderModel(projectile->GetModel());
 
         }
-        //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-        //{
-        //    //  レンダラーに登録
-        //    sceneGame.RegisterRenderModel(projectile->GetModel());
-        //}
+
         return true;
     }
     return false;
@@ -1010,15 +1043,17 @@ bool Player::InputAttack()
     if (mouse.GetButtonDown() & Mouse::BTN_LEFT || gamePad.GetButtonDown() & GamePad::BTN_X)
     {
         attacking = true;
-        if (attackCount < attackLimit && attacking)
+        if (attackCount < attackLimit)
         {
             attackCount++;
+            attacking = true;
             return true;
         }
         else
         {
             attackCount = 0;
             attackTimer = 0;
+            attacking = false;
         }
     }
     return false;
@@ -1053,15 +1088,13 @@ void Player::TransitionIdleState()
     else
     {
         model->PlayAnimation(Anim_Idle, true);
-        if (attacking)
-        {
-            if (attackCount >= attackLimit || attackTimer > 100)
-            {
-                attackTimer = 0;
-                attackCount = 0;
-                attacking = false;
-            }
-        }
+    }
+    if (attacking && attackCount >= attackLimit)
+    {
+        attackTimer = 0;
+        attackCount = 0;
+        attacking = false;
+
     }
 }
 
@@ -1316,12 +1349,10 @@ void Player::TransitionAttackState()
 // 攻撃ステート更新処理
 void Player::UpdateAttackState(float elapsedTime)
 {
-    
 
     if (!model->IsPlayAnimation())
     {
         TransitionIdleState();
-        attacking = false;
     }
     //　シュート入力処理
     if (InputProjectile())
@@ -1334,8 +1365,14 @@ void Player::UpdateAttackState(float elapsedTime)
         TransitionDodgeState();
     }
 
+    // アニメーションの再生時間を取得
     float animationTime = model->GetCurrentAnimationSeconds();
-    attackCollisionFlag = animationTime >= 0.3f && animationTime <= 1.0f;
+    float animationSpeed = model->GetCurrentAnimationSpeed();
+
+    // アニメーションの速度に応じて攻撃の当たり判定を調整
+    float adjustedStartTime = 0.3f / animationSpeed;
+    float adjustedEndTime = 1.0f / animationSpeed;
+    attackCollisionFlag = animationTime >= adjustedStartTime && animationTime <= adjustedEndTime;
 
     if (attackCollisionFlag)
     {
@@ -1563,6 +1600,7 @@ void Player::TransitionSwingState()
     {
         if (firstSwing)
         {
+
             model->PlayAnimation(Anim_StartSwing, false);
             firstSwing = false;
             //  スイングモデル（現在仮、Geometricに変更予定）
@@ -1573,6 +1611,7 @@ void Player::TransitionSwingState()
                 //  レンダラーに登録
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
+            FirstSwing->Play(false, 0.8f);
             //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
             //{
             //    //  レンダラーに登録
@@ -1581,7 +1620,6 @@ void Player::TransitionSwingState()
         }
         else
         {
-
             model->PlayAnimation(Anim_Swinging, false);
             SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
             SceneGame& sceneGame = SceneGame::Instance();
@@ -1604,6 +1642,7 @@ void Player::TransitionSwingState()
         //連続スイングのモーション
         if (!onSwing)
         {
+            Swing->Play(false, 0.8f);
             //  スイングモデル（現在仮、Geometricに変更予定）
             SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
             SceneGame& sceneGame = SceneGame::Instance();
@@ -1612,11 +1651,6 @@ void Player::TransitionSwingState()
                 //  レンダラーに登録
                 sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
             }
-            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  レンダラーに登録
-            //    sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
-            //}
 
         }
         //　初回スイングのモーション  
@@ -1631,19 +1665,10 @@ void Player::TransitionSwingState()
                 //  レンダラーに登録
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
-            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  レンダラーに登録
-            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-            //}
         }
 
-
         FindWallSwingPoint();
-
-
         onSwing = true;
-
 
     }
 
@@ -1761,9 +1786,11 @@ void Player::UpdateSwingState(float elapsedTime)
     //もし最高点に着いたら、連続スイングを行う
     float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
     GamePad& gamePad = Input::Instance().GetGamePad();
+
     //  自動で連続スイングする
     if (dotProduct <= 0)
     {
+        Swing->Play(false, 0.8f);
         TransitionSwingState();
     }
 
@@ -2014,9 +2041,6 @@ void Player::UpdateSwingToKickState(float elapsedTime)
             DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
         DirectX::XMStoreFloat3(&front, swingDir);
     }
-    //DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
-    //    DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
-    //DirectX::XMStoreFloat3(&front, swingDir);
 
     // アニメーションの再生時間を取得
     float animationTime = model->GetCurrentAnimationSeconds();

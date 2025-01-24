@@ -28,8 +28,8 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 
-#define TUTORIAL
-//#define DEBUG
+//#define TUTORIAL
+#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -218,6 +218,8 @@ void SceneGame::Finalize()
 void SceneGame::Update(float elapsedTime)
 {
     Bgm->Play(true, 0.1f);
+
+
 
     Graphics& graphics = Graphics::Instance();
 
@@ -439,10 +441,11 @@ void SceneGame::Render()
     sceneRenderer->SetShadowmapData(rc.shadowMapData);
     sceneRenderer->Render(rc.deviceContext);
 
+
     postprocessingRenderer->Render(rc.deviceContext);
     postprocessingRenderer->radialblurActive(Player::Instance().GetAttackSoon());
 
-    LightManager::Instance().PushRenderContext(rc);
+
 
     // カメラパラメータ設定
     Camera& camera = Camera::Instance();
@@ -795,7 +798,6 @@ void SceneGame::PauseGame()
 void SceneGame::RegisterRenderModel(Model* model)
 {
     shadowmapRenderer->RegisterRenderModel(model);
-    //shadowmapCasterRenderer->RegisterRenderModel(model);
     sceneRenderer->RegisterRenderModel(model);
     const ModelResource* resource = model->GetResource();
     for (const ModelResource::Material& material : resource->GetMaterials())
@@ -809,7 +811,6 @@ void SceneGame::RegisterRenderModel(Model* model)
 void SceneGame::UnregisterRenderModel(Model* model)
 {
     shadowmapRenderer->UnregisterRenderModel(model);
-    //shadowmapCasterRenderer->UnregisterRenderModel(model);
     sceneRenderer->UnregisterRenderModel(model);
 
 }
@@ -817,6 +818,28 @@ void SceneGame::UnregisterRenderModel(Model* model)
 bool SceneGame::IsNextWave() const
 {
     return nextWaveTimer > 0.0f;
+}
+
+void SceneGame::SetRadialBlurActive(bool active)
+{
+    Graphics& graphics = Graphics::Instance();
+    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
+
+    // 描画処理
+    RenderContext rc;
+    rc.deviceContext = dc;
+
+    if (active)
+    {
+        if (rc.radialblurData.blur_radius < 50.0f)
+        {
+            rc.radialblurData.blur_radius++;
+        }
+    }
+    else
+    {
+        rc.radialblurData.blur_radius = 0.0f;
+    }
 }
 
 //  Waveによって敵を生成
@@ -850,7 +873,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         CharacterManager& characterManager = CharacterManager::Instance();
         {
             characterManager.Register(thief);
-
 
         }
 
@@ -1236,8 +1258,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
             characterManager.Register(thief8);
             characterManager.Register(thief9);
             characterManager.Register(thief10);
-
-
         }
     }
     break;

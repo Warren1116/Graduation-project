@@ -12,7 +12,7 @@ ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(
 	model = std::make_unique<Model>("Data/Model/SpiderWeb/spiderweb.mdl");
 
 
-	//nohit = Audio::Instance().LoadAudioSource("Data/Audio/tyodan.wav");
+    stickWall = Audio::Instance().LoadAudioSource("Data/Audio/WebStickToWall.wav");
 
 
 	// 表示サイズ
@@ -63,13 +63,6 @@ void ProjectileStraight::Update(float elapsedTime)
     HitResult hit;
     if (StageManager::Instance().RayCast(start, end, hit))
     {
-        // 反射弾
-        //DirectX::XMVECTOR ReflectVector = DirectX::XMVector3Reflect(DirectX::XMLoadFloat3(&direction), DirectX::XMLoadFloat3(&hit.normal));
-        //DirectX::XMFLOAT3 reflectDirection;
-        //DirectX::XMStoreFloat3(&reflectDirection, ReflectVector);
-        //direction.x = reflectDirection.x;
-        //direction.y = reflectDirection.y;
-        //direction.z = reflectDirection.z;
 
         position.x = hit.position.x;
         position.y = hit.position.y;
@@ -78,6 +71,7 @@ void ProjectileStraight::Update(float elapsedTime)
         SceneGame& sceneGame = SceneGame::Instance();
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
+            stickWall->Play(false, 1.0f);
             sceneGame.UnregisterRenderModel(model.get());
 
 
@@ -88,17 +82,6 @@ void ProjectileStraight::Update(float elapsedTime)
 
         }
 
-        //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-        //{
-        //    sceneGame.UnregisterRenderModel(model.get());
-
-
-        //    ProjectileWall* WallWeb = new ProjectileWall(&Player::Instance().GetBrokenProjectileManager());
-        //    WallWeb->SetPosition(hit.position);
-        //    WallWeb->SetDirection({ hit.normal });
-        //    sceneGame.RegisterRenderModel(WallWeb->GetModel());
-
-        //}
         Destroy();
     }
     else

@@ -36,6 +36,7 @@ public:
     void	radialblurActive(bool active);
 
 
+
 private:
 	// シーン描画データ
 	ShaderResourceViewData			sceneData;

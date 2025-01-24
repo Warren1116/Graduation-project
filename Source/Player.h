@@ -330,10 +330,22 @@ private:
 	float jumpSpeed = 16.0f;
 	//　ヒットエフェクト
 	std::unique_ptr<Effect> hitEffect = nullptr;
+    //	攻撃音
 	std::unique_ptr<AudioSource> punch = nullptr;
 	std::unique_ptr<AudioSource> punch2 = nullptr;
 	std::unique_ptr<AudioSource> kick = nullptr;
+	//  落とす音
+	std::unique_ptr<AudioSource> Fall = nullptr;
+	bool fallSoundPlayed = false;
+	//  スパイダーセンス
+    std::unique_ptr<AudioSource> spiderSense = nullptr;
+    bool spiderSensePlayed = false;
 
+    //　シュート音
+	std::unique_ptr<AudioSource> FirstSwing = nullptr;
+	std::unique_ptr<AudioSource> Swing = nullptr;
+	std::unique_ptr<AudioSource> ShotWeb = nullptr;
+	bool shotWebPlayed = false;
 
 	// ステート
 	State state = State::Idle;
@@ -349,7 +361,7 @@ private:
 	float attackRadius = 0.4f;
 	// 攻撃の回数
 	int attackCount = 0;
-	int attackLimit = 3;
+	const int attackLimit = 3;
 	float attackTimer = 0;
 	//	攻撃判定
 	bool attacking = false;

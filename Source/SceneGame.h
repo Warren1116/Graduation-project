@@ -96,7 +96,7 @@ public:
     int GetTotalWaves() { return totalWaves; }
     bool IsNextWave() const;
 
-    void SetRadialBlurActive(bool active) { radialBlurActive = active; }
+    void SetRadialBlurActive(bool active);
     bool IsRadialBlurActive() const { return radialBlurActive; }
 
 

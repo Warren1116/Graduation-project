@@ -33,7 +33,8 @@ private:
 	static ProjectileStraight* instance;
 
 
-	std::unique_ptr<AudioSource> nohit = nullptr;
+	//　サウンド
+	std::unique_ptr<AudioSource> stickWall = nullptr;
 
 };
 

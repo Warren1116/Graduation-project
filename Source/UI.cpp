@@ -10,6 +10,7 @@
 
 void UI::Initialize()
 {
+    // 画像読み込み
     LockOnScope = std::make_unique<Sprite>("Data/Sprite/LockOnScope.png");
     TutorialMove = std::make_unique<Sprite>("Data/Sprite/Tutorial_Move.png");
     TutorialJump = std::make_unique<Sprite>("Data/Sprite/Tutorial_Jump.png");
@@ -22,22 +23,21 @@ void UI::Initialize()
     TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
     Font = std::make_unique<Sprite>("Data/Sprite/Font.png");
     Font2 = std::make_unique<Sprite>("Data/Sprite/Font2.png");
-    spiderSense = std::make_unique<Sprite>("Data/Sprite/SpiderSense.png");
-    spiderSense2 = std::make_unique<Sprite>("Data/Sprite/SpiderSense2.png");
-
-
+    SpiderSense = std::make_unique<Sprite>("Data/Sprite/SpiderSense.png");
+    SpiderSense2 = std::make_unique<Sprite>("Data/Sprite/SpiderSense2.png");
+    FocusingLineB = std::make_unique<Sprite>("Data/Sprite/FocusingLineBlack.png");
+    FocusingLineW = std::make_unique<Sprite>("Data/Sprite/FocusingLineWhite.png");
     HpBox = std::make_unique<Sprite>("Data/Sprite/HpBox1.png");
     Number = std::make_unique<Sprite>("Data/Sprite/Numbers.png");
-
+    WaveCounterBox = std::make_unique<Sprite>(("Data/Sprite/WaveCounterBox.png"));
     HpBar = std::make_unique<Sprite>();
     SkillBar = std::make_unique<Sprite>();
-    WaveCounterBox = std::make_unique<Sprite>(("Data/Sprite/WaveCounterBox.png"));
 
 }
 
 void UI::Update(float elapsedtime)
 {
-    if (SceneGame::Instance().GetIsTutorialPaused())
+    if (SceneGame::Instance().GetIsTutorialPaused() || Player::Instance().GetOnSwing())
     {
         if (increasingAlpha)
         {
@@ -84,6 +84,7 @@ void UI::Update(float elapsedtime)
             }
         }
     }
+
 }
 
 
@@ -114,14 +115,171 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
     // 　Waveカウンターの描画
     RenderWaveCounter(dc, view, projection);
 
+    //  HPバーとSkillバーの描画
+    RenderHpBar(dc, view, projection);
 
+    //　集中線の描画
+    RenderFocusingLine(dc, view, projection);
 
 #ifdef TUTORIAL
     //  チュトリアルの描画
     RenderTutorial(dc, view, projection);
 #endif // !TUTORIAL
 
-    //  HPのUI表現
+
+}
+
+void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    D3D11_VIEWPORT viewport;
+    UINT numViewports = 1;
+    dc->RSGetViewports(&numViewports, &viewport);
+
+    // 変換行列
+    DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
+    DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
+    DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+
+
+    // プレイヤーの頭の位置を取得
+    Model::Node* PlayerHeadPos = Player::Instance().model->FindNode("mixamorig:HeadTop_End");
+    DirectX::XMVECTOR playerHeadPos = DirectX::XMVectorSet(
+        PlayerHeadPos->worldTransform._41,
+        PlayerHeadPos->worldTransform._42,
+        PlayerHeadPos->worldTransform._43,
+        1.0f);
+
+    // 3D座標を2D座標に変換
+    DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
+        playerHeadPos,
+        viewport.TopLeftX,
+        viewport.TopLeftY,
+        viewport.Width,
+        viewport.Height,
+        viewport.MinDepth,
+        viewport.MaxDepth,
+        Projection,
+        View,
+        World);
+
+    DirectX::XMFLOAT3 screenPosition;
+    DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
+
+    SpiderSense->Render(dc,
+        screenPosition.x - 55.0f, screenPosition.y - 40.0f,
+        120.0f, 75.0f,
+        0, 0,
+        static_cast<float>(SpiderSense->GetTextureWidth()), static_cast<float>(SpiderSense->GetTextureHeight()),
+        0,
+        1, 1, 1, alpha);
+
+    SpiderSense2->Render(dc,
+        screenPosition.x - 55.0f, screenPosition.y - 40.0f,
+        120.0f, 75.0f,
+        0, 0,
+        static_cast<float>(SpiderSense2->GetTextureWidth()), static_cast<float>(SpiderSense2->GetTextureHeight()),
+        0,
+        1, 1, 1, alphaColor);
+
+}
+
+
+void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX, float offsetY)
+{
+    float x = screenWidth + offsetX;
+    float y = screenHeight + offsetY;
+    float width = 250.0f;
+    float height = 250.0f;
+    float srcX = isController ? sprite->GetTextureWidth() * 0.5f : 0.0f;
+    float srcY = 0.0f;
+    float srcWidth = sprite->GetTextureWidth() * 0.5f;
+    float srcHeight = sprite->GetTextureHeight();
+
+    sprite->Render(dc, x, y, width, height, srcX, srcY, srcWidth, srcHeight, 0, 1, 1, 1, alpha);
+}
+
+void UI::RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    float screenWidth = Graphics::Instance().GetScreenWidth();
+    float screenHeight = Graphics::Instance().GetScreenHeight();
+
+    // ウェーブ数を取得
+    int wave = SceneGame::Instance().GetCurrentWave();
+    // 最大ウェーブ数を取得
+    int totalWaves = SceneGame::Instance().GetTotalWaves();
+    // ウェーブ数の文字列
+    std::string waveText = "Wave " + std::to_string(wave) + "/" + std::to_string(totalWaves);
+
+    // 次のウェーブの文字を表示
+    if (SceneGame::Instance().IsNextWave())
+    {
+        WaveCounterBox->Render(dc,
+            screenWidth * 0.06f, screenHeight * 0.215f,
+            180, 30,
+            0, 0,
+            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
+            0,
+            1.0f, 1.0f, 1.0f, 0.3f);
+        TextFont->textout(dc, waveText, screenWidth * 0.08f, screenHeight * 0.22f, 15, 18, { 1,1,1,1 });
+
+
+        if (wave > 1)
+        {
+            waveText = "Next Wave";
+        }
+        else if (wave == 1)
+        {
+            waveText = "Start Wave";
+        }
+        else if (wave == 0)
+        {
+            waveText = "Tutorial";
+        }
+
+
+        WaveCounterBox->Render(dc,
+            screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
+            250, 65,
+            0, 0,
+            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
+            0,
+            1.0f, 1.0f, 1.0f, 0.3f);
+        TextFont->textout(dc, waveText, screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
+    }
+
+    if (EnemyManager::Instance().GetEnemyCount() == 0 && SceneGame::Instance().GetCurrentWave() == 5)
+    {
+        WaveCounterBox->Render(dc,
+            screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
+            250, 65,
+            0, 0,
+            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
+            0,
+            1.0f, 1.0f, 1.0f, 0.3f);
+        TextFont->textout(dc, "Complete", screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
+
+    }
+}
+
+void UI::RenderFocusingLine(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    if (Player::Instance().GetOnSwing())
+    {
+        float screenWidth = Graphics::Instance().GetScreenWidth();
+        float screenHeight = Graphics::Instance().GetScreenHeight();
+
+        float srcWidth = FocusingLineB->GetTextureWidth();
+        float srcHeight = FocusingLineB->GetTextureHeight();
+
+        FocusingLineB->Render(dc, 0, 0, screenWidth, screenHeight, 0, 0, srcWidth, srcHeight, 0, 1, 1, 1, alpha);
+
+    }
+
+}
+
+//  HPのUI表現
+void UI::RenderHpBar(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
     {
         HpBox->Render(dc,
             30, 20,
@@ -208,137 +366,6 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
                     0.5f, 0.5f, 0.5f, 0.5f);
             }
         }
-    }
-
-
-
-}
-
-void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
-{
-    D3D11_VIEWPORT viewport;
-    UINT numViewports = 1;
-    dc->RSGetViewports(&numViewports, &viewport);
-
-    // 変換行列
-    DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
-    DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
-    DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
-
-    Model::Node* PlayerHeadPos = Player::Instance().model->FindNode("mixamorig:HeadTop_End");
-    DirectX::XMVECTOR playerHeadPos = DirectX::XMVectorSet(
-        PlayerHeadPos->worldTransform._41,
-        PlayerHeadPos->worldTransform._42,
-        PlayerHeadPos->worldTransform._43,
-        1.0f);
-
-    DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
-        playerHeadPos,
-        viewport.TopLeftX,
-        viewport.TopLeftY,
-        viewport.Width,
-        viewport.Height,
-        viewport.MinDepth,
-        viewport.MaxDepth,
-        Projection,
-        View,
-        World);
-
-    DirectX::XMFLOAT3 screenPosition;
-    DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
-
-    spiderSense->Render(dc,
-        screenPosition.x - 55.0f, screenPosition.y - 40.0f,
-        120.0f, 75.0f,
-        0, 0,
-        static_cast<float>(spiderSense->GetTextureWidth()), static_cast<float>(spiderSense->GetTextureHeight()),
-        0,
-        1, 1, 1, alpha);
-
-    spiderSense2->Render(dc,
-        screenPosition.x - 55.0f, screenPosition.y - 40.0f,
-        120.0f, 75.0f,
-        0, 0,
-        static_cast<float>(spiderSense2->GetTextureWidth()), static_cast<float>(spiderSense2->GetTextureHeight()),
-        0,
-        1, 1, 1, alphaColor);
-
-}
-
-
-void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX, float offsetY)
-{
-    float x = screenWidth + offsetX;
-    float y = screenHeight + offsetY;
-    float width = 250.0f;
-    float height = 250.0f;
-    float srcX = isController ? sprite->GetTextureWidth() * 0.5f : 0.0f;
-    float srcY = 0.0f;
-    float srcWidth = sprite->GetTextureWidth() * 0.5f;
-    float srcHeight = sprite->GetTextureHeight();
-
-    sprite->Render(dc, x, y, width, height, srcX, srcY, srcWidth, srcHeight, 0, 1, 1, 1, alpha);
-}
-
-void UI::RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
-{
-    float screenWidth = Graphics::Instance().GetScreenWidth();
-    float screenHeight = Graphics::Instance().GetScreenHeight();
-
-    // ウェーブ数を取得
-    int wave = SceneGame::Instance().GetCurrentWave();
-    // 最大ウェーブ数を取得
-    int totalWaves = SceneGame::Instance().GetTotalWaves();
-    // ウェーブ数の文字列
-    std::string waveText = "Wave " + std::to_string(wave) + "/" + std::to_string(totalWaves);
-
-    // 次のウェーブの文字を表示
-    if (SceneGame::Instance().IsNextWave())
-    {
-        WaveCounterBox->Render(dc,
-            screenWidth * 0.06f, screenHeight * 0.215f,
-            180, 30,
-            0, 0,
-            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
-            0,
-            1.0f, 1.0f, 1.0f, 0.3f);
-        TextFont->textout(dc, waveText, screenWidth * 0.08f, screenHeight * 0.22f, 15, 18, { 1,1,1,1 });
-
-        if (wave > 1)
-        {
-            waveText = "Next Wave";
-        }
-        else if (wave == 1)
-        {
-            waveText = "Start Wave";
-        }
-        else if (wave == 0)
-        {
-            waveText = "Tutorial";
-        }
-
-
-        WaveCounterBox->Render(dc,
-            screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
-            250, 65,
-            0, 0,
-            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
-            0,
-            1.0f, 1.0f, 1.0f, 0.3f);
-        TextFont->textout(dc, waveText, screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
-    }
-
-    if (EnemyManager::Instance().GetEnemyCount() == 0 && SceneGame::Instance().GetCurrentWave() == 5)
-    {
-        WaveCounterBox->Render(dc,
-            screenWidth * 0.5f - static_cast<float>(WaveCounterBox->GetTextureWidth()) * 0.5f, screenHeight * 0.1f,
-            250, 65,
-            0, 0,
-            static_cast<float>(WaveCounterBox->GetTextureWidth()), static_cast<float>(WaveCounterBox->GetTextureHeight()),
-            0,
-            1.0f, 1.0f, 1.0f, 0.3f);
-        TextFont->textout(dc, "Complete", screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
-
     }
 }
 

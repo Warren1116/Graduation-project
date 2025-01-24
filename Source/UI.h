@@ -33,6 +33,10 @@ public:
 
     void RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    void RenderFocusingLine(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+
+    void RenderHpBar(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
+
     void Clear();
 
 
@@ -51,8 +55,16 @@ private:
     std::unique_ptr<Sprite> Font;
     std::unique_ptr<Sprite> Font2;
 
-    std::unique_ptr<Sprite> spiderSense;
-    std::unique_ptr<Sprite> spiderSense2;
+    std::unique_ptr<Sprite> SpiderSense;
+    std::unique_ptr<Sprite> SpiderSense2;
+
+    std::unique_ptr<Sprite> FocusingLineB;
+    std::unique_ptr<Sprite> FocusingLineW;
+    bool switchFocusingLine = false;
+    int frameCounter = 0; // フレームカウンター
+    const int frameThreshold = 30; // スプライトを切り替えるフレーム数の閾値
+
+
 
     std::unique_ptr<Sprite> HpBox;
     std::unique_ptr<Sprite> Number;
