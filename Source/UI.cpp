@@ -280,91 +280,53 @@ void UI::RenderFocusingLine(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& 
 //  HPのUI表現
 void UI::RenderHpBar(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
+    const float hpBoxX = 30.0f;
+    const float hpBoxY = 20.0f;
+    const float hpBoxWidth = 100.0f;
+    const float hpBoxHeight = 50.0f;
+    const float hpBarX = 130.0f;
+    const float hpBarY = 35.0f;
+    const float hpBarWidth = 500.0f;
+    const float hpBarHeight = 25.0f;
+    const float skillBarX = 130.0f;
+    const float skillBarY = 75.0f;
+    const float cellWidth = 40.0f;
+    const float cellHeight = 25.0f;
+    const float cellSpacing = 5.0f;
+    const int maxSkillTime = 5; // 最大スキルタイムを5と仮定
+
+    // HPボックスの描画
+    HpBox->Render(dc, hpBoxX, hpBoxY, hpBoxWidth, hpBoxHeight, 0, 0, static_cast<float>(HpBox->GetTextureWidth()), static_cast<float>(HpBox->GetTextureHeight()), 1.5f, 1, 1, 1, 0.8f);
+
+    // HP数値の描画
+    Number->RenderNumber(dc, Player::Instance().GetHealth(), hpBoxX + 20.0f, hpBoxY + 10.0f, 25.0f, 25.0f, 1, 1, 1, 1);
+
+    // HPバーの描画
+    float gaugeWidth = Player::Instance().GetMaxHealth() * Player::Instance().GetHealth();
+    HpBar->Render(dc, hpBarX, hpBarY, hpBarWidth, hpBarHeight, 0, 0, 250, 20, 1.5f, 1, 1, 1, 0.5f);
+    HpBar->Render(dc, hpBarX, hpBarY, gaugeWidth, hpBarHeight, 0, 0, 250, 20, 1.5f, 1, 1, 1, 1);
+
+    // スキルバーの描画
+    float skillTime = Player::Instance().GetSkillTime();
+    for (int i = 0; i < maxSkillTime; ++i)
     {
-        HpBox->Render(dc,
-            30, 20,
-            100, 50,
-            0, 0,
-            static_cast<float>(HpBox->GetTextureWidth()), static_cast<float>(HpBox->GetTextureHeight()),
-            1.5f,
-            1, 1, 1, 0.8f);
-        Number->RenderNumber(dc, Player::Instance().GetHealth(), 50, 30, 25, 25, 1, 1, 1, 1);
-
-        float gaugeWidth = Player::Instance().GetMaxHealth() * Player::Instance().GetHealth() * 5.0f;
-
-        //  HPバー下の枠
-        HpBar->Render(dc,
-            130, 35,
-            375, 25,
-            0, 0,
-            250, 20,
-            1.5f,
-            1, 1, 1, 0.5f);
-
-        // HPバー
-        HpBar->Render(dc,
-            130, 35,
-            gaugeWidth, 25,
-            0, 0,
-            250, 20,
-            1.5f,
-            1, 1, 1, 1);
-    }
-
-    //スキルバー
-    {
-        float skillTime = Player::Instance().GetSkillTime();
-        int maxSkillTime = 5; // 最大スキルタイムを5と仮定
-        float cellWidth = 40.0f; // 各格子の幅
-        float cellHeight = 25.0f; // 各格子の高さ
-        float startX = 130.0f; // スキルバーの開始位置X
-        float startY = 75.0f; // スキルバーの開始位置Y
-
-        for (int i = 0; i < maxSkillTime; ++i)
+        float x = skillBarX + i * (cellWidth + cellSpacing);
+        if (i < static_cast<int>(skillTime))
         {
-            if (i < static_cast<int>(skillTime))
-            {
-                // スキルタイムが残っている場合は明るい色で描画
-                SkillBar->Render(dc,
-                    startX + i * (cellWidth + 5.0f), startY,
-                    cellWidth, cellHeight,
-                    0, 0,
-                    250, 20,
-                    1.5f,
-                    1, 1, 1, 1);
-            }
-            else if (i == static_cast<int>(skillTime))
-            {
-                // スキルタイムが部分的に残っている場合は部分的に描画
-                float partialWidth = (skillTime - static_cast<int>(skillTime)) * cellWidth;
-                SkillBar->Render(dc,
-                    startX + i * (cellWidth + 5.0f), startY,
-                    partialWidth, cellHeight,
-                    0, 0,
-                    250, 20,
-                    1.5f,
-                    1, 1, 1, 1);
-
-                // 残りの部分を暗い色で描画
-                SkillBar->Render(dc,
-                    startX + i * (cellWidth + 5.0f) + partialWidth, startY,
-                    cellWidth - partialWidth, cellHeight,
-                    0, 0,
-                    250, 20,
-                    1.5f,
-                    0.5f, 0.5f, 0.5f, 0.5f);
-            }
-            else
-            {
-                // スキルタイムが残っていない場合は暗い色で描画
-                SkillBar->Render(dc,
-                    startX + i * (cellWidth + 5.0f), startY,
-                    cellWidth, cellHeight,
-                    0, 0,
-                    250, 20,
-                    1.5f,
-                    0.5f, 0.5f, 0.5f, 0.5f);
-            }
+            // スキルタイムが残っている場合は明るい色で描画
+            SkillBar->Render(dc, x, skillBarY, cellWidth, cellHeight, 0, 0, 250, 20, 1.5f, 1, 1, 1, 1);
+        }
+        else if (i == static_cast<int>(skillTime))
+        {
+            // スキルタイムが部分的に残っている場合は部分的に描画
+            float partialWidth = (skillTime - static_cast<int>(skillTime)) * cellWidth;
+            SkillBar->Render(dc, x, skillBarY, partialWidth, cellHeight, 0, 0, 250, 20, 1.5f, 1, 1, 1, 1);
+            SkillBar->Render(dc, x + partialWidth, skillBarY, cellWidth - partialWidth, cellHeight, 0, 0, 250, 20, 1.5f, 0.5f, 0.5f, 0.5f, 0.5f);
+        }
+        else
+        {
+            // スキルタイムが残っていない場合は暗い色で描画
+            SkillBar->Render(dc, x, skillBarY, cellWidth, cellHeight, 0, 0, 250, 20, 1.5f, 0.5f, 0.5f, 0.5f, 0.5f);
         }
     }
 }

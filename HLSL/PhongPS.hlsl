@@ -34,7 +34,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     //ƒ}ƒeƒŠƒAƒ‹’è”
     float3 ka = float3(1, 1, 1);
     float3 kd = float3(1, 1, 1);
-    float3 ks = float3(1, 1, 1);
+    float3 ks = float3(0, 0, 0);
     float shiness = 128;
     
     

@@ -143,7 +143,7 @@ protected:
 	float gravity = -1.0f;
 	DirectX::XMFLOAT3 velocity = { 0, 0, 0 };
 	bool isGround = false;
-	int health = 15;
+	int health = 100;
 	int maxHealth = 5;
 	float stepOffset = 1.5f;
 	float invincibleTimer = 0.0f;

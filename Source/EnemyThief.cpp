@@ -130,7 +130,7 @@ void EnemyThief::Update(float elapsedTime)
 
     }
 
-
+    //  HPは0以上と投げ技されてないならステージマシン更新
     if (!Player::Instance().GetIsUseGrab() && health >= 0)
     {
         stateMachine->Update(elapsedTime);
@@ -145,11 +145,13 @@ void EnemyThief::Update(float elapsedTime)
     // オブジェクト行列更新
     UpdateTransform();
 
+    // アニメーション更新
     model->UpdateAnimation(elapsedTime);
 
     // モデル行列更新
     model->UpdateTransform(transform);
 
+    //　死亡ステートの更新
     if (state == State::Dead && !Player::Instance().GetIsUseGrab())
     {
         UpdateDeathState(elapsedTime);

@@ -182,6 +182,9 @@ void Player::Update(float elapsedTime)
         case State::TitleIdle:
             UpdateTitleIdleState(elapsedTime);
             break;
+        case State::Ultimate:
+            UpdateUltimateState(elapsedTime);
+            break;
 
         }
 
@@ -212,6 +215,7 @@ void Player::Update(float elapsedTime)
         // モデル行列更新
         model->UpdateTransform(transform);
 
+        //　攻撃ウンター・スキルタイム更新
         if (attacking)
         {
             attackTimer++;
@@ -424,7 +428,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                             {
                                 skillTime += 0.1f;
                             }
-                            
+
                         }
                     }
                 }
@@ -893,12 +897,42 @@ void Player::UpdateCameraState(float elapsedTime)
 
         vx = sinf(angle.y + DirectX::XM_PIDIV2) * -10;
         vz = cosf(angle.y + DirectX::XM_PIDIV2) * -10;
-
         p.data.push_back({ 180, { position.x + vx, position.y + 3, position.z + vz }, position });
 
         vx = sinf(angle.y) * 7;
         vz = -cosf(angle.y) * 7;
         p.data.push_back({ 230, { position.x + vx, position.y + 3, position.z + vz }, position });
+
+        Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
+        break;
+    }
+    case State::Ultimate:
+    {
+        MessageData::CAMERACHANGEMOTIONMODEDATA p;
+        float vx = sinf(angle.y) * 6;
+        float vz = cosf(angle.y) * 6;
+        p.data.push_back({ 0, { position.x + vx, position.y + 3, position.z + vz }, position });
+        p.data.push_back({ 15, { position.x + vx, position.y + 3, position.z + vz }, position });
+
+        vx = sinf(angle.y + DirectX::XM_PIDIV2) * -10;
+        vz = cosf(angle.y + DirectX::XM_PIDIV2) * -10;
+        p.data.push_back({ 40, { position.x + vx, position.y + 3, position.z + vz }, position });
+        p.data.push_back({ 55, { position.x + vx, position.y + 3, position.z + vz }, position });
+        
+        vx = sinf(angle.y) * -6;
+        vz = cosf(angle.y) * -6;
+        p.data.push_back({ 80, { position.x + vx, position.y + 3, position.z + vz }, position });
+        p.data.push_back({ 95, { position.x + vx, position.y + 3, position.z + vz }, position });
+
+        vx = sinf(angle.y + DirectX::XM_PIDIV2) * 10;
+        vz = cosf(angle.y + DirectX::XM_PIDIV2) * 10;
+        p.data.push_back({ 115, { position.x + vx, position.y + 5, position.z + vz }, position });
+        p.data.push_back({ 120, { position.x + vx, position.y + 5, position.z + vz }, position });
+
+        vx = sinf(angle.y) * 8;
+        vz = cosf(angle.y) * 8;
+        p.data.push_back({ 145, { position.x + vx, position.y + 2, position.z + vz }, position });
+
 
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
         break;
@@ -1105,6 +1139,8 @@ void Player::TransitionIdleState()
 // 待機ステート更新処理
 void Player::UpdateIdleState(float elapsedTime)
 {
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
     lastState = state;
     //移動入力処理
     if (InputMove(elapsedTime))
@@ -1123,7 +1159,6 @@ void Player::UpdateIdleState(float elapsedTime)
         TransitionDodgeState();
     }
 
-
     if (!onClimb)
     {
         //弾丸入力処理
@@ -1141,13 +1176,16 @@ void Player::UpdateIdleState(float elapsedTime)
     if (lockonEnemy && skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
-        GamePad& gamePad = Input::Instance().GetGamePad();
         if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
         {
             IsUseGrab = true;
             TransitionGrabState();
         }
 
+    }
+    if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
+    {
+        TransitionUltimateState();
     }
 
 
@@ -2059,6 +2097,122 @@ void Player::UpdateSwingToKickState(float elapsedTime)
         TransitionIdleState();
         IsUseSwingKick = false;
     }
+}
+
+void Player::TransitionUltimateState()
+{
+    state = State::Ultimate;
+    model->PlayAnimation(Anim_Ultimate, false);
+}
+
+void Player::UpdateUltimateState(float elapsedTime)
+{
+
+    static float timeSinceLastShot = 0.0f;
+    static int currentDirectionIndex = 0;
+    static int shotsPerDirection = 0;
+    static std::vector<DirectX::XMFLOAT3> directions;
+
+    // アニメーションが再生中でない場合、待機ステートに遷移
+    if (!model->IsPlayAnimation())
+    {
+        TransitionIdleState();
+        timeSinceLastShot = 0.0f;
+        currentDirectionIndex = 0;
+        shotsPerDirection = 0;
+        directions.clear();
+        return;
+    }
+
+    // 初回のみランダムな方向を生成
+    if (directions.empty())
+    {
+        for (int i = 0; i < 8; ++i)
+        {
+            float x, y, z;
+            do
+            {
+                x = static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f;
+                y = static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f;
+                z = static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f;
+            } while (x * x + y * y + z * z > 1.0f || y < 0.0f); // 半球状に制限
+
+            float length = sqrtf(x * x + y * y + z * z);
+            x /= length;
+            y /= length;
+            z /= length;
+
+            directions.push_back({ x, y, z });
+        }
+    }
+
+    // プレイヤーの位置を取得
+    DirectX::XMFLOAT3 playerPos = { position.x,position.y+1.0f,position.z };
+
+    // 発射間隔を設定
+    const float shotInterval = 0.2f;
+
+    // 時間を更新
+    timeSinceLastShot += elapsedTime;
+
+    // 発射間隔が経過したら弾丸を発射
+    if (timeSinceLastShot >= shotInterval)
+    {
+        timeSinceLastShot = 0.0f;
+
+        // 現在の方向に弾丸を発射
+        if (shotsPerDirection < 2)
+        {
+            ShotWeb->Play(false, 0.8f);
+            // 弾丸を生成して発射
+            ProjectileStraight* projectile = new ProjectileStraight(&projectileManager);
+            projectile->Launch(directions[currentDirectionIndex], playerPos);
+
+            // モデルをレンダラーに登録
+            SceneGame& sceneGame = SceneGame::Instance();
+            if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
+            {
+                sceneGame.RegisterRenderModel(projectile->GetModel());
+            }
+
+            shotsPerDirection++;
+        }
+        else
+        {
+            // 次の方向に移動
+            currentDirectionIndex++;
+            shotsPerDirection = 0;
+
+            // 全方向に発射し終わったら終了
+            if (currentDirectionIndex >= directions.size())
+            {
+                TransitionIdleState();
+                return;
+            }
+        }
+    }
+    // 攻撃範囲の設定
+    EnemyManager& enemyManager = EnemyManager::Instance();
+    int enemyCount = enemyManager.GetEnemyCount();
+
+    for (int i = 0; i < enemyCount; ++i)
+    {
+        Enemy* enemy = enemyManager.GetEnemy(i);
+        DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
+
+        // プレイヤーと敵の距離を計算
+        float dx = enemyPos.x - position.x;
+        float dz = enemyPos.z - position.z;
+        float distance = sqrtf(dx * dx + dz * dz);
+
+        // 敵が攻撃範囲内にいる場合、ダメージを与える
+        if (distance <= ultimateAttackRadius)
+        {
+            enemy->ApplyDamage(10, 0.5f); // ダメージ量と無敵時間を設定
+        }
+    }
+
+
 }
 
 

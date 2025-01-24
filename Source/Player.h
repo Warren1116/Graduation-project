@@ -137,6 +137,7 @@ public:
 		CrouchIdle,
 		TitleIdle,
 		SwingToKick,
+		Ultimate,
 
 		EventMode,
 	};
@@ -268,15 +269,19 @@ private:
 	bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);
 
 
-    //Titleステート用
+    //	Titleステート用
     void TransitionTitleIdleState();
     void UpdateTitleIdleState(float elapsedTime);
-
     void TransitionCrouchIdleState();
     void UpdateCrouchIdleState(float elapsedTime);
 
+    //  スイングキックステートへ遷移
     void TransitionSwingToKickState();
     void UpdateSwingToKickState(float elapsedTime);
+
+    //  必殺技ステートへ遷移
+	void TransitionUltimateState();
+    void UpdateUltimateState(float elapsedTime);
 
 
 private:
@@ -308,6 +313,7 @@ private:
 		Anim_TitleIdle,
 		Anim_Crouch,
 		Anim_SwingToKick,
+        Anim_Ultimate,
 	};
 
 
@@ -409,6 +415,9 @@ private:
 	float webTimer;
 	float skillTime;
     float skillTimeMax = 5.0f;
+
+	float ultimateAttackRadius = 5.0f; // 攻撃範囲の半径
+
 
 private:
 	// メッセージキー
