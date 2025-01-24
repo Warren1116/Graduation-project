@@ -377,8 +377,9 @@ private:
 
     //　スイングキック
     bool IsUseSwingKick = false;
-
+    //  回避の方向
     DirectX::XMFLOAT3 dodgeDirection;
+
 
 	//カメラロック用
 	LockonState			lockonState = LockonState::NotLocked;
@@ -407,6 +408,7 @@ private:
 	// 糸のタイマー
 	float webTimer;
 	float skillTime;
+    float skillTimeMax = 5.0f;
 
 private:
 	// メッセージキー

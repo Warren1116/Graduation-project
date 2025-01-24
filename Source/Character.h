@@ -29,6 +29,7 @@ public:
 	const DirectX::XMFLOAT3& GetRight() const { return { transform._11, transform._12, transform._13 }; }
 	const DirectX::XMFLOAT3& GetUp() const { return { transform._21, transform._22, transform._23 }; }
 	const DirectX::XMFLOAT3& GetFront() const { return { transform._31, transform._32, transform._33 }; }
+    void SetFront(const DirectX::XMFLOAT3& front) { transform._31 = front.x; transform._32 = front.y; transform._33 = front.z; }
 
 	// 位置設定
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
@@ -170,6 +171,10 @@ protected:
 
 	float fallStartHeight = 0.0f;
 	float landingHeightThreshold = 1.0f;
+
+	// クォータニオンを使った回転を管理するためのメンバ変数
+	DirectX::XMFLOAT4 climbRotationQuaternion;
+	DirectX::XMFLOAT3 wallNormal;
 
 };
 

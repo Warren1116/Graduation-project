@@ -216,7 +216,7 @@ void Player::Update(float elapsedTime)
         {
             attackTimer++;
         }
-        if (skillTime < 5)
+        if (skillTime < skillTimeMax)
         {
             skillTime += elapsedTime * 0.01f;
         }
@@ -420,7 +420,11 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                                 break;
                             }
                             hitEffect->Play(enemyPos);
-                            skillTime += 0.1f;
+                            if (skillTime < skillTimeMax)
+                            {
+                                skillTime += 0.1f;
+                            }
+                            
                         }
                     }
                 }
@@ -1309,11 +1313,13 @@ void Player::TransitionClimbWallState()
     {
         model->PlayAnimation(Anim_ClimbDown, true);
     }
+    onSwing = false;
 }
 
 //  クライミングステートへの遷移
 void Player::UpdateClimbWallState(float elapsedTime)
 {
+
     //　クライミング中Spaceキー押せば元の状態に戻る
     if (InputJump())
     {

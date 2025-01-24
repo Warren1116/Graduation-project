@@ -1268,12 +1268,14 @@ void SceneGame::SpawnEnemiesForWave(int wave)
 //  次のWaveを開始
 void SceneGame::StartNextWave()
 {
+    //  Waveを進める
     if (currentWave < totalWaves)
     {
         currentWave++;          //  Waveを進める
         waveInProgress = true;  //  Waveが進行中
         nextWaveTimer = 5.0f;   //  2秒のUI表示
         SpawnEnemiesForWave(currentWave); //  Waveによって敵を生成
+        Player::Instance().SetgetAttackSoon(false);
     }
 
 
