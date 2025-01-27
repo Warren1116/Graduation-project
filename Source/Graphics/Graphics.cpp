@@ -4,8 +4,6 @@
 #include "Graphics\Shader\ShadowmapCasterShader.h"
 
 #include "Graphics\Shader\DefaultSpriteShader.h"
-//#include "Graphics/Shader/GaussianBlurShader.h"
-//#include "Graphics/Shader/LuminanceExtractionShader.h"
 #include "Graphics/Shader/FinalpassShader.h"
 #include "Graphics/Shader/SkyboxShader.h"
 
@@ -156,7 +154,7 @@ Graphics::Graphics(HWND hWnd)
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 		lineRenderer = std::make_unique<LineRenderer>(device.Get());
 		imguiRenderer = std::make_unique<ImGuiRenderer>(hWnd, device.Get());
-		geometricPrimitive = std::make_unique<GeometricPrimitive>(device.Get());
+		//geometricPrimitive = std::make_unique<GeometricPrimitive>(device.Get());
 	}
 }
 

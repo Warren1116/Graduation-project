@@ -21,27 +21,6 @@ void Light::PushRenderContext(RenderContext& rc) const
 
 			break;
 		}
-		case	LightType::Spot:
-		{
-			if (rc.spotLightCount >= SpotLightMax)
-				break;
-
-			rc.spotLightData[rc.spotLightCount].position.x = position.x;
-			rc.spotLightData[rc.spotLightCount].position.y = position.y;
-			rc.spotLightData[rc.spotLightCount].position.z = position.z;
-			rc.spotLightData[rc.spotLightCount].position.w = 1.0f;
-			rc.spotLightData[rc.spotLightCount].direction.x = direction.x;
-			rc.spotLightData[rc.spotLightCount].direction.y = direction.y;
-			rc.spotLightData[rc.spotLightCount].direction.z = direction.z;
-			rc.spotLightData[rc.spotLightCount].direction.w = 0.0f;
-			rc.spotLightData[rc.spotLightCount].color = color;
-			rc.spotLightData[rc.spotLightCount].range = range;
-			rc.spotLightData[rc.spotLightCount].innerCorn = innerCorn;
-			rc.spotLightData[rc.spotLightCount].outerCorn = outerCorn;
-			rc.spotLightData[rc.spotLightCount].power = power;
-			++rc.spotLightCount;
-			break;
-		}
 	}
 }
 
@@ -50,7 +29,6 @@ void Light::DrawDebugGUI()
 	static constexpr char* lightTypeName[] =
 	{
 		"Directional",
-		"Spot",
 	};
 
 	if (ImGui::TreeNode(lightTypeName[static_cast<int>(lightType)]))
@@ -88,6 +66,7 @@ void Light::DrawDebugGUI()
 	}
 }
 
+// デバッグ描画
 void Light::DrawDebugPrimitive()
 {
 	DebugRenderer*	debugRenderer	= Graphics::Instance().GetDebugRenderer();

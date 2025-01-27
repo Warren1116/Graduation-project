@@ -11,15 +11,9 @@ ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(
     instance = this;
 	model = std::make_unique<Model>("Data/Model/SpiderWeb/spiderweb.mdl");
 
-
-    stickWall = Audio::Instance().LoadAudioSource("Data/Audio/WebStickToWall.wav");
-
-
 	// 表示サイズ
 	scale.x = scale.y = scale.z = 0.05f;
 	radius = 0.3f;
-
-
 
 }
 
@@ -32,6 +26,7 @@ ProjectileStraight::~ProjectileStraight()
 // 更新処理
 void ProjectileStraight::Update(float elapsedTime)
 {
+    //時間経過で消滅
     lifeTimer -= elapsedTime;
     if (lifeTimer <= 0.0f)
     {
@@ -41,16 +36,10 @@ void ProjectileStraight::Update(float elapsedTime)
             sceneGame.shadowmapRenderer->UnregisterRenderModel(model.get());
             sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
         }
-        //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-        //{
-        //    sceneGame.shadowmapCasterRenderer->UnregisterRenderModel(model.get());
-        //    sceneGame.sceneRenderer->UnregisterRenderModel(model.get());
-        //}
-
         Destroy();
     }
 
-
+    // 飛ぶ処理
     float speed = this->speed * elapsedTime;
 
     float newX = position.x + direction.x * speed;
@@ -60,10 +49,10 @@ void ProjectileStraight::Update(float elapsedTime)
     DirectX::XMFLOAT3 start = { position.x, position.y, position.z };
     DirectX::XMFLOAT3 end = { newX, newY, newZ };
 
+    // レイキャストによる壁判定
     HitResult hit;
     if (StageManager::Instance().RayCast(start, end, hit))
     {
-
         position.x = hit.position.x;
         position.y = hit.position.y;
         position.z = hit.position.z;
@@ -71,7 +60,6 @@ void ProjectileStraight::Update(float elapsedTime)
         SceneGame& sceneGame = SceneGame::Instance();
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
-            stickWall->Play(false, 1.0f);
             sceneGame.UnregisterRenderModel(model.get());
 
 
@@ -79,29 +67,22 @@ void ProjectileStraight::Update(float elapsedTime)
             WallWeb->SetPosition(hit.position);
             WallWeb->SetDirection({hit.normal});
             sceneGame.RegisterRenderModel(WallWeb->GetModel());
-
         }
 
         Destroy();
     }
-    else
+    else //壁にぶつからなかった
     {
         position.x = newX;
         position.y = newY;
         position.z = newZ;
     }
-
-
+    
+    // オブジェクト行列更新
     UpdateTransform();
     model->UpdateTransform(transform);
 
 }
-
-// 描画処理
-//void ProjectileStraight::Render(const RenderContext& rc, ModelShader* shader)
-//{
-//	shader->Draw(rc, model);
-//}
 
 // 発射
 void ProjectileStraight::Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position)

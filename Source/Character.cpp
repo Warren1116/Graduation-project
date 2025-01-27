@@ -157,6 +157,7 @@ void Character::UpdateVerticalMove(float elapsedTime)
         position.y += velocity.y * elapsedTime;
     }
 
+    //クライミングしてない場合
     if (!onClimb)
     {
         //地面の向きに沿うようにXZ軸回転
@@ -325,14 +326,14 @@ void Character::UpdateHorizontalMove(float elapsedTime)
 
                 }
             }
-            else
+            else //壁にぶつからなかった
             {
                 position.x = hit2.position.x;
                 position.z = hit2.position.z;
             }
 
         }
-        else
+        else //壁にぶつからなかった
         {
             hitWall = false;
             onClimb = false;

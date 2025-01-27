@@ -42,15 +42,6 @@ void ProjectileManager::Update(float elapsedTime)
 	removes.clear();
 }
 
-//// 描画処理
-//void ProjectileManager::Render(const RenderContext& rc, ModelShader* shader)
-//{
-//	for (Projectile* projectile : projectiles)
-//	{
-//		projectile->Render(rc, shader);
-//	}
-//}
-
 // デバッグプリミティブ描画
 void ProjectileManager::DrawDebugPrimitive()
 {

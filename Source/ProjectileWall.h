@@ -14,9 +14,6 @@ public:
 	// XVˆ—
 	void Update(float elapsedTime) override;
 
-	//// •`‰æˆ—
-	//void Render(const RenderContext& rc, ModelShader* shader) override;
-
 private:
 	float lifeTimer = 3.0f;
 

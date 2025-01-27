@@ -126,6 +126,7 @@ protected:
 
 
 protected:
+    // 基本情報設定
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 1, 1, 1 };
@@ -159,6 +160,7 @@ protected:
 	float skinWidth = 0.01f;
 	float slopeLimit = 45.0f;
 
+    //　生死判定
 	bool isAlive = true;
 
 	//　プレイヤー判定用
@@ -169,6 +171,7 @@ protected:
 	bool isThrown = false;
 	bool IsLockedOn = false;
 
+    //　壁登り用
 	float fallStartHeight = 0.0f;
 	float landingHeightThreshold = 1.0f;
 

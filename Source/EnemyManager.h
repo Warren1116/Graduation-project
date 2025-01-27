@@ -39,6 +39,7 @@ public:
 	// エネミー取得
 	Enemy* GetEnemy(int index) { return enemies.at(index); }
 	
+    // エネミーモデル取得
 	Model* GetEnemyModel(int index);
 
 	// エネミー削除

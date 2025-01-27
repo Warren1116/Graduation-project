@@ -12,7 +12,6 @@
 
 #include<ctime>
 
-
 // ‚’¼“¯ŠúŠÔŠuİ’è
 static const int syncInterval = 1;
 

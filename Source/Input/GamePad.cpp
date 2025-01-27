@@ -162,6 +162,7 @@ void GamePad::Update()
 		if (GetAsyncKeyState(VK_LSHIFT) & 0x8000) newButtonState |= BTN_KEYBOARD_SHIFT;
 		if (GetAsyncKeyState(VK_ESCAPE) & 0x8000) newButtonState |= BTN_KEYBOARD_ESC;
 		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) newButtonState |= BTN_KEYBOARD_CTLR;
+		if (GetAsyncKeyState(VK_MENU) & 0x8000) newButtonState |= BTN_KEYBOARD_ALT;
 
 #if 1
 		if (newButtonState & BTN_UP)    ly = 1.0f;

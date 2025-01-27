@@ -123,7 +123,7 @@ LineRenderer::LineRenderer(ID3D11Device* device)
 		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 	}
 
-	//
+	
 	{
 		D3D11_BUFFER_DESC desc = {};
 		desc.Usage = D3D11_USAGE_DYNAMIC;

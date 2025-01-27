@@ -33,6 +33,7 @@ public:
 	//	デバッグ情報の表示
 	void	DrawDebugGUI();
 
+    //　ラジアルブラーの有効無効
     void	radialblurActive(bool active);
 
 

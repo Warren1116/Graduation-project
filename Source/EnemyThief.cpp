@@ -8,17 +8,16 @@
 #include "Camera.h"
 #include "CharacterManager.h"
 
-
-#define USESTATEMACHINE3
-
 // コンストラクタ
 EnemyThief::EnemyThief()
 {
+    // モデル読み込み
     model = std::make_unique<Model>("Data/Model/Enemy/Thief.mdl");
 
     // モデルが大きいのでスケーリング
     scale.x = scale.y = scale.z = 0.01f;
 
+    // モデルの中心位置を設定
     radius = 0.5f;
     height = 1.0f;
 
@@ -61,7 +60,7 @@ EnemyThief::~EnemyThief()
 
 void EnemyThief::Update(float elapsedTime)
 {
-
+    //　状態更新
     switch (state)
     {
     case EnemyThief::State::Damage:
@@ -69,40 +68,45 @@ void EnemyThief::Update(float elapsedTime)
         break;
     }
 
+    //　PlayerのSwingKickに攻撃される時
     if (Player::Instance().GetIsUseSwingKick() && IsLockedOn)
     {
         TransitionDamageState();
     }
-
+    
+    //　PlayerのGrabに攻撃される時
     if (Player::Instance().GetIsUseGrab() && IsLockedOn)
     {
         ThrowFlag = true;
     }
 
+    // 投げ技される時の処理
     if (ThrowFlag)
     {
         webTimer += elapsedTime;
 
+        // 3秒後に投げ技される
         if (webTimer > 3.0f)
         {
             IsLockedOn = false;
             DirectX::XMVECTOR pointA, pointB;
 
+            //  プレイヤーの方向に投げ技される
             DirectX::XMVECTOR DirectionVec;
             DirectX::XMVECTOR playerBack = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&Player::Instance().GetFront()), -1.0f);
             DirectX::XMVECTOR playerUp = DirectX::XMLoadFloat3(&Player::Instance().GetUp());
-
             playerBack = DirectX::XMVector3Normalize(playerBack);
             playerUp = DirectX::XMVector3Normalize(playerUp);
 
             playerBack = DirectX::XMVectorScale(playerBack, 22.0f);
             playerUp = DirectX::XMVectorScale(playerUp, 22.0f);
-
             DirectionVec = DirectX::XMVectorAdd(playerBack, playerUp);
 
+            //  投げ技される位置
             pointA = DirectX::XMLoadFloat3(&position);
             pointB = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Player::Instance().GetPosition()), DirectionVec);
 
+            //  投げ技される方向
             DirectX::XMFLOAT3 directionVec;
             DirectX::XMStoreFloat3(&directionVec, DirectionVec);
 
@@ -110,14 +114,17 @@ void EnemyThief::Update(float elapsedTime)
 
             float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectionVec));
 
+            //  投げ技される速度
             float speed = 10.0f;
             DirectX::XMVECTOR Velocity = DirectX::XMLoadFloat3(&velocity);
 
+            //  仮の重力
             float gravity = 1.0f;
 
             static float timeElapsed = 0.0f;
             timeElapsed += elapsedTime;
 
+            //  投げ技される位置の更新
             DirectX::XMVECTOR newPosition = pointA;
             newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorScale(Velocity, timeElapsed));
             newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorSet(0.0f, -0.5f * gravity * timeElapsed * timeElapsed, 0.0f, 0.0f));
@@ -158,6 +165,7 @@ void EnemyThief::Update(float elapsedTime)
     }
 }
 
+//　死亡ステートへの遷移
 void EnemyThief::TransitionDeathState()
 {
     velocity.x = 0;
@@ -181,6 +189,7 @@ void EnemyThief::TransitionDeathState()
 
 }
 
+//　死亡ステートの更新
 void EnemyThief::UpdateDeathState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
@@ -191,6 +200,7 @@ void EnemyThief::UpdateDeathState(float elapsedTime)
     }
 }
 
+//　ダメージステートへの遷移
 void EnemyThief::TransitionDamageState()
 {
     state = State::Damage;
@@ -199,6 +209,7 @@ void EnemyThief::TransitionDamageState()
     model->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false, 0.2f, attackAnimationSpeed);
 }
 
+//　ダメージステートの更新
 void EnemyThief::UpdateDamageState(float elapsedTime)
 {
     if (!model->IsPlayAnimation() && health > 0)
@@ -273,7 +284,7 @@ void EnemyThief::MoveToTarget(float elapsedTime, float speedRate)
 }
 
 
-
+// メッセージ受信処理
 bool EnemyThief::OnMessage(const Telegram& telegram)
 {
     switch (telegram.msg)
@@ -293,7 +304,7 @@ bool EnemyThief::OnMessage(const Telegram& telegram)
     return false;
 }
 
-
+// プレイヤーを探す
 bool EnemyThief::SearchPlayer()
 {
     // プレイヤーとの高低差を考慮して3Dで距離判定をする

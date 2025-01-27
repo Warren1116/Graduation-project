@@ -4,7 +4,6 @@
 #include <tchar.h>
 #include "../resource.h"
 
-
 #include "Framework.h"
 
 const LONG SCREEN_WIDTH = 1280;
@@ -33,7 +32,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex.lpszMenuName = NULL;
-	wcex.lpszClassName = _T("Game");
+	wcex.lpszClassName = _T("Spider_X");
 	wcex.hIconSm = 0;
 	wcex.hIcon = LoadIcon(instance, MAKEINTRESOURCE(IDI_ICON1));
 	wcex.hIconSm = LoadIcon(instance, MAKEINTRESOURCE(IDI_ICON1));
@@ -59,7 +58,7 @@ INT WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance, LPWSTR cmd_line
 	LONG screenWidth = rc.right - rc.left;
 	LONG screenHeight = rc.bottom - rc.top;
 
-	HWND hWnd = CreateWindow(_T("Game"), _T(""), WS_POPUP | WS_VISIBLE, rc.left, rc.top, screenWidth, screenHeight, NULL, NULL, instance, NULL);
+	HWND hWnd = CreateWindow(_T("Spider_X"), _T(""), WS_POPUP | WS_VISIBLE, rc.left, rc.top, screenWidth, screenHeight, NULL, NULL, instance, NULL);
 	ShowWindow(hWnd, cmd_show);
 
 	Framework f(hWnd);

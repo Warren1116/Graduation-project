@@ -24,11 +24,6 @@ public:
 
 	virtual void DrawDebugGUI() {}
 
-	//virtual float PlayerToBoss() { return 0; }
-
-	//void SetCameraFlg(bool flg) { camerashake = flg; }
-	//float GetCameraFlg() { return camerashake; }
-
 	// 攻撃フラグ取得
 	virtual bool	GetAttackFlg() { return attackFlg; }
 	// 攻撃フラグセット
@@ -41,10 +36,7 @@ public:
 	// メッセージ受信したときの処理
 	virtual bool OnMessage(const Telegram& msg);
 
-	////ロックオンされているかどうか
-	//virtual bool GetIsLockedOn() const { return IsLockedOn; }
-	//virtual void SetLockedOn(bool lockStatus) { IsLockedOn = lockStatus;}
-
+    // モデル取得
 	Model* GetModel() const { return model; }
 
 protected:
@@ -58,6 +50,5 @@ protected:
 	float searchRange = 0.0f;
 	float attackRange = 0.0f;
 
-	//bool IsLockedOn = false;
 };
 

@@ -31,7 +31,7 @@ bool Meta::OnMessage(const Telegram& telegram)
 			// 送信者を除くエネミーにメッセージを送る
 			if (telegram.sender != enemyId)
 			{
-				// TODO 05_05 仲間を呼ぶメッセージの送信
+				// 仲間を呼ぶメッセージの送信
 				// 誰かがプレイヤーを発見したので送信者を除く敵にメッセージを送る
 				// メタAIから各敵に送るメッセージも MsgCallHelp です。
 				Meta::Instance().SendMessaging(
@@ -62,7 +62,7 @@ bool Meta::OnMessage(const Telegram& telegram)
 		}
 		if (enmVec.size() > 0)
 		{
-			// TODO 05_05 攻撃権の付与
+			// 攻撃権の付与
 			// enmVecのサイズで乱数を取得し、取得した値をインデックス値として
 			// enmVecに登録された敵の一人に攻撃権を与える
 			// 攻撃権を与えるメッセージはMsgGiveAttackRightです。
@@ -86,7 +86,7 @@ bool Meta::OnMessage(const Telegram& telegram)
 		//要求してきた敵のidはtelegramから取得出来ます。
 		if (count == 0)
 		{
-			// TODO 05_05 攻撃権の付与
+			// 攻撃権の付与
 			// 誰も攻撃権を持っていなければMetaAIから送信者に攻撃権付与のメッセージを送る
 			// メッセージはMsgGiveAttackRight
 			Meta::Instance().SendMessaging(

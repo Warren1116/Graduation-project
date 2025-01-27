@@ -78,7 +78,6 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
         rc.radialblurData = radialblurData;
 
 		shader->Draw(rc, renderSprite.get());
-
 		shader->End(rc);
 	}
 }
@@ -106,7 +105,7 @@ void	PostprocessingRenderer::DrawDebugGUI()
 {
 	if (ImGui::TreeNode("PostProcess"))
 	{
-
+        // カラーグレーディング
 		if (ImGui::TreeNode("ColorGrading"))
 		{
 			ImGui::SliderFloat("hueShift", &colorGradingData.hueShift, 0.0f, 360.0f);
@@ -115,6 +114,7 @@ void	PostprocessingRenderer::DrawDebugGUI()
 			ImGui::TreePop();
 		}
 
+        //ラジアルブラー
 		if (ImGui::TreeNode("radial blur"))
 		{
 			ImGui::SliderFloat2("center", &radialblurData.blur_center.x, 0, 1);
@@ -128,6 +128,7 @@ void	PostprocessingRenderer::DrawDebugGUI()
 	}
 }
 
+//　ラジアルブラーの有効無効
 void PostprocessingRenderer::radialblurActive(bool active)
 {
 	if (active)

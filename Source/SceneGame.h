@@ -40,6 +40,8 @@ public:
         Swing,
         Climb,
         Dodge,
+        Healing,
+        Ultimate,
         Finish,
     };
 
@@ -186,6 +188,8 @@ private:
     bool canAcceptInput;
     bool firstTimeGetAttack = true;
     TutorialState lastState;
+    bool firstTimeHealing = true;
+    bool firstTimeUltimate = true;
 
 
     //pause時コントローラーの選択判定

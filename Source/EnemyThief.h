@@ -5,10 +5,6 @@
 #include "Telegram.h"
 #include "Audio/Audio.h"
 
-#define USESTATEMACHINE3
-
-
-
 // エネミーアニメーション
 enum class EnemyAnimation
 {
@@ -170,6 +166,7 @@ private:
 	StateMachine* stateMachine = nullptr;
 
 
+	//投げされる時用
 	float timeElapsed = 0.0f;
 	float totalFlightTime;
 	float webTimer;

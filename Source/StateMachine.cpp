@@ -10,11 +10,13 @@ StateMachine::~StateMachine()
     statePool.clear();
 }
 
+//  更新処理
 void StateMachine::Update(float elapsedTime)
 {
     currentState->Execute(elapsedTime);
 }
 
+//  ステートの設定
 void StateMachine::SetState(int newState)
 {
     currentState = statePool.at(newState);
@@ -22,6 +24,7 @@ void StateMachine::SetState(int newState)
     currentState->Enter();
 }
 
+//  ステートの変更
 void StateMachine::ChangeState(int newState)
 {
     if (newState >= 0 && newState < statePool.size())
@@ -39,7 +42,7 @@ void StateMachine::ChangeState(int newState)
     }
 }
 
-
+//  ステートのインデックスを取得
 int StateMachine::GetStateIndex()
 {
     int i = 0;

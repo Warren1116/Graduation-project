@@ -69,7 +69,10 @@ Player::Player(bool flag)
     FirstSwing = Audio::Instance().LoadAudioSource("Data/Audio/FirstSwingWeb.wav");
     Swing = Audio::Instance().LoadAudioSource("Data/Audio/SwingWeb.wav");
     ShotWeb = Audio::Instance().LoadAudioSource("Data/Audio/ShotWeb.wav");
-
+    // 回復音
+    Healing = Audio::Instance().LoadAudioSource("Data/Audio/Healing.wav");
+    // ダメージ音
+    Damage = Audio::Instance().LoadAudioSource("Data/Audio/Damage.wav");
 
     skillTime = 5.0f;
 
@@ -383,7 +386,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                 outPosition))
             {
                 // ダメージを与える
-                if (enemy->ApplyDamage(3, 0.5f))
+                if (enemy->ApplyDamage(15, 0.5f))
                 {
                     // 吹き飛ばす
                     {
@@ -467,22 +470,6 @@ void Player::TransitionDodgeState()
     model->PlayAnimation(Anim_Dodge, false, 0.2, attackAnimationSpeed);
     getAttacksoon = false;
 
-    // GetMoveVec から移動ベクトルを取得
-    DirectX::XMFLOAT3 moveVec = GetMoveVec();
-
-    // 移動ベクトルがゼロの場合、後ろに移動
-    if (moveVec.x == 0 && moveVec.z == 0)
-    {
-        dodgeDirection = GetFront();
-        dodgeDirection.x = -dodgeDirection.x * 50.0f;
-        dodgeDirection.z = -dodgeDirection.z * 50.0f;
-    }
-    else
-    {
-        // y 軸の成分を無視して x, z 軸の成分のみを使用
-        moveVec.y = 0.0f;
-        dodgeDirection = moveVec;
-    }
 }
 
 void Player::UpdateDodgeState(float elapsedTime)
@@ -543,7 +530,7 @@ void Player::UpdateGrabState(float elapsedTime)
         fallSoundPlayed = false;
 
         IsUseGrab = false;
-        lockonEnemy->ApplyDamage(20.0, 1.0);
+        lockonEnemy->ApplyDamage(100.0, 1.0);
 
         if (lockonEnemy)
         {
@@ -918,7 +905,7 @@ void Player::UpdateCameraState(float elapsedTime)
         vz = cosf(angle.y + DirectX::XM_PIDIV2) * -10;
         p.data.push_back({ 40, { position.x + vx, position.y + 3, position.z + vz }, position });
         p.data.push_back({ 55, { position.x + vx, position.y + 3, position.z + vz }, position });
-        
+
         vx = sinf(angle.y) * -6;
         vz = cosf(angle.y) * -6;
         p.data.push_back({ 80, { position.x + vx, position.y + 3, position.z + vz }, position });
@@ -1036,7 +1023,7 @@ void Player::CollisionProjectileVsEnemies()
             {
                 //ダメージを与える
 
-                if (enemy->ApplyDamage(3, 1.0f))
+                if (enemy->ApplyDamage(15, 1.0f))
                 {
                     //吹き飛ばす
                     {
@@ -1098,16 +1085,52 @@ bool Player::InputAttack()
 
 }
 
+//　回避入力処理
 bool Player::InputDodge()
 {
     // ボタン入力でジャンプ
     GamePad& gamePad = Input::Instance().GetGamePad();
     if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_CTLR || gamePad.GetButtonDown() & GamePad::BTN_B)
     {
+        // GetMoveVec から移動ベクトルを取得
+        DirectX::XMFLOAT3 moveVec = GetMoveVec();
+
+        // 移動ベクトルがゼロの場合、後ろに移動
+        if (moveVec.x == 0 && moveVec.z == 0)
+        {
+            dodgeDirection = GetFront();
+            dodgeDirection.x = -dodgeDirection.x * 50.0f;
+            dodgeDirection.z = -dodgeDirection.z * 50.0f;
+        }
+        else
+        {
+            // y 軸の成分を無視して x, z 軸の成分のみを使用
+            moveVec.y = 0.0f;
+            dodgeDirection = moveVec;
+        }
         return true;
     }
     return false;
 
+}
+
+//　回復入力処理
+bool Player::InputHealing()
+{
+    // ボタン入力でジャンプ
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_ALT || gamePad.GetButtonDown() & GamePad::BTN_LEFT_TRIGGER)
+    {
+        Healing->Play(false, 0.4f);
+        skillTime -= 1.0f;
+        health += 20;
+        if (health > 100)
+        {
+            health = 100;
+        }
+        return true;
+    }
+    return false;
 }
 
 // 待機ステートへ遷移
@@ -1154,13 +1177,15 @@ void Player::UpdateIdleState(float elapsedTime)
         TransitionJumpState();
 
     }
-    if (/*GetAttackSoon() && */InputDodge())
-    {
-        TransitionDodgeState();
-    }
 
     if (!onClimb)
     {
+        // 回避入力処理
+        if (/*GetAttackSoon() && */InputDodge())
+        {
+            TransitionDodgeState();
+        }
+
         //弾丸入力処理
         if (InputProjectile())
         {
@@ -1173,6 +1198,14 @@ void Player::UpdateIdleState(float elapsedTime)
             TransitionAttackState();
         }
     }
+
+    // 回復入力処理
+    if (skillTime > 1.0f)
+    {
+        InputHealing();
+    }
+
+    //  投げ技入力処理
     if (lockonEnemy && skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
@@ -1183,9 +1216,14 @@ void Player::UpdateIdleState(float elapsedTime)
         }
 
     }
-    if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
+
+    //  必殺技入力処理
+    if (skillTime >= 3)
     {
-        TransitionUltimateState();
+        if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
+        {
+            TransitionUltimateState();
+        }
     }
 
 
@@ -1255,18 +1293,34 @@ void Player::UpdateMoveState(float elapsedTime)
         TransitionJumpState();
     }
 
-    //弾丸入力処理
+    // 弾丸入力処理
     if (InputProjectile())
     {
         TransitionShotingState();
     }
 
-    //攻撃入力処理
+    // 攻撃入力処理
     if (InputAttack())
     {
         TransitionAttackState();
     }
 
+    // 回復入力処理
+    if (skillTime > 1.0f)
+    {
+        InputHealing();
+    }
+
+    //  必殺技入力処理
+    if (skillTime >= 3)
+    {
+        if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
+        {
+            TransitionUltimateState();
+        }
+    }
+
+    //　投げ技入力処理
     if (lockonEnemy && skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
@@ -1277,8 +1331,6 @@ void Player::UpdateMoveState(float elapsedTime)
             TransitionGrabState();
         }
     }
-    float axisLX = gamePad.GetAxisLX();
-    float axisLY = gamePad.GetAxisLY();
 
 }
 
@@ -1370,11 +1422,11 @@ void Player::UpdateClimbWallState(float elapsedTime)
         TransitionIdleState();
     }
 
+    //　壁の上に登れるかどうかの判定
     if (IsNearWallTop())
     {
         TransitionClimbTopState();
     }
-
     else
     {
         CanClimb = false;
@@ -1393,7 +1445,7 @@ void Player::TransitionAttackState()
 // 攻撃ステート更新処理
 void Player::UpdateAttackState(float elapsedTime)
 {
-
+    //　モーションが終わったら待機ステートへ遷移
     if (!model->IsPlayAnimation())
     {
         TransitionIdleState();
@@ -1418,6 +1470,7 @@ void Player::UpdateAttackState(float elapsedTime)
     float adjustedEndTime = 1.0f / animationSpeed;
     attackCollisionFlag = animationTime >= adjustedStartTime && animationTime <= adjustedEndTime;
 
+    //  攻撃の当たり判定
     if (attackCollisionFlag)
     {
         //  カメラロック中攻撃すると
@@ -1470,6 +1523,7 @@ void Player::UpdateAttackState(float elapsedTime)
 void Player::TransitionDamageState()
 {
     state = State::Damage;
+    Damage->Play(false, 0.4f);
 
     // ダメージアニメーション再生
     float attackAnimationSpeed = 1.5f; // アニメーション速度を速くするための倍率
@@ -1490,7 +1544,6 @@ void Player::UpdateDamageState(float elapsedTime)
     // ダメージアニメーションが終わったら待機ステートへ遷移
     if (!model->IsPlayAnimation())
     {
-
         // コントローラー振動停止
         GamePad& gamePad = Input::Instance().GetGamePad();
         gamePad.StopVibration();
@@ -1502,6 +1555,12 @@ void Player::UpdateDamageState(float elapsedTime)
 // 死亡ステートへ遷移
 void Player::TransitionDeathState()
 {
+    //  死亡したらHPを0にする
+    if (health <= 0)
+    {
+        health = 0;
+    }
+
     state = State::Death;
 
     // 死亡アニメーション再生
@@ -1511,6 +1570,7 @@ void Player::TransitionDeathState()
 // 死亡ステート更新処理
 void Player::UpdateDeathState(float elapsedTime)
 {
+    //　モーションが終わったらシーンを切り替える
     if (!model->IsPlayAnimation())
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
@@ -1640,11 +1700,12 @@ void Player::TransitionSwingState()
 {
     state = State::Swing;
 
+    //  移動中スイングすると
     if (lastState == State::Move)
     {
         if (firstSwing)
         {
-
+            FirstSwing->Play(false, 0.8f);
             model->PlayAnimation(Anim_StartSwing, false);
             firstSwing = false;
             //  スイングモデル（現在仮、Geometricに変更予定）
@@ -1655,12 +1716,6 @@ void Player::TransitionSwingState()
                 //  レンダラーに登録
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
-            FirstSwing->Play(false, 0.8f);
-            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-            //{
-            //    //  レンダラーに登録
-            //    sceneGame.RegisterRenderModel(swingWebRight->GetModel());
-            //}
         }
         else
         {
@@ -1675,18 +1730,17 @@ void Player::TransitionSwingState()
 
         }
 
+        //  スイング位置を探す
         FindWallSwingPoint();
-
         onSwing = true;
-
-
     }
+    //  ジャンプ中スイングすると
     else if (lastState == State::Jump)
     {
         //連続スイングのモーション
         if (!onSwing)
         {
-            Swing->Play(false, 0.8f);
+            FirstSwing->Play(false, 0.8f);
             //  スイングモデル（現在仮、Geometricに変更予定）
             SwingWeb* swingWebLeft = new SwingWeb(&projectileManager, true);
             SceneGame& sceneGame = SceneGame::Instance();
@@ -1711,6 +1765,7 @@ void Player::TransitionSwingState()
             }
         }
 
+        //  スイング位置を探す
         FindWallSwingPoint();
         onSwing = true;
 
@@ -1868,6 +1923,7 @@ void Player::UpdateSwingState(float elapsedTime)
 //スイングポイントを探す（仮）
 bool Player::FindWallSwingPoint()
 {
+    //仮に前方と上方にベクトルを作成
     DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
     DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
 
@@ -1889,6 +1945,7 @@ bool Player::FindWallSwingPoint()
 
 }
 
+//　投げ技Active
 bool Player::ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos)
 {
     if (IsUseGrab)
@@ -1902,6 +1959,7 @@ bool Player::ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos)
     return false;
 }
 
+//　Titleモーション
 void Player::TransitionTitleIdleState()
 {
     state = State::TitleIdle;
@@ -1910,9 +1968,10 @@ void Player::TransitionTitleIdleState()
 
 void Player::UpdateTitleIdleState(float elapsedTime)
 {
-
+    // 使っていない
 }
 
+//　Titleモーション（二つ目）
 void Player::TransitionCrouchIdleState()
 {
     state = State::CrouchIdle;
@@ -1920,6 +1979,7 @@ void Player::TransitionCrouchIdleState()
 
 }
 
+//　Titleモーション
 void Player::UpdateCrouchIdleState(float elapsedTime)
 {
     if (!model->IsPlayAnimation())
@@ -1928,6 +1988,7 @@ void Player::UpdateCrouchIdleState(float elapsedTime)
     }
 }
 
+//　SwingKickステートへの遷移
 void Player::TransitionSwingToKickState()
 {
     state = State::SwingToKick;
@@ -1957,6 +2018,7 @@ void Player::TransitionSwingToKickState()
 
 }
 
+//　SwingKickステートの更新処理
 void Player::UpdateSwingToKickState(float elapsedTime)
 {
     // スイング中壁にぶつかった時の処理
@@ -2089,9 +2151,10 @@ void Player::UpdateSwingToKickState(float elapsedTime)
     // アニメーションの再生時間を取得
     float animationTime = model->GetCurrentAnimationSeconds();
 
-
+    //　右足の攻撃判定
     CollisionNodeVsEnemies("mixamorig:RightToeBase", attackRadius);
 
+    //　モーションが終わったら待機ステートへ遷移
     if (!model->IsPlayAnimation())
     {
         TransitionIdleState();
@@ -2099,15 +2162,17 @@ void Player::UpdateSwingToKickState(float elapsedTime)
     }
 }
 
+//　必殺技ステートへの遷移
 void Player::TransitionUltimateState()
 {
     state = State::Ultimate;
+    skillTime -= 3;
     model->PlayAnimation(Anim_Ultimate, false);
 }
 
+//　必殺技ステートの更新処理
 void Player::UpdateUltimateState(float elapsedTime)
 {
-
     static float timeSinceLastShot = 0.0f;
     static int currentDirectionIndex = 0;
     static int shotsPerDirection = 0;
@@ -2147,7 +2212,7 @@ void Player::UpdateUltimateState(float elapsedTime)
     }
 
     // プレイヤーの位置を取得
-    DirectX::XMFLOAT3 playerPos = { position.x,position.y+1.0f,position.z };
+    DirectX::XMFLOAT3 playerPos = { position.x,position.y + 1.0f,position.z };
 
     // 発射間隔を設定
     const float shotInterval = 0.2f;
@@ -2208,7 +2273,7 @@ void Player::UpdateUltimateState(float elapsedTime)
         // 敵が攻撃範囲内にいる場合、ダメージを与える
         if (distance <= ultimateAttackRadius)
         {
-            enemy->ApplyDamage(10, 0.5f); // ダメージ量と無敵時間を設定
+            enemy->ApplyDamage(50, 0.5f); // ダメージ量と無敵時間を設定
         }
     }
 

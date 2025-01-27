@@ -18,11 +18,13 @@ LightManager::~LightManager()
 	Clear();
 }
 
+//　ライトを登録
 void LightManager::Register(Light* light)
 {
 	lights.emplace_back(light);
 }
 
+//　ライトを削除
 void LightManager::Remove(Light* light)
 {
 	std::vector<Light*>::iterator	it = std::find(lights.begin(), lights.end(), light);
@@ -42,6 +44,7 @@ void LightManager::Clear()
 	lights.clear();
 }
 
+// レンダリングコンテキストにライト情報を追加
 void LightManager::PushRenderContext(RenderContext& rc)
 {
 	// 環境光の情報を追加
@@ -58,6 +61,7 @@ void LightManager::PushRenderContext(RenderContext& rc)
 	}
 }
 
+// デバッグGUI描画
 void LightManager::DrawDebugGUI()
 {
 	if (ImGui::TreeNode("Lights"))
@@ -74,6 +78,7 @@ void LightManager::DrawDebugGUI()
 	}
 }
 
+// デバッグプリミティブ描画
 void LightManager::DrawDebugPrimitive()
 {
 	for (Light* light : lights)

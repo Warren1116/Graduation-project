@@ -50,6 +50,8 @@ private:
     std::unique_ptr<Sprite> TutorialGrab;
     std::unique_ptr<Sprite> TutorialDodge;
     std::unique_ptr<Sprite> TutorialSwing;
+    std::unique_ptr<Sprite> TutorialHealing;
+    std::unique_ptr<Sprite> TutorialUltimate;
     std::unique_ptr<Sprite> TextFont;
 
     std::unique_ptr<Sprite> Font;

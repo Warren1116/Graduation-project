@@ -23,6 +23,7 @@ void Enemy::DrawDebugPrimitive()
 
 }
 
+//　メッセージ受信したときの処理
 bool Enemy::OnMessage(const Telegram& msg)
 {
 	return false;

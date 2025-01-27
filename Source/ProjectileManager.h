@@ -19,9 +19,6 @@ public:
 	// 更新処理
 	void Update(float elapsedTime);
 
-	////// 描画処理
-	//void Render(const RenderContext& rc, ModelShader* shader);
-
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive();
 

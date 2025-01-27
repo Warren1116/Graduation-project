@@ -20,6 +20,8 @@ void UI::Initialize()
     TutorialGrab = std::make_unique<Sprite>("Data/Sprite/Tutorial_Grab.png");
     TutorialDodge = std::make_unique<Sprite>("Data/Sprite/Tutorial_Dodge.png");
     TutorialSwing = std::make_unique<Sprite>("Data/Sprite/Tutorial_Swing.png");
+    TutorialHealing = std::make_unique<Sprite>("Data/Sprite/Tutorial_Healing.png");
+    TutorialUltimate = std::make_unique<Sprite>("Data/Sprite/Tutorial_Ultimate.png");
     TextFont = std::make_unique<Sprite>("Data/Font/font4.png");
     Font = std::make_unique<Sprite>("Data/Sprite/Font.png");
     Font2 = std::make_unique<Sprite>("Data/Sprite/Font2.png");
@@ -37,6 +39,7 @@ void UI::Initialize()
 
 void UI::Update(float elapsedtime)
 {
+    //  チュートリアルの進行
     if (SceneGame::Instance().GetIsTutorialPaused() || Player::Instance().GetOnSwing())
     {
         if (increasingAlpha)
@@ -87,7 +90,7 @@ void UI::Update(float elapsedtime)
 
 }
 
-
+//  UIの描画
 void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     //  攻撃を受ける時にSpiderSenseを描画する
@@ -129,6 +132,7 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
 
 }
 
+//  SpiderSenseの描画
 void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     D3D11_VIEWPORT viewport;
@@ -184,6 +188,7 @@ void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
 }
 
 
+//  チュートリアルの描画
 void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX, float offsetY)
 {
     float x = screenWidth + offsetX;
@@ -198,6 +203,7 @@ void UI::RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceConte
     sprite->Render(dc, x, y, width, height, srcX, srcY, srcWidth, srcHeight, 0, 1, 1, 1, alpha);
 }
 
+//  WaveCounterの描画
 void UI::RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     float screenWidth = Graphics::Instance().GetScreenWidth();
@@ -261,6 +267,7 @@ void UI::RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
     }
 }
 
+//  集中線の描画
 void UI::RenderFocusingLine(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     if (Player::Instance().GetOnSwing())
@@ -331,6 +338,7 @@ void UI::RenderHpBar(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, c
     }
 }
 
+//　チュートリアルのクリア
 void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
     float screenWidth = Graphics::Instance().GetScreenWidth();
@@ -388,6 +396,12 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
         TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
         RenderTutorialSprite(TutorialJump, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0, -300);
+        break;
+    case SceneGame::TutorialState::Healing:
+        RenderTutorialSprite(TutorialHealing, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
+        break;
+    case SceneGame::TutorialState::Ultimate:
+        RenderTutorialSprite(TutorialUltimate, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
         break;
     }
 

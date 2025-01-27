@@ -12,11 +12,8 @@ public:
 	static SwingWeb& InstanceLeft() { return *instanceLeft; }
 	static SwingWeb& InstanceRight() { return *instanceRight; }
 
-
 	SwingWeb(ProjectileManager* manager, bool leftHand);
 	~SwingWeb() override;
-
-	static SwingWeb& Instance() { return *instance; }
 
 	// XVˆ—
 	void Update(float elapsedTime) override;
@@ -24,7 +21,6 @@ public:
 private:
 	static SwingWeb* instanceLeft;
 	static SwingWeb* instanceRight;
-	static SwingWeb* instance;
 
 	bool isLeftHand = true;
 

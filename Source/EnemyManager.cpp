@@ -45,6 +45,7 @@ void EnemyManager::Register(Enemy* enemy)
 	enemies.emplace_back(enemy);
 }
 
+// エネミー全削除
 void EnemyManager::Clear()
 {
 	for (Enemy* enemy : enemies)
@@ -77,7 +78,7 @@ void EnemyManager::DrawDebugGUI()
 	ImGui::End();
 }
 
-
+// エネミー取得
 Model* EnemyManager::GetEnemyModel(int index)
 {
 	if (index < 0 || index >= enemies.size())
@@ -124,15 +125,6 @@ void EnemyManager::CollisionEnemyVsEnemies()
 				Enemy* enemyB = enemies.at(j);
 
 				DirectX::XMFLOAT3 outPosition;
-				//if (Collision::IntersectSphereVsSphere(
-				//	enemyA->GetPosition(), enemyA->GetRadius(),
-				//	enemyB->GetPosition(), enemyB->GetRadius(),
-				//	outPosition))
-				//{
-				//	// 押し出し後の位置設定
-				//	enemyB->SetPosition(outPosition);
-				//}
-
 				if (Collision::IntersectCylinderVsCylinder(
 					enemyA->GetPosition(), enemyA->GetRadius(), enemyA->GetHeight(),
 					enemyB->GetPosition(), enemyB->GetRadius(), enemyB->GetHeight(),

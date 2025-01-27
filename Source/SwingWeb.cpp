@@ -3,7 +3,6 @@
 #include "ProjectileWall.h"
 #include "Mathf.h"
 
-SwingWeb* SwingWeb::instance = nullptr;
 SwingWeb* SwingWeb::instanceLeft = nullptr;
 SwingWeb* SwingWeb::instanceRight = nullptr;
 
@@ -21,7 +20,7 @@ SwingWeb::SwingWeb(ProjectileManager* manager, bool leftHand) : Projectile(manag
         instanceRight = this;
     }
 
-
+    // モデル読み込み
     model = std::make_unique<Model>("Data/Model/SpiderWeb/SwingWeb.mdl");
 
     // 表示サイズ
@@ -41,6 +40,7 @@ SwingWeb::~SwingWeb()
 void SwingWeb::Update(float elapsedTime)
 {
     Player& player = Player::Instance();
+
     if (!player.GetIsUseGrab())
     {
         if (player.GetState() != Player::State::Swing && player.GetState() != Player::State::SwingToKick)
@@ -51,14 +51,10 @@ void SwingWeb::Update(float elapsedTime)
                 Destroy();
                 sceneGame.UnregisterRenderModel(model.get());
             }
-            //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-            //{
-            //    Destroy();
-            //    sceneGame.UnregisterRenderModel(model.get());
-            //}
             
         }
 
+        //　手の位置を取得
         DirectX::XMFLOAT3 handPos;
         Model::Node* handNode = isLeftHand
             ? player.model->FindNode("mixamorig:LeftHand")
@@ -79,46 +75,8 @@ void SwingWeb::Update(float elapsedTime)
 
         position = handPos;
     }
-    //else
-    //{
-    //    // ロックオン中の敵が存在するか確認
-    //    Enemy* lockonEnemy = player.GetLockonEnemy();
-    //    if (lockonEnemy != nullptr && lockonEnemy->GetAlive())
-    //    {
-    //        // 糸は手から出るように、右手のNodeを探す
-    //        Model::Node* RightHandPos = player.model->FindNode("mixamorig:RightHand");
-    //        DirectX::XMFLOAT3 pos;
-    //        pos.x = RightHandPos->worldTransform._41;
-    //        pos.y = RightHandPos->worldTransform._42;
-    //        pos.z = RightHandPos->worldTransform._43;
 
-    //        DirectX::XMFLOAT3 EnemyPos = lockonEnemy->GetPosition();
-    //        DirectX::XMFLOAT3 dir = EnemyPos - pos;
-    //        DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&dir);
-    //        dirVec = DirectX::XMVector3Normalize(dirVec);
-    //        DirectX::XMStoreFloat3(&direction, dirVec);
-
-    //        position = pos;
-    //    }
-    //    else
-    //    {
-    //        // ロックオン中の敵が存在しない場合、適切な処理を行う
-    //        // 例えば、糸を消すなど
-    //        SceneGame& sceneGame = SceneGame::Instance();
-    //        if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
-    //        {
-    //            Destroy();
-    //            sceneGame.UnregisterRenderModel(model.get());
-    //        }
-
-    //        //if (sceneGame.shadowmapCasterRenderer && sceneGame.sceneRenderer)
-    //        //{
-    //        //    Destroy();
-    //        //    sceneGame.UnregisterRenderModel(model.get());
-    //        //}
-    //    }
-    //}
-
+    
     UpdateTransform();
     model->UpdateTransform(transform);
 

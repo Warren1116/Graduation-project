@@ -37,15 +37,6 @@ void CharacterManager::Update(float elapsedTime)
 	CollisionCharacterVsCharacter();
 }
 
-//// 描画処理
-//void CharacterManager::Render(ID3D11DeviceContext* context, Shader* shader)
-//{
-//	for (Character* character : characteres)
-//	{
-//		character->Render(context, shader);
-//	}
-//}
-
 // デバッグプリミティブ描画
 void CharacterManager::DrawDebugPrimitive()
 {

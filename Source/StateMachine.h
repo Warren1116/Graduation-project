@@ -20,7 +20,6 @@ public:
     //  現在のステート番号取得
     int GetStateIndex();
 
-
     //  ステート登録
     void RegisterState(HierarchicalState* state);
     //  2層目ステート変更
@@ -31,8 +30,6 @@ public:
 
 
 private:
-
-
     //  現在のステート
     HierarchicalState* currentState = nullptr;
     //  各ステートを保持する配列

@@ -29,7 +29,7 @@ static const UINT SHADOWMAP_SIZE = 2048;
 
 
 //#define TUTORIAL
-#define DEBUG
+//#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -130,10 +130,6 @@ void SceneGame::Initialize()
         // カメラコントローラー初期化
         cameraController = std::make_unique<CameraController>();
 
-        ////// エネミー初期化
-        //for (int i = 0; i < enemyManager.GetEnemyCount(); i++) {
-        //    characterManager.Register(enemyManager.GetEnemy(i));
-        //}
 
     }
 
@@ -443,7 +439,7 @@ void SceneGame::Render()
 
 
     postprocessingRenderer->Render(rc.deviceContext);
-    postprocessingRenderer->radialblurActive(Player::Instance().GetAttackSoon());
+    //postprocessingRenderer->radialblurActive(Player::Instance().GetAttackSoon());
 
 
 
@@ -670,6 +666,20 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         SetTutorialState(SceneGame::TutorialState::Dodge);
     }
 
+    if (player->GetHealth() < 50 && tutorialState != SceneGame::TutorialState::Healing && firstTimeHealing)
+    {
+        lastState = tutorialState;
+        firstTimeHealing = false;
+        SetTutorialState(SceneGame::TutorialState::Healing);
+    }
+
+    if (currentWave > 0 && player->GetSkillTime() >= 3 && tutorialState != SceneGame::TutorialState::Ultimate && firstTimeUltimate)
+    {
+        lastState = tutorialState;
+        firstTimeUltimate = false;
+        SetTutorialState(SceneGame::TutorialState::Ultimate);
+    }
+
     //  チュトリアルの進行
     switch (tutorialState)
     {
@@ -731,7 +741,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         break;
         //  スイングのチュトリアル
     case SceneGame::TutorialState::Swing:
-        if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER))
+        if(player->GetOnSwing())
             AdvanceTutorialState(SceneGame::TutorialState::Climb);
         break;
         //  クライミングのチュトリアル
@@ -741,12 +751,24 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         break;
         //  回避のチュトリアル
     case SceneGame::TutorialState::Dodge:
-        CheckTutorialTimeout(0.5f);
-        if (player->InputDodge())
+        CheckTutorialTimeout(0.3f);
+        if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_CTLR || gamePad.GetButtonDown() & GamePad::BTN_B)
         {
             AdvanceTutorialState(lastState);
         }
-
+        break;
+    case SceneGame::TutorialState::Healing:
+        CheckTutorialTimeout(0.3f);
+        if (player->InputHealing())
+        {
+            AdvanceTutorialState(lastState);
+        }
+        break;
+    case SceneGame::TutorialState::Ultimate:
+        if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_V || gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER))
+        {
+            AdvanceTutorialState(lastState);
+        }
         break;
         //  チュトリアル終了
     case SceneGame::TutorialState::Finish:

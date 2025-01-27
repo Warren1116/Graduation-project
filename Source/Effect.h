@@ -21,6 +21,7 @@ public:
 	// スケール設定
 	void SetScale(Effekseer::Handle handle, const DirectX::XMFLOAT3& scale);
 
+    // ハンドル取得
 	Effekseer::Handle GetHandle() { return effectHandle; }
 private:
 	Effekseer::EffectRef effekseerEffect;

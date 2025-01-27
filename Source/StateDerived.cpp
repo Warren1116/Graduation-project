@@ -3,12 +3,6 @@
 #include "Mathf.h"
 #include "MetaAI.h"
 
-
-// Stateを基底クラスとして各種Stateクラスを用意する。
-// Wanderはサンプルとしてすでに記述済み
-// 各種Enter関数の内容は各Transition○○State関数を参考に
-// 各種Execute関数の内容は各Update○○State関数を参考に
-
 // 徘徊ステートに入った時のメソッド
 void WanderState::Enter()
 {
@@ -62,7 +56,6 @@ void IdleState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
-    // 各種Enter関数の内容は各Transition○○State関数を参考に
     // タイマーをランダム設定
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Idle), true);
     owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
@@ -73,7 +66,6 @@ void IdleState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)return;
 
-    // 各種Execute関数の内容は各Update○○State関数を参考に
     // タイマー処理
     owner->SetStateTimer(owner->GetStateTimer() - elapsedTime);
 
@@ -89,7 +81,7 @@ void IdleState::Execute(float elapsedTime)
 // 待機ステートから出ていくときのメソッド
 void IdleState::Exit()
 {
-    //書かなくてよい
+
 }
 
 
@@ -98,11 +90,10 @@ void PursuitState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
-    // 各種Enter関数の内容は各Transition○○State関数を参考に
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
 
-    // TODO 05_06 敵を発見したんで仲間を呼ぶ
+    // 敵を発見したんで仲間を呼ぶ
     // エネミーからメタAIへ MsgCallHelp を送信する。
     Meta::Instance().SendMessaging(
         owner->GetId(),
@@ -159,14 +150,14 @@ void AttackState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
-    //randomType = static_cast<AttackType>(Mathf::RandomRange(1, 2));
-
+    // 攻撃タイプをランダムで決定
+    // パンチ攻撃
     if (owner->randomType == EnemyThief::AttackType::Punch)
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
 
     }
-
+    // シュート攻撃
     if (owner->randomType == EnemyThief::AttackType::Shot)
     {
         owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Shot));
@@ -226,7 +217,7 @@ void PunchState::Enter()
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackPunch), false);
         Player::Instance().SetgetAttackSoon(false);
-        Player::Instance().ApplyDamage(1, 2.0f);
+        Player::Instance().ApplyDamage(12, 2.0f);
     }
 }
 
@@ -315,7 +306,7 @@ void ShotState::Enter()
         Fire->Play(false);
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::AttackShot), false);
         Player::Instance().SetgetAttackSoon(false);
-        Player::Instance().ApplyDamage(1, 2.0f);
+        Player::Instance().ApplyDamage(8, 2.0f);
     }
 }
 
@@ -410,7 +401,7 @@ void BattleState::Exit()
 {
 }
 
-// TODO 05_03 メタAIからメッセージを受信したときに呼ばれるステートを追加
+// メタAIからメッセージを受信したときに呼ばれるステートを追加
 // デストラクタ
 RecieveState::~RecieveState()
 {
@@ -446,7 +437,7 @@ void RecieveState::Exit()
 {
 }
 
-// TODO 05_03 他のエネミーから呼ばれたときのステートを追加
+// 他のエネミーから呼ばれたときのステートを追加
 void CalledState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
@@ -496,6 +487,7 @@ void StandbyState::Enter()
             MESSAGE_TYPE::MsgAskAttackRight);
     }
 
+    //　攻撃をランダムに設定する
     owner->randomType = (static_cast<EnemyThief::AttackType>(Mathf::RandomRange(1, 2)));
 
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::HoldGun), false);
@@ -517,7 +509,7 @@ void StandbyState::Execute(float elapsedTime)
     float angleY = atan2f(DirectX::XMVectorGetX(toPlayer), DirectX::XMVectorGetZ(toPlayer));
     owner->SetAngle(DirectX::XMFLOAT3(0, angleY, 0));
 
-
+    // 攻撃権があるとき
     if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) 
     {
         Player::Instance().SetgetAttackSoon(true);
@@ -526,7 +518,6 @@ void StandbyState::Execute(float elapsedTime)
             Player::Instance().SetgetShotSoon(true);
 
         }
-
 
         Player::Instance().SetAttackEnemy(owner);
     }

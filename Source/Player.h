@@ -64,6 +64,9 @@ public:
 	// Dodge入力処理
 	bool InputDodge();
 
+    //　回復入力処理
+	bool InputHealing();
+
 	// ロックオンステート
 	enum class LockonState
 	{
@@ -266,8 +269,8 @@ private:
 	//	スイングポイントを探す
 	bool FindWallSwingPoint();
 
+	//　投げ技Active
 	bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);
-
 
     //	Titleステート用
     void TransitionTitleIdleState();
@@ -353,6 +356,12 @@ private:
 	std::unique_ptr<AudioSource> ShotWeb = nullptr;
 	bool shotWebPlayed = false;
 
+    //  回復音
+	std::unique_ptr<AudioSource> Healing = nullptr;
+
+	//	ダメージ音
+	std::unique_ptr<AudioSource> Damage = nullptr;
+
 	// ステート
 	State state = State::Idle;
 	bool attackCollisionFlag = false;
@@ -416,7 +425,7 @@ private:
 	float skillTime;
     float skillTimeMax = 5.0f;
 
-	float ultimateAttackRadius = 5.0f; // 攻撃範囲の半径
+	float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
 
 
 private:

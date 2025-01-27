@@ -18,23 +18,15 @@ public:
 	// 更新処理
 	void Update(float elapsedTime) override;
 
-	//// 描画処理
-	//void Render(const RenderContext& rc, ModelShader* shader) override;
-
 	// 発射
 	void Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position);
 	
 
 private:
-
+	//基本情報
 	float speed = 10.0f;
 	float lifeTimer = 3.0f;
 	bool one = false;
 	static ProjectileStraight* instance;
-
-
-	//　サウンド
-	std::unique_ptr<AudioSource> stickWall = nullptr;
-
 };
 
