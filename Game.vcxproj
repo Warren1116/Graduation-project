@@ -179,7 +179,6 @@
     <ClInclude Include="Source\Renderer\ModelRenderer.h" />
     <ClInclude Include="Source\Renderer\PostprocessingRenderer.h" />
     <ClInclude Include="Source\Renderer\SceneRenderer.h" />
-    <ClInclude Include="Source\Renderer\ShadowmapCasterRenderer.h" />
     <ClInclude Include="Source\Renderer\ShadowmapRenderer.h" />
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\Scene.h" />
@@ -264,7 +263,6 @@
     <ClCompile Include="Source\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp" />
     <ClCompile Include="Source\Renderer\SceneRenderer.cpp" />
-    <ClCompile Include="Source\Renderer\ShadowmapCasterRenderer.cpp" />
     <ClCompile Include="Source\Renderer\ShadowmapRenderer.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\SceneClear.cpp" />

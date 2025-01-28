@@ -39,37 +39,13 @@ float4 main(VS_OUT pin) : SV_TARGET
     
     
 	// 環境光の計算
-    float3 ambient = ka.rgb * ambientLightColor.rgb/* * diffuseColor.rgb*/;
-    //float3 ambient = float()1;
-	
-
-	// 平行光源のライティング計算
-    //float3 diffuse = CalcLambertDiffuse(N, L, directionalLightData.color.rgb, kd.rgb);
-    //float3 specular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks.rgb);
+    float3 ambient = ka.rgb * ambientLightColor.rgb/* * diffuseColor.rgb*/;	
 
     float3 diffuse = CalcLambertDiffuse(N, L, directionalLightData.color.rgb, kd);
     float3 specular = CalcPhongSpecular(N, L, directionalLightData.color.rgb, E, shiness, ks);
 
     // 平行光源の影なので、平行光源に対して影を適応
     float3 shadow = CalcShadowColorPCFFilter(shadowMap, shadowMapSamplerState, pin.shadowTexcoord, shadowColor, shadowBias);
-
-    //float3 shadow = 1;
-    //for (int j = 0; j < ShadowmapCount; ++j)
-    //{
-    //    float3 shadowTexcoord = pin.shadowTexcoord[j];
-    //    シャドウマップのUV範囲内か、深度値が範囲内か判定する
-    //    if (shadowTexcoord.z >= 0 && shadowTexcoord.z <= 1 &&
-    //        shadowTexcoord.x >= 0 && shadowTexcoord.x <= 1 &&
-    //        shadowTexcoord.y >= 0 && shadowTexcoord.y <= 1)
-    //    {
-    //        シャドウマップから深度値取得
-    //        float depth = shadowMap[j].Sample(shadowMapSamplerState, shadowTexcoord.xy).r;
-    //        深度値を比較して影かどうかを判定する
-    //        if (shadowTexcoord.z - depth > shadowBias[j])
-    //            shadow = shadowColor;
-    //        break;
-    //    }
-    //}
     
     diffuse *= shadow;
     specular *= shadow;

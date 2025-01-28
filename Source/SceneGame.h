@@ -16,7 +16,6 @@
 #include "HeadUpDisplay.h"
 #include "EnemyThief.h"
 #include "Enemy.h"
-#include "Renderer\ShadowmapCasterRenderer.h"
 
 // ƒQ[ƒ€ƒV[ƒ“
 class SceneGame : public Scene

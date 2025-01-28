@@ -11,8 +11,6 @@ Meta::Meta(Player* pl, EnemyManager* eManager) : player(pl), enemyManager(eManag
 }
 void Meta::Update()
 {
-	// ここで自発的にメタAIが監視している処理があれば記載する
-	// 今課題ではメタAIのイベントトリガーはメッセージを受信したときのため記述する処理は無し
 
 }
 

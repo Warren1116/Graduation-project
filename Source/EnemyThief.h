@@ -41,9 +41,6 @@ public:
 	// 更新処理
 	void Update(float elapsedTime)override;
 
-	//// 描画処理
-	//void Render(ID3D11DeviceContext* dc, Shader* shader)override;
-
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive() override;
 
@@ -81,14 +78,12 @@ public:
 	float GetAttackRange() { return attackRange; }
 	float GetPunchRange() { return punchRange; }
 
-	//2週目
 	//ステートマシン取得
 	StateMachine* GetStateMachine() { return stateMachine; }
 	//モデル取得
 	Model* GetModel() { return model.get(); }
 
-	//	5週目　
-	//TODO 05_02 メッセージ受信関数を追加
+	//メッセージ受信関数を追加
 	bool OnMessage(const Telegram& msg);
 
 	void SetThrown(bool thrown) { isThrown = thrown; }
@@ -141,7 +136,7 @@ public:
 		Dead,
 	};
 
-	//TODO を経由して他のエネミーから呼ばれたときの処理
+	//を経由して他のエネミーから呼ばれたときの処理
 	enum class Recieve
 	{
 		Called,

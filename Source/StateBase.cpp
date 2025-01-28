@@ -4,7 +4,6 @@
 // 2層目ステートセット
 void HierarchicalState::SetSubState(int newState)
 {
-	// TODO 03_02 前回のSetState関数を参考に記述しなさい
 	subState = subStatePool.at(newState);
 
 	subState->Enter();
@@ -13,7 +12,6 @@ void HierarchicalState::SetSubState(int newState)
 // 2層目のステート切り替え
 void HierarchicalState::ChangeSubState(int newState)
 {
-	// 前回のChangeState関数を参考に記述しなさい
 	if (newState >= 0 && newState < subStatePool.size())
 	{
 		if (subState != nullptr)

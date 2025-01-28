@@ -9,7 +9,6 @@
 #include "Renderer/SceneRenderer.h"
 #include "Renderer\PostprocessingRenderer.h"
 #include "Player.h"
-#include "Renderer\ShadowmapCasterRenderer.h"
 #include "Graphics\Light.h"
 
 
