@@ -180,11 +180,26 @@ private:
     float attackWarningTime = 1.0f;
 };
 
+// ダメージステートオブジェクト
 class  DamageState : public State
 {
 public:
     DamageState(EnemyThief* enemy) : State(enemy) {};
     ~DamageState() {}
+    // ステートに入ったときのメソッド
+    void Enter() override;
+    // ステートで実行するのメソッド
+    void Execute(float elapsedTime) override;
+    // ステートから出ていくときのメソッド
+    void Exit() override;
+};
+
+// 死亡ステートオブジェクト
+class  DeadState : public State
+{
+public:
+    DeadState(EnemyThief* enemy) : State(enemy) {};
+    ~DeadState() {}
     // ステートに入ったときのメソッド
     void Enter() override;
     // ステートで実行するのメソッド

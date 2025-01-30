@@ -28,13 +28,14 @@ public:
 	const SRVHandle GetDepthStencilShaderResourceView() const override;
 
 	//	シーン情報の設定
-	void	SetSceneData(ShaderResourceViewData srv);
+	void  SetSceneData(ShaderResourceViewData srv);
 
 	//	デバッグ情報の表示
-	void	DrawDebugGUI();
+	void  DrawDebugGUI();
 
     //　ラジアルブラーの有効無効
-    void	radialblurActive(bool active);
+    void  radialblurActive(bool active);
+
 
 
 

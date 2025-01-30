@@ -37,6 +37,8 @@ EnemyThief::EnemyThief()
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new AttackState(this));
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PunchState(this));
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new ShotState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new DamageState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new DeadState(this));
 
     // ステートマシンにメッセージを受信したときのサブステートを追加登録
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Recieve), new CalledState(this));
@@ -60,20 +62,13 @@ EnemyThief::~EnemyThief()
 
 void EnemyThief::Update(float elapsedTime)
 {
-    //　状態更新
-    switch (state)
-    {
-    case EnemyThief::State::Damage:
-        UpdateDamageState(elapsedTime);
-        break;
-    }
 
     //　PlayerのSwingKickに攻撃される時
     if (Player::Instance().GetIsUseSwingKick() && IsLockedOn)
     {
-        TransitionDamageState();
+        stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Damage));
     }
-    
+
     //　PlayerのGrabに攻撃される時
     if (Player::Instance().GetIsUseGrab() && IsLockedOn)
     {
@@ -138,7 +133,7 @@ void EnemyThief::Update(float elapsedTime)
     }
 
     //  HPは0以上と投げ技されてないならステージマシン更新
-    if (!Player::Instance().GetIsUseGrab() && health >= 0)
+    if (!Player::Instance().GetIsUseGrab())
     {
         stateMachine->Update(elapsedTime);
     }
@@ -157,78 +152,12 @@ void EnemyThief::Update(float elapsedTime)
 
     // モデル行列更新
     model->UpdateTransform(transform);
-
-    //　死亡ステートの更新
-    if (state == State::Dead && !Player::Instance().GetIsUseGrab())
-    {
-        UpdateDeathState(elapsedTime);
-    }
 }
-
-//　死亡ステートへの遷移
-void EnemyThief::TransitionDeathState()
-{
-    velocity.x = 0;
-    velocity.y = 0;
-    velocity.z = 0;
-    state = State::Dead;
-    if (Player::Instance().GetIsUseGrab())
-    {
-        model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
-    }
-    else
-    {
-        model->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
-    }
-    SetAttackFlg(false);
-
-    Meta::Instance().SendMessaging(
-        GetId(),
-        static_cast<int>(Meta::Identity::Meta),
-        MESSAGE_TYPE::MsgChangeAttackRight);
-
-}
-
-//　死亡ステートの更新
-void EnemyThief::UpdateDeathState(float elapsedTime)
-{
-    if (!model->IsPlayAnimation())
-    {
-        isAlive = false;
-        Destroy();
-        SceneGame::Instance().UnregisterRenderModel(model.get());
-    }
-}
-
-//　ダメージステートへの遷移
-void EnemyThief::TransitionDamageState()
-{
-    state = State::Damage;
-    float attackAnimationSpeed = 1.5f; // アニメーション速度を速くするための倍率
-
-    model->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false, 0.2f, attackAnimationSpeed);
-}
-
-//　ダメージステートの更新
-void EnemyThief::UpdateDamageState(float elapsedTime)
-{
-    if (!model->IsPlayAnimation() && health > 0)
-    {
-        stateMachine->ChangeState(static_cast<int>(EnemyThief::State::Battle));
-    }
-    else if (!model->IsPlayAnimation() && health < 1)
-    {
-        isAlive = false;
-        Destroy();
-        SceneGame::Instance().UnregisterRenderModel(model.get());
-    }
-}
-
 
 // 死亡した時に呼ばれる
 void EnemyThief::OnDead()
 {
-    TransitionDeathState();
+    stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
     Player::Instance().SetgetShotSoon(false);
 }
 

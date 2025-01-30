@@ -143,3 +143,4 @@ void PostprocessingRenderer::radialblurActive(bool active)
         radialblurData.blur_radius = 0.0f;
 	}
 }
+

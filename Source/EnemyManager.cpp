@@ -102,6 +102,7 @@ void EnemyManager::Remove(Enemy* enemy)
 	removes.insert(enemy);
 }
 
+// IDからエネミーを取得
 Enemy* EnemyManager::GetEnemyFromId(int id)
 {
 	for (Enemy* enemy : enemies)

@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Mathf.h"
 #include "MetaAI.h"
+#include "SceneGame.h"
 
 // 徘徊ステートに入った時のメソッド
 void WanderState::Enter()
@@ -523,7 +524,6 @@ void StandbyState::Execute(float elapsedTime)
     }
 
 
-
     // 攻撃権があるとき
     if (owner->GetAttackFlg())
     {
@@ -554,3 +554,54 @@ void StandbyState::Exit()
 
 }
 
+// ダメージステートに入った時のメソッド
+void DamageState::Enter()
+{
+    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false);
+
+}
+
+// ダメージステートで実行するメソッド
+void DamageState::Execute(float elapsedTime)
+{
+    if(!owner->GetModel()->IsPlayAnimation() && owner->GetHealth() > 0)
+    {
+        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
+    }
+    else if (!owner->GetModel()->IsPlayAnimation() && owner->GetHealth() < 0)
+    {
+        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
+    }
+}
+
+// ダメージステートから出ていくときのメソッド
+void DamageState::Exit()
+{
+}
+
+// 死亡ステートに入った時のメソッド
+void DeadState::Enter()
+{
+    // 死亡モーション再生
+    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
+    // 攻撃権を放棄
+        Meta::Instance().SendMessaging(
+        owner->GetId(),
+        static_cast<int>(Meta::Identity::Meta),
+        MESSAGE_TYPE::MsgChangeAttackRight);
+}
+
+// 死亡ステートで実行するメソッド
+void DeadState::Execute(float elapsedTime)
+{
+    if (!owner->GetModel()->IsPlayAnimation())
+    {
+        owner->Destroy();
+        SceneGame::Instance().UnregisterRenderModel(owner->GetModel());
+    }
+}
+
+// 死亡ステートから出ていくときのメソッド
+void DeadState::Exit()
+{
+}

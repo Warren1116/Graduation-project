@@ -97,8 +97,6 @@ public:
     int GetTotalWaves() { return totalWaves; }
     bool IsNextWave() const;
 
-    void SetRadialBlurActive(bool active);
-    bool IsRadialBlurActive() const { return radialBlurActive; }
 
 
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;

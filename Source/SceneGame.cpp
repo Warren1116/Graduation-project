@@ -28,8 +28,8 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 
-#define TUTORIAL
-//#define DEBUG
+//#define TUTORIAL
+#define DEBUG
 
 // 初期化
 void SceneGame::Initialize()
@@ -213,10 +213,13 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+    //　背景音楽
     Bgm->Play(true, 0.1f);
 
+    //　ラジアルブラーの処理
+    postprocessingRenderer->radialblurActive(Player::Instance().GetAttackSoon());
 
-
+    //  Graphicsクラスのインスタンスを取得
     Graphics& graphics = Graphics::Instance();
 
     //  Waveの更新
@@ -236,6 +239,7 @@ void SceneGame::Update(float elapsedTime)
     //  UI更新処理
     UI::Instance().Update(elapsedTime);
 
+    //  Pause時描画のAlpha処理
     if (increasingAlpha)
     {
         alpha += alphaSpeed * 0.7f;
@@ -255,9 +259,6 @@ void SceneGame::Update(float elapsedTime)
         }
     }
 
-    SetRadialBlurActive(Player::Instance().GetAttackSoon());
-
-
     GamePad& gamePad = Input::Instance().GetGamePad();
     const GamePadButton controllerButton =
         GamePad::BTN_UP
@@ -268,15 +269,24 @@ void SceneGame::Update(float elapsedTime)
         | GamePad::BTN_Y
         | GamePad::BTN_A
         | GamePad::BTN_B
+        | GamePad::BTN_LEFT_SHOULDER
+        | GamePad::BTN_RIGHT_SHOULDER
+        | GamePad::BTN_LEFT_THUMB
+        | GamePad::BTN_RIGHT_THUMB
+        | GamePad::BTN_LEFT_TRIGGER
+        | GamePad::BTN_RIGHT_TRIGGER
         ;
 
+    //  コントローラーの使用切り替え
     if (gamePad.GetButtonDown() & controllerButton)
     {
         UseController = true;
     }
     Mouse& mouse = Input::Instance().GetMouse();
-    float mouseLength = sqrtf((mouse.GetPositionX() - mouse.GetOldPositionX()) * (mouse.GetPositionX() - mouse.GetOldPositionX()) + (mouse.GetPositionY() - mouse.GetOldPositionY()) * (mouse.GetPositionY() - mouse.GetOldPositionY()));
-
+    float mouseLength = sqrtf((mouse.GetPositionX() - mouse.GetOldPositionX()) *
+        (mouse.GetPositionX() - mouse.GetOldPositionX()) + 
+        (mouse.GetPositionY() - mouse.GetOldPositionY()) * 
+        (mouse.GetPositionY() - mouse.GetOldPositionY()));
     if (mouseLength > 0.0f)
     {
         UseController = false;
@@ -325,6 +335,7 @@ void SceneGame::Update(float elapsedTime)
             SceneManager::Instance().ChangeScene(new SceneTitle);
         }
 
+        //  チュトリアルの操作方法選択
         if (isTutorial)
         {
             if (mouse.GetPositionX() > screenWidth * 0.35f && mouse.GetPositionX() < screenWidth * 0.35f + 250
@@ -427,20 +438,15 @@ void SceneGame::Render()
     RenderContext rc;
     rc.deviceContext = dc;
     rc.shadowMapData = shadowmapRenderer->GetShadowMapData();
-    //rc.shadowMapData = shadowmapCasterRenderer->GetShadowMapData();
 
     // シャドウマップの描画
     shadowmapRenderer->Render(rc.deviceContext);
-    //shadowmapCasterRenderer->Render(rc.deviceContext);
 
     // シーンの描画
     sceneRenderer->SetShadowmapData(rc.shadowMapData);
     sceneRenderer->Render(rc.deviceContext);
 
-
     postprocessingRenderer->Render(rc.deviceContext);
-    //postprocessingRenderer->radialblurActive(Player::Instance().GetAttackSoon());
-
 
 
     // カメラパラメータ設定
@@ -654,6 +660,7 @@ void SceneGame::Render()
 
 }
 
+//  チュトリアルの更新処理
 void SceneGame::UpdateTutorialState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -731,6 +738,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
                 AdvanceTutorialState(SceneGame::TutorialState::Grab);
         }
         break;
+        //  投げ技のチュトリアル
     case SceneGame::TutorialState::Grab:
         if (Player::Instance().GetLockonEnemy() != nullptr)
         {
@@ -757,6 +765,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
             AdvanceTutorialState(lastState);
         }
         break;
+        //  回復のチュトリアル
     case SceneGame::TutorialState::Healing:
         CheckTutorialTimeout(0.3f);
         if (player->InputHealing())
@@ -764,6 +773,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
             AdvanceTutorialState(lastState);
         }
         break;
+        //  必殺技のチュトリアル
     case SceneGame::TutorialState::Ultimate:
         if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_V || gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER))
         {
@@ -842,28 +852,6 @@ bool SceneGame::IsNextWave() const
     return nextWaveTimer > 0.0f;
 }
 
-void SceneGame::SetRadialBlurActive(bool active)
-{
-    Graphics& graphics = Graphics::Instance();
-    ID3D11DeviceContext* dc = graphics.GetDeviceContext();
-
-    // 描画処理
-    RenderContext rc;
-    rc.deviceContext = dc;
-
-    if (active)
-    {
-        if (rc.radialblurData.blur_radius < 50.0f)
-        {
-            rc.radialblurData.blur_radius++;
-        }
-    }
-    else
-    {
-        rc.radialblurData.blur_radius = 0.0f;
-    }
-}
-
 //  Waveによって敵を生成
 void SceneGame::SpawnEnemiesForWave(int wave)
 {
@@ -895,11 +883,10 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         CharacterManager& characterManager = CharacterManager::Instance();
         {
             characterManager.Register(thief);
-
         }
-
     }
     break;
+
     case 1:
     {
         // 敵を初期化
@@ -939,7 +926,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief6->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
         EnemyManager::Instance().Register(thief6);
 
-
         //	モデルを各レンダラーに登録
         Model* list[] =
         {
@@ -965,11 +951,10 @@ void SceneGame::SpawnEnemiesForWave(int wave)
             characterManager.Register(thief4);
             characterManager.Register(thief5);
             characterManager.Register(thief6);
-
         }
-
     }
     break;
+
     case 2:
     {
         // 敵を初期化
@@ -1033,11 +1018,10 @@ void SceneGame::SpawnEnemiesForWave(int wave)
             characterManager.Register(thief4);
             characterManager.Register(thief5);
             characterManager.Register(thief6);
-
         }
-
     }
     break;
+
     case 3:
     {
         EnemyThief* thief = new EnemyThief();
@@ -1076,8 +1060,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief6->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
         EnemyManager::Instance().Register(thief6);
 
-
-
         //	モデルを各レンダラーに登録
         Model* list[] =
         {
@@ -1103,10 +1085,10 @@ void SceneGame::SpawnEnemiesForWave(int wave)
             characterManager.Register(thief4);
             characterManager.Register(thief5);
             characterManager.Register(thief6);
-
         }
     }
     break;
+
     case 4:
     {
         EnemyThief* thief = new EnemyThief();
@@ -1151,7 +1133,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief7->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
         EnemyManager::Instance().Register(thief7);
 
-
         //	モデルを各レンダラーに登録
         Model* list[] =
         {
@@ -1179,7 +1160,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
             characterManager.Register(thief5);
             characterManager.Register(thief6);
             characterManager.Register(thief7);
-
         }
     }
     break;
@@ -1246,7 +1226,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief10->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
         EnemyManager::Instance().Register(thief10);
 
-
         //	モデルを各レンダラーに登録
         Model* list[] =
         {
@@ -1283,6 +1262,7 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         }
     }
     break;
+
     }
 
 }

@@ -89,20 +89,6 @@ public:
 	void SetThrown(bool thrown) { isThrown = thrown; }
 	bool IsThrown() const { return isThrown; }
 
-private:
-
-	// 死亡ステートへ遷移
-	void TransitionDeathState();
-
-	// 死亡ステート更新処理
-	void UpdateDeathState(float elapsedTime);
-
-	// ダメージステートへ遷移
-	void TransitionDamageState();
-    // ダメージステート更新処理
-    void UpdateDamageState(float elapsedTime);
-
-
 protected:
 	void OnDead();
 
@@ -112,11 +98,9 @@ public:
 	{
 		Search,
 		Battle,
+
 		// MetaAIからメッセージを受信したときのステートを追加
 		Recieve,
-		Dead,
-
-		Damage,
 	};
 
 	enum class Search
@@ -131,9 +115,10 @@ public:
 		Attack,
 		Punch,
 		Shot,
+		Damage,
+		Dead,
 		// 戦闘中に攻撃権を持っていないときの処理を追加
 		Standby,
-		Dead,
 	};
 
 	//を経由して他のエネミーから呼ばれたときの処理
@@ -141,6 +126,7 @@ public:
 	{
 		Called,
 	};
+
 
 	float				stateTimer = 0.0f;
 
