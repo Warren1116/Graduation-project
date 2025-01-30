@@ -28,5 +28,9 @@ private:
 	float lifeTimer = 3.0f;
 	bool one = false;
 	static ProjectileStraight* instance;
+
+	std::unique_ptr<Effect> destroyEffect = nullptr;
+
+
 };
 

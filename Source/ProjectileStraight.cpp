@@ -10,6 +10,7 @@ ProjectileStraight::ProjectileStraight(ProjectileManager* manager) : Projectile(
 {
     instance = this;
 	model = std::make_unique<Model>("Data/Model/SpiderWeb/spiderweb.mdl");
+    destroyEffect = std::make_unique<Effect>("Data/Effect/web4.efk");
 
 	// 表示サイズ
 	scale.x = scale.y = scale.z = 0.05f;
@@ -53,6 +54,8 @@ void ProjectileStraight::Update(float elapsedTime)
     HitResult hit;
     if (StageManager::Instance().RayCast(start, end, hit))
     {
+        destroyEffect->Play(hit.position,0.15f);
+        //destroyEffect->SetScale(destroyEffect->GetHandle(), { 0.01f,0.01f,0.01f });
         position.x = hit.position.x;
         position.y = hit.position.y;
         position.z = hit.position.z;

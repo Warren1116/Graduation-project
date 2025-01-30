@@ -9,14 +9,12 @@
 Projectile::Projectile(ProjectileManager* manager)
 	: manager(manager)
 {
-	//destroyEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
 	manager->Register(this);
 }
 
 Projectile::Projectile(BrokenProjectileManager* broken_manager)
 	: broken_manager(broken_manager)
 {
-	//destroyEffect = std::make_unique<Effect>("Data/Effect/Hit.efk");
 	broken_manager->Register(this);
 }
 

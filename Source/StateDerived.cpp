@@ -558,8 +558,8 @@ void StandbyState::Exit()
 void DamageState::Enter()
 {
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false);
-
 }
+
 
 // ダメージステートで実行するメソッド
 void DamageState::Execute(float elapsedTime)
@@ -573,6 +573,7 @@ void DamageState::Execute(float elapsedTime)
         owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
     }
 }
+
 
 // ダメージステートから出ていくときのメソッド
 void DamageState::Exit()

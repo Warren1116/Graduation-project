@@ -50,8 +50,6 @@ EnemyThief::EnemyThief()
     stateMachine->SetState(static_cast<int>(State::Search));
     ThrowFlag = false;
 
-
-
 }
 
 // デストラクタ
