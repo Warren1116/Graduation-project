@@ -176,6 +176,7 @@
     <ClInclude Include="Source\ProjectileStraight.h" />
     <ClInclude Include="Source\ProjectileWall.h" />
     <ClInclude Include="Source\Renderer\BaseRenderer.h" />
+    <ClInclude Include="Source\Renderer\DecalRenderer.h" />
     <ClInclude Include="Source\Renderer\ModelRenderer.h" />
     <ClInclude Include="Source\Renderer\PostprocessingRenderer.h" />
     <ClInclude Include="Source\Renderer\SceneRenderer.h" />
@@ -260,6 +261,7 @@
     <ClCompile Include="Source\ProjectileStraight.cpp" />
     <ClCompile Include="Source\ProjectileWall.cpp" />
     <ClCompile Include="Source\Renderer\BaseRenderer.cpp" />
+    <ClCompile Include="Source\Renderer\DecalRenderer.cpp" />
     <ClCompile Include="Source\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp" />
     <ClCompile Include="Source\Renderer\SceneRenderer.cpp" />

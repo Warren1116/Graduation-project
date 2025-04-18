@@ -14,6 +14,8 @@
 
 //#define DEBUG
 
+SceneTitle* SceneTitle::instance = nullptr;
+
 // 初期化
 void SceneTitle::Initialize()
 {
@@ -28,7 +30,6 @@ void SceneTitle::Initialize()
 
         //	シャドウマップレンダラー
         shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
-        //shadowmapCasterRenderer = std::make_unique<ShadowmapCasterRenderer>(2048);
 
         //	シーンレンダラー
         sceneRenderer = std::make_unique<SceneRenderer>(width, height);
@@ -106,8 +107,8 @@ void SceneTitle::Initialize()
     Bgm = Audio::Instance().LoadAudioSource("Data/Audio/TitleBgm.wav");
 
 
-    UseController = false;
-    controllerPos = { 0,0 };
+    UseController = true;
+    controllerPos = { 0,540 };
 
 }
 
@@ -122,7 +123,7 @@ void SceneTitle::Finalize()
     LightManager::Instance().Clear();
 
     shadowmapRenderer->ClearRenderModel();
-    //shadowmapCasterRenderer->ClearRenderModel();
+
     sceneRenderer->ClearRenderModel();
 
 }
@@ -197,6 +198,7 @@ void SceneTitle::Update(float elapsedTime)
         controllerPos.y == 540 && gamePad.GetButtonDown() & GamePad::BTN_A)
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
+
     }
 
 
@@ -254,11 +256,9 @@ void SceneTitle::Render()
     {
         //シャドウマップの描画
         shadowmapRenderer->Render(dc);
-        //shadowmapCasterRenderer->Render(dc);
 
         //シーンの描画
         sceneRenderer->SetShadowmapData(shadowmapRenderer->GetShadowMapData());
-        //sceneRenderer->SetShadowmapData(shadowmapCasterRenderer->GetShadowMapData());
         sceneRenderer->Render(dc);
 
         postprocessingRenderer->Render(dc);
@@ -407,7 +407,6 @@ void SceneTitle::Render()
 //  モデルをレンダラーに登録
 void SceneTitle::RegisterRenderModel(Model* model)
 {
-    //shadowmapCasterRenderer->RegisterRenderModel(model);
     shadowmapRenderer->RegisterRenderModel(model);
     sceneRenderer->RegisterRenderModel(model);
     const ModelResource* resource = model->GetResource();
@@ -422,7 +421,6 @@ void SceneTitle::RegisterRenderModel(Model* model)
 void SceneTitle::UnregisterRenderModel(Model* model)
 {
     shadowmapRenderer->UnregisterRenderModel(model);
-    //shadowmapCasterRenderer->UnregisterRenderModel(model);
     sceneRenderer->UnregisterRenderModel(model);
 
 

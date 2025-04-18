@@ -3,6 +3,10 @@
 #include "Graphics/Texture.h"
 #include <WICTextureLoader.h>
 #include <DDSTextureLoader.h>
+#include <sstream>
+#include <filesystem>
+#include <map>
+using namespace std;
 
 //#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -79,3 +83,52 @@ Texture::Texture(const char* filename)
 	}
 }
 
+
+
+//static map<wstring, ComPtr<ID3D11ShaderResourceView>> resources;
+//HRESULT load_texture_from_file(ID3D11Device* device, const wchar_t* filename, ID3D11ShaderResourceView** shader_resource_view, D3D11_TEXTURE2D_DESC* texture2d_desc)
+//{
+//	HRESULT hr{ S_OK };
+//	ComPtr<ID3D11Resource> resource;
+//
+//	auto it = resources.find(filename);
+//	if (it != resources.end())
+//	{
+//		*shader_resource_view = it->second.Get();
+//		(*shader_resource_view)->AddRef();
+//		(*shader_resource_view)->GetResource(resource.GetAddressOf());
+//	}
+//	else
+//	{
+//		// UNIT.31
+//		std::filesystem::path dds_filename(filename);
+//		dds_filename.replace_extension("dds");
+//		if (std::filesystem::exists(dds_filename.c_str()))
+//		{
+//			hr = DirectX::CreateDDSTextureFromFile(device, dds_filename.c_str(), resource.GetAddressOf(), shader_resource_view);
+//			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//		}
+//		else
+//		{
+//			hr = DirectX::CreateWICTextureFromFile(device, filename, resource.GetAddressOf(), shader_resource_view);
+//			_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//		}
+//		resources.insert(make_pair(filename, *shader_resource_view));
+//	}
+//
+//	// DECAL
+//	if (texture2d_desc)
+//	{
+//		ComPtr<ID3D11Texture2D> texture2d;
+//		hr = resource.Get()->QueryInterface<ID3D11Texture2D>(texture2d.GetAddressOf());
+//		_ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+//		texture2d->GetDesc(texture2d_desc);
+//	}
+//
+//	return hr;
+//}
+//void release_all_textures()
+//{
+//	resources.clear();
+//}
+//

@@ -31,6 +31,7 @@ public:
 	// デバッグプリミティブ描画
 	void DrawDebugPrimitive();
 
+    // デバッグGUI描画
 	void DrawDebugGUI();
 
 	// エネミー数取得

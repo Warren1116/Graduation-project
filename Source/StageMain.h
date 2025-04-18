@@ -5,6 +5,7 @@
 #include "WayPoint.h"
 #include "EffectManager.h"
 #include "Effect.h"
+#include <functional>
 
 
 // ステージ
@@ -27,6 +28,23 @@ private:
 		};
 		std::vector<Area>		areas;
 	};
+
+	struct mesh
+	{
+		std::string name;
+		struct subset
+		{
+			std::string material_name;
+			std::vector<DirectX::XMFLOAT3> positions;
+		};
+		std::vector<subset> subsets;
+		DirectX::XMFLOAT3 bounding_box[2]
+		{
+			{ +D3D11_FLOAT32_MAX, +D3D11_FLOAT32_MAX, +D3D11_FLOAT32_MAX },
+			{ -D3D11_FLOAT32_MAX, -D3D11_FLOAT32_MAX, -D3D11_FLOAT32_MAX }
+		};
+	};
+	std::vector<mesh> meshes;
 
 public:
 	StageMain();

@@ -47,53 +47,7 @@ float4 CalcFog(in float4 color, float4 fog_color, float eye_length)
 }
 
 float4 main(VS_OUT pin) : SV_TARGET
-{
-	//// カラーの取得
- //   float4 color = sceneTexture.Sample(sceneSampler, pin.texcoord) * pin.color;
-
-	//// ブルームテクスチャを加算する
- //   color.rgb += bloomTexture.Sample(sceneSampler, pin.texcoord).rgb;
-
- //   //  深度値を取る
- //   float depth = DepthMap.Sample(sceneSampler, pin.texcoord).r;
-    
- //   //  NDC座標と深度値からワールド座標に変換する
- //   float4 ndc = float4(pin.texcoord.xy, depth, 1);
- //   ndc.x = ndc.x * 2 - 1;
- //   ndc.y = ndc.y * -2 + 1;
- //   float4 pos = mul(ndc, mul(inverseProjection, inverseView));
- //   pos /= pos.w;
- //   //  カメラからピクセル座標への距離を求める
- //   depth = length(pos.xyz - viewPosition.xyz);
-    
- //   // Compute fog factor
- //   //float fogFactor = ComputeFogFactor(fogDensity, depth, fogHeightFalloff, fogCutoffDistance);
- //   float fogFactor = ComputeFogFactor(fogDensity, depth, fogHeightFalloff, groundLevel, viewPosition.xyz);
-
- //   // Apply fog to color
- //   color = ApplyFog(color, fogColor, fogFactor);
-        		
-	//// 色調補正処理
-	//{
-	//	// RGB > HSVに変換
- //       color.rgb = RGB2HSV(color.rgb);
-
-	//	// 色相調整
- //       color.r += hueShift;
-
-	//	// 彩度調整
- //       color.g *= saturation;
-
-	//	// 明度調整
- //       color.b *= brightness;
-
-	//	// HSV > RGBに変換
- //       color.rgb = HSV2RGB(color.rgb);
- //   }
-
- //   return color;
-
-    
+{  
     float2 scene_map_size;
     sceneTexture.GetDimensions(scene_map_size.x, scene_map_size.y);
     

@@ -483,48 +483,49 @@ void Sprite::Render(ID3D11DeviceContext* immediate_context, float dx, float dy, 
 
 }
 
-void Sprite::Render(ID3D11DeviceContext* immediate_context, Vertex* vertices) const
-{
-	{
-		// 頂点バッファの内容の編集を開始する。
-		D3D11_MAPPED_SUBRESOURCE mappedBuffer;
-		HRESULT hr = immediate_context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+//void Sprite::Render(ID3D11DeviceContext* immediate_context, Vertex* vertices) const
+//{
+//	{
+//		// 頂点バッファの内容の編集を開始する。
+//		D3D11_MAPPED_SUBRESOURCE mappedBuffer;
+//		HRESULT hr = immediate_context->Map(vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+//		_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+//
+//		// pDataを編集することで頂点データの内容を書き換えることができる。
+//		Vertex* v = static_cast<Vertex*>(mappedBuffer.pData);
+//		for (int i = 0; i < 4; ++i)
+//		{
+//			v[i] = vertices[i];
+//		}
+//
+//		// 頂点バッファの内容の編集を終了する。
+//		immediate_context->Unmap(vertexBuffer.Get(), 0);
+//	}
+//
+//	{
+//		// パイプライン設定
+//		UINT stride = sizeof(Vertex);
+//		UINT offset = 0;
+//		immediate_context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+//		immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+//		immediate_context->IASetInputLayout(inputLayout.Get());
+//
+//		immediate_context->RSSetState(rasterizerState.Get());
+//		const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+//		immediate_context->OMSetBlendState(blendState.Get(), blendFactor, 0xFFFFFFFF);
+//
+//		immediate_context->VSSetShader(vertexShader.Get(), nullptr, 0);
+//		immediate_context->PSSetShader(pixelShader.Get(), nullptr, 0);
+//
+//		immediate_context->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
+//		immediate_context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+//
+//		// 描画
+//		immediate_context->Draw(4, 0);
+//	}
+//
+//}
 
-		// pDataを編集することで頂点データの内容を書き換えることができる。
-		Vertex* v = static_cast<Vertex*>(mappedBuffer.pData);
-		for (int i = 0; i < 4; ++i)
-		{
-			v[i] = vertices[i];
-		}
-
-		// 頂点バッファの内容の編集を終了する。
-		immediate_context->Unmap(vertexBuffer.Get(), 0);
-	}
-
-	{
-		// パイプライン設定
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		immediate_context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-		immediate_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		immediate_context->IASetInputLayout(inputLayout.Get());
-
-		immediate_context->RSSetState(rasterizerState.Get());
-		const float blendFactor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		immediate_context->OMSetBlendState(blendState.Get(), blendFactor, 0xFFFFFFFF);
-
-		immediate_context->VSSetShader(vertexShader.Get(), nullptr, 0);
-		immediate_context->PSSetShader(pixelShader.Get(), nullptr, 0);
-
-		immediate_context->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
-		immediate_context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
-
-		// 描画
-		immediate_context->Draw(4, 0);
-	}
-
-}
 
 void Sprite::textout(ID3D11DeviceContext* immediate_context, std::string s, float x, float y, float w, float h, DirectX::XMFLOAT4 color)
 {

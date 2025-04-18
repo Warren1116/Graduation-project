@@ -529,8 +529,8 @@ void Player::UpdateGrabState(float elapsedTime)
         shotWebPlayed = false;
         fallSoundPlayed = false;
 
+        lockonEnemy->ApplyDamage(110.0, 1.0);
         IsUseGrab = false;
-        lockonEnemy->ApplyDamage(100.0, 1.0);
 
         if (lockonEnemy)
         {
@@ -650,8 +650,6 @@ bool Player::IsNearWallTop()
 
 }
 
-
-
 //　カメラステート更新処理
 void Player::UpdateCameraState(float elapsedTime)
 {
@@ -684,7 +682,6 @@ void Player::UpdateCameraState(float elapsedTime)
         Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
         return;
     }
-
 
     switch (state)
     {
@@ -777,8 +774,7 @@ void Player::UpdateCameraState(float elapsedTime)
                     }
                     else
                     {
-
-                        MessageData::CAMERACHANGEFREEMODEDATA	p = { position };
+                        MessageData::CAMERACHANGEFREEMODEDATA p = { position };
                         Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
                         break;
                     }
@@ -791,7 +787,7 @@ void Player::UpdateCameraState(float elapsedTime)
         }
 
         //  今ロックしてる敵がまだ存在するかどうか（死亡）
-        if (lockonState == LockonState::Locked && lockonEnemy != nullptr && lockonEnemy->GetHealth() == 0)
+        if (lockonState == LockonState::Locked && lockonEnemy != nullptr && lockonEnemy->GetHealth() < 1)
         {
             // 死亡したら次一番近いの敵を探す
             lockonEnemy->SetLockedOn(false);
@@ -878,19 +874,25 @@ void Player::UpdateCameraState(float elapsedTime)
     case State::Grab:
     {
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
-        float vx = sinf(angle.y) * -9;
-        float vz = -cosf(angle.y) * -9;
+        float backDistance = 7.0f;
+        float heightOffset = 2.0f;
+
+        float vx = sinf(angle.y) * -backDistance;
+        float vz = cosf(angle.y) * -backDistance;
         p.data.push_back({ 0, { position.x + vx, position.y + 3, position.z + vz }, position });
+        
+        vx = sin(angle.y + DirectX::XM_PIDIV2 * 0.5f) * -backDistance;
+        vz = cos(angle.y + DirectX::XM_PIDIV2 * 0.5f) * -backDistance;
+        p.data.push_back({ 100, { position.x + vx, position.y + 3, position.z + vz }, position });
 
-        vx = sinf(angle.y + DirectX::XM_PIDIV2) * -10;
-        vz = cosf(angle.y + DirectX::XM_PIDIV2) * -10;
-        p.data.push_back({ 180, { position.x + vx, position.y + 3, position.z + vz }, position });
+        vx = sin(angle.y + DirectX::XM_PIDIV2) * -backDistance;
+        vz = cos(angle.y + DirectX::XM_PIDIV2) * -backDistance;
+        p.data.push_back({ 200, { position.x + vx, position.y + 3, position.z + vz }, position });
 
-        vx = sinf(angle.y) * 7;
-        vz = -cosf(angle.y) * 7;
-        p.data.push_back({ 230, { position.x + vx, position.y + 3, position.z + vz }, position });
+
 
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
+
         break;
     }
     case State::Ultimate:
@@ -919,7 +921,6 @@ void Player::UpdateCameraState(float elapsedTime)
         vx = sinf(angle.y) * 8;
         vz = cosf(angle.y) * 8;
         p.data.push_back({ 145, { position.x + vx, position.y + 2, position.z + vz }, position });
-
 
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
         break;
@@ -1140,6 +1141,25 @@ void Player::TransitionIdleState()
     onSwing = false;
     firstSwing = true;
 
+    if (lastState == State::Swing)
+    {
+        // 前方に進むためのベクトルを計算
+        DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+
+        forwardVec = DirectX::XMVector3Normalize(forwardVec);
+        upVec = DirectX::XMVector3Normalize(upVec);
+
+        forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // 勢いを調整
+        upVec = DirectX::XMVectorScale(upVec, 8.0f);
+
+        // 速度に加算
+        DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+        velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
+        DirectX::XMStoreFloat3(&velocity, velocityVec);
+
+    }
+
     //　クライミング中なら別の待機モーション
     if (onClimb)
     {
@@ -1257,17 +1277,13 @@ void Player::UpdateMoveState(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
     //  移動中SHIFTキー同時に押すと
-    HitResult hit;
-    //if (FindWallSwingPoint(position, 5.0f, hit))
-    //{
     if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime) && firstSwing)
     {
         lastState = state;
         TransitionSwingState();
     }
-    //}
 
-    if (/*GetAttackSoon() && */InputDodge())
+    if (InputDodge())
     {
         TransitionDodgeState();
     }
@@ -1699,7 +1715,6 @@ void Player::UpdateLandState(float elapsedTime)
 void Player::TransitionSwingState()
 {
     state = State::Swing;
-
     //  移動中スイングすると
     if (lastState == State::Move)
     {
@@ -1889,17 +1904,25 @@ void Player::UpdateSwingState(float elapsedTime)
     //  自動で連続スイングする
     if (dotProduct <= 0)
     {
-        Swing->Play(false, 0.8f);
-        TransitionSwingState();
+        // 前方に進むためのベクトルを計算
+        DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+
+        forwardVec = DirectX::XMVector3Normalize(forwardVec);
+        upVec = DirectX::XMVector3Normalize(upVec);
+
+        forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // 勢いを調整
+        upVec = DirectX::XMVectorScale(upVec, 8.0f);
+
+        // 速度に加算
+        DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+        velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
+        DirectX::XMStoreFloat3(&velocity, velocityVec);
+
+        TransitionSwingToKickState();
+        //Swing->Play(false, 0.8f);
+        //TransitionSwingState();
     }
-
-    //  キーボードで連続スイングする
-    //if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_TRIGGER)
-    //{
-    //    TransitionSwingState();
-    //    return;
-    //}
-
 
     //位置更新
     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
@@ -1914,8 +1937,9 @@ void Player::UpdateSwingState(float elapsedTime)
     //  キーを押されてない時スイングをキャンセルする
     if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
     {
+        lastState = state;
         TransitionIdleState();
-        velocity = { 0,0,0 };
+        /*velocity = { 0,0,0 };*/
     }
 }
 

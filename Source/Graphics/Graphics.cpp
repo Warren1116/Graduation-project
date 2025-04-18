@@ -156,6 +156,7 @@ Graphics::Graphics(HWND hWnd)
 		imguiRenderer = std::make_unique<ImGuiRenderer>(hWnd, device.Get());
 		//geometricPrimitive = std::make_unique<GeometricPrimitive>(device.Get());
 	}
+
 }
 
 // デストラクタ

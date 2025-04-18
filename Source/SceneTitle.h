@@ -16,9 +16,9 @@
 class SceneTitle : public Scene
 {
 public:
-
 	SceneTitle() {}
 	~SceneTitle() override {}
+	static SceneTitle& Instance() { return *instance; }
 
 	// èâä˙âª
 	void Initialize() override;
@@ -41,10 +41,7 @@ private:
 	std::unique_ptr<SceneRenderer>			sceneRenderer;
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
-    //std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
 
-	//std::unique_ptr<Sprite> Font;
-	//std::unique_ptr<Sprite> TextFont;
 	std::unique_ptr<Sprite> Title;
 	std::unique_ptr<Sprite> Start;
 	std::unique_ptr<Sprite> Quit;
@@ -67,6 +64,10 @@ private:
 
 	//BGM
 	std::unique_ptr<AudioSource> Bgm = nullptr;
+
+private:
+	static SceneTitle* instance;
+
 
 };
 

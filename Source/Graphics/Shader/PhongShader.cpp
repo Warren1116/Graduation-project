@@ -238,25 +238,11 @@ void PhongShader::Begin(const RenderContext& rc)
     cbShadowMap.lightViewProjection = rc.shadowMapData.lightViewProjection;
     cbShadowMap.shadowBias = rc.shadowMapData.shadowBias;
 
-
-    //for (int i = 0; i < ShadowmapCount; ++i)
-    //{
-    //    //	バイアスの処理が4枚以上は考慮していないのでアサートで止めておく
-    //    assert(ShadowmapCount <= 4);  //本来はstatic_assertの使用が望ましい
-    //    (&cbShadowMap.shadowBias.x)[i] = rc.shadowMapData.shadowBias[i];
-    //    cbShadowMap.lightViewProjection[i] = rc.shadowMapData.lightViewProjection[i];
-    //}
-
     rc.deviceContext->UpdateSubresource(shadowMapConstantBuffer.Get(), 0, 0, &cbShadowMap, 0, 0);
     //シャドウマップ設定
 
     rc.deviceContext->PSSetShaderResources(2, 1, &rc.shadowMapData.shadowMap);
-    //ID3D11ShaderResourceView* srvs[ShadowmapCount];
-    //for (int i = 0; i < ShadowmapCount; ++i)
-    //{
-    //    srvs[i] = rc.shadowMapData.shadowMap[i];
-    //}
-    //rc.deviceContext->PSSetShaderResources(2, ShadowmapCount, srvs);
+
 
 }
 
@@ -266,33 +252,6 @@ void PhongShader::SetBuffers(const RenderContext& rc, const std::vector<Model::N
     // メッシュ用定数バッファ更新
     CbMesh cbMesh;
     ::memset(&cbMesh, 0, sizeof(cbMesh));
-
-    //if (!mesh.nodeIndices.empty())
-    //{
-    //    for (size_t i = 0; i < mesh.nodeIndices.size(); ++i)
-    //    {
-    //        if (mesh.nodeIndices.at(i) < nodes.size() && i < mesh.offsetTransforms.size())
-    //        {
-    //            DirectX::XMMATRIX worldTransform = DirectX::XMLoadFloat4x4(&nodes.at(mesh.nodeIndices.at(i)).worldTransform);
-    //            DirectX::XMMATRIX offsetTransform = DirectX::XMLoadFloat4x4(&mesh.offsetTransforms.at(i));
-    //            DirectX::XMMATRIX boneTransform = offsetTransform * worldTransform;
-    //            DirectX::XMStoreFloat4x4(&cbMesh.boneTransforms[i], boneTransform);
-    //        }
-    //    }
-    //}
-    //else if (mesh.nodeIndex < nodes.size())
-    //{
-    //    cbMesh.boneTransforms[0] = nodes.at(mesh.nodeIndex).worldTransform;
-    //}
-
-    //rc.deviceContext->UpdateSubresource(meshConstantBuffer.Get(), 0, 0, &cbMesh, 0, 0);
-
-    //UINT stride = sizeof(ModelResource::Vertex);
-    //UINT offset = 0;
-    //rc.deviceContext->IASetVertexBuffers(0, 1, mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-    //rc.deviceContext->IASetIndexBuffer(mesh.indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-    //rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
 
     if (mesh.nodeIndices.size() > 0)
     {
@@ -375,7 +334,6 @@ void PhongShader::Draw(const RenderContext& rc, const Model* model)
             CbSubset cbSubset;
             cbSubset.materialColor = subset.material->color;
             rc.deviceContext->UpdateSubresource(subsetConstantBuffer.Get(), 0, 0, &cbSubset, 0, 0);
-            //rc.deviceContext->PSSetShaderResources(0, 1, subset.material->diffuse_map.GetAddressOf());
             ID3D11ShaderResourceView* srvs[] =
             {
                 subset.material->diffuse_map.Get(),
@@ -396,7 +354,6 @@ void PhongShader::End(const RenderContext& rc)
     rc.deviceContext->PSSetShader(nullptr, nullptr, 0);
     rc.deviceContext->IASetInputLayout(nullptr);
 
-    //ID3D11ShaderResourceView* srvs[] = { nullptr ,nullptr,nullptr};
     ID3D11ShaderResourceView* srvs[] = { nullptr ,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
     rc.deviceContext->PSSetShaderResources(0, ARRAYSIZE(srvs), srvs);
 }

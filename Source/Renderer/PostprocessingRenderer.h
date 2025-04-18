@@ -38,7 +38,6 @@ public:
 
 
 
-
 private:
 	// シーン描画データ
 	ShaderResourceViewData			sceneData;

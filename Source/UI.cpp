@@ -5,6 +5,7 @@
 #include "Input\GamePad.h"
 #include "Input\Input.h"
 #include "EnemyManager.h"
+#include "SceneTitle.h"
 
 #define TUTORIAL
 

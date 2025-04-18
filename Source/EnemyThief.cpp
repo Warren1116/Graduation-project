@@ -48,7 +48,8 @@ EnemyThief::EnemyThief()
 
     // ステートをセット
     stateMachine->SetState(static_cast<int>(State::Search));
-    ThrowFlag = false;
+
+    GetThrowFlag = false;
 
 }
 
@@ -60,7 +61,6 @@ EnemyThief::~EnemyThief()
 
 void EnemyThief::Update(float elapsedTime)
 {
-
     //　PlayerのSwingKickに攻撃される時
     if (Player::Instance().GetIsUseSwingKick() && IsLockedOn)
     {
@@ -70,11 +70,11 @@ void EnemyThief::Update(float elapsedTime)
     //　PlayerのGrabに攻撃される時
     if (Player::Instance().GetIsUseGrab() && IsLockedOn)
     {
-        ThrowFlag = true;
+        GetThrowFlag = true;
     }
 
     // 投げ技される時の処理
-    if (ThrowFlag)
+    if (GetThrowFlag)
     {
         webTimer += elapsedTime;
 
@@ -123,9 +123,8 @@ void EnemyThief::Update(float elapsedTime)
             newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorSet(0.0f, -0.5f * gravity * timeElapsed * timeElapsed, 0.0f, 0.0f));
 
             position = DirectX::XMFLOAT3(DirectX::XMVectorGetX(newPosition), DirectX::XMVectorGetY(newPosition), DirectX::XMVectorGetZ(newPosition));
-            model->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
 
-            ThrowFlag = false;
+            GetThrowFlag = false;
         }
 
     }
@@ -150,13 +149,15 @@ void EnemyThief::Update(float elapsedTime)
 
     // モデル行列更新
     model->UpdateTransform(transform);
+
 }
 
 // 死亡した時に呼ばれる
 void EnemyThief::OnDead()
 {
-    stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
     Player::Instance().SetgetShotSoon(false);
+    stateMachine->SetState(static_cast<int>(State::Battle));
+    stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
 }
 
 void EnemyThief::DrawDebugPrimitive()
@@ -219,7 +220,7 @@ bool EnemyThief::OnMessage(const Telegram& telegram)
     case MESSAGE_TYPE::MsgCallHelp:
         if (!SearchPlayer())
         {	// プレイヤーを見つけていないときに一層目ステートをReceiveに変更する
-            stateMachine->ChangeState(static_cast<int>(EnemyThief::State::Recieve));
+            stateMachine->SetState(static_cast<int>(EnemyThief::State::Recieve));
         }
         return true;
         //	メタAIから攻撃権を与えられたとき
@@ -296,6 +297,22 @@ void EnemyThief::DrawDebugGUI()
         {
             subStr = "Standby";
         }
+        if (stateMachine->GetState()->GetSubStateIndex() == static_cast<int>(EnemyThief::Battle::Shot))
+        {
+            subStr = "Shot";
+        }
+        if (stateMachine->GetState()->GetSubStateIndex() == static_cast<int>(EnemyThief::Battle::Punch))
+        {
+            subStr = "Punch";
+        }
+        if (stateMachine->GetState()->GetSubStateIndex() == static_cast<int>(EnemyThief::Battle::Damage))
+        {
+            subStr = "Damage";
+        }
+        if (stateMachine->GetState()->GetSubStateIndex() == static_cast<int>(EnemyThief::Battle::Dead))
+        {
+            subStr = "Dead";
+        }
         break;
     case State::Recieve:
         if (stateMachine->GetStateIndex() == static_cast<int>(EnemyThief::Recieve::Called))
@@ -329,6 +346,7 @@ void EnemyThief::DrawDebugGUI()
         ImGui::Checkbox("lockon", &IsLockedOn);
         ImGui::InputFloat("webTimer", &webTimer);
         ImGui::InputInt("Hp", &health);
+
     }
 
 

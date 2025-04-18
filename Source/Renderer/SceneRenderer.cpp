@@ -85,14 +85,6 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		// ライトの情報をセット
 		LightManager::Instance().PushRenderContext(rc);
 
-		// シャドウマップの情報をセット
-		//for (int i = 0; i < ShadowmapCount; ++i)
-		//{
-		//	rc.shadowMapData.shadowMap[i] = shadowmapDepthStencil[i]->GetShaderResourceView().Get();
-		//	rc.shadowMapData.lightViewProjection[i] = lightViewProjection[i];
-		//	rc.shadowMapData.shadowBias[i] = shadowBias[i];
-		//}
-
 		//シャドウマップの情報をセット
 		rc.shadowMapData = shadowMapData;
 

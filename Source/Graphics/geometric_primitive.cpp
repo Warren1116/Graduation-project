@@ -66,14 +66,9 @@ void GeometricPrimitive::create_com_buffers(ID3D11Device* device, vertex* vertic
 
 Geometric_cube::Geometric_cube(ID3D11Device* device) : GeometricPrimitive(device)
 {
-    vertex vertices[24]
-    {
-    };
-
-
-    uint32_t indices[36]
-    {
-    };
+    // create a mesh for a cube
+    vertex vertices[24]{};
+    uint32_t indices[36]{};
 
     //top
     uint32_t face = 0;

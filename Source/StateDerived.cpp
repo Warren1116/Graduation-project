@@ -7,7 +7,8 @@
 // 徘徊ステートに入った時のメソッド
 void WanderState::Enter()
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetHealth() <= 0)
+        return;
 
     owner->SetRandomTargetPosition();
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Walk), true);
@@ -16,7 +17,8 @@ void WanderState::Enter()
 // 徘徊ステートで実行するメソッド
 void WanderState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetHealth() <= 0)
+        return;
 
     // 目的地点までのXZ平面での距離判定
     DirectX::XMFLOAT3 position = owner->GetPosition();
@@ -55,7 +57,7 @@ void WanderState::Exit()
 // 待機ステートに入った時のメソッド
 void IdleState::Enter()
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // タイマーをランダム設定
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Idle), true);
@@ -65,7 +67,7 @@ void IdleState::Enter()
 // 待機ステートで実行するメソッド
 void IdleState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // タイマー処理
     owner->SetStateTimer(owner->GetStateTimer() - elapsedTime);
@@ -89,7 +91,7 @@ void IdleState::Exit()
 // 追跡ステートに入った時のメソッド
 void PursuitState::Enter()
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
@@ -106,9 +108,9 @@ void PursuitState::Enter()
 // 追跡ステートで実行するメソッド
 void PursuitState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
-    if (!owner->IsThrown())
+    if (!owner->IsGetThrow())
     {
         // 各種Execute関数の内容は各Update○○State関数を参考に
         // 目標地点をプレイヤー位置に設定
@@ -149,7 +151,7 @@ void PursuitState::Exit()
 // 攻撃ステートに入った時のメソッド
 void AttackState::Enter()
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // 攻撃タイプをランダムで決定
     // パンチ攻撃
@@ -169,7 +171,7 @@ void AttackState::Enter()
 // 攻撃ステートで実行するメソッド
 void AttackState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     owner->SetTargetPosition(Player::Instance().GetPosition());
 
@@ -201,7 +203,7 @@ void AttackState::Exit()
 // パンチステートに入った時のメソッド
 void PunchState::Enter()
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
@@ -225,7 +227,7 @@ void PunchState::Enter()
 // パンチステートで実行するメソッド
 void PunchState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     owner->SetTargetPosition(Player::Instance().GetPosition());
 
@@ -278,7 +280,7 @@ void ShotState::Enter()
 {
     Fire = Audio::Instance().LoadAudioSource("Data/Audio/Fire.wav");
 
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
@@ -314,7 +316,7 @@ void ShotState::Enter()
 // シュートステートで実行するメソッド
 void ShotState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // 攻撃権があるとき
     if (owner->GetAttackFlg())
@@ -441,7 +443,7 @@ void RecieveState::Exit()
 // 他のエネミーから呼ばれたときのステートを追加
 void CalledState::Enter()
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(5.0f);
@@ -450,7 +452,8 @@ void CalledState::Enter()
 // コールドステートで実行するメソッド
 void CalledState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetHealth() <= 0)
+        return;
 
     // タイマー処理
     float timer = owner->GetStateTimer();
@@ -464,6 +467,8 @@ void CalledState::Execute(float elapsedTime)
     // 対象をプレイヤー地点に設定
     owner->SetTargetPosition(Player::Instance().GetPosition());
     owner->MoveToTarget(elapsedTime, 1.0f);
+    owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
+
 
 }
 
@@ -475,7 +480,7 @@ void CalledState::Exit()
 // 戦闘待機ステートに入った時のメソッド
 void StandbyState::Enter()
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
@@ -499,7 +504,7 @@ void StandbyState::Enter()
 // 戦闘待機ステートで実行するメソッド
 void StandbyState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)return;
+    if (owner->GetDeadCheck())return;
 
     // プレイヤーに向けて
     DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
@@ -568,10 +573,7 @@ void DamageState::Execute(float elapsedTime)
     {
         owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
     }
-    else if (!owner->GetModel()->IsPlayAnimation() && owner->GetHealth() < 0)
-    {
-        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
-    }
+
 }
 
 
@@ -583,13 +585,21 @@ void DamageState::Exit()
 // 死亡ステートに入った時のメソッド
 void DeadState::Enter()
 {
+    owner->SetDeadCheck(true);
     // 死亡モーション再生
-    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
+    if (owner->IsGetThrow())
+    {
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
+    }
+    else
+    {
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
+    }
     // 攻撃権を放棄
-        Meta::Instance().SendMessaging(
-        owner->GetId(),
-        static_cast<int>(Meta::Identity::Meta),
-        MESSAGE_TYPE::MsgChangeAttackRight);
+    Meta::Instance().SendMessaging(
+    owner->GetId(),
+    static_cast<int>(Meta::Identity::Meta),
+    MESSAGE_TYPE::MsgChangeAttackRight);
 }
 
 // 死亡ステートで実行するメソッド
@@ -597,8 +607,8 @@ void DeadState::Execute(float elapsedTime)
 {
     if (!owner->GetModel()->IsPlayAnimation())
     {
-        owner->Destroy();
         SceneGame::Instance().UnregisterRenderModel(owner->GetModel());
+        owner->Destroy();
     }
 }
 

@@ -39,8 +39,6 @@ void SceneGame::Initialize()
 
     //シャドウマップ用に深度ステンシルの生成
     {
-
-        //shadowmapDepthStencil = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
         for (auto& it : shadowmapDepthStencil)
         {
             it = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
@@ -60,7 +58,6 @@ void SceneGame::Initialize()
 
         //	シャドウマップレンダラー
         shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
-        //shadowmapCasterRenderer = std::make_unique<ShadowmapCasterRenderer>(2048);
         //	シーンレンダラー
         sceneRenderer = std::make_unique<SceneRenderer>(width, height);
 
@@ -163,7 +160,7 @@ void SceneGame::Initialize()
     // HUD生成
     //headUpDisplay = new HeadUpDisplay();
 
-    UseController = false;
+    UseController = true;
     controllerPos = { 245,540 };
 
 }
@@ -188,7 +185,6 @@ void SceneGame::Finalize()
     EffectManager::Instance().Finalize();
     instance = nullptr;
 
-    //shadowmapCasterRenderer->ClearRenderModel();
     shadowmapRenderer->ClearRenderModel();
     sceneRenderer->ClearRenderModel();
 
@@ -213,6 +209,7 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+
     //　背景音楽
     Bgm->Play(true, 0.1f);
 
@@ -284,8 +281,8 @@ void SceneGame::Update(float elapsedTime)
     }
     Mouse& mouse = Input::Instance().GetMouse();
     float mouseLength = sqrtf((mouse.GetPositionX() - mouse.GetOldPositionX()) *
-        (mouse.GetPositionX() - mouse.GetOldPositionX()) + 
-        (mouse.GetPositionY() - mouse.GetOldPositionY()) * 
+        (mouse.GetPositionX() - mouse.GetOldPositionX()) +
+        (mouse.GetPositionY() - mouse.GetOldPositionY()) *
         (mouse.GetPositionY() - mouse.GetOldPositionY()));
     if (mouseLength > 0.0f)
     {
@@ -313,6 +310,7 @@ void SceneGame::Update(float elapsedTime)
 
         }
 
+        //  マウスの座標取得
         Mouse& mouse = Input::Instance().GetMouse();
         float screenWidth = static_cast<float>(graphics.GetScreenWidth());
         float screenHeight = static_cast<float>(graphics.GetScreenHeight());
@@ -394,28 +392,25 @@ void SceneGame::Update(float elapsedTime)
     //// HUD更新
     //headUpDisplay->Update(elapsedTime);
 
+     // キャラクターマネージャーの更新
+    CharacterManager::Instance().Update(elapsedTime);
+
+
     // カメラコントローラー更新処理
     Camera& camera = Camera::Instance();
 
     cameraController->Update(elapsedTime);
+    
 
 
 #ifdef DEBUG
-    //GamePad& gamePad = Input::Instance().GetGamePad();
-    //if (gamePad.GetButtonDown() & GamePad::BTN_ESC)
-    //{
-    //    isPaused = !isPaused;
-    //}
 
     if (gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT && gamePad.GetButton() & GamePad::BTN_KEYBOARD_R)
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
     }
-    //if (isPaused)
-    //{
-    //    return;
-    //}
-#endif // 
+
+#endif 
 
 }
 
@@ -448,7 +443,6 @@ void SceneGame::Render()
 
     postprocessingRenderer->Render(rc.deviceContext);
 
-
     // カメラパラメータ設定
     Camera& camera = Camera::Instance();
     rc.viewPosition.x = camera.GetEye().x;
@@ -478,19 +472,19 @@ void SceneGame::Render()
                 && mouse.GetPositionY() > screenHeight * 0.2f + 50 && mouse.GetPositionY() < screenHeight * 0.2f + 170 ||
                 UseController && controllerPos.y == 300)
             {
-                ControlWay->Render(dc, 
+                ControlWay->Render(dc,
                     screenWidth * 0.08f, screenHeight * 0.15f,
                     350, 350,
-                    0, 0, 
+                    0, 0,
                     static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
             }
             else
             {
-                ControlWay->Render(dc, 
+                ControlWay->Render(dc,
                     screenWidth * 0.1f, screenHeight * 0.2f,
                     250, 250,
-                    0, 0, 
+                    0, 0,
                     static_cast<float>(ControlWay->GetTextureWidth()), static_cast<float>(ControlWay->GetTextureHeight())
                     , 0, 1, 1, 1, 1);
             }
@@ -529,14 +523,14 @@ void SceneGame::Render()
                     ControllerFont->Render(dc,
                         screenWidth * 0.35f, screenHeight * 0.1f,
                         350, 350,
-                        0, 0, 
+                        0, 0,
                         static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
                         , 0, 1, 1, 1, alpha);
 
                     ControllerPicture->Render(dc,
                         screenWidth * 0.35f, screenHeight * 0.25f,
                         750, 650,
-                        0, 0, 
+                        0, 0,
                         static_cast<float>(ControllerPicture->GetTextureWidth()), static_cast<float>(ControllerPicture->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
@@ -545,7 +539,7 @@ void SceneGame::Render()
                     ControllerFont->Render(dc,
                         screenWidth * 0.35f, screenHeight * 0.1f,
                         250, 250,
-                        0, 0, 
+                        0, 0,
                         static_cast<float>(ControllerFont->GetTextureWidth()), static_cast<float>(ControllerFont->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
@@ -563,7 +557,7 @@ void SceneGame::Render()
                     KeyBoardPicture->Render(dc,
                         screenWidth * 0.35f, screenHeight * 0.32f,
                         870, 480,
-                        0, 0, 
+                        0, 0,
                         static_cast<float>(KeyBoardPicture->GetTextureWidth()), static_cast<float>(KeyBoardPicture->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
@@ -572,7 +566,7 @@ void SceneGame::Render()
                     KeyBoardFont->Render(dc,
                         screenWidth * 0.65f, screenHeight * 0.1f,
                         250, 250,
-                        0, 0, 
+                        0, 0,
                         static_cast<float>(KeyBoardFont->GetTextureWidth()), static_cast<float>(KeyBoardFont->GetTextureHeight())
                         , 0, 1, 1, 1, 1);
                 }
@@ -631,6 +625,12 @@ void SceneGame::Render()
             case TutorialState::Swing:
                 str = "Tutorial Swing";
                 break;
+            case TutorialState::Healing:
+                str = "Tutorial Healing";
+                break;
+            case TutorialState::Ultimate:
+                str = "Tutorial Ultimate";
+                break;
             case TutorialState::Finish:
                 str = "Tutorial Finish";
                 break;
@@ -648,7 +648,6 @@ void SceneGame::Render()
         LightManager::Instance().DrawDebugGUI();
         ImGui::Separator();
         shadowmapRenderer->DrawDebugGUI();
-        //shadowmapCasterRenderer->DrawDebugGUI();
         ImGui::Separator();
         sceneRenderer->DrawDebugGUI();
         ImGui::Separator();
@@ -749,7 +748,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         break;
         //  スイングのチュトリアル
     case SceneGame::TutorialState::Swing:
-        if(player->GetOnSwing())
+        if (player->GetOnSwing())
             AdvanceTutorialState(SceneGame::TutorialState::Climb);
         break;
         //  クライミングのチュトリアル
@@ -775,7 +774,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         break;
         //  必殺技のチュトリアル
     case SceneGame::TutorialState::Ultimate:
-        if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_V || gamePad.GetButton() & GamePad::BTN_LEFT_SHOULDER))
+        if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
         {
             AdvanceTutorialState(lastState);
         }
@@ -844,13 +843,13 @@ void SceneGame::UnregisterRenderModel(Model* model)
 {
     shadowmapRenderer->UnregisterRenderModel(model);
     sceneRenderer->UnregisterRenderModel(model);
-
 }
 
 bool SceneGame::IsNextWave() const
 {
     return nextWaveTimer > 0.0f;
 }
+
 
 //  Waveによって敵を生成
 void SceneGame::SpawnEnemiesForWave(int wave)
@@ -1102,7 +1101,7 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief2->SetTerritory(thief2->GetPosition(), 10.0f);
         thief2->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
         EnemyManager::Instance().Register(thief2);
-          
+
         EnemyThief* thief3 = new EnemyThief();
         thief3->SetPosition(DirectX::XMFLOAT3(37.0f, 0.0f, -25.0f));
         thief3->SetTerritory(thief3->GetPosition(), 10.0f);
@@ -1114,7 +1113,7 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief4->SetTerritory(thief4->GetPosition(), 10.0f);
         thief4->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(270), 0));
         EnemyManager::Instance().Register(thief4);
-                
+
         EnemyThief* thief5 = new EnemyThief();
         thief5->SetPosition(DirectX::XMFLOAT3(39.0f, 0.0f, -21.0f));
         thief5->SetTerritory(thief5->GetPosition(), 10.0f);
@@ -1292,6 +1291,7 @@ void SceneGame::CheckWaveClear()
         StartNextWave();
     }
 }
+
 
 
 

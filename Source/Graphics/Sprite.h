@@ -52,8 +52,8 @@ public:
 		float angle, Pivot pivot = Pivot::LeftTop,
 		float r = 1, float g = 1, float b = 1, float a = 1) const;
 
-	// ï`âÊé¿çs
-	void Render(ID3D11DeviceContext* dc, Vertex* vertices) const;
+	//// ï`âÊé¿çs
+	//void Render(ID3D11DeviceContext* dc, Vertex* vertices) const;
 
 
 	void textout(ID3D11DeviceContext* immediate_context, std::string s,

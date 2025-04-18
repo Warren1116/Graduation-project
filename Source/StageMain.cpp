@@ -6,10 +6,11 @@
 #include "Player.h"
 #include <algorithm>
 #include "SceneGame.h"
-
+#include <functional>
 
 static  StageMain* instance = nullptr;
 int stageNum = -1;
+
 
 // インスタンス取得
 StageMain& StageMain::Instance()
@@ -26,6 +27,7 @@ void StageMain::SetStageNum(int num)
 {
     stageNum = num;
 }
+
 
 // コンストラクタ
 StageMain::StageMain()

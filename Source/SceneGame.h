@@ -17,6 +17,11 @@
 #include "EnemyThief.h"
 #include "Enemy.h"
 
+#include "Graphics\geometric_primitive.h"
+
+#include "CharacterManager.h"
+
+
 // ゲームシーン
 class SceneGame : public Scene
 {
@@ -97,19 +102,10 @@ public:
     int GetTotalWaves() { return totalWaves; }
     bool IsNextWave() const;
 
-
-
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
-    //std::unique_ptr<ShadowmapCasterRenderer> shadowmapCasterRenderer;
 
-    //	シャドウマップ用情報
-    //std::unique_ptr<DepthStencil> shadowmapDepthStencil;	//シャドウマップ用深度ステンシルバッファ
-    //float shadowDrawRect = 500.0f;
-    //DirectX::XMFLOAT4X4 lightViewProjection;				//ライトビュープロジェクション行列
-    //DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };		//影の色
-    //float shadowBias = 0.001f;								//深度比較用のオフセット値
 
     //	シャドウマップ用深度ステンシルバッファ
     std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
@@ -122,7 +118,12 @@ public:
 
     float shadowDrawRect = 500.0f;
 
-
+    // COLLISION_MESH
+    DirectX::XMFLOAT4X4 transform;
+    DirectX::XMFLOAT3 intersection_position;
+    DirectX::XMFLOAT3 intersection_normal;
+    std::string intersection_mesh;
+    std::string intersection_material;
 
 private:
     std::unique_ptr<Player> player;
@@ -195,6 +196,5 @@ private:
 
     //ラジアルブラー
     bool radialBlurActive = false;
-
 
 };

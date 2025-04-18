@@ -52,6 +52,15 @@
     <Filter Include="Source\System\Event">
       <UniqueIdentifier>{37d7831b-76d1-4923-a6e6-c17044a7ec20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Character\Enemy">
+      <UniqueIdentifier>{e6df2e2b-d334-4dec-85c3-37513fde6b15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Character\Player">
+      <UniqueIdentifier>{abd84b0f-79b7-4659-992f-e6370aff6443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Graphics\Renderer">
+      <UniqueIdentifier>{1ab40f13-e458-41ab-bb7e-9c01046c8ed3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -78,13 +87,7 @@
     <ClInclude Include="Source\Input\GamePad.h">
       <Filter>Source\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\DebugRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\Graphics.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Graphics\ImGuiRenderer.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Model.h">
@@ -100,9 +103,6 @@
       <Filter>Source\Input</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\RenderContext.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Graphics\LineRenderer.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Sprite.h">
@@ -138,12 +138,6 @@
     <ClInclude Include="Source\Character.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Enemy.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyManager.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Framework.h">
       <Filter>Source\System</Filter>
     </ClInclude>
@@ -158,18 +152,6 @@
     </ClInclude>
     <ClInclude Include="Source\Misc.h">
       <Filter>Source\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Player.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Projectile.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileManager.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileStraight.h">
-      <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\ResourceManager.h">
       <Filter>Source\System</Filter>
@@ -213,9 +195,6 @@
     <ClInclude Include="Source\SearchAlgorithm.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\BaseRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="External\DirectXTex\DDSTextureLoader.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
@@ -228,20 +207,11 @@
     <ClInclude Include="Source\Graphics\Shader\FinalpassShader.h">
       <Filter>Source\Graphics\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\ModelRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Renderer\PostprocessingRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\RenderTarget.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Shader\ShadowmapCasterShader.h">
       <Filter>Source\Graphics\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Renderer\ShadowmapRenderer.h">
-      <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Shader\SkyboxShader.h">
       <Filter>Source\Graphics\Shader</Filter>
@@ -251,12 +221,6 @@
     </ClInclude>
     <ClInclude Include="Source\SceneClear.h">
       <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileWall.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EnemyThief.h">
-      <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\StateDerived.h">
       <Filter>Source\System\AI</Filter>
@@ -282,17 +246,8 @@
     <ClInclude Include="Source\Graphics\Geometric_primitive.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BrokenProjectileManager.h">
-      <Filter>Source\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Renderer\SceneRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI.h">
       <Filter>Source\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SwingWeb.h">
-      <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\EventData.h">
       <Filter>Source\System\Event</Filter>
@@ -312,10 +267,67 @@
     <ClInclude Include="Source\SpriteLayout.h">
       <Filter>Source\System\Event</Filter>
     </ClInclude>
-    <ClInclude Include="Source\PrimitiveRenderer.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Source\BrokenProjectileManager.h">
+      <Filter>Source\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Enemy.h">
+      <Filter>Source\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyManager.h">
+      <Filter>Source\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyThief.h">
+      <Filter>Source\Character\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Player.h">
+      <Filter>Source\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Projectile.h">
+      <Filter>Source\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileManager.h">
+      <Filter>Source\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileStraight.h">
+      <Filter>Source\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileWall.h">
+      <Filter>Source\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SwingWeb.h">
+      <Filter>Source\Character\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\BaseRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGuiRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\ModelRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\PostprocessingRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\ShadowmapRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\SceneRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PrimitiveRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\LineRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\DebugRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer\DecalRenderer.h">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -336,13 +348,7 @@
     <ClCompile Include="Source\Input\GamePad.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\DebugRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\Graphics.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Model.cpp">
@@ -353,9 +359,6 @@
     </ClCompile>
     <ClCompile Include="Source\Input\Input.cpp">
       <Filter>Source\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\LineRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Sprite.cpp">
       <Filter>Source\Graphics</Filter>
@@ -390,12 +393,6 @@
     <ClCompile Include="Source\Character.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Enemy.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyManager.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Framework.cpp">
       <Filter>Source\System</Filter>
     </ClCompile>
@@ -407,18 +404,6 @@
     </ClCompile>
     <ClCompile Include="Source\Mathf.cpp">
       <Filter>Source\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Player.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Projectile.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileManager.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileStraight.cpp">
-      <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\ResourceManager.cpp">
       <Filter>Source\System</Filter>
@@ -453,9 +438,6 @@
     <ClCompile Include="Source\Graphics\LightManager.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\BaseRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
@@ -468,20 +450,11 @@
     <ClCompile Include="Source\Graphics\Shader\FinalpassShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Renderer\ModelRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\RenderTarget.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Shader\ShadowmapCasterShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\ShadowmapRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Shader\SkyboxShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
@@ -494,12 +467,6 @@
     </ClCompile>
     <ClCompile Include="Source\SceneClear.cpp">
       <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileWall.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EnemyThief.cpp">
-      <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\StateBase.cpp">
       <Filter>Source\System\AI</Filter>
@@ -525,17 +492,8 @@
     <ClCompile Include="Source\Graphics\Shader.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BrokenProjectileManager.cpp">
-      <Filter>Source\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\SceneRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI.cpp">
       <Filter>Source\UI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SwingWeb.cpp">
-      <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\EventData.cpp">
       <Filter>Source\System\Event</Filter>
@@ -555,8 +513,65 @@
     <ClCompile Include="Source\SpriteLayout.cpp">
       <Filter>Source\System\Event</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BrokenProjectileManager.cpp">
+      <Filter>Source\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Enemy.cpp">
+      <Filter>Source\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyManager.cpp">
+      <Filter>Source\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyThief.cpp">
+      <Filter>Source\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Player.cpp">
+      <Filter>Source\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Projectile.cpp">
+      <Filter>Source\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileManager.cpp">
+      <Filter>Source\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileStraight.cpp">
+      <Filter>Source\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileWall.cpp">
+      <Filter>Source\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SwingWeb.cpp">
+      <Filter>Source\Character\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\BaseRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ModelRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\ShadowmapRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\SceneRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="Source\PrimitiveRenderer.cpp">
-      <Filter>Source\Graphics</Filter>
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\LineRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\DebugRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer\DecalRenderer.cpp">
+      <Filter>Source\Graphics\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

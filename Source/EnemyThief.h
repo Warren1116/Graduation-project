@@ -86,8 +86,11 @@ public:
 	//メッセージ受信関数を追加
 	bool OnMessage(const Telegram& msg);
 
-	void SetThrown(bool thrown) { isThrown = thrown; }
-	bool IsThrown() const { return isThrown; }
+	void SetThrow(bool thown) { GetThrowFlag = thown; }
+	bool IsGetThrow() const { return GetThrowFlag; }
+
+
+
 
 protected:
 	void OnDead();
@@ -98,7 +101,6 @@ public:
 	{
 		Search,
 		Battle,
-
 		// MetaAIからメッセージを受信したときのステートを追加
 		Recieve,
 	};
@@ -151,7 +153,7 @@ private:
 	float timeElapsed = 0.0f;
 	float totalFlightTime;
 	float webTimer;
-	bool ThrowFlag;
+	bool GetThrowFlag;
 
 
 
