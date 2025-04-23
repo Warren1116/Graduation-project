@@ -26,6 +26,7 @@
 class SceneGame : public Scene
 {
 public:
+
     SceneGame() {}
     ~SceneGame() override {}
     static SceneGame& Instance() { return *instance; }
@@ -124,6 +125,8 @@ public:
     DirectX::XMFLOAT3 intersection_normal;
     std::string intersection_mesh;
     std::string intersection_material;
+
+
 
 private:
     std::unique_ptr<Player> player;

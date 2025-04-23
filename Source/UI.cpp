@@ -33,6 +33,7 @@ void UI::Initialize()
     HpBox = std::make_unique<Sprite>("Data/Sprite/HpBox1.png");
     Number = std::make_unique<Sprite>("Data/Sprite/Numbers.png");
     WaveCounterBox = std::make_unique<Sprite>(("Data/Sprite/WaveCounterBox.png"));
+    Hold = std::make_unique<Sprite>("Data/Sprite/Hold.png");
     HpBar = std::make_unique<Sprite>();
     SkillBar = std::make_unique<Sprite>();
 
@@ -387,7 +388,7 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         Font->Render(dc, screenWidth * 0.43f, screenHeight * 0.8f, 220.0f, 220.0f, 0, 0, static_cast<float>(Font->GetTextureWidth()), static_cast<float>(Font->GetTextureHeight()), 0, 1, 1, 1, 1);
         RenderTutorialSprite(TutorialSwing, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, -250, -300);
 
-        TextFont->textout(dc, "Hold", screenWidth * 0.38f, screenHeight * 0.68f, 30, 30, { 0,0,0,1 });
+        Hold->Render(dc, screenWidth * 0.38f, screenHeight * 0.65f, 120, 120, 0, 0, static_cast<float>(Hold->GetTextureWidth()), static_cast<float>(Hold->GetTextureHeight()), 0, 1, 1, 1, 1);
         TextFont->textout(dc, "+", screenWidth * 0.48f, screenHeight * 0.75f, 40, 40, { 1,1,1,1 });
 
         RenderTutorialSprite(TutorialMove, dc, screenWidth * 0.5f, screenHeight, 1.0f, isController, 0, -300);
@@ -449,7 +450,6 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
             1, 1, 1, 1);
     }
 }
-
 
 
 void UI::Clear()

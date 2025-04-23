@@ -118,6 +118,7 @@ void SceneGame::Initialize()
     }
 
 
+
     //// キャラクター生成処理
     CharacterManager& characterManager = CharacterManager::Instance();
     {

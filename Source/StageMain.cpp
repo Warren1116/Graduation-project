@@ -160,17 +160,22 @@ void StageMain::Update(float elapsedTime)
     DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
 
     if (playerPos.x < volumeMin.x || playerPos.x > volumeMax.x
-        || playerPos.z < volumeMin.z || playerPos.z > volumeMax.z
-        || playerPos.y < volumeMin.y)
+        || playerPos.z < volumeMin.z || playerPos.z > volumeMax.z)
     {
         DirectX::XMFLOAT3 clampedPos = playerPos;
         clampedPos.x = std::clamp(playerPos.x, volumeMin.x, volumeMax.x);
         clampedPos.z = std::clamp(playerPos.z, volumeMin.z, volumeMax.z);
+
+        Player::Instance().SetPosition(clampedPos);
+    }
+    if (playerPos.y < volumeMin.y)
+    {
+        DirectX::XMFLOAT3 clampedPos = playerPos;
         float offsetY = 0.9f;
         clampedPos.y = volumeMin.y + offsetY;
         Player::Instance().SetPosition(clampedPos);
-        Player::Instance().SetVelocity({ 0, 0, 0 });
     }
+
 
     // タイマーを更新
     warningAreaTimer += elapsedTime;

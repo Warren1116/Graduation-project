@@ -27,7 +27,7 @@ public:
 
     void RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
-    void RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection); 
+    void RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
     void RenderTutorialSprite(std::unique_ptr<Sprite>& sprite, ID3D11DeviceContext* dc, float screenWidth, float screenHeight, float alpha, bool isController, float offsetX = 0.0f, float offsetY = 0.0f);
 
@@ -56,6 +56,7 @@ private:
 
     std::unique_ptr<Sprite> Font;
     std::unique_ptr<Sprite> Font2;
+    std::unique_ptr<Sprite> Hold;
 
     std::unique_ptr<Sprite> SpiderSense;
     std::unique_ptr<Sprite> SpiderSense2;
@@ -80,7 +81,7 @@ private:
     float alphaSpeed = 0.02f;
     bool increasingAlpha = false;
     bool fadeOut = true;
-    
+
 
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
     float radialblurRadius = 0.0f;
