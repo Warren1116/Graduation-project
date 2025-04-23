@@ -17,7 +17,7 @@ Model::Model(const char* filename)
 
 	// ノード
 	const std::vector<ModelResource::Node>& resNodes = resource->GetNodes();
-	
+
 	nodes.resize(resNodes.size());
 	for (size_t nodeIndex = 0; nodeIndex < nodes.size(); ++nodeIndex)
 	{
@@ -76,6 +76,9 @@ void Model::UpdateTransform(const DirectX::XMFLOAT4X4& transform)
 // アニメーション更新処理
 void Model::UpdateAnimation(float elapsedTime)
 {
+	//アニメーションを再生中でないなら処理しない
+	if (isAnimationPaused) return;
+
 	// 再生中でないなら処理しない
 	if (!IsPlayAnimation()) return;
 
@@ -134,7 +137,7 @@ void Model::UpdateAnimation(float elapsedTime)
 					DirectX::XMVECTOR S = DirectX::XMVectorLerp(S0, S1, blendRate);
 					DirectX::XMVECTOR R = DirectX::XMQuaternionSlerp(R0, R1, blendRate);
 					DirectX::XMVECTOR T = DirectX::XMVectorLerp(T0, T1, blendRate);
-					
+
 					DirectX::XMStoreFloat3(&node.scale, S);
 					DirectX::XMStoreFloat4(&node.rotate, R);
 					DirectX::XMStoreFloat3(&node.translate, T);
@@ -205,7 +208,7 @@ void Model::PlayAnimation(int index, bool loop, float blendSeconds, float speed)
 	animationEndFlag = false;
 	animationBlendTime = 0.0f;
 	animationBlendSeconds = blendSeconds;
-    animationSpeed = speed;
+	animationSpeed = speed;
 }
 
 // アニメーション再生中か

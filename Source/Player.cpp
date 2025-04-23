@@ -880,7 +880,7 @@ void Player::UpdateCameraState(float elapsedTime)
         float vx = sinf(angle.y) * -backDistance;
         float vz = cosf(angle.y) * -backDistance;
         p.data.push_back({ 0, { position.x + vx, position.y + 3, position.z + vz }, position });
-        
+
         vx = sin(angle.y + DirectX::XM_PIDIV2 * 0.5f) * -backDistance;
         vz = cos(angle.y + DirectX::XM_PIDIV2 * 0.5f) * -backDistance;
         p.data.push_back({ 100, { position.x + vx, position.y + 3, position.z + vz }, position });

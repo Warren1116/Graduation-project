@@ -156,14 +156,18 @@ StageMain::~StageMain()
 // 更新処理
 void StageMain::Update(float elapsedTime)
 {
+    // プレイヤーの位置を取得
     DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
 
     if (playerPos.x < volumeMin.x || playerPos.x > volumeMax.x
-        || playerPos.z < volumeMin.z || playerPos.z > volumeMax.z)
+        || playerPos.z < volumeMin.z || playerPos.z > volumeMax.z
+        || playerPos.y < volumeMin.y)
     {
         DirectX::XMFLOAT3 clampedPos = playerPos;
         clampedPos.x = std::clamp(playerPos.x, volumeMin.x, volumeMax.x);
         clampedPos.z = std::clamp(playerPos.z, volumeMin.z, volumeMax.z);
+        float offsetY = 0.9f;
+        clampedPos.y = volumeMin.y + offsetY;
         Player::Instance().SetPosition(clampedPos);
         Player::Instance().SetVelocity({ 0, 0, 0 });
     }
@@ -172,6 +176,7 @@ void StageMain::Update(float elapsedTime)
     warningAreaTimer += elapsedTime;
     warningArea2Timer += elapsedTime;
 
+    // プレイヤーが指定の範囲外に出たら警告エフェクトを再生
     if ((playerPos.x < volumeMin.x || playerPos.x > volumeMax.x) && warningAreaTimer >= warningAreaCooldown)
     {
         warningArea->Play(playerPos);
@@ -181,6 +186,26 @@ void StageMain::Update(float elapsedTime)
     {
         warningArea2->Play(playerPos);
         warningArea2Timer = 0.0f;
+    }
+
+
+
+    EnemyManager& enemyManager = EnemyManager::Instance();
+
+    int enemyCount = enemyManager.GetEnemyCount();
+    for (int i = 0; i < enemyCount; ++i)
+    {
+        Enemy* enemy = enemyManager.GetEnemy(i);
+
+        DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
+        if (enemyPos.x < volumeMin.x || enemyPos.x > volumeMax.x
+            || enemyPos.z < volumeMin.z || enemyPos.z > volumeMax.z)
+        {
+            DirectX::XMFLOAT3 clampedPos = enemyPos;
+            clampedPos.x = std::clamp(enemyPos.x, volumeMin.x, volumeMax.x);
+            clampedPos.z = std::clamp(enemyPos.z, volumeMin.z, volumeMax.z);
+            enemy->SetPosition(clampedPos);
+        }
     }
 
     // モデル行列更新

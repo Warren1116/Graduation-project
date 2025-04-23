@@ -12,7 +12,7 @@ class Enemy : public Character
 public:
 	Enemy() {}
 	~Enemy() override {}
-	
+
 	// 更新処理
 	virtual void Update(float elapsedTime) = 0;
 
@@ -36,8 +36,14 @@ public:
 	// メッセージ受信したときの処理
 	virtual bool OnMessage(const Telegram& msg);
 
-    // モデル取得
+	// モデル取得
 	Model* GetModel() const { return model; }
+
+	// ダメージを受けたときに呼ばれる
+	void OnDamaged() override {};
+
+	// 死亡したときに呼ばれる
+	void OnDead() override {};
 
 protected:
 	Model* model = nullptr;

@@ -14,8 +14,8 @@ public:
 
 	struct Node
 	{
-		const char*			name;
-		Node*				parent = nullptr;
+		const char* name;
+		Node* parent = nullptr;
 		DirectX::XMFLOAT3	scale = { 1, 1, 1 };
 		DirectX::XMFLOAT4	rotate = { 0, 0, 0, 1 };
 		DirectX::XMFLOAT3	translate = { 0, 0, 0 };
@@ -166,10 +166,10 @@ public:
 	// 現在のアニメーション再生時間取得
 	float GetCurrentAnimationSeconds() const { return currentAnimationSeconds; }
 
-    // 現在のアニメーション長さ取得
+	// 現在のアニメーション長さ取得
 	float GetCurrentAnimationLength() const;
 
-    // 現在のアニメーション速度取得
+	// 現在のアニメーション速度取得
 	float GetCurrentAnimationSpeed() const;
 
 	// 現在のアニメーション番号
@@ -180,6 +180,17 @@ public:
 
 	// ノードポーズ取得
 	void GetNodePoses(std::vector<NodePose>& nodePoses) const;
+
+	//	アニメーションを一時停止
+	void PauseAnimation()
+	{
+		isAnimationPaused = true;
+	}
+	//	アニメーションを再開
+	void Model::ResumeAnimation()
+	{
+		isAnimationPaused = false;
+	}
 
 private:
 	std::shared_ptr<ModelResource>	resource;
@@ -194,4 +205,5 @@ private:
 	float animationBlendTime = 0.0f;
 	float animationBlendSeconds = 0.0f;
 	float animationSpeed = 1.0f;
+	bool isAnimationPaused = false;
 };

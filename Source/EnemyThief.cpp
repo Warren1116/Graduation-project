@@ -61,12 +61,6 @@ EnemyThief::~EnemyThief()
 
 void EnemyThief::Update(float elapsedTime)
 {
-    //　PlayerのSwingKickに攻撃される時
-    if (Player::Instance().GetIsUseSwingKick() && IsLockedOn)
-    {
-        stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Damage));
-    }
-
     //　PlayerのGrabに攻撃される時
     if (Player::Instance().GetIsUseGrab() && IsLockedOn)
     {
@@ -133,6 +127,11 @@ void EnemyThief::Update(float elapsedTime)
     if (!Player::Instance().GetIsUseGrab())
     {
         stateMachine->Update(elapsedTime);
+        model->ResumeAnimation();
+    }
+    else
+    {
+        model->PauseAnimation();
     }
 
     // 速力処理更新
@@ -155,10 +154,18 @@ void EnemyThief::Update(float elapsedTime)
 // 死亡した時に呼ばれる
 void EnemyThief::OnDead()
 {
+    CharacterManager::Instance().Remove(this);
     Player::Instance().SetgetShotSoon(false);
     stateMachine->SetState(static_cast<int>(State::Battle));
     stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
 }
+
+void EnemyThief::OnDamaged()
+{
+    stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Damage));
+
+}
+
 
 void EnemyThief::DrawDebugPrimitive()
 {
@@ -266,7 +273,6 @@ bool EnemyThief::SearchPlayer()
 // デバッグエネミー情報表示
 void EnemyThief::DrawDebugGUI()
 {
-
     std::string str = "";
     std::string subStr = "";
 
@@ -346,6 +352,7 @@ void EnemyThief::DrawDebugGUI()
         ImGui::Checkbox("lockon", &IsLockedOn);
         ImGui::InputFloat("webTimer", &webTimer);
         ImGui::InputInt("Hp", &health);
+        ImGui::Checkbox("Alive", &isAlive);
 
     }
 

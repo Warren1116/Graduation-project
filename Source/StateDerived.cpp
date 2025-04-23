@@ -4,6 +4,40 @@
 #include "MetaAI.h"
 #include "SceneGame.h"
 
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          親SearchState
+//-----------------------------------------------------------------------------------------------------------------------------------------
+// デストラクタ
+SearchState::~SearchState()
+{
+    for (State* state : subStatePool)
+    {
+        delete state;
+    }
+    subStatePool.clear();
+}
+
+// サーチステートに入った時のメソッド
+void SearchState::Enter()
+{
+    SetSubState(static_cast<int>(EnemyThief::Search::Idle));
+}
+
+// サーチステートで実行するメソッド
+void SearchState::Execute(float elapsedTime)
+{
+    subState->Execute(elapsedTime);
+}
+
+// サーチステートから出ていくときのメソッド
+void SearchState::Exit()
+{
+
+}
+//----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子BattleState（SearchState）
+//----------------------------------------------------------------------------------------------------------------------------------------
 // 徘徊ステートに入った時のメソッド
 void WanderState::Enter()
 {
@@ -45,6 +79,7 @@ void WanderState::Execute(float elapsedTime)
         owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
     }
 
+
 }
 
 // 徘徊ステートから出ていくときのメソッド
@@ -52,12 +87,13 @@ void WanderState::Exit()
 {
     //書かなくてよい
 }
-
-
+//-----------------------------------------------------------------------------------------------------------------------------------------
+// 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　子idleState（SearchState）
+//-----------------------------------------------------------------------------------------------------------------------------------------
 // 待機ステートに入った時のメソッド
 void IdleState::Enter()
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // タイマーをランダム設定
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Idle), true);
@@ -67,7 +103,7 @@ void IdleState::Enter()
 // 待機ステートで実行するメソッド
 void IdleState::Execute(float elapsedTime)
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // タイマー処理
     owner->SetStateTimer(owner->GetStateTimer() - elapsedTime);
@@ -78,7 +114,9 @@ void IdleState::Execute(float elapsedTime)
 
     // プレイヤーが見つかったとき追跡ステートへ遷移
     if (owner->SearchPlayer())
+    {
         owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
+    }
 }
 
 // 待機ステートから出ていくときのメソッド
@@ -86,12 +124,47 @@ void IdleState::Exit()
 {
 
 }
+//-----------------------------------------------------------------------------------------------------------------------------------------
 
 
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          親BattleState
+//-----------------------------------------------------------------------------------------------------------------------------------------
+BattleState::~BattleState()
+{
+    for (State* state : subStatePool)
+    {
+        delete state;
+    }
+    subStatePool.clear();
+}
+
+void BattleState::Enter()
+{
+    SetSubState(static_cast<int>(EnemyThief::Battle::Pursuit));
+}
+
+void BattleState::Execute(float elapsedTime)
+{
+    subState->Execute(elapsedTime);
+}
+
+void BattleState::Exit()
+{
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子PursuitState（BattleState）
+//-----------------------------------------------------------------------------------------------------------------------------------------
 // 追跡ステートに入った時のメソッド
 void PursuitState::Enter()
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)
+    {
+        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
+        return;
+    }
 
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
@@ -108,8 +181,11 @@ void PursuitState::Enter()
 // 追跡ステートで実行するメソッド
 void PursuitState::Execute(float elapsedTime)
 {
-    if (owner->GetDeadCheck())return;
-
+    if (owner->GetHealth() <= 0)
+    {
+        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
+        return;
+    }
     if (!owner->IsGetThrow())
     {
         // 各種Execute関数の内容は各Update○○State関数を参考に
@@ -147,11 +223,13 @@ void PursuitState::Exit()
     Player::Instance().SetgetAttackSoon(false);
     Player::Instance().SetgetShotSoon(false);
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------------- 
+//                                                          子AttackState（BattleState）
+// -----------------------------------------------------------------------------------------------------------------------------------------
 // 攻撃ステートに入った時のメソッド
 void AttackState::Enter()
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // 攻撃タイプをランダムで決定
     // パンチ攻撃
@@ -171,7 +249,7 @@ void AttackState::Enter()
 // 攻撃ステートで実行するメソッド
 void AttackState::Execute(float elapsedTime)
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     owner->SetTargetPosition(Player::Instance().GetPosition());
 
@@ -198,12 +276,13 @@ void AttackState::Exit()
 {
 
 }
-
-
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子PunchState（BattleState）
+//-----------------------------------------------------------------------------------------------------------------------------------------
 // パンチステートに入った時のメソッド
 void PunchState::Enter()
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
@@ -227,7 +306,7 @@ void PunchState::Enter()
 // パンチステートで実行するメソッド
 void PunchState::Execute(float elapsedTime)
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     owner->SetTargetPosition(Player::Instance().GetPosition());
 
@@ -272,15 +351,15 @@ void PunchState::Exit()
             MESSAGE_TYPE::MsgChangeAttackRight);
     }
 }
-
-
-
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子ShotState（BattleState）
+//-----------------------------------------------------------------------------------------------------------------------------------------
 // シュートステートに入った時のメソッド
 void ShotState::Enter()
 {
     Fire = Audio::Instance().LoadAudioSource("Data/Audio/Fire.wav");
 
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
@@ -316,7 +395,7 @@ void ShotState::Enter()
 // シュートステートで実行するメソッド
 void ShotState::Execute(float elapsedTime)
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // 攻撃権があるとき
     if (owner->GetAttackFlg())
@@ -351,136 +430,13 @@ void ShotState::Exit()
 
     }
 }
-
-
-// デストラクタ
-SearchState::~SearchState()
-{
-    for (State* state : subStatePool)
-    {
-        delete state;
-    }
-    subStatePool.clear();
-}
-
-// サーチステートに入った時のメソッド
-void SearchState::Enter()
-{
-    SetSubState(static_cast<int>(EnemyThief::Search::Idle));
-}
-
-// サーチステートで実行するメソッド
-void SearchState::Execute(float elapsedTime)
-{
-    subState->Execute(elapsedTime);
-}
-
-// サーチステートから出ていくときのメソッド
-void SearchState::Exit()
-{
-
-}
-
-BattleState::~BattleState()
-{
-    for (State* state : subStatePool)
-    {
-        delete state;
-    }
-    subStatePool.clear();
-}
-
-void BattleState::Enter()
-{
-    SetSubState(static_cast<int>(EnemyThief::Search::Wander));
-}
-
-void BattleState::Execute(float elapsedTime)
-{
-    subState->Execute(elapsedTime);
-}
-
-void BattleState::Exit()
-{
-}
-
-// メタAIからメッセージを受信したときに呼ばれるステートを追加
-// デストラクタ
-RecieveState::~RecieveState()
-{
-    for (State* state : subStatePool)
-    {
-        delete state;
-    }
-    subStatePool.clear();
-}
-
-// データ受信したときのステート
-void RecieveState::Enter()
-{
-    // 初期ステートを設定
-    SetSubState(static_cast<int>(EnemyThief::Recieve::Called));
-}
-
-// サーチステートで実行するメソッド
-void RecieveState::Execute(float elapsedTime)
-{
-    // 子ステート実行
-    subState->Execute(elapsedTime);
-
-    if (owner->SearchPlayer())
-    {
-        // Battleステートへ遷移
-        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
-    }
-}
-
-// サーチステートから出ていくときのメソッド
-void RecieveState::Exit()
-{
-}
-
-// 他のエネミーから呼ばれたときのステートを追加
-void CalledState::Enter()
-{
-    if (owner->GetDeadCheck())return;
-
-    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
-    owner->SetStateTimer(5.0f);
-}
-
-// コールドステートで実行するメソッド
-void CalledState::Execute(float elapsedTime)
-{
-    if (owner->GetHealth() <= 0)
-        return;
-
-    // タイマー処理
-    float timer = owner->GetStateTimer();
-    timer -= elapsedTime;
-    owner->SetStateTimer(timer);
-    if (timer < 0.0f)
-    {
-        // 徘徊ステートへ遷移
-        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Search));
-    }
-    // 対象をプレイヤー地点に設定
-    owner->SetTargetPosition(Player::Instance().GetPosition());
-    owner->MoveToTarget(elapsedTime, 1.0f);
-    owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
-
-
-}
-
-// コールドステートから出ていくときのメソッド
-void CalledState::Exit()
-{
-}
-
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子StandbyState（BattleState）
+// -----------------------------------------------------------------------------------------------------------------------------------------
 // 戦闘待機ステートに入った時のメソッド
 void StandbyState::Enter()
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // 攻撃権がなければ
     if (!owner->GetAttackFlg())
@@ -504,7 +460,7 @@ void StandbyState::Enter()
 // 戦闘待機ステートで実行するメソッド
 void StandbyState::Execute(float elapsedTime)
 {
-    if (owner->GetDeadCheck())return;
+    if (owner->GetHealth() <= 0)return;
 
     // プレイヤーに向けて
     DirectX::XMFLOAT3 playerPosition = Player::Instance().GetPosition();
@@ -516,7 +472,7 @@ void StandbyState::Execute(float elapsedTime)
     owner->SetAngle(DirectX::XMFLOAT3(0, angleY, 0));
 
     // 攻撃権があるとき
-    if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon()) 
+    if (attackCooldownTimer <= attackWarningTime && !Player::Instance().GetAttackSoon())
     {
         Player::Instance().SetgetAttackSoon(true);
         if (owner->randomType == EnemyThief::AttackType::Shot)
@@ -558,53 +514,61 @@ void StandbyState::Exit()
 {
 
 }
-
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子DamageState（BattleState）
+//-----------------------------------------------------------------------------------------------------------------------------------------
 // ダメージステートに入った時のメソッド
 void DamageState::Enter()
 {
-    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false);
+    //　PlayerのSwingKickに攻撃される時
+    if (Player::Instance().GetIsUseSwingKick() && owner->GetIsLockedOn())
+    {
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false);
+    }
 }
 
 
 // ダメージステートで実行するメソッド
 void DamageState::Execute(float elapsedTime)
 {
-    if(!owner->GetModel()->IsPlayAnimation() && owner->GetHealth() > 0)
+    if (!owner->GetModel()->IsPlayAnimation() && owner->GetHealth() > 0)
     {
         owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
     }
 
 }
-
-
 // ダメージステートから出ていくときのメソッド
 void DamageState::Exit()
 {
+
 }
 
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子DeadState（BattleState）
+//-----------------------------------------------------------------------------------------------------------------------------------------
 // 死亡ステートに入った時のメソッド
 void DeadState::Enter()
 {
-    owner->SetDeadCheck(true);
     // 死亡モーション再生
-    if (owner->IsGetThrow())
-    {
-        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
-    }
-    else
+    //if (owner->IsGetThrow())
+    //{
+    //    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
+    //}
+    //else
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
     }
     // 攻撃権を放棄
     Meta::Instance().SendMessaging(
-    owner->GetId(),
-    static_cast<int>(Meta::Identity::Meta),
-    MESSAGE_TYPE::MsgChangeAttackRight);
+        owner->GetId(),
+        static_cast<int>(Meta::Identity::Meta),
+        MESSAGE_TYPE::MsgChangeAttackRight);
 }
 
 // 死亡ステートで実行するメソッド
 void DeadState::Execute(float elapsedTime)
 {
+
     if (!owner->GetModel()->IsPlayAnimation())
     {
         SceneGame::Instance().UnregisterRenderModel(owner->GetModel());
@@ -616,3 +580,82 @@ void DeadState::Execute(float elapsedTime)
 void DeadState::Exit()
 {
 }
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          親RecieveState
+//-----------------------------------------------------------------------------------------------------------------------------------------
+// メタAIからメッセージを受信したときに呼ばれるステートを追加
+// デストラクタ
+RecieveState::~RecieveState()
+{
+    for (State* state : subStatePool)
+    {
+        delete state;
+    }
+    subStatePool.clear();
+}
+
+// データ受信したときのステート
+void RecieveState::Enter()
+{
+    // 初期ステートを設定
+    SetSubState(static_cast<int>(EnemyThief::Recieve::Called));
+}
+
+// サーチステートで実行するメソッド
+void RecieveState::Execute(float elapsedTime)
+{
+    // 子ステート実行
+    subState->Execute(elapsedTime);
+
+    if (owner->SearchPlayer())
+    {
+        // Battleステートへ遷移
+        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Battle));
+    }
+}
+
+// サーチステートから出ていくときのメソッド
+void RecieveState::Exit()
+{
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//                                                          子CalledState（RecieveState）
+//-----------------------------------------------------------------------------------------------------------------------------------------
+// 他のエネミーから呼ばれたときのステートを追加
+void CalledState::Enter()
+{
+    if (owner->GetHealth() <= 0)return;
+
+    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
+    owner->SetStateTimer(5.0f);
+}
+
+// コールドステートで実行するメソッド
+void CalledState::Execute(float elapsedTime)
+{
+    if (owner->GetHealth() <= 0)
+        return;
+
+    // タイマー処理
+    float timer = owner->GetStateTimer();
+    timer -= elapsedTime;
+    owner->SetStateTimer(timer);
+    if (timer < 0.0f)
+    {
+        // 徘徊ステートへ遷移
+        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Search));
+    }
+
+    // 対象をプレイヤー地点に設定
+    owner->SetTargetPosition(Player::Instance().GetPosition());
+    owner->MoveToTarget(elapsedTime, 1.0f);
+
+}
+
+// コールドステートから出ていくときのメソッド
+void CalledState::Exit()
+{
+}
+//-----------------------------------------------------------------------------------------------------------------------------------------
