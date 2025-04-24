@@ -26,7 +26,6 @@
 class SceneGame : public Scene
 {
 public:
-
     SceneGame() {}
     ~SceneGame() override {}
     static SceneGame& Instance() { return *instance; }
@@ -126,7 +125,8 @@ public:
     std::string intersection_mesh;
     std::string intersection_material;
 
-
+    //  チュートリアルの完了フラグ
+    static bool tutorialCompleted;
 
 private:
     std::unique_ptr<Player> player;

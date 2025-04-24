@@ -267,6 +267,54 @@ void Character::UpdateHorizontalMove(float elapsedTime)
     float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
     if (velocityLengthXZ > 0.0f)
     {
+    
+        // レイの方向（前後左右）
+        DirectX::XMFLOAT3 directions[4] = {
+            {  velocity.x, 0.0f,  velocity.z }, // 前
+            { -velocity.x, 0.0f, -velocity.z }, // 後
+            { -velocity.z, 0.0f,  velocity.x }, // 左（右手系における90度回転）
+            {  velocity.z, 0.0f, -velocity.x }  // 右
+        };
+
+        // 移動前の位置
+        DirectX::XMFLOAT3 originalPos = position;
+
+        bool blocked = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            DirectX::XMFLOAT3 dir = directions[i];
+            float len = sqrtf(dir.x * dir.x + dir.z * dir.z);
+            if (len == 0.0f) continue;
+
+            dir.x /= len;
+            dir.z /= len;
+
+            DirectX::XMFLOAT3 start = { position.x, position.y + stepOffset, position.z };
+            DirectX::XMFLOAT3 end = {
+                start.x + dir.x * 0.5f,  // レイの長さは0.5m程度
+                start.y,
+                start.z + dir.z * 0.5f
+            };
+
+            HitResult hit;
+            if (StageManager::Instance().RayCast(start, end, hit))
+            {
+                blocked = true;
+
+                // 壁にめり込まないように後退 or 修正（必要に応じて）
+                DirectX::XMVECTOR normal = DirectX::XMLoadFloat3(&hit.normal);
+                normal = DirectX::XMVector3Normalize(normal);
+                DirectX::XMVECTOR offset = DirectX::XMVectorScale(normal, 0.5f);
+
+                DirectX::XMVECTOR currentPos = DirectX::XMLoadFloat3(&position);
+                DirectX::XMVECTOR newPos = DirectX::XMVectorAdd(currentPos, offset);
+
+                DirectX::XMStoreFloat3(&position, newPos);
+
+                // 1方向でもヒットしたら他方向のチェック不要にする場合 break;
+                break;
+            }
+        }
 
         //水平移動値
         float mx = velocity.x * elapsedTime;

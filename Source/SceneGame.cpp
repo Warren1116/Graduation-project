@@ -27,9 +27,11 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-
 #define TUTORIAL
 //#define DEBUG
+
+//	チュートリアルの状態
+bool SceneGame::tutorialCompleted = false;
 
 // 初期化
 void SceneGame::Initialize()
@@ -164,6 +166,19 @@ void SceneGame::Initialize()
     UseController = true;
     controllerPos = { 245,540 };
 
+    //  一回目のチュートリアルを実行する
+#ifdef TUTORIAL
+    if (!tutorialCompleted) {
+        tutorialState = SceneGame::TutorialState::First;
+        tutorialTimer = 0.0f;
+        tutorialCompleted = true;
+    }
+    else 
+    {
+        tutorialState = SceneGame::TutorialState::Finish;
+    }
+#endif
+
 }
 
 // 終了化
@@ -175,6 +190,7 @@ void SceneGame::Finalize()
     //    delete headUpDisplay;
     //    headUpDisplay = nullptr;
     //}
+
 
     // エネミー終了化
     EnemyManager::Instance().Clear();
@@ -666,26 +682,33 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
     GamePad& gamePad = Input::Instance().GetGamePad();
     Mouse& mouse = Input::Instance().GetMouse();
 
-    if (player->GetAttackSoon() && tutorialState != SceneGame::TutorialState::Dodge && firstTimeGetAttack)
+
+    //  一回目のチュートリアルを実行する
+    if (!tutorialCompleted)
     {
-        lastState = tutorialState;
-        firstTimeGetAttack = false;
-        SetTutorialState(SceneGame::TutorialState::Dodge);
+        if (player->GetAttackSoon() && tutorialState != SceneGame::TutorialState::Dodge && firstTimeGetAttack)
+        {
+            lastState = tutorialState;
+            firstTimeGetAttack = false;
+            SetTutorialState(SceneGame::TutorialState::Dodge);
+        }
+
+        if (player->GetHealth() < 50 && tutorialState != SceneGame::TutorialState::Healing && firstTimeHealing)
+        {
+            lastState = tutorialState;
+            firstTimeHealing = false;
+            SetTutorialState(SceneGame::TutorialState::Healing);
+        }
+
+        if (currentWave ==1  && player->GetSkillTime() >= 3 && tutorialState != SceneGame::TutorialState::Ultimate && firstTimeUltimate)
+        {
+            lastState = tutorialState;
+            firstTimeUltimate = false;
+            SetTutorialState(SceneGame::TutorialState::Ultimate);
+        }
     }
 
-    if (player->GetHealth() < 50 && tutorialState != SceneGame::TutorialState::Healing && firstTimeHealing)
-    {
-        lastState = tutorialState;
-        firstTimeHealing = false;
-        SetTutorialState(SceneGame::TutorialState::Healing);
-    }
 
-    if (currentWave > 0 && player->GetSkillTime() >= 3 && tutorialState != SceneGame::TutorialState::Ultimate && firstTimeUltimate)
-    {
-        lastState = tutorialState;
-        firstTimeUltimate = false;
-        SetTutorialState(SceneGame::TutorialState::Ultimate);
-    }
 
     //  チュトリアルの進行
     switch (tutorialState)
@@ -783,6 +806,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         //  チュトリアル終了
     case SceneGame::TutorialState::Finish:
         tutorialTimer = 0;
+        tutorialCompleted = true;
         break;
     }
 }
