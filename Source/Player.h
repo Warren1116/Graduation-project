@@ -46,6 +46,9 @@ public:
 	// 更新処理
 	void Update(float elapsedTime);
 
+	// 状態更新処理
+    void UpdateState(float elapsedTime);
+
 	// デバッグ用GUI描画
 	void DrawDebugGUI();
 
@@ -268,6 +271,12 @@ private:
 
 	//	スイングポイントを探す
 	bool FindWallSwingPoint();
+
+    //	スイングの当たり判定
+    void SwingCollision(float elapsedTime);
+
+	//
+	void HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient);
 
 	//　投げ技Active
 	bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);

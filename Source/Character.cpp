@@ -155,6 +155,8 @@ void Character::UpdateVerticalMove(float elapsedTime)
     if (onClimb)
     {
         position.y += velocity.y * elapsedTime;
+        isGround = false;
+        return;
     }
 
     //クライミングしてない場合
@@ -313,7 +315,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
                     //  モデルが壁にぶち込んたので、位置の修正
                     DirectX::XMVECTOR collisionNormal = DirectX::XMLoadFloat3(&hit.normal);
                     collisionNormal = DirectX::XMVector3Normalize(collisionNormal);
-                    DirectX::XMVECTOR offset = DirectX::XMVectorScale(collisionNormal, 0.3f);
+                    DirectX::XMVECTOR offset = DirectX::XMVectorScale(collisionNormal, 0.1f);
 
                     DirectX::XMVECTOR currentPosition = DirectX::XMLoadFloat3(&collectPosition);
                     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(currentPosition, offset);

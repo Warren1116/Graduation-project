@@ -101,6 +101,8 @@ private:
     // 前方レイ飛ばしてない時対応（敵用）
     void CheckWallCollision(float elapsedTime);
 
+
+
 protected:
 	// 移動処理
 	void Move(float vx, float vy, float vz, float speed);

@@ -132,117 +132,76 @@ void Player::Update(float elapsedTime)
     //  カメラステートの更新処理
     UpdateCameraState(elapsedTime);
 
-    // タイトルの場合
+    //  状態の更新処理
+    UpdateState(elapsedTime);
+
+    //弾丸更新処理
+    projectileManager.Update(elapsedTime);
+    brokenprojectileManager.Update(elapsedTime);
+
+    // 速度処理更新
+    UpdateVelocity(elapsedTime);
+
+    // 無敵時間更新処理
+    UpdateInvincibleTimer(elapsedTime);
+
+    // プレイヤーとエネミーとの衝突処理
+    CollisionPlayerVsEnemies();
+    CollisionProjectileVsEnemies();
+
+    //// イベントスクリプトポイントクリア
+    //EventPointManager::Instance().CheckPoint(position, radius);
+
+    // オブジェクト行列を更新
+    UpdateTransform();
+
+    // アニメーション更新
+    model->UpdateAnimation(elapsedTime);
+
+    // モデル行列更新
+    model->UpdateTransform(transform);
+
+    //　攻撃ウンター・スキルタイム更新
+    if (attacking)  attackTimer++;
+    if (skillTime < skillTimeMax) skillTime += elapsedTime * 0.01f;
+
+    if (EnemyManager::Instance().GetEnemyCount() == 0) getAttacksoon = false;
+
+    // spiderSenseの再生状態を管理
+    if (getAttacksoon && !spiderSensePlayed)
     {
-        // ステート毎の処理
-        switch (state)
-        {
-        case State::Idle:
-            UpdateIdleState(elapsedTime);
-            break;
-        case State::Move:
-            UpdateMoveState(elapsedTime);
-            break;
-        case State::Jump:
-            UpdateJumpState(elapsedTime);
-            break;
-        case State::Land:
-            UpdateLandState(elapsedTime);
-            break;
-        case State::Attack:
-            UpdateAttackState(elapsedTime);
-            break;
-        case State::Damage:
-            UpdateDamageState(elapsedTime);
-            break;
-        case State::Death:
-            UpdateDeathState(elapsedTime);
-            break;
-        case State::Climb:
-            UpdateClimbWallState(elapsedTime);
-            break;
-        case State::Swing:
-            UpdateSwingState(elapsedTime);
-            break;
-        case State::Shot:
-            UpdateShotingState(elapsedTime);
-            break;
-        case State::Dodge:
-            UpdateDodgeState(elapsedTime);
-            break;
-        case State::ClimbTop:
-            UpdateClimbTopState(elapsedTime);
-            break;
-        case State::Grab:
-            UpdateGrabState(elapsedTime);
-            break;
-        case State::SwingToKick:
-            UpdateSwingToKickState(elapsedTime);
-            break;
-        case State::CrouchIdle:
-            UpdateCrouchIdleState(elapsedTime);
-            break;
-        case State::TitleIdle:
-            UpdateTitleIdleState(elapsedTime);
-            break;
-        case State::Ultimate:
-            UpdateUltimateState(elapsedTime);
-            break;
+        spiderSense->Play(false, 0.8f);
+        spiderSensePlayed = true;
+    }
+    else if (!getAttacksoon)
+    {
+        spiderSensePlayed = false;
+    }
 
-        }
+}
 
-        //弾丸更新処理
-        projectileManager.Update(elapsedTime);
-        brokenprojectileManager.Update(elapsedTime);
-
-        // 速度処理更新
-        UpdateVelocity(elapsedTime);
-
-        // 無敵時間更新処理
-        UpdateInvincibleTimer(elapsedTime);
-
-        // プレイヤーとエネミーとの衝突処理
-        CollisionPlayerVsEnemies();
-        CollisionProjectileVsEnemies();
-
-        //// イベントスクリプトポイントクリア
-        //EventPointManager::Instance().CheckPoint(position, radius);
-
-
-        // オブジェクト行列を更新
-        UpdateTransform();
-
-        // アニメーション更新
-        model->UpdateAnimation(elapsedTime);
-
-        // モデル行列更新
-        model->UpdateTransform(transform);
-
-        //　攻撃ウンター・スキルタイム更新
-        if (attacking)
-        {
-            attackTimer++;
-        }
-        if (skillTime < skillTimeMax)
-        {
-            skillTime += elapsedTime * 0.01f;
-        }
-
-        if (EnemyManager::Instance().GetEnemyCount() == 0)
-        {
-            getAttacksoon = false;
-        }
-
-        // spiderSenseの再生状態を管理
-        if (getAttacksoon && !spiderSensePlayed)
-        {
-            spiderSense->Play(false, 0.8f);
-            spiderSensePlayed = true;
-        }
-        else if (!getAttacksoon)
-        {
-            spiderSensePlayed = false;
-        }
+void Player::UpdateState(float elapsedTime)
+{
+    // ステート毎の処理
+    switch (state)
+    {
+    case State::Idle:UpdateIdleState(elapsedTime); break;
+    case State::Move:UpdateMoveState(elapsedTime); break;
+    case State::Jump:UpdateJumpState(elapsedTime); break;
+    case State::Land:UpdateLandState(elapsedTime); break;
+    case State::Attack:UpdateAttackState(elapsedTime); break;
+    case State::Damage:UpdateDamageState(elapsedTime); break;
+    case State::Death:UpdateDeathState(elapsedTime); break;
+    case State::Climb:UpdateClimbWallState(elapsedTime); break;
+    case State::Swing:UpdateSwingState(elapsedTime); break;
+    case State::Shot:UpdateShotingState(elapsedTime); break;
+    case State::Dodge:UpdateDodgeState(elapsedTime); break;
+    case State::ClimbTop:UpdateClimbTopState(elapsedTime); break;
+    case State::Grab:UpdateGrabState(elapsedTime); break;
+    case State::SwingToKick:UpdateSwingToKickState(elapsedTime); break;
+    case State::CrouchIdle:UpdateCrouchIdleState(elapsedTime); break;
+    case State::TitleIdle:UpdateTitleIdleState(elapsedTime); break;
+    case State::Ultimate:UpdateUltimateState(elapsedTime); break;
     }
 }
 
@@ -258,6 +217,11 @@ bool Player::InputMove(float elapsedTime)
     if (!onClimb)
     {
         Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+    }
+    else
+    {
+        moveVec.x = 0;
+        moveVec.z = 0;
     }
 
     return moveVec.x != 0 || moveVec.y != 0 || moveVec.z != 0;
@@ -440,23 +404,17 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
     }
 }
 
+
 void Player::PlayAttackAnimation()
 {
     // 連撃のアニメーション
     float attackAnimationSpeed = 1.5f; // アニメーション速度を速くするための倍率
     switch (attackCount)
     {
-    case 1:
-        model->PlayAnimation(Anim_Attack, false, 0.1f, attackAnimationSpeed);
-        break;
-    case 2:
-        model->PlayAnimation(Anim_Attack2, false, 0.1f, attackAnimationSpeed);
-        break;
-    case 3:
-        model->PlayAnimation(Anim_Kick, false, 0.1f, attackAnimationSpeed);
-        break;
-    default:
-        break;
+    case 1: model->PlayAnimation(Anim_Attack, false, 0.1f, attackAnimationSpeed); break;
+    case 2: model->PlayAnimation(Anim_Attack2, false, 0.1f, attackAnimationSpeed); break;
+    case 3: model->PlayAnimation(Anim_Kick, false, 0.1f, attackAnimationSpeed); break;
+    default: break;
     }
 
 
@@ -503,10 +461,7 @@ void Player::TransitionClimbTopState()
 
 void Player::UpdateClimbTopState(float elapsedTime)
 {
-    if (!model->IsPlayAnimation())
-    {
-        TransitionIdleState();
-    }
+    if (!model->IsPlayAnimation()) TransitionIdleState();
 }
 
 void Player::TransitionGrabState()
@@ -871,6 +826,7 @@ void Player::UpdateCameraState(float elapsedTime)
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
         break;
     }
+    //　投げ技時のカメラ
     case State::Grab:
     {
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
@@ -889,12 +845,11 @@ void Player::UpdateCameraState(float elapsedTime)
         vz = cos(angle.y + DirectX::XM_PIDIV2) * -backDistance;
         p.data.push_back({ 200, { position.x + vx, position.y + 3, position.z + vz }, position });
 
-
-
         Messenger::Instance().SendData(MessageData::CAMERACHANGEMOTIONMODE, &p);
 
         break;
     }
+    //  範囲攻撃時のカメラ
     case State::Ultimate:
     {
         MessageData::CAMERACHANGEMOTIONMODEDATA p;
@@ -1791,68 +1746,8 @@ void Player::TransitionSwingState()
 //  スイングステートの更新処理
 void Player::UpdateSwingState(float elapsedTime)
 {
-    // スイング中壁にぶつかった時の処理
-    float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
-    if (velocityLengthXZ > 0.0f)
-    {
-        float mx = velocity.x * elapsedTime;
-        float mz = velocity.z * elapsedTime;
-
-        //レイを設定
-        DirectX::XMFLOAT3 start = position;
-        DirectX::XMFLOAT3 end = {
-            position.x + mx,
-            position.y,
-            position.z + mz
-        };
-        float distance = sqrtf(mx * mx + mz * mz);
-
-        //そして判定を精度を上げるため、レイを分割して判定を行う
-        int steps = static_cast<int>(distance / 0.5f);
-        steps = max(steps, 5);
-        HitResult hit;
-
-        const int raySamples = 3;
-        float angleStep = DirectX::XM_2PI / raySamples;
-
-        //簡易版のスフィアキャストを作る
-        for (int step = 0; step <= steps; ++step) {
-            float t = step / static_cast<float>(steps);
-            DirectX::XMVECTOR currentPoint = DirectX::XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
-
-            for (int i = 0; i < raySamples; ++i) {
-                float angle = i * angleStep;
-                float offsetX = radius * 0.5f * cosf(angle);
-                float offsetZ = radius * 0.5f * sinf(angle);
-
-                DirectX::XMFLOAT3 offsetPoint;
-                DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
-
-                //レイを飛ばす
-                if (StageManager::Instance().RayCast(position, offsetPoint, hit))
-                {
-                    DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
-                    hitNormal = DirectX::XMVector3Normalize(hitNormal);
-                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.3f);
-
-                    DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
-                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
-
-                    DirectX::XMStoreFloat3(&position, adjustedPosition);
-
-
-                    //当たったらクライミングステートへの変更
-                    onClimb = true;
-                    TransitionIdleState();
-                    velocity.x = 0;
-                    velocity.z = 0;
-                    velocity.y = 0;
-                    return;
-                }
-            }
-        }
-        position = end;
-    }
+    //  スイング中の当たり判定
+    SwingCollision(elapsedTime);
 
     //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
@@ -1939,7 +1834,6 @@ void Player::UpdateSwingState(float elapsedTime)
     {
         lastState = state;
         TransitionIdleState();
-        /*velocity = { 0,0,0 };*/
     }
 }
 
@@ -1966,6 +1860,73 @@ bool Player::FindWallSwingPoint()
     previousSwingPoint = swingPoint;
 
     return false;
+
+}
+
+void Player::SwingCollision(float elapsedTime)
+{
+    // スイング中壁にぶつかった時の処理
+    float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
+    if (velocityLengthXZ > 0.0f)
+    {
+        float mx = velocity.x * elapsedTime;
+        float mz = velocity.z * elapsedTime;
+
+        //レイを設定
+        DirectX::XMFLOAT3 start = position;
+        DirectX::XMFLOAT3 end = {
+            position.x + mx,
+            position.y,
+            position.z + mz
+        };
+        float distance = sqrtf(mx * mx + mz * mz);
+
+        //そして判定を精度を上げるため、レイを分割して判定を行う
+        int steps = static_cast<int>(distance / 0.5f);
+        steps = max(steps, 5);
+        HitResult hit;
+
+        const int raySamples = 3;
+        float angleStep = DirectX::XM_2PI / raySamples;
+
+        //簡易版のスフィアキャストを作る
+        for (int step = 0; step <= steps; ++step) {
+            float t = step / static_cast<float>(steps);
+            DirectX::XMVECTOR currentPoint = DirectX::XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
+
+            for (int i = 0; i < raySamples; ++i) {
+                float angle = i * angleStep;
+                float offsetX = radius * 0.5f * cosf(angle);
+                float offsetZ = radius * 0.5f * sinf(angle);
+
+                DirectX::XMFLOAT3 offsetPoint;
+                DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
+
+                //レイを飛ばす
+                if (StageManager::Instance().RayCast(position, offsetPoint, hit))
+                {
+                    DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
+                    hitNormal = DirectX::XMVector3Normalize(hitNormal);
+                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.3f);
+
+                    DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
+                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
+
+                    DirectX::XMStoreFloat3(&position, adjustedPosition);
+
+
+                    //当たったらクライミングステートへの変更
+                    onClimb = true;
+                    TransitionIdleState();
+                    velocity.x = 0;
+                    velocity.z = 0;
+                    velocity.y = 0;
+                    return;
+                }
+            }
+        }
+        position = end;
+    }
 
 }
 
@@ -2045,63 +2006,7 @@ void Player::TransitionSwingToKickState()
 //　SwingKickステートの更新処理
 void Player::UpdateSwingToKickState(float elapsedTime)
 {
-    // スイング中壁にぶつかった時の処理
-    float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
-    if (velocityLengthXZ > 0.0f)
-    {
-        float mx = velocity.x * elapsedTime;
-        float mz = velocity.z * elapsedTime;
-
-        //レイを設定
-        DirectX::XMFLOAT3 start = position;
-        DirectX::XMFLOAT3 end = {
-            position.x + mx,
-            position.y,
-            position.z + mz
-        };
-        float distance = sqrtf(mx * mx + mz * mz);
-
-        //そして判定を精度を上げるため、レイを分割して判定を行う
-        int steps = static_cast<int>(distance / 0.5f);
-        steps = max(steps, 5);
-        HitResult hit;
-
-        const int raySamples = 3;
-        float angleStep = DirectX::XM_2PI / raySamples;
-
-        //簡易版のスフィアキャストを作る
-        for (int step = 0; step <= steps; ++step) {
-            float t = step / static_cast<float>(steps);
-            DirectX::XMVECTOR currentPoint = DirectX::XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
-
-            for (int i = 0; i < raySamples; ++i) {
-                float angle = i * angleStep;
-                float offsetX = radius * 0.5f * cosf(angle);
-                float offsetZ = radius * 0.5f * sinf(angle);
-
-                DirectX::XMFLOAT3 offsetPoint;
-                DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
-
-                //レイを飛ばす
-                if (StageManager::Instance().RayCast(position, offsetPoint, hit))
-                {
-                    DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
-                    hitNormal = DirectX::XMVector3Normalize(hitNormal);
-                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.3f);
-
-                    DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
-                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
-
-                    DirectX::XMStoreFloat3(&position, adjustedPosition);
-
-                    SetVelocity({ 0, 0, 0 });
-
-                    return;
-                }
-            }
-        }
-        position = end;
-    }
+    SwingCollision(elapsedTime);
 
     //スイング位置
     DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
@@ -2128,7 +2033,6 @@ void Player::UpdateSwingToKickState(float elapsedTime)
     {
         float correctionFactor = (currentLength - ropeLength) * 0.5f;
         DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-        //Q = DirectX::XMVectorAdd(Q, correction);
 
         DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
 
