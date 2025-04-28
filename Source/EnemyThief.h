@@ -143,7 +143,7 @@ private:
 
     DirectX::XMFLOAT3	targetPosition = { 0.0f,0.0f,0.0f };
     DirectX::XMFLOAT3	territoryOrigin = { 0.0f,0.0f,0.0f };
-    float				territoryRange = 10.0f;
+    float				territoryRange = 7.0f;
     float				moveSpeed = 3.5f;
     float				turnSpeed = DirectX::XMConvertToRadians(360);
 

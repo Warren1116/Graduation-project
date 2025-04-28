@@ -102,6 +102,9 @@ public:
     int GetTotalWaves() { return totalWaves; }
     bool IsNextWave() const;
 
+    //  カメラの状態を更新
+    void UpdateCameraState(float elapsedTime);
+
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
@@ -142,6 +145,8 @@ private:
     std::unique_ptr<Sprite> KeyBoardFont;
     bool ControllerButton = false;
     bool KeyBoardButton = false;
+    DirectX::XMFLOAT3 cameraPos;
+    DirectX::XMFLOAT3 cameraAngle;
 
     //BGM
     std::unique_ptr<AudioSource> Bgm = nullptr;
@@ -200,4 +205,6 @@ private:
     //ラジアルブラー
     bool radialBlurActive = false;
 
+    //  カメラタイマー
+    float cameraTimer;
 };

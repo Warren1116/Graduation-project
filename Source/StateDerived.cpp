@@ -525,6 +525,10 @@ void DamageState::Enter()
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false);
     }
+    else
+    {
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GetHit), false);
+    }
 }
 
 

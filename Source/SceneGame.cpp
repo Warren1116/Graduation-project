@@ -18,7 +18,7 @@
 #include "CharacterManager.h"
 #include "Messenger.h"
 #include "UI.h"
-
+#include "MessageData.h"
 #include "Graphics/geometric_primitive.h"
 #include "EventScripter.h"
 #include "EventPointManager.h"
@@ -165,6 +165,7 @@ void SceneGame::Initialize()
 
     UseController = true;
     controllerPos = { 245,540 };
+    cameraTimer = 90.0f;
 
     //  一回目のチュートリアルを実行する
 #ifdef TUTORIAL
@@ -173,12 +174,14 @@ void SceneGame::Initialize()
         tutorialTimer = 0.0f;
         tutorialCompleted = true;
     }
-    else 
+    else
     {
         tutorialState = SceneGame::TutorialState::Finish;
     }
 #endif
 
+    cameraPos = Camera::Instance().GetEye();
+    cameraAngle = Camera::Instance().GetEye();
 }
 
 // 終了化
@@ -226,6 +229,7 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+    UpdateCameraState(elapsedTime);
 
     //　背景音楽
     Bgm->Play(true, 0.1f);
@@ -412,12 +416,11 @@ void SceneGame::Update(float elapsedTime)
      // キャラクターマネージャーの更新
     CharacterManager::Instance().Update(elapsedTime);
 
-
     // カメラコントローラー更新処理
     Camera& camera = Camera::Instance();
-
     cameraController->Update(elapsedTime);
-    
+
+
 
 
 #ifdef DEBUG
@@ -608,6 +611,12 @@ void SceneGame::Render()
         ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 
+        if (ImGui::Begin("cameraPos", nullptr, ImGuiWindowFlags_None))
+        {
+            ImGui::SliderFloat3("cameraPos", &cameraPos.x, 0.0f, 100.0f);
+            ImGui::SliderFloat3("cameraAngle", &cameraAngle.x, 0.0f, 50.0f);
+
+        }
 
         if (ImGui::Begin("Tutorial", nullptr, ImGuiWindowFlags_None))
         {
@@ -700,7 +709,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
             SetTutorialState(SceneGame::TutorialState::Healing);
         }
 
-        if (currentWave ==1  && player->GetSkillTime() >= 3 && tutorialState != SceneGame::TutorialState::Ultimate && firstTimeUltimate)
+        if (currentWave == 1 && player->GetSkillTime() >= 3 && tutorialState != SceneGame::TutorialState::Ultimate && firstTimeUltimate)
         {
             lastState = tutorialState;
             firstTimeUltimate = false;
@@ -875,6 +884,77 @@ bool SceneGame::IsNextWave() const
     return nextWaveTimer > 0.0f;
 }
 
+void SceneGame::UpdateCameraState(float elapsedTime)
+{
+    cameraTimer--;
+    switch (currentWave)
+    {
+    case 2:
+        if (cameraTimer > 0)
+        {
+            EnemyManager& enemyManager = EnemyManager::Instance();
+            DirectX::XMFLOAT3 position = enemyManager.GetEnemy(0)->GetPosition();
+            position.x -= 4.0f;
+            position.y += 2.0f;
+            Camera::Instance().SetLookAt(position, { 0,-10,10 }, { 0,1,0 });
+            cameraController.get()->SetTransition(true);
+        }
+        else
+        {
+            cameraController.get()->SetTransition(false);
+        }
+        break;
+    case 3:
+        if (cameraTimer > 0)
+        {
+            EnemyManager& enemyManager = EnemyManager::Instance();
+            DirectX::XMFLOAT3 position = enemyManager.GetEnemy(0)->GetPosition();
+            position.x += 4.0f;
+            position.y += 2.0f;
+            Camera::Instance().SetLookAt(position, { 0,-10,10 }, { 0,1,0 });
+            cameraController.get()->SetTransition(true);
+        }
+        else
+        {
+            cameraController.get()->SetTransition(false);
+        }
+        break;
+    case 4:
+        if (cameraTimer > 0)
+        {
+            EnemyManager& enemyManager = EnemyManager::Instance();
+            DirectX::XMFLOAT3 position = enemyManager.GetEnemy(0)->GetPosition();
+            position.x += 5.0f;
+            position.y += 2.0f;
+            position.z += 15.0f;
+            Camera::Instance().SetLookAt(position, { 0,-10,-90 }, { 0,1,0 });
+            cameraController.get()->SetTransition(true);
+        }
+        else
+        {
+            cameraController.get()->SetTransition(false);
+        }
+        break;
+    case 5:
+        if (cameraTimer > 0)
+        {
+            EnemyManager& enemyManager = EnemyManager::Instance();
+            DirectX::XMFLOAT3 position = enemyManager.GetEnemy(0)->GetPosition();
+            position.x -= 7.0f;
+            position.y += 2.0f;
+            Camera::Instance().SetLookAt(position, { 0,-10,-10 }, { 0,1,0 });
+            cameraController.get()->SetTransition(true);
+        }
+        else
+        {
+            cameraController.get()->SetTransition(false);
+        }
+        break;
+    }
+
+
+}
+
 
 //  Waveによって敵を生成
 void SceneGame::SpawnEnemiesForWave(int wave)
@@ -1043,6 +1123,7 @@ void SceneGame::SpawnEnemiesForWave(int wave)
             characterManager.Register(thief5);
             characterManager.Register(thief6);
         }
+
     }
     break;
 
@@ -1297,6 +1378,7 @@ void SceneGame::StartNextWave()
     //  Waveを進める
     if (currentWave < totalWaves)
     {
+        cameraTimer = 90.0f;
         currentWave++;          //  Waveを進める
         waveInProgress = true;  //  Waveが進行中
         nextWaveTimer = 5.0f;   //  2秒のUI表示

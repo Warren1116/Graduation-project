@@ -12,7 +12,7 @@
 #include "StageManager.h"
 #include "CharacterManager.h"
 
-//#define DEBUG
+#define DEBUG
 
 SceneTitle* SceneTitle::instance = nullptr;
 

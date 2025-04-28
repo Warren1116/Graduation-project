@@ -74,12 +74,10 @@ Player::Player(bool flag)
     // ダメージ音
     Damage = Audio::Instance().LoadAudioSource("Data/Audio/Damage.wav");
 
-    skillTime = 5.0f;
+    skillTime = 50.0f;
 
     // 待機ステートへ遷移
-    //TransitionIdleState();
     TransitionCrouchIdleState();
-    //TransitionTitleIdleState();
 
 
     //  Event用
@@ -117,13 +115,6 @@ Player::Player(bool flag)
 // デストラクタ
 Player::~Player()
 {
-    //  チュートリアルのEvent用
-    //Messenger::Instance().RemoveReceiver(EventModeIndex);
-    //Messenger::Instance().RemoveReceiver(GameModeIndex);
-
-    //Messenger::Instance().RemoveReceiver(SetPositionIndex);
-    //Messenger::Instance().RemoveReceiver(MoveIndex);
-    //Messenger::Instance().RemoveReceiver(MotionIndex);
 }
 
 // 更新処理
@@ -636,6 +627,8 @@ void Player::UpdateCameraState(float elapsedTime)
         MessageData::CAMERACHANGEFREEMODEDATA p = { position };
         Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
         return;
+
+
     }
 
     switch (state)
@@ -1215,13 +1208,6 @@ void Player::TransitionMoveState()
     }
 
     state = State::Move;
-    //// 移動量が小さい場合は歩行アニメーションを再生
-    //if (moveAmount < 0.6f)
-    //{
-    //    model->PlayAnimation(Anim_Walking, true);
-    //}
-    //// 移動量が大きい場合は走行アニメーションを再生
-    //else
     {
         model->PlayAnimation(Anim_Running, true);
     }
@@ -1907,7 +1893,7 @@ void Player::SwingCollision(float elapsedTime)
                 {
                     DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
                     hitNormal = DirectX::XMVector3Normalize(hitNormal);
-                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.3f);
+                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.15f);
 
                     DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
                     DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);

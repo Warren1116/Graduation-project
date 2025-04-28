@@ -36,6 +36,9 @@ public:
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
 
+    //  カメラの遷移
+	void SetTransition(bool Active) { this->isTransition = Active; }
+
 private:
 	// フリーカメラ更新処理
 	void FreeCamera(float elapsedTime);
@@ -85,6 +88,7 @@ private:
 	float				shakeTimer = 0;
 	float				shakePower = 1;
 
+    bool isTransition = false;
 
 	// メッセージキー
 	uint64_t			CAMERACHANGEFREEMODEKEY;

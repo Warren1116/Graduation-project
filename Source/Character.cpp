@@ -269,6 +269,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
     float velocityLengthXZ = sqrtf(velocity.x * velocity.x + velocity.z * velocity.z);
     if (velocityLengthXZ > 0.0f)
     {
+
         //水平移動値
         float mx = velocity.x * elapsedTime;
         float mz = velocity.z * elapsedTime;
@@ -315,7 +316,7 @@ void Character::UpdateHorizontalMove(float elapsedTime)
                     //  モデルが壁にぶち込んたので、位置の修正
                     DirectX::XMVECTOR collisionNormal = DirectX::XMLoadFloat3(&hit.normal);
                     collisionNormal = DirectX::XMVector3Normalize(collisionNormal);
-                    DirectX::XMVECTOR offset = DirectX::XMVectorScale(collisionNormal, 0.1f);
+                    DirectX::XMVECTOR offset = DirectX::XMVectorScale(collisionNormal, 0.3f);
 
                     DirectX::XMVECTOR currentPosition = DirectX::XMLoadFloat3(&collectPosition);
                     DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(currentPosition, offset);
@@ -350,7 +351,7 @@ void Character::CheckWallCollision(float elapsedTime)
     DirectX::XMFLOAT3 start = { position.x, position.y + stepOffset, position.z };
 
     // ちょっと距離を取る
-    float checkDistance = 0.5f;
+    float checkDistance = 0.3f;
 
     // 各方面の方向ベクトル
     DirectX::XMFLOAT3 directions[4] = {

@@ -46,27 +46,30 @@ void CameraController::Update(float elapsedTime)
         shakeTimer -= elapsedTime;
     }
 
-    // 地形との当たり判定を行う
-    HitResult	hitResult;
-    if (StageManager::Instance().RayCast(newTarget, newPosition, hitResult))
+    if (!isTransition)
     {
-        DirectX::XMVECTOR	p = DirectX::XMLoadFloat3(&hitResult.position);
-        DirectX::XMVECTOR	cuv = DirectX::XMVectorSet(0, 1, 0, 0);
-        p = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorReplicate(4), cuv, p);
-        DirectX::XMStoreFloat3(&newPosition, p);
+        // 地形との当たり判定を行う
+        HitResult	hitResult;
+        if (StageManager::Instance().RayCast(newTarget, newPosition, hitResult))
+        {
+            DirectX::XMVECTOR	p = DirectX::XMLoadFloat3(&hitResult.position);
+            DirectX::XMVECTOR	cuv = DirectX::XMVectorSet(0, 1, 0, 0);
+            p = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorReplicate(4), cuv, p);
+            DirectX::XMStoreFloat3(&newPosition, p);
+        }
+        static	constexpr	float	Speed = 1.0f / 8.0f;
+        position.x += (newPosition.x - position.x) * Speed;
+        position.y += (newPosition.y - position.y) * Speed;
+        position.z += (newPosition.z - position.z) * Speed;
+        target.x += (newTarget.x - target.x) * Speed;
+        target.y += (newTarget.y - target.y) * Speed;
+        target.z += (newTarget.z - target.z) * Speed;
+
+
+        // カメラに視点を注視点を設定
+        Camera::Instance().SetLookAt(position, target, DirectX::XMFLOAT3(0, 1, 0));
+
     }
-    static	constexpr	float	Speed = 1.0f / 8.0f;
-    position.x += (newPosition.x - position.x) * Speed;
-    position.y += (newPosition.y - position.y) * Speed;
-    position.z += (newPosition.z - position.z) * Speed;
-    target.x += (newTarget.x - target.x) * Speed;
-    target.y += (newTarget.y - target.y) * Speed;
-    target.z += (newTarget.z - target.z) * Speed;
-
-
-    // カメラに視点を注視点を設定
-    Camera::Instance().SetLookAt(position, target, DirectX::XMFLOAT3(0, 1, 0));
-
 
 }
 
