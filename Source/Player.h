@@ -283,7 +283,6 @@ private:
 
     //	Titleステート用
     void TransitionTitleIdleState();
-    void UpdateTitleIdleState(float elapsedTime);
     void TransitionCrouchIdleState();
     void UpdateCrouchIdleState(float elapsedTime);
 

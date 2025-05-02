@@ -12,7 +12,7 @@
 #include "StageManager.h"
 #include "CharacterManager.h"
 
-#define DEBUG
+//#define DEBUG
 
 SceneTitle* SceneTitle::instance = nullptr;
 
@@ -262,7 +262,6 @@ void SceneTitle::Render()
         sceneRenderer->Render(dc);
 
         postprocessingRenderer->Render(dc);
-
 
     }
 

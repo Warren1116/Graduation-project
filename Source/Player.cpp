@@ -74,7 +74,7 @@ Player::Player(bool flag)
     // ダメージ音
     Damage = Audio::Instance().LoadAudioSource("Data/Audio/Damage.wav");
 
-    skillTime = 50.0f;
+    skillTime = 5.0f;
 
     // 待機ステートへ遷移
     TransitionCrouchIdleState();
@@ -84,7 +84,6 @@ Player::Player(bool flag)
     //// メッセージ受信登録
     //EventModeIndex = Messenger::Instance().AddReceiver(MessageData::EVENTMODEEVENT, [&](void* data) { TransitionIdleState(); state = State::EventMode; });
     //GameModeIndex = Messenger::Instance().AddReceiver(MessageData::GAMEMODEEVENT, [&](void* data) { state = State::Idle; });
-
     //// イベントの情報登録
     //SetPositionIndex = Messenger::Instance().AddReceiver(MessageData::PLAYERSETPOSITIONEVENT,
     //    [&](void* data)
@@ -191,7 +190,6 @@ void Player::UpdateState(float elapsedTime)
     case State::Grab:UpdateGrabState(elapsedTime); break;
     case State::SwingToKick:UpdateSwingToKickState(elapsedTime); break;
     case State::CrouchIdle:UpdateCrouchIdleState(elapsedTime); break;
-    case State::TitleIdle:UpdateTitleIdleState(elapsedTime); break;
     case State::Ultimate:UpdateUltimateState(elapsedTime); break;
     }
 }
@@ -266,14 +264,12 @@ DirectX::XMFLOAT3 Player::GetMoveVec() const
         // 進行ベクトルを計算する
         vec.x = (ax * cameraRightX) + (ay * cameraFrontX);
         vec.z = (ax * cameraRightZ) + (ay * cameraFrontZ);
-        // Y軸には移動しない
-        //vec.y = 0;
+        // Y軸
         vec.y = ay * cameraUpY * 3.0f;
     }
 
     return vec;
 }
-
 
 // プレイヤーとエネミーとの衝突処理
 void Player::CollisionPlayerVsEnemies()
@@ -321,7 +317,6 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
         nodePosition.x = node->worldTransform._41;
         nodePosition.y = node->worldTransform._42;
         nodePosition.z = node->worldTransform._43;
-
 
         // 指定のノードとすべての敵を総当たりで衝突処理
         EnemyManager& enemyManager = EnemyManager::Instance();
@@ -1732,88 +1727,13 @@ void Player::TransitionSwingState()
 //  スイングステートの更新処理
 void Player::UpdateSwingState(float elapsedTime)
 {
-    //  スイング中の当たり判定
+    //スイングの当たり判定
     SwingCollision(elapsedTime);
 
-    //スイング位置
-    DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
-    DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
-    DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
-    float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
+    //振り子運動の計算
+    HandleSwingPhysics(elapsedTime, 10.0f, 10.0f, 0.005f);
 
-    //糸の長さ
-    const float ropeLength = 10.0f;
-    //糸の向き
-    DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
-
-    //仮の重力
-    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -10.0f, 0.0f, 0.0f);
-    //速力更新
-    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
-    //仮の空気阻力系数
-    const float dragCoefficient = 0.005f;
-    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
-
-    //糸の修正
-    if (currentLength > ropeLength)
-    {
-        float correctionFactor = (currentLength - ropeLength) * 0.5f;
-        DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-        //Q = DirectX::XMVectorAdd(Q, correction);
-
-        DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
-
-        float smoothFactor = 0.1f;
-        Q = DirectX::XMVectorLerp(Q, targetPosition, smoothFactor);
-    }
-
-    //速度の修正
-    DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(
-        velocityVec,
-        DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
-
-
-    //スイング最高点の判定
-    //前方のベクトルの取得
-    DirectX::XMFLOAT3 front = GetFront();
-    DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
-    //もし最高点に着いたら、連続スイングを行う
-    float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
     GamePad& gamePad = Input::Instance().GetGamePad();
-
-    //  自動で連続スイングする
-    if (dotProduct <= 0)
-    {
-        // 前方に進むためのベクトルを計算
-        DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
-        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
-
-        forwardVec = DirectX::XMVector3Normalize(forwardVec);
-        upVec = DirectX::XMVector3Normalize(upVec);
-
-        forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // 勢いを調整
-        upVec = DirectX::XMVectorScale(upVec, 8.0f);
-
-        // 速度に加算
-        DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-        velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
-        DirectX::XMStoreFloat3(&velocity, velocityVec);
-
-        TransitionSwingToKickState();
-        //Swing->Play(false, 0.8f);
-        //TransitionSwingState();
-    }
-
-    //位置更新
-    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
-    DirectX::XMStoreFloat3(&position, newPosition);
-    DirectX::XMStoreFloat3(&velocity, tangentVelocity);
-
-    //キャラクターの向きを更新
-    DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
-        DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
-    DirectX::XMStoreFloat3(&front, swingDir);
 
     //  キーを押されてない時スイングをキャンセルする
     if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
@@ -1836,7 +1756,6 @@ bool Player::FindWallSwingPoint()
 
     forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
     upVec = DirectX::XMVectorScale(upVec, 12.0f);
-
 
     SwingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
     DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
@@ -1913,6 +1832,105 @@ void Player::SwingCollision(float elapsedTime)
         }
         position = end;
     }
+}
+
+//振り子運動の計算
+void Player::HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient)
+{   
+    //スイング位置
+    DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
+    DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
+    DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
+    float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
+
+    //糸の向き
+    DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
+
+    //仮の重力
+    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -gravityStrength, 0.0f, 0.0f);
+    //速力更新
+    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
+    //仮の空気阻力系数
+    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
+
+    //糸の修正
+    if (currentLength > ropeLength)
+    {
+        float correctionFactor = (currentLength - ropeLength) * 0.5f;
+        DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
+
+        DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
+
+        float smoothFactor = 0.1f;
+        Q = DirectX::XMVectorLerp(Q, targetPosition, smoothFactor);
+    }
+
+    //速度の修正
+    DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(
+        velocityVec,
+        DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
+
+    //位置更新
+    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
+    DirectX::XMStoreFloat3(&position, newPosition);
+    DirectX::XMStoreFloat3(&velocity, tangentVelocity);
+
+    DirectX::XMFLOAT3 front = GetFront();
+    DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
+    //もし最高点に着いたら、連続スイングを行う
+    float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
+    GamePad& gamePad = Input::Instance().GetGamePad();
+
+    if (state == State::Swing)
+    {
+        //  自動で連続スイングする
+        if (dotProduct <= 0)
+        {
+            // 前方に進むためのベクトルを計算
+            DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+            DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+
+            forwardVec = DirectX::XMVector3Normalize(forwardVec);
+            upVec = DirectX::XMVector3Normalize(upVec);
+
+            forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // 勢いを調整
+            upVec = DirectX::XMVectorScale(upVec, 8.0f);
+
+            // 速度に加算
+            DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+            velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
+            DirectX::XMStoreFloat3(&velocity, velocityVec);
+
+            TransitionSwingState();
+        }
+
+
+        //キャラクターの向きを更新
+        DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
+            DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
+        DirectX::XMStoreFloat3(&front, swingDir);
+    }
+    else if (state == State::SwingToKick)
+    {
+        //キャラクターの向きを更新
+        if (lockonEnemy)
+        {
+            DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
+            DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
+            DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
+            DirectX::XMStoreFloat3(&front, directionToEnemy);
+            Turn(elapsedTime, front.x, front.z, turnSpeed);
+
+        }
+        else
+        {
+            DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
+                DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
+            DirectX::XMStoreFloat3(&front, swingDir);
+        }
+    }
+
 
 }
 
@@ -1935,11 +1953,6 @@ void Player::TransitionTitleIdleState()
 {
     state = State::TitleIdle;
     model->PlayAnimation(Anim_Crouch, false);
-}
-
-void Player::UpdateTitleIdleState(float elapsedTime)
-{
-    // 使っていない
 }
 
 //　Titleモーション（二つ目）
@@ -1992,75 +2005,11 @@ void Player::TransitionSwingToKickState()
 //　SwingKickステートの更新処理
 void Player::UpdateSwingToKickState(float elapsedTime)
 {
+    //スイングの当たり判定
     SwingCollision(elapsedTime);
 
-    //スイング位置
-    DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
-    DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
-    DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
-    float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
-
-    //糸の長さ
-    const float ropeLength = 12.0f;
-    //糸の向き
-    DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
-
-    //仮の重力
-    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -20.0f, 0.0f, 0.0f);
-    //速力更新
-    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
-    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
-    //仮の空気阻力系数
-    const float dragCoefficient = 0.0001f;
-    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
-
-    //糸の修正
-    if (currentLength > ropeLength)
-    {
-        float correctionFactor = (currentLength - ropeLength) * 0.5f;
-        DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
-
-        DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
-
-        float smoothFactor = 0.1f;
-        Q = DirectX::XMVectorLerp(Q, targetPosition, smoothFactor);
-    }
-
-    //速度の修正
-    DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(
-        velocityVec,
-        DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection));
-
-
-    //前方のベクトルの取得
-    DirectX::XMFLOAT3 front = GetFront();
-    DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
-    float dotProduct = DirectX::XMVectorGetX(DirectX::XMVector3Dot(tangentVelocity, frontVec));
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
-
-    //位置更新
-    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
-    DirectX::XMStoreFloat3(&position, newPosition);
-    DirectX::XMStoreFloat3(&velocity, tangentVelocity);
-
-
-    //キャラクターの向きを更新
-    if (lockonEnemy)
-    {
-        DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&position);
-        DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&lockonEnemy->GetPosition());
-        DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
-        DirectX::XMStoreFloat3(&front, directionToEnemy);
-        Turn(elapsedTime, front.x, front.z, turnSpeed);
-
-    }
-    else
-    {
-        DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
-            DirectX::XMVectorSubtract(XMLoadFloat3(&swingPoint), XMLoadFloat3(&position)));
-        DirectX::XMStoreFloat3(&front, swingDir);
-    }
+    //振り子運動の計算
+    HandleSwingPhysics(elapsedTime, 12.0f, 20.0f, 0.0001f);
 
     // アニメーションの再生時間を取得
     float animationTime = model->GetCurrentAnimationSeconds();

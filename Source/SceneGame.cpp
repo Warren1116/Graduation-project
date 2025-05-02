@@ -27,8 +27,8 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-//#define TUTORIAL
-#define DEBUG
+#define TUTORIAL
+//#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -119,8 +119,6 @@ void SceneGame::Initialize()
         RegisterRenderModel(model);
     }
 
-
-
     //// キャラクター生成処理
     CharacterManager& characterManager = CharacterManager::Instance();
     {
@@ -129,8 +127,6 @@ void SceneGame::Initialize()
 
         // カメラコントローラー初期化
         cameraController = std::make_unique<CameraController>();
-
-
     }
 
     // 平行光源を追加
@@ -172,7 +168,7 @@ void SceneGame::Initialize()
     if (!tutorialCompleted) {
         tutorialState = SceneGame::TutorialState::First;
         tutorialTimer = 0.0f;
-        tutorialCompleted = true;
+
     }
     else
     {
@@ -420,9 +416,6 @@ void SceneGame::Update(float elapsedTime)
     Camera& camera = Camera::Instance();
     cameraController->Update(elapsedTime);
 
-
-
-
 #ifdef DEBUG
 
     if (gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT && gamePad.GetButton() & GamePad::BTN_KEYBOARD_R)
@@ -656,6 +649,9 @@ void SceneGame::Render()
                 break;
             case TutorialState::Ultimate:
                 str = "Tutorial Ultimate";
+                break;
+            case TutorialState::Dodge:
+                str = "Tutorial Dodge";
                 break;
             case TutorialState::Finish:
                 str = "Tutorial Finish";
