@@ -55,7 +55,6 @@ void ProjectileStraight::Update(float elapsedTime)
     if (StageManager::Instance().RayCast(start, end, hit))
     {
         destroyEffect->Play(hit.position,0.15f);
-        //destroyEffect->SetScale(destroyEffect->GetHandle(), { 0.01f,0.01f,0.01f });
         position.x = hit.position.x;
         position.y = hit.position.y;
         position.z = hit.position.z;
@@ -64,8 +63,6 @@ void ProjectileStraight::Update(float elapsedTime)
         if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
         {
             sceneGame.UnregisterRenderModel(model.get());
-
-
             ProjectileWall* WallWeb = new ProjectileWall(&Player::Instance().GetBrokenProjectileManager());
             WallWeb->SetPosition(hit.position);
             WallWeb->SetDirection({hit.normal});

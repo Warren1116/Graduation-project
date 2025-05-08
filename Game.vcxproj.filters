@@ -189,12 +189,6 @@
     <ClInclude Include="Source\Graphics\LightManager.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\WayPoint.h">
-      <Filter>Source</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SearchAlgorithm.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
     <ClInclude Include="External\DirectXTex\DDSTextureLoader.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
@@ -325,9 +319,6 @@
     <ClInclude Include="Source\Graphics\DebugRenderer.h">
       <Filter>Source\Graphics\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Renderer\DecalRenderer.h">
-      <Filter>Source\Graphics\Renderer</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -426,9 +417,6 @@
     <ClCompile Include="Source\StageManager.cpp">
       <Filter>Source\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="Source\WayPoint.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\Shader\PhongShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
     </ClCompile>
@@ -461,9 +449,6 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\Texture.cpp">
       <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SearchAlgorithm.cpp">
-      <Filter>Source\System\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\SceneClear.cpp">
       <Filter>Source\Scene</Filter>
@@ -568,9 +553,6 @@
       <Filter>Source\Graphics\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp">
-      <Filter>Source\Graphics\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\DecalRenderer.cpp">
       <Filter>Source\Graphics\Renderer</Filter>
     </ClCompile>
   </ItemGroup>

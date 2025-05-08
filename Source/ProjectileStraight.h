@@ -20,7 +20,6 @@ public:
 
 	// ”­Ë
 	void Launch(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& position);
-	
 
 private:
 	//Šî–{î•ñ

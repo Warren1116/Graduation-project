@@ -9,7 +9,6 @@ SwingWeb* SwingWeb::instanceRight = nullptr;
 // コンストラクタ
 SwingWeb::SwingWeb(ProjectileManager* manager, bool leftHand) : Projectile(manager), isLeftHand(leftHand)
 {
-    //instance = this;
 
     if (isLeftHand)
     {

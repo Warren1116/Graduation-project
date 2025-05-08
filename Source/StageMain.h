@@ -2,7 +2,6 @@
 
 #include "Graphics/Model.h"
 #include "Stage.h"
-#include "WayPoint.h"
 #include "EffectManager.h"
 #include "Effect.h"
 #include <functional>
@@ -58,16 +57,9 @@ public:
 		const DirectX::XMFLOAT3& end,
 		HitResult& hit) override;
 
-
 	// 位置設定
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
 	DirectX::XMFLOAT3 GetPosition() const { return position; }
-
-	//DirectX::XMFLOAT3 GetIndexWayPoint(int index);
-
-	//int NearWayPointIndex(DirectX::XMFLOAT3 target);
-	
-	//void DrawDebugGUI() override;
 
 	void DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection) override;
 
@@ -104,7 +96,6 @@ private:
 	CollisionMesh	collisionMesh;
 
 	DirectX::XMFLOAT3 volumeMin, volumeMax;
-
 
 	float warningAreaTimer = 0.0f; // warningAreaのタイマー
 	float warningArea2Timer = 0.0f; // warningArea2のタイマー

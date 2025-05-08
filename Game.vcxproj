@@ -176,7 +176,6 @@
     <ClInclude Include="Source\ProjectileStraight.h" />
     <ClInclude Include="Source\ProjectileWall.h" />
     <ClInclude Include="Source\Renderer\BaseRenderer.h" />
-    <ClInclude Include="Source\Renderer\DecalRenderer.h" />
     <ClInclude Include="Source\Renderer\ModelRenderer.h" />
     <ClInclude Include="Source\Renderer\PostprocessingRenderer.h" />
     <ClInclude Include="Source\Renderer\SceneRenderer.h" />
@@ -188,7 +187,6 @@
     <ClInclude Include="Source\SceneLoading.h" />
     <ClInclude Include="Source\SceneManager.h" />
     <ClInclude Include="Source\SceneTitle.h" />
-    <ClInclude Include="Source\SearchAlgorithm.h" />
     <ClInclude Include="Source\SpriteLayout.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageMain.h" />
@@ -198,7 +196,6 @@
     <ClInclude Include="Source\SwingWeb.h" />
     <ClInclude Include="Source\Telegram.h" />
     <ClInclude Include="Source\UI.h" />
-    <ClInclude Include="Source\WayPoint.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp" />
@@ -261,7 +258,6 @@
     <ClCompile Include="Source\ProjectileStraight.cpp" />
     <ClCompile Include="Source\ProjectileWall.cpp" />
     <ClCompile Include="Source\Renderer\BaseRenderer.cpp" />
-    <ClCompile Include="Source\Renderer\DecalRenderer.cpp" />
     <ClCompile Include="Source\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="Source\Renderer\PostprocessingRenderer.cpp" />
     <ClCompile Include="Source\Renderer\SceneRenderer.cpp" />
@@ -272,7 +268,6 @@
     <ClCompile Include="Source\SceneLoading.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\SceneTitle.cpp" />
-    <ClCompile Include="Source\SearchAlgorithm.cpp" />
     <ClCompile Include="Source\SpriteLayout.cpp" />
     <ClCompile Include="Source\StageMain.cpp" />
     <ClCompile Include="Source\StageManager.cpp" />
@@ -281,7 +276,6 @@
     <ClCompile Include="Source\StateMachine.cpp" />
     <ClCompile Include="Source\SwingWeb.cpp" />
     <ClCompile Include="Source\UI.cpp" />
-    <ClCompile Include="Source\WayPoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Constants.hlsli" />

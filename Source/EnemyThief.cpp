@@ -329,7 +329,6 @@ void EnemyThief::DrawDebugGUI()
 
     }
 
-
     //トランスフォーム
     if (ImGui::CollapsingHeader("EnemyThief", ImGuiTreeNodeFlags_DefaultOpen))
     {

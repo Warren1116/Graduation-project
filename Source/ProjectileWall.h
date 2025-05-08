@@ -31,13 +31,6 @@ private:
 		DirectX::XMFLOAT4 color{ 1,1,1,1 };
 		int decal_index = -1;
 	};
-	//bool use_wire = true;
-	//std::unique_ptr<Geometric_cube> decal_cube;
-	std::vector<decal_texture> decal_textures;
-	std::vector<decal_data> decal_datas;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> decal_depth_stencil_state;
-
-	void gbuffer_decal_pass();
 
 };
 

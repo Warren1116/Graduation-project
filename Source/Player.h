@@ -155,13 +155,6 @@ public:
 
 	float GetSkillTime() const { return skillTime; }
 
-	struct Joint
-	{
-		DirectX::XMFLOAT3	position;
-		DirectX::XMFLOAT3	oldPosition;
-	};
-	Joint		joints[5];
-
 protected:
 
 	// ダメージを受けたときに呼ばれる
@@ -434,22 +427,6 @@ private:
     float skillTimeMax = 5.0f;
 
 	float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
-
-
-private:
-	// メッセージキー
-	uint64_t	EventModeIndex = -1;
-	uint64_t	GameModeIndex = -1;
-
-	uint64_t	SetPositionIndex = -1;
-	uint64_t	MoveIndex = -1;
-	struct
-	{
-		DirectX::XMFLOAT3 moveVec;
-		float moveSpeed;
-		float turnSpeed;
-	} moveData;
-	uint64_t	MotionIndex = -1;
 
 };
 
