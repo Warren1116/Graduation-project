@@ -67,7 +67,9 @@ Player::Player(bool flag)
     spiderSense = Audio::Instance().LoadAudioSource("Data/Audio/spiderSense.wav");
     // シュート音
     FirstSwing = Audio::Instance().LoadAudioSource("Data/Audio/FirstSwingWeb.wav");
+    // スイング音
     Swing = Audio::Instance().LoadAudioSource("Data/Audio/SwingWeb.wav");
+    // ショット音
     ShotWeb = Audio::Instance().LoadAudioSource("Data/Audio/ShotWeb.wav");
     // 回復音
     Healing = Audio::Instance().LoadAudioSource("Data/Audio/Healing.wav");
@@ -78,7 +80,6 @@ Player::Player(bool flag)
 
     // 待機ステートへ遷移
     TransitionCrouchIdleState();
-
 
     //  Event用
     //// メッセージ受信登録
@@ -106,7 +107,6 @@ Player::Player(bool flag)
     //        if (model->GetCurrentAnimationIndex())
     //            model->PlayAnimation(d->index, d->loop, d->blendSecond);
     //    });
-
 
 }
 
