@@ -2,14 +2,12 @@
 
 #include "Graphics/LightManager.h"
 #include "Camera.h"
-#include "SearchAlgorithm.h"
 #include "StageManager.h"
 #include "Player.h"
 #include "EnemyManager.h"
 #include "Input/Input.h"
 #include "EffectManager.h"
 #include "SceneGame.h"
-#include "EventPointManager.h"
 
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
@@ -40,10 +38,8 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 	Graphics& graphics = Graphics::Instance();
 	Camera& camera = Camera::Instance();
 	
-
 	// 現在設定されているバッファを退避
 	CacheRenderTargets(dc);
-
 
 	// 画面クリア＆レンダーターゲット設定
 	ID3D11RenderTargetView* rtv = renderTarget->GetRenderTargetView().Get();
@@ -153,10 +149,8 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		}
 	}
 
-
 	//	シェーダーがあれば終了処理
-	if (shader)
-		shader->End(rc);
+	if (shader) shader->End(rc);
 
 	EffectManager::Instance().Render(rc.view, rc.projection);
 
@@ -168,9 +162,6 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 	//	デバッグプリミティブの表示
 	if (drawDebugPrimitive)
 	{
-		// イベントスクリプトの範囲描画
-		EventPointManager::Instance().DrawDebugPrimitive();
-
 		// ライトのデバッグプリミティブ描画
 		LightManager::Instance().DrawDebugPrimitive();
 
@@ -181,13 +172,10 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		Stage* stage = StageManager::Instance().GetStage(0);
 		stage->DrawDebugPrimitive(dc, rc.view, rc.projection);
 
-		//SearchAlgorithm::Instance().SearchRender(dc, rc.view, rc.projection, stage);
-
 		Player::Instance().DrawDebugPrimitive();
 		EnemyManager::Instance().DrawDebugPrimitive();
 		
 	}
-
 
 	//	元のバッファに戻す
 	RestoreRenderTargets(dc);

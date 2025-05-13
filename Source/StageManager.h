@@ -20,9 +20,6 @@ public:
 	// 更新処理
 	void Update(float elapsedTime);
 
-	// 描画処理
-	//void Render(const RenderContext& rc, ModelShader* shader);
-
 	// ステージ登録
 	void Register(Stage* stage);
 
@@ -33,7 +30,7 @@ public:
 	bool RayCast(const DirectX::XMFLOAT3& start, 
 		const DirectX::XMFLOAT3& end, 
 		HitResult& hit);
-	
+
 	// ステージ取得
 	Stage* GetStage(int index) { return stages.at(index); }
 

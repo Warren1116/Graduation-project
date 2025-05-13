@@ -11,7 +11,6 @@
 #include "EnemyManager.h"
 #include "CameraController.h"
 #include "ProjectileManager.h"
-#include "Graphics/geometric_primitive.h"
 #include "BrokenProjectileManager.h"
 #include <memory.h>
 #include "Enemy.h"
@@ -268,7 +267,7 @@ private:
     //	スイングの当たり判定
     void SwingCollision(float elapsedTime);
 
-	//
+	// スイングの計算
 	void HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient);
 
 	//　投げ技Active

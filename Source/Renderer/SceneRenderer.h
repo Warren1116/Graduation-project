@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Renderer/ModelRenderer.h"
-#include "Graphics/geometric_primitive.h"
 
 // シーンレンダラー
 class SceneRenderer : public ModelRenderer
@@ -50,12 +49,6 @@ private:
 	float shadowBias= { 0.001f};
 	//	影の色
 	DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
-
-
-	//std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
-	//DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
-	//float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
-	//DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
 
 };

@@ -135,7 +135,6 @@ Graphics::Graphics(HWND hWnd)
 
 	// モデルシェーダー
 	{
-		//modelShaders[static_cast<int>(ModelShaderId::Lambert)] = std::make_unique<LambertShader>(device.Get());
 		modelShaders[static_cast<int>(ModelShaderId::Phong)] = std::make_unique<PhongShader>(device.Get());
 		modelShaders[static_cast<int>(ModelShaderId::ShadowmapCaster)] = std::make_unique<ShadowmapCasterShader>(device.Get());
 
@@ -154,7 +153,6 @@ Graphics::Graphics(HWND hWnd)
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 		lineRenderer = std::make_unique<LineRenderer>(device.Get());
 		imguiRenderer = std::make_unique<ImGuiRenderer>(hWnd, device.Get());
-		//geometricPrimitive = std::make_unique<GeometricPrimitive>(device.Get());
 	}
 
 }

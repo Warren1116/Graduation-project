@@ -49,9 +49,6 @@
     <Filter Include="Source\UI">
       <UniqueIdentifier>{2a6f9028-dfd6-4505-9da3-334498146ea1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\System\Event">
-      <UniqueIdentifier>{37d7831b-76d1-4923-a6e6-c17044a7ec20}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Character\Enemy">
       <UniqueIdentifier>{e6df2e2b-d334-4dec-85c3-37513fde6b15}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,15 @@
     </Filter>
     <Filter Include="Source\Graphics\Renderer">
       <UniqueIdentifier>{1ab40f13-e458-41ab-bb7e-9c01046c8ed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Graphics\Light">
+      <UniqueIdentifier>{ad14d52c-35c7-423a-a7fe-bb74997ae252}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Camera">
+      <UniqueIdentifier>{8169574c-e40e-48aa-bac5-18c551778f9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\Effect">
+      <UniqueIdentifier>{44288f1d-a31e-4d9e-99e4-73f5ed6f41ac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -96,9 +102,6 @@
     <ClInclude Include="Source\Graphics\ModelResource.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\Shader.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Input\Input.h">
       <Filter>Source\Input</Filter>
     </ClInclude>
@@ -120,19 +123,7 @@
     <ClInclude Include="Source\Input\Mouse.h">
       <Filter>Source\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Source\CameraController.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Camera.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Collision.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Effect.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EffectManager.h">
       <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Character.h">
@@ -183,12 +174,6 @@
     <ClInclude Include="Source\Graphics\Shader\PhongShader.h">
       <Filter>Source\Graphics\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\Light.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Graphics\LightManager.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="External\DirectXTex\DDSTextureLoader.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
@@ -237,29 +222,11 @@
     <ClInclude Include="Source\CharacterManager.h">
       <Filter>Source\Character</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\Geometric_primitive.h">
-      <Filter>Source\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Source\UI.h">
       <Filter>Source\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\EventData.h">
-      <Filter>Source\System\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EventPointManager.h">
-      <Filter>Source\System\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\EventScripter.h">
-      <Filter>Source\System\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\HeadUpDisplay.h">
-      <Filter>Source\System\Event</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\Font.h">
       <Filter>Source\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SpriteLayout.h">
-      <Filter>Source\System\Event</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="Source\BrokenProjectileManager.h">
@@ -319,6 +286,27 @@
     <ClInclude Include="Source\Graphics\DebugRenderer.h">
       <Filter>Source\Graphics\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\LightManager.h">
+      <Filter>Source\Graphics\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Light.h">
+      <Filter>Source\Graphics\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Camera.h">
+      <Filter>Source\System\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CameraController.h">
+      <Filter>Source\System\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Effect.h">
+      <Filter>Source\System\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EffectManager.h">
+      <Filter>Source\System\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -366,18 +354,6 @@
     <ClCompile Include="Source\Input\Mouse.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Camera.cpp">
-      <Filter>Source\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\CameraController.cpp">
-      <Filter>Source\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Effect.cpp">
-      <Filter>Source\System</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EffectManager.cpp">
-      <Filter>Source\System</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Collision.cpp">
       <Filter>Source\System</Filter>
     </ClCompile>
@@ -419,12 +395,6 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\Shader\PhongShader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\Light.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\LightManager.cpp">
-      <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="External\DirectXTex\DDSTextureLoader.cpp">
       <Filter>Source\Graphics</Filter>
@@ -471,32 +441,11 @@
     <ClCompile Include="Source\CharacterManager.cpp">
       <Filter>Source\Character</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\Geometric_primitive.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\Shader.cpp">
-      <Filter>Source\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Source\UI.cpp">
       <Filter>Source\UI</Filter>
     </ClCompile>
-    <ClCompile Include="Source\EventData.cpp">
-      <Filter>Source\System\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EventPointManager.cpp">
-      <Filter>Source\System\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\EventScripter.cpp">
-      <Filter>Source\System\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\HeadUpDisplay.cpp">
-      <Filter>Source\System\Event</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\Font.cpp">
       <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SpriteLayout.cpp">
-      <Filter>Source\System\Event</Filter>
     </ClCompile>
     <ClCompile Include="Source\BrokenProjectileManager.cpp">
       <Filter>Source\Character\Player</Filter>
@@ -554,6 +503,27 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp">
       <Filter>Source\Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Light.cpp">
+      <Filter>Source\Graphics\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\LightManager.cpp">
+      <Filter>Source\Graphics\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Camera.cpp">
+      <Filter>Source\System\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CameraController.cpp">
+      <Filter>Source\System\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Effect.cpp">
+      <Filter>Source\System\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EffectManager.cpp">
+      <Filter>Source\System\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

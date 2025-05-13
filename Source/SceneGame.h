@@ -13,12 +13,8 @@
 #include "Renderer/SceneRenderer.h"
 #include "Renderer/PostprocessingRenderer.h"
 #include "MetaAI.h"
-#include "HeadUpDisplay.h"
 #include "EnemyThief.h"
 #include "Enemy.h"
-
-#include "Graphics\geometric_primitive.h"
-
 #include "CharacterManager.h"
 
 
@@ -134,7 +130,6 @@ public:
 private:
     std::unique_ptr<Player> player;
     std::unique_ptr<CameraController> cameraController;
-    HeadUpDisplay* headUpDisplay = nullptr;
     std::unique_ptr<Sprite> Pause;
     std::unique_ptr<Sprite> PauseBackGround;
     std::unique_ptr<Sprite> ToTitle;

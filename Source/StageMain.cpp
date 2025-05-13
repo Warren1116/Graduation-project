@@ -36,8 +36,8 @@ StageMain::StageMain()
 
     instance = this;
     // ステージモデルの読み込み
-    cityModel = std::make_unique<Model>("Data/Model/ExampleStage/a.mdl");
-    groundModel = std::make_unique<Model>("Data/Model/ExampleStage/c.mdl");
+    cityModel = std::make_unique<Model>("Data/Model/ExampleStage/Stage1.mdl");
+    groundModel = std::make_unique<Model>("Data/Model/ExampleStage/Plane1.mdl");
 
     warningArea = std::make_unique<Effect>("Data/Effect/warningArea.efk");
     warningArea2 = std::make_unique<Effect>("Data/Effect/warningArea2.efk");
@@ -45,10 +45,7 @@ StageMain::StageMain()
     position = { 0.0f, 0.0f, 0.0f };
     scale.x = scale.y = scale.z = 1.0f;
 
-
     angle.y = DirectX::XMConvertToRadians(0);
-    //angle.y = DirectX::XMConvertToRadians(180);
-
 
     DirectX::XMVECTOR VolumeMin = DirectX::XMVectorReplicate(FLT_MAX);
     DirectX::XMVECTOR VolumeMax = DirectX::XMVectorReplicate(-FLT_MAX);
@@ -156,6 +153,7 @@ StageMain::~StageMain()
 // 更新処理
 void StageMain::Update(float elapsedTime)
 {
+
     // プレイヤーの位置を取得
     DirectX::XMFLOAT3 playerPos = Player::Instance().GetPosition();
 
@@ -176,7 +174,6 @@ void StageMain::Update(float elapsedTime)
         Player::Instance().SetPosition(clampedPos);
     }
 
-
     // タイマーを更新
     warningAreaTimer += elapsedTime;
     warningArea2Timer += elapsedTime;
@@ -192,8 +189,6 @@ void StageMain::Update(float elapsedTime)
         warningArea2->Play(playerPos);
         warningArea2Timer = 0.0f;
     }
-
-
 
     EnemyManager& enemyManager = EnemyManager::Instance();
 
@@ -216,8 +211,6 @@ void StageMain::Update(float elapsedTime)
     // モデル行列更新
     UpdateTransform();
     cityModel->UpdateTransform(transform);
-
-
 }
 
 
@@ -242,7 +235,6 @@ void StageMain::DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLO
     }
 
 }
-
 
 // レイキャスト
 bool StageMain::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit)

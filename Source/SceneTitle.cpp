@@ -208,8 +208,6 @@ void SceneTitle::Update(float elapsedTime)
         PostQuitMessage(1);
     }
 
-
-
     EnemyManager::Instance().Update(elapsedTime);
 }
 
@@ -243,11 +241,6 @@ void SceneTitle::Render()
     rc.viewPosition.w = 1;
     rc.view = camera.GetView();
     rc.projection = camera.GetProjection();
-
-    ////// カメラパラメータ設定
-    //Camera& camera = Camera::Instance();
-    //rc.view = camera.GetView();
-    //rc.projection = camera.GetProjection();
 
     float screenWidth = static_cast<float>(graphics.GetScreenWidth());
     float screenHeight = static_cast<float>(graphics.GetScreenHeight());

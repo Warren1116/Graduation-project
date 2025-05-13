@@ -12,15 +12,13 @@
 #include "ProjectileWall.h"
 #include "CharacterManager.h"
 #include "SwingWeb.h"
-
 #include "MessageData.h"
 #include "Messenger.h"
-
 #include "SceneManager.h"
 #include "SceneTitle.h"
 #include "SceneLoading.h"
-
 #include "EnemyThief.h"
+
 Player* Player::instance = nullptr;
 
 // コンストラクタ
@@ -390,10 +388,7 @@ void Player::UpdateDodgeState(float elapsedTime)
     DirectX::XMStoreFloat3(&velocity, vel);
     DirectX::XMStoreFloat3(&position, playerPos);
 
-    if (!model->IsPlayAnimation())
-    {
-        TransitionIdleState();
-    }
+    if (!model->IsPlayAnimation()) TransitionIdleState();
 }
 
 void Player::TransitionClimbTopState()
@@ -580,8 +575,6 @@ void Player::UpdateCameraState(float elapsedTime)
         MessageData::CAMERACHANGEFREEMODEDATA p = { position };
         Messenger::Instance().SendData(MessageData::CAMERACHANGEFREEMODE, &p);
         return;
-
-
     }
 
     switch (state)
@@ -829,7 +822,6 @@ void Player::UpdateCameraState(float elapsedTime)
 
     }
 }
-
 
 //  発射ステートべの遷移
 void Player::TransitionShotingState()
@@ -1266,16 +1258,12 @@ void Player::UpdateJumpState(float elapsedTime)
 
 
     //  ジャンブ中移動とSHIFTキー同時に押すと
-    HitResult hit;
-    //if (FindWallSwingPoint(position, 5.0f, hit))
-    //{
     if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime))
     {
         lastState = state;
         //  スイングステートへの遷移
         TransitionSwingState();
     }
-    //}
 
     //  もしクライミング中なら、クライミング状態をキャンセルする
     if (onClimb)
@@ -1638,7 +1626,6 @@ void Player::TransitionSwingState()
             }
 
         }
-
         //  スイング位置を探す
         FindWallSwingPoint();
         onSwing = true;
@@ -1663,7 +1650,6 @@ void Player::TransitionSwingState()
         //　初回スイングのモーション  
         {
             model->PlayAnimation(Anim_Swinging, false);
-
             //  スイングモデル（現在仮、Geometricに変更予定）
             SwingWeb* swingWebRight = new SwingWeb(&projectileManager, false);
             SceneGame& sceneGame = SceneGame::Instance();
@@ -1673,7 +1659,6 @@ void Player::TransitionSwingState()
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
         }
-
         //  スイング位置を探す
         FindWallSwingPoint();
         onSwing = true;
@@ -1701,8 +1686,7 @@ void Player::UpdateSwingState(float elapsedTime)
     }
 }
 
-
-//スイングポイントを探す（仮）
+//スイングポイントを探す
 bool Player::FindWallSwingPoint()
 {
     //仮に前方と上方にベクトルを作成
@@ -1723,7 +1707,6 @@ bool Player::FindWallSwingPoint()
     previousSwingPoint = swingPoint;
 
     return false;
-
 }
 
 void Player::SwingCollision(float elapsedTime)
@@ -1735,7 +1718,7 @@ void Player::SwingCollision(float elapsedTime)
         float mx = velocity.x * elapsedTime;
         float mz = velocity.z * elapsedTime;
 
-        //レイを設定
+        // レイの始点と終点を計算
         DirectX::XMFLOAT3 start = position;
         DirectX::XMFLOAT3 end = {
             position.x + mx,
@@ -1744,7 +1727,7 @@ void Player::SwingCollision(float elapsedTime)
         };
         float distance = sqrtf(mx * mx + mz * mz);
 
-        //そして判定を精度を上げるため、レイを分割して判定を行う
+        // レイ分割数を計算（精度向上のため）
         int steps = static_cast<int>(distance / 0.5f);
         steps = max(steps, 5);
         HitResult hit;
@@ -1752,7 +1735,7 @@ void Player::SwingCollision(float elapsedTime)
         const int raySamples = 3;
         float angleStep = DirectX::XM_2PI / raySamples;
 
-        //簡易版のスフィアキャストを作る
+        // 簡易スフィアキャスト
         for (int step = 0; step <= steps; ++step) {
             float t = step / static_cast<float>(steps);
             DirectX::XMVECTOR currentPoint = DirectX::XMVectorLerp(XMLoadFloat3(&start), XMLoadFloat3(&end), t);
@@ -1765,29 +1748,33 @@ void Player::SwingCollision(float elapsedTime)
                 DirectX::XMFLOAT3 offsetPoint;
                 DirectX::XMStoreFloat3(&offsetPoint, DirectX::XMVectorAdd(currentPoint, DirectX::XMVectorSet(offsetX, 0, offsetZ, 0)));
 
-                //レイを飛ばす
+                // レイを飛ばす
                 if (StageManager::Instance().RayCast(position, offsetPoint, hit))
                 {
+                    // 法線を取得して正規化
                     DirectX::XMVECTOR hitNormal = XMLoadFloat3(&hit.normal);
                     hitNormal = DirectX::XMVector3Normalize(hitNormal);
-                    DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.15f);
 
-                    DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
-                    DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
+                    // 法線のY成分が小さいほど、垂直な面（壁）と判断
+                    float normalY = DirectX::XMVectorGetY(hitNormal);
+                    if (fabsf(normalY) < 0.5f)
+                    {
+                        // 衝突位置を調整してプレイヤーを少し押し戻す
+                        DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.15f);
+                        DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
+                        DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
+                        DirectX::XMStoreFloat3(&position, adjustedPosition);
 
-                    DirectX::XMStoreFloat3(&position, adjustedPosition);
-
-
-                    //当たったらクライミングステートへの変更
-                    onClimb = true;
-                    TransitionIdleState();
-                    velocity.x = 0;
-                    velocity.z = 0;
-                    velocity.y = 0;
-                    return;
+                        // クライミングステートへ遷移
+                        onClimb = true;
+                        TransitionIdleState();
+                        velocity = { 0, 0, 0 };
+                        return;
+                    }
                 }
             }
         }
+        // 衝突がなければそのまま位置更新
         position = end;
     }
 }

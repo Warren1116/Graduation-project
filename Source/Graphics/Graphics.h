@@ -8,13 +8,11 @@
 #include "Graphics/LineRenderer.h"
 #include "Graphics/ImGuiRenderer.h"
 #include <mutex>
-#include "Graphics/geometric_primitive.h"
 #include "PrimitiveRenderer.h"
 
 
 enum class ModelShaderId
 {
-	//Lambert,
 	Phong,
 	ShadowmapCaster,
 	Max
@@ -75,8 +73,6 @@ public:
 	// ImGuiレンダラ取得
 	ImGuiRenderer* GetImGuiRenderer() const { return imguiRenderer.get(); }
 
-	GeometricPrimitive* GetGeometricPrimitiver() const { return geometricPrimitive.get(); }
-
 	// プリミティブレンダラ取得
 	PrimitiveRenderer* GetPrimitiveRenderer() const { return primitiveRenderer.get(); }
 
@@ -99,7 +95,6 @@ private:
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
 	std::unique_ptr<ImGuiRenderer>					imguiRenderer;
-	std::unique_ptr<GeometricPrimitive>				geometricPrimitive;
 	std::unique_ptr<PrimitiveRenderer>				primitiveRenderer;
 
 	float	screenWidth;

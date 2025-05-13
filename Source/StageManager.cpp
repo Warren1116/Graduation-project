@@ -9,14 +9,6 @@ void StageManager::Update(float elapsedTime)
 	}
 }
 
-//// •`‰æˆ—
-//void StageManager::Render(const RenderContext& rc, ModelShader* shader)
-//{
-//	for (Stage* stage : stages)
-//	{
-//		stage->Render(rc, shader);
-//	}
-//}
 
 // ƒXƒe[ƒW“o˜^
 void StageManager::Register(Stage* stage)
@@ -52,7 +44,6 @@ bool StageManager::RayCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOA
 			}
 		}
 	}
-
     return result;
 }
 

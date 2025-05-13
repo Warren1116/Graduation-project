@@ -19,15 +19,13 @@
 #include "Messenger.h"
 #include "UI.h"
 #include "MessageData.h"
-#include "Graphics/geometric_primitive.h"
-#include "EventScripter.h"
-#include "EventPointManager.h"
+
 
 SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-#define TUTORIAL
+//#define TUTORIAL
 //#define DEBUG
 
 //	チュートリアルの状態
@@ -46,12 +44,6 @@ void SceneGame::Initialize()
             it = std::make_unique<DepthStencil>(SHADOWMAP_SIZE, SHADOWMAP_SIZE);
         }
     }
-
-    // イベントスクリプト初期化
-    EventScripter::Instance().Initialize();
-
-    // イベントスクリプトポイント読み込み
-    //EventPointManager::Instance().LoadPoints("Data/Script/EventScript.txt");
 
     //	各種レンダラー生成
     {
@@ -101,7 +93,6 @@ void SceneGame::Initialize()
     EnemyManager& enemyManager = EnemyManager::Instance();
     ProjectileManager& projectileManager = ProjectileManager::Instance();
 
-
     // 敵を初期化
     StartNextWave();
 
@@ -111,8 +102,6 @@ void SceneGame::Initialize()
         player->model.get(),
         stageMain->GetCityModel(),
         stageMain->GetGroundModel(),
-
-
     };
     for (Model* model : list)
     {
@@ -156,9 +145,6 @@ void SceneGame::Initialize()
     //  UIの初期化
     UI::Instance().Initialize();
 
-    // HUD生成
-    //headUpDisplay = new HeadUpDisplay();
-
     UseController = true;
     controllerPos = { 245,540 };
     cameraTimer = 90.0f;
@@ -183,14 +169,6 @@ void SceneGame::Initialize()
 // 終了化
 void SceneGame::Finalize()
 {
-    // HUD終了化
-    //if (headUpDisplay != nullptr)
-    //{
-    //    delete headUpDisplay;
-    //    headUpDisplay = nullptr;
-    //}
-
-
     // エネミー終了化
     EnemyManager::Instance().Clear();
 
@@ -208,18 +186,10 @@ void SceneGame::Finalize()
     //  UI終了化
     UI::Instance().Clear();
 
-    //// イベントスクリプトポイントクリア
-    //EventPointManager::Instance().Clear();
-
-    //// イベントスクリプト終了化
-    //EventScripter::Instance().Finalize();
-
     LightManager::Instance().Clear();
     shadowmapRenderer.reset();
     sceneRenderer.reset();
     postprocessingRenderer.reset();
-
-
 }
 
 // 更新処理
@@ -246,9 +216,6 @@ void SceneGame::Update(float elapsedTime)
             nextWaveTimer = 0.0f;
         }
     }
-
-    //// イベントスクリプト初期化
-    //EventScripter::Instance().Update(elapsedTime);
 
     //  UI更新処理
     UI::Instance().Update(elapsedTime);
@@ -405,9 +372,6 @@ void SceneGame::Update(float elapsedTime)
 
     // エフェクト更新処理
     EffectManager::Instance().Update(elapsedTime);
-
-    //// HUD更新
-    //headUpDisplay->Update(elapsedTime);
 
      // キャラクターマネージャーの更新
     CharacterManager::Instance().Update(elapsedTime);
@@ -588,16 +552,12 @@ void SceneGame::Render()
 
         }
 
-        //headUpDisplay->Render(dc);
 
     }
 
 #ifdef DEBUG
     // 2DデバッグGUI描画
     {
-        //headUpDisplay->DrawDebugGUI();
-
-
         player->DrawDebugGUI();
         EnemyManager::Instance().DrawDebugGUI();
 
@@ -712,8 +672,6 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
             SetTutorialState(SceneGame::TutorialState::Ultimate);
         }
     }
-
-
 
     //  チュトリアルの進行
     switch (tutorialState)
@@ -950,7 +908,6 @@ void SceneGame::UpdateCameraState(float elapsedTime)
 
 
 }
-
 
 //  Waveによって敵を生成
 void SceneGame::SpawnEnemiesForWave(int wave)
