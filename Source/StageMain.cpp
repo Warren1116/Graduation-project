@@ -37,7 +37,7 @@ StageMain::StageMain()
     instance = this;
     // ステージモデルの読み込み
     cityModel = std::make_unique<Model>("Data/Model/ExampleStage/Stage1.mdl");
-    groundModel = std::make_unique<Model>("Data/Model/ExampleStage/Plane1.mdl");
+    groundModel = std::make_unique<Model>("Data/Model/ExampleStage/Plane.mdl");
 
     warningArea = std::make_unique<Effect>("Data/Effect/warningArea.efk");
     warningArea2 = std::make_unique<Effect>("Data/Effect/warningArea2.efk");

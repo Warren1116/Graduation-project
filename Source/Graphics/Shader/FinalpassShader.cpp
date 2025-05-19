@@ -74,16 +74,16 @@ FinalpassShader::FinalpassShader(ID3D11Device* device)
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 
-        // フォグ用バッファ
-        desc.ByteWidth = sizeof(Fog);
-        desc.Usage = D3D11_USAGE_DEFAULT;
-        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        desc.CPUAccessFlags = 0;
-        desc.MiscFlags = 0;
-        desc.StructureByteStride = 0;
+        //// フォグ用バッファ
+        //desc.ByteWidth = sizeof(Fog);
+        //desc.Usage = D3D11_USAGE_DEFAULT;
+        //desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        //desc.CPUAccessFlags = 0;
+        //desc.MiscFlags = 0;
+        //desc.StructureByteStride = 0;
 
-        hr = device->CreateBuffer(&desc, 0, finalpassConstantBuffer[1].GetAddressOf());
-        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+        //hr = device->CreateBuffer(&desc, 0, finalpassConstantBuffer[1].GetAddressOf());
+        //_ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 
         desc.ByteWidth = sizeof(RadialBlurConstance);
@@ -93,7 +93,7 @@ FinalpassShader::FinalpassShader(ID3D11Device* device)
         desc.MiscFlags = 0;
         desc.StructureByteStride = 0;
 
-        hr = device->CreateBuffer(&desc, 0, finalpassConstantBuffer[2].GetAddressOf());
+        hr = device->CreateBuffer(&desc, 0, finalpassConstantBuffer[1].GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
 
@@ -255,9 +255,9 @@ void FinalpassShader::Draw(const RenderContext& rc, const Sprite* sprite)
     DirectX::XMStoreFloat4x4(&cbFinalpassConstances.inverseView, DirectX::XMMatrixInverse(nullptr, V));
     DirectX::XMStoreFloat4x4(&cbFinalpassConstances.inverseProjection, DirectX::XMMatrixInverse(nullptr, P));
 
-    cbFinalpassConstances.hueShift = rc.colorGradingData.hueShift;
-    cbFinalpassConstances.saturation = rc.colorGradingData.saturation;
-    cbFinalpassConstances.brightness = rc.colorGradingData.brightness;
+    //cbFinalpassConstances.hueShift = rc.colorGradingData.hueShift;
+    //cbFinalpassConstances.saturation = rc.colorGradingData.saturation;
+    //cbFinalpassConstances.brightness = rc.colorGradingData.brightness;
 
     rc.deviceContext->UpdateSubresource(finalpassConstantBuffer[0].Get(), 0, 0, &cbFinalpassConstances, 0, 0);
 
@@ -268,7 +268,7 @@ void FinalpassShader::Draw(const RenderContext& rc, const Sprite* sprite)
     radialBlur.blur_center = rc.radialblurData.blur_center;
     radialBlur.blur_mask_radius = rc.radialblurData.blur_mask_radius;
 
-    rc.deviceContext->UpdateSubresource(finalpassConstantBuffer[2].Get(), 0, 0, &radialBlur, 0, 0);
+    rc.deviceContext->UpdateSubresource(finalpassConstantBuffer[1].Get(), 0, 0, &radialBlur, 0, 0);
 
 
     UINT stride = sizeof(Sprite::Vertex);

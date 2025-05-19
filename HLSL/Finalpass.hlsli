@@ -17,34 +17,12 @@ cbuffer CBFinalpass : register(b0)
     row_major float4x4 view;
     row_major float4x4 projection;
     row_major float4x4 inverseView;
-    row_major float4x4 inverseProjection;
-	//	色調補正
-    float hueShift; // 色相調整
-    float saturation; // 彩度調整
-    float brightness; // 明度調整
-    float colorGradiationDummy;
-	
+    row_major float4x4 inverseProjection;	
 };
-
-cbuffer CBFog : register(b1)
-{
-    float3 fogColor;
-    //float fogIntensity;
-	
-    float fogDensity;
-    float fogHeightFalloff;
-    float fogCutoffDistance;
-    float groundLevel;
-
-    //float mieScatteringCoef;
-    //float timeScale;
-    //float noiseScale;
-    float dummy;
-}
 
 
 // ラジアルブラー用の定数バッファ
-cbuffer RADIAL_BLUR_CONSTANT_BUFFER : register(b2)
+cbuffer RADIAL_BLUR_CONSTANT_BUFFER : register(b1)
 {
     float blur_radius;
     int blur_sampling_count;

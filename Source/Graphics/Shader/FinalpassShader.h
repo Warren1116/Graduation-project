@@ -24,25 +24,8 @@ private:
         DirectX::XMFLOAT4X4	projection;
         DirectX::XMFLOAT4X4	inverseView;
         DirectX::XMFLOAT4X4	inverseProjection;
-        //	色調補正
-        float				hueShift;	// 色相調整
-        float				saturation;	// 彩度調整
-        float				brightness;	// 明度調整
-        float				colorGradiationDummy;
 
-    };
-    struct Fog
-    {
-        DirectX::XMFLOAT3 fogColor;
-        //float fogIntensity;
-        float fogDensity;
-        float fogHeightFalloff;
-        float fogCutoffDistance;
-        float groundLevel;
-        //float mieScatteringCoef;
-        //float timeScale;
-        //float noiseScale;
-        float dummy;
+
     };
 
     struct RadialBlurConstance
@@ -55,7 +38,7 @@ private:
     };
 
 
-    Microsoft::WRL::ComPtr<ID3D11Buffer>				finalpassConstantBuffer[3];
+    Microsoft::WRL::ComPtr<ID3D11Buffer>				finalpassConstantBuffer[2];
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader>			vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>			pixelShader;

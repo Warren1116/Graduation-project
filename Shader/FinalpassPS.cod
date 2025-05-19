@@ -4,34 +4,6 @@
 //
 // Buffer Definitions: 
 //
-// cbuffer CBFinalpass
-// {
-//
-//   float4 screenSize;                 // Offset:    0 Size:    16 [unused]
-//   float4 viewPosition;               // Offset:   16 Size:    16
-//   row_major float4x4 view;           // Offset:   32 Size:    64 [unused]
-//   row_major float4x4 projection;     // Offset:   96 Size:    64 [unused]
-//   row_major float4x4 inverseView;    // Offset:  160 Size:    64
-//   row_major float4x4 inverseProjection;// Offset:  224 Size:    64
-//   float hueShift;                    // Offset:  288 Size:     4
-//   float saturation;                  // Offset:  292 Size:     4
-//   float brightness;                  // Offset:  296 Size:     4
-//   float colorGradiationDummy;        // Offset:  300 Size:     4 [unused]
-//
-// }
-//
-// cbuffer CBFog
-// {
-//
-//   float3 fogColor;                   // Offset:    0 Size:    12
-//   float fogDensity;                  // Offset:   12 Size:     4
-//   float fogHeightFalloff;            // Offset:   16 Size:     4 [unused]
-//   float fogCutoffDistance;           // Offset:   20 Size:     4
-//   float groundLevel;                 // Offset:   24 Size:     4
-//   float dummy;                       // Offset:   28 Size:     4 [unused]
-//
-// }
-//
 // cbuffer RADIAL_BLUR_CONSTANT_BUFFER
 // {
 //
@@ -51,10 +23,7 @@
 // sceneSampler                      sampler      NA          NA             s0      1 
 // sceneTexture                      texture  float4          2d             t0      1 
 // bloomTexture                      texture  float4          2d             t1      1 
-// DepthMap                          texture   float          2d             t2      1 
-// CBFinalpass                       cbuffer      NA          NA            cb0      1 
-// CBFog                             cbuffer      NA          NA            cb1      1 
-// RADIAL_BLUR_CONSTANT_BUFFER       cbuffer      NA          NA            cb2      1 
+// RADIAL_BLUR_CONSTANT_BUFFER       cbuffer      NA          NA            cb1      1 
 //
 //
 //
@@ -76,27 +45,24 @@
 //
 ps_5_0
 dcl_globalFlags refactoringAllowed
-dcl_constantbuffer CB0[19], immediateIndexed
 dcl_constantbuffer CB1[2], immediateIndexed
-dcl_constantbuffer CB2[2], immediateIndexed
 dcl_sampler s0, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_resource_texture2d (float,float,float,float) t1
-dcl_resource_texture2d (float,float,float,float) t2
 dcl_input_ps linear v2.xy
 dcl_output o0.xyzw
-dcl_temps 7
+dcl_temps 5
 resinfo_indexable(texture2d)(float,float,float,float) r0.xy, l(0), t0.xyzw
 sample_indexable(texture2d)(float,float,float,float) r1.xyzw, v2.xyxx, t0.xyzw, s0
-add r0.zw, -v2.xxxy, cb2[0].zzzw
-div r2.xy, cb2[0].xxxx, r0.xyxx
-itof r2.z, cb2[0].y
+add r0.zw, -v2.xxxy, cb1[0].zzzw
+div r2.xy, cb1[0].xxxx, r0.xyxx
+itof r2.z, cb1[0].y
 div r2.xy, r2.xyxx, r2.zzzz
 mul r0.zw, r0.zzzw, r2.xxxy
 mov r3.xyzw, r1.xyzw
 mov r2.x, l(1)
 loop 
-  ige r2.y, r2.x, cb2[0].y
+  ige r2.y, r2.x, cb1[0].y
   breakc_nz r2.y
   itof r2.y, r2.x
   mad r2.yw, r0.zzzw, r2.yyyy, v2.xxxy
@@ -105,8 +71,8 @@ loop
   iadd r2.x, r2.x, l(1)
 endloop 
 min r0.x, r0.y, r0.x
-div r0.x, cb2[1].x, r0.x
-add r0.yz, v2.xxyx, -cb2[0].zzwz
+div r0.x, cb1[1].x, r0.x
+add r0.yz, v2.xxyx, -cb1[0].zzwz
 dp2 r0.y, r0.yzyy, r0.yzyy
 sqrt r0.y, r0.y
 div_sat r0.x, r0.y, r0.x
@@ -114,100 +80,7 @@ div r2.xyzw, r3.xyzw, r2.zzzz
 add r2.xyzw, -r1.xyzw, r2.xyzw
 mad r0.xyzw, r0.xxxx, r2.xyzw, r1.xyzw
 sample_indexable(texture2d)(float,float,float,float) r1.xyz, v2.xyxx, t1.xyzw, s0
-add r1.xyz, r0.yzxy, r1.yzxy
-sample_indexable(texture2d)(float,float,float,float) r1.w, v2.xyxx, t2.yzwx, s0
-mad r2.x, v2.x, l(2.000000), l(-1.000000)
-mad r2.y, v2.y, l(-2.000000), l(1.000000)
-mul r3.xyzw, cb0[11].xyzw, cb0[14].yyyy
-mad r3.xyzw, cb0[14].xxxx, cb0[10].xyzw, r3.xyzw
-mad r3.xyzw, cb0[14].zzzz, cb0[12].xyzw, r3.xyzw
-mad r3.xyzw, cb0[14].wwww, cb0[13].xyzw, r3.xyzw
-mul r4.xyzw, cb0[11].xyzw, cb0[15].yyyy
-mad r4.xyzw, cb0[15].xxxx, cb0[10].xyzw, r4.xyzw
-mad r4.xyzw, cb0[15].zzzz, cb0[12].xyzw, r4.xyzw
-mad r4.xyzw, cb0[15].wwww, cb0[13].xyzw, r4.xyzw
-mul r5.xyzw, cb0[11].xyzw, cb0[16].yyyy
-mad r5.xyzw, cb0[16].xxxx, cb0[10].xyzw, r5.xyzw
-mad r5.xyzw, cb0[16].zzzz, cb0[12].xyzw, r5.xyzw
-mad r5.xyzw, cb0[16].wwww, cb0[13].xyzw, r5.xyzw
-mul r6.xyzw, cb0[11].xyzw, cb0[17].yyyy
-mad r6.xyzw, cb0[17].xxxx, cb0[10].xyzw, r6.xyzw
-mad r6.xyzw, cb0[17].zzzz, cb0[12].xyzw, r6.xyzw
-mad r6.xyzw, cb0[17].wwww, cb0[13].xyzw, r6.xyzw
-mul r4.xyzw, r2.yyyy, r4.xyzw
-mad r2.xyzw, r2.xxxx, r3.xyzw, r4.xyzw
-mad r2.xyzw, r1.wwww, r5.xyzw, r2.xyzw
-add r2.xyzw, r6.xyzw, r2.xyzw
-div r2.xyz, r2.xyzx, r2.wwww
-add r2.xyz, r2.xyzx, -cb0[1].xyzx
-dp3 r1.w, r2.xyzx, r2.xyzx
-sqrt r1.w, r1.w
-add r2.x, cb0[1].y, -cb1[1].z
-lt r2.y, l(0.000000), r2.x
-mul r2.x, r2.x, -cb1[0].w
-mul r2.x, r2.x, l(1.442695)
-exp r2.x, r2.x
-add r2.x, -r2.x, l(1.000000)
-max r2.x, r2.x, l(0.000000)
-add r1.w, -r1.w, cb1[1].y
-div_sat r1.w, r1.w, cb1[1].y
-add r1.w, -r1.w, l(1.000000)
-mul r1.w, r1.w, r2.x
-and r1.w, r1.w, r2.y
-add r2.xyz, -r1.xyzx, cb1[0].yzxy
-mad r1.xyz, r1.wwww, r2.xyzx, r1.xyzx
-max r1.w, r1.y, r1.x
-max r1.w, r1.w, r1.z
-min r2.x, r1.y, r1.x
-min r2.x, r1.z, r2.x
-add r2.x, r1.w, -r2.x
-div r2.y, r2.x, r1.w
-ge r2.z, r1.w, l(0.000000)
-and r2.z, r2.z, l(0x3f800000)
-mul r2.y, r2.z, r2.y
-mul r2.z, r2.y, cb0[18].y
-mul r3.y, r1.w, cb0[18].z
-eq r2.w, r2.z, l(0.000000)
-if_nz r2.w
-  mov r0.xyz, r3.yyyy
-else 
-  lt r2.w, l(0.000000), r2.y
-  add r4.xyz, -r1.yzxy, r1.xyzx
-  div r4.xyz, r4.xyzx, r2.xxxx
-  eq r1.xy, r1.wwww, r1.zxzz
-  mul r1.z, r4.x, l(60.000000)
-  mad r4.xy, r4.yzyy, l(60.000000, 60.000000, 0.000000, 0.000000), l(120.000000, 240.000000, 0.000000, 0.000000)
-  movc r1.y, r1.y, r4.x, r4.y
-  movc r1.x, r1.x, r1.z, r1.y
-  lt r1.y, r1.x, l(0.000000)
-  add r1.z, r1.x, l(360.000000)
-  movc r1.x, r1.y, r1.z, r1.x
-  and r1.x, r1.x, r2.w
-  add r1.x, r1.x, cb0[18].x
-  mul r1.y, r1.x, l(360.000000)
-  ge r1.y, r1.y, -r1.y
-  movc r1.yz, r1.yyyy, l(0,360.000000,0.002778,0), l(0,-360.000000,-0.002778,0)
-  mul r1.x, r1.z, r1.x
-  frc r1.x, r1.x
-  mul r1.x, r1.x, r1.y
-  mul r1.y, r1.x, l(0.016667)
-  round_z r1.y, r1.y
-  mad r1.x, r1.x, l(0.016667), -r1.y
-  mad r1.z, -r2.y, cb0[18].y, l(1.000000)
-  mul r3.z, r1.z, r3.y
-  mad r1.z, -r2.z, r1.x, l(1.000000)
-  add r1.x, -r1.x, l(1.000000)
-  mad r1.x, -r2.z, r1.x, l(1.000000)
-  mul r3.xw, r1.xxxz, r3.yyyy
-  eq r2.xyzw, r1.yyyy, l(0.000000, 1.000000, 2.000000, 3.000000)
-  eq r1.xy, r1.yyyy, l(4.000000, 5.000000, 0.000000, 0.000000)
-  and r1.yzw, r3.yyzw, r1.yyyy
-  movc r1.xyz, r1.xxxx, r3.xzyx, r1.yzwy
-  movc r1.xyz, r2.wwww, r3.zwyz, r1.xyzx
-  movc r1.xyz, r2.zzzz, r3.zyxz, r1.xyzx
-  movc r1.xyz, r2.yyyy, r3.wyzw, r1.xyzx
-  movc r0.xyz, r2.xxxx, r3.yxzy, r1.xyzx
-endif 
-mov o0.xyzw, r0.xyzw
+add o0.xyz, r0.xyzx, r1.xyzx
+mov o0.w, r0.w
 ret 
-// Approximately 124 instruction slots used
+// Approximately 31 instruction slots used
