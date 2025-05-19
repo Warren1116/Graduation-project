@@ -25,11 +25,7 @@ private:
 		DirectX::XMFLOAT4 viewPosition;
 		DirectX::XMFLOAT4X4 viewProjection;
 		DirectX::XMFLOAT4 ambientLightColor;
-
 		DirectionalLightData directionalLightData; //平行光源情報
-		SpotLightData spotLightData[SpotLightMax]; //スポットライト情報
-		int spotLightCount; //スポットライト数
-		DirectX::XMFLOAT3 dummy3;
 	};
 
 	struct CbMesh

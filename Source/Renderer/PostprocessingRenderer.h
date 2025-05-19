@@ -36,17 +36,12 @@ public:
     //　ラジアルブラーの有効無効
     void  radialblurActive(bool active);
 
-
-
 private:
 	// シーン描画データ
 	ShaderResourceViewData			sceneData;
 
 	// 描画用スプライト
 	std::unique_ptr<Sprite>			renderSprite;
-
-	// 色調補正データ
-	ColorGradingData				colorGradingData;
 
 	//ラジアルブラー
 	RadialBlurData					radialblurData;

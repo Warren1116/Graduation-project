@@ -219,7 +219,6 @@ void FinalpassShader::Begin(const RenderContext& rc)
     {
         finalpassConstantBuffer[0].Get(),
         finalpassConstantBuffer[1].Get(),
-        finalpassConstantBuffer[2].Get(),
     };
     rc.deviceContext->VSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);
     rc.deviceContext->PSSetConstantBuffers(0, ARRAYSIZE(constantBuffers), constantBuffers);

@@ -105,7 +105,6 @@ public:
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 
-
     //	シャドウマップ用深度ステンシルバッファ
     std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
     //	ライトビュープロジェクション行列

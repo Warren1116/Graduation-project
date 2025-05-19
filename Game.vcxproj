@@ -272,9 +272,6 @@
     <None Include="HLSL\Finalpass.hlsli" />
     <None Include="HLSL\Font.hlsli" />
     <None Include="HLSL\GaussianBlur.hlsli" />
-    <None Include="HLSL\gbuffer.hlsli" />
-    <None Include="HLSL\gbuffer_decal_constant_buffer.hlsli" />
-    <None Include="HLSL\gbuffer_decal_primitive.hlsli" />
     <None Include="HLSL\geometric_primitive.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\Line.hlsli" />

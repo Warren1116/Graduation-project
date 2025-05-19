@@ -49,37 +49,7 @@ float4 main(VS_OUT pin) : SV_TARGET
     
     diffuse *= shadow;
     specular *= shadow;
-    
-	// スポットライトの処理
-    for (int i = 0; i < spotLightCount; ++i)
-    {
-		// ライトベクトルを算出
-        float3 lightVector = pin.world_position - spotLightData[i].position.xyz;
-
-		// ライトベクトルの長さを算出
-        float lightLength = length(lightVector);
-
-        if (lightLength >= spotLightData[i].range)
-            continue;
-
-		// 距離減衰を算出する
-        float attenuate = saturate(1.0f - lightLength / spotLightData[i].range);
-
-        lightVector = normalize(lightVector);
-
-		// 角度減衰を算出してattenuateに乗算する
-        float3 spotDirection = normalize(spotLightData[i].direction.xyz);
-        float angle = dot(spotDirection, lightVector);
-        float area = spotLightData[i].innerCorn - spotLightData[i].outerCorn;
-        attenuate *= saturate(1.0f - (spotLightData[i].innerCorn - angle) / area);
-
-        diffuse += CalcLambertDiffuse(N, lightVector,
-									spotLightData[i].color.rgb, kd.rgb) * attenuate;
-        specular += CalcPhongSpecular(N, lightVector,
-									spotLightData[i].color.rgb, E, shiness, ks.rgb) * attenuate;
-
-    }
-        
+            
     return float4((diffuseColor.rgb * (ambient + diffuse) + specular), diffuseColor.a);
     
 }

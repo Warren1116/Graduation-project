@@ -72,7 +72,6 @@ void PostprocessingRenderer::Render(ID3D11DeviceContext* dc)
 		rc.finalpassData.bloomTexture = workRenderTarget[1]->GetShaderResourceView().Get();
 		rc.finalpassData.colorMap = sceneData.color.Get();
 		rc.finalpassData.depthMap = sceneData.depth.Get();
-		rc.colorGradingData = colorGradingData;
 
 		//ラジアルブラー
         rc.radialblurData = radialblurData;
@@ -105,15 +104,6 @@ void	PostprocessingRenderer::DrawDebugGUI()
 {
 	if (ImGui::TreeNode("PostProcess"))
 	{
-        // カラーグレーディング
-		if (ImGui::TreeNode("ColorGrading"))
-		{
-			ImGui::SliderFloat("hueShift", &colorGradingData.hueShift, 0.0f, 360.0f);
-			ImGui::SliderFloat("saturation", &colorGradingData.saturation, 0.0f, 2.0f);
-			ImGui::SliderFloat("brightness", &colorGradingData.brightness, 0.0f, 2.0f);
-			ImGui::TreePop();
-		}
-
         //ラジアルブラー
 		if (ImGui::TreeNode("radial blur"))
 		{
