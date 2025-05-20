@@ -67,6 +67,9 @@
     <Filter Include="Source\System\Effect">
       <UniqueIdentifier>{44288f1d-a31e-4d9e-99e4-73f5ed6f41ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\MiniMap">
+      <UniqueIdentifier>{35334444-a3f2-4d70-84d4-f6ada98dbfac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -307,6 +310,9 @@
     <ClInclude Include="Source\Graphics\Shader.h">
       <Filter>Source\Graphics\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Source\MiniMap.h">
+      <Filter>Source\System\MiniMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -524,6 +530,9 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\Shader.cpp">
       <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MiniMap.cpp">
+      <Filter>Source\System\MiniMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

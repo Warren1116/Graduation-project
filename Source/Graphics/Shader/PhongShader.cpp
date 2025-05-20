@@ -128,8 +128,6 @@ PhongShader::PhongShader(ID3D11Device* device)
 
         HRESULT hr = device->CreateDepthStencilState(&desc, depthStencilState.GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
-
     }
 
     //ラスタライザステート
@@ -147,11 +145,9 @@ PhongShader::PhongShader(ID3D11Device* device)
         desc.CullMode = D3D11_CULL_BACK;
         desc.AntialiasedLineEnable = false;
 
-
         HRESULT hr = device->CreateRasterizerState(&desc, rasterizerState.GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
-
 
     //サンプラステート
     {
@@ -186,7 +182,6 @@ PhongShader::PhongShader(ID3D11Device* device)
 
         hr = device->CreateSamplerState(&desc, shadowMapSamplerState.GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
-
     }
 }
 

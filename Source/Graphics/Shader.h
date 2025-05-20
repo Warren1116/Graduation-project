@@ -28,7 +28,6 @@ public:
 	// サブセット単位で描画
 	virtual void DrawSubset(const RenderContext& rc, const ModelResource::Subset& subset) = 0;
 
-
 	// 描画
 	virtual void Draw(const RenderContext& rc, const Model* model) {}
 

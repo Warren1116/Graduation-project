@@ -10,19 +10,6 @@
 class Sprite
 {
 public:
-	enum class Pivot
-	{
-		LeftTop,
-		LeftCenter,
-		LeftBottom,
-		CenterTop,
-		CenterCenter,
-		CenterBottom,
-		RightTop,
-		RightCenter,
-		RightBottom,
-	};
-
 	Sprite();
 	Sprite(const char* filename);
 	~Sprite() {}
@@ -42,18 +29,6 @@ public:
 		float sw, float sh,
 		float angle,
 		float r, float g, float b, float a) const;
-
-	// ï`âÊé¿çs
-	void Render(ID3D11DeviceContext* dc,
-		float dx, float dy,
-		float dw, float dh,
-		float sx, float sy,
-		float sw, float sh,
-		float angle, Pivot pivot = Pivot::LeftTop,
-		float r = 1, float g = 1, float b = 1, float a = 1) const;
-
-	//// ï`âÊé¿çs
-	//void Render(ID3D11DeviceContext* dc, Vertex* vertices) const;
 
 
 	void textout(ID3D11DeviceContext* immediate_context, std::string s,

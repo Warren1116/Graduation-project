@@ -86,6 +86,4 @@ private:
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
     float radialblurRadius = 0.0f;
 
-
-
 };

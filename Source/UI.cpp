@@ -6,6 +6,7 @@
 #include "Input\Input.h"
 #include "EnemyManager.h"
 #include "SceneTitle.h"
+#include "MiniMap.h"
 
 #define TUTORIAL
 
@@ -37,10 +38,12 @@ void UI::Initialize()
     HpBar = std::make_unique<Sprite>();
     SkillBar = std::make_unique<Sprite>();
 
+    MiniMap::Instance().Initialize(Graphics::Instance().GetDevice(), 128);
 }
 
 void UI::Update(float elapsedtime)
 {
+    MiniMap::Instance().Update(elapsedtime);
     //  チュートリアルの進行
     if (SceneGame::Instance().GetIsTutorialPaused() || Player::Instance().GetOnSwing())
     {
@@ -95,6 +98,8 @@ void UI::Update(float elapsedtime)
 //  UIの描画
 void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
+    MiniMap::Instance().Render(dc);
+
     //  攻撃を受ける時にSpiderSenseを描画する
     if (Player::Instance().GetAttackSoon())
     {

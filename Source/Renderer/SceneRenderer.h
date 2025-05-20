@@ -50,5 +50,9 @@ private:
 	//	âeÇÃêF
 	DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
 
+//private:
+//    // MiniMapóp
+//    DirectX::XMMATRIX miniMapviewProjection;
+//	std::unique_ptr<Sprite> miniMapSprite;
 
 };
