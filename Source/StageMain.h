@@ -73,7 +73,8 @@ public:
 	Model* GetGroundModel() { return groundModel.get(); }
 
 	CollisionMesh& GetCollisionMesh() { return collisionMesh; }
-
+    DirectX::XMFLOAT3 GetVolumeMin() { return volumeMin; }
+    DirectX::XMFLOAT3 GetVolumeMax() { return volumeMax; }
 
 private:
 	// s—ñXV

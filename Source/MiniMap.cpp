@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "EnemyManager.h"
 #include "StageManager.h"
-
+#include "StageMain.h"
 
 using namespace DirectX;
 
@@ -15,6 +15,10 @@ MiniMap& MiniMap::Instance()
 void MiniMap::Initialize(ID3D11Device* device, int size)
 {
     textureSize = size;
+
+    stageMin = StageMain::Instance().GetVolumeMin();
+    stageMax = StageMain::Instance().GetVolumeMax();
+
     CreateBaseTexture(device, size);
     GenerateBaseMap();
     CreateTexture(device, size);
@@ -53,32 +57,34 @@ void MiniMap::CreateBaseTexture(ID3D11Device* device, int size)
 
 void MiniMap::GenerateBaseMap()
 {
+    float rayStartHeight = 100.0f;
+
     for (int y = 0; y < textureSize; ++y)
     {
         for (int x = 0; x < textureSize; ++x)
         {
-            float worldX = (x - textureSize / 2.0f);
-            float worldZ = (y - textureSize / 2.0f);
+            float u = static_cast<float>(x) / (textureSize - 1);
+            float v = static_cast<float>(y) / (textureSize - 1);
 
-            XMVECTOR origin = XMVectorSet(worldX, 100.0f, worldZ, 1.0f);
-            XMVECTOR dir = XMVectorSet(0, -1, 0, 0);
+            float worldX = stageMin.x + u * (stageMax.x - stageMin.x);
+            float worldZ = stageMin.z + v * (stageMax.z - stageMin.z);
 
-            XMFLOAT3 o, d;
-            XMStoreFloat3(&o, origin);
-            XMStoreFloat3(&d, dir);
+            XMFLOAT3 origin(worldX, rayStartHeight, worldZ);
+            XMFLOAT3 direction(0.0f, -1.0f, 0.0f);
 
             HitResult hit;
-            if (StageManager::Instance().RayCast(o, d, hit))
+            if (StageManager::Instance().RayCast(origin, direction, hit))
             {
-                if (hit.position.y > 5.0f)
+                if (hit.position.y > Player::Instance().GetPosition().y)
                 {
-                    baseMapPixels[y * textureSize + x] = 0xFF404040;
+                    baseMapPixels[y * textureSize + x] = 0xFF606060;
                 }
                 else
                 {
-                    baseMapPixels[y * textureSize + x] = 0xFF000000;
+                    baseMapPixels[y * textureSize + x] = 0xFF202020;
                 }
             }
+
         }
     }
 }
@@ -111,23 +117,39 @@ void MiniMap::Update(float elapsedtime)
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
     dynamicPixels = baseMapPixels;
 
-    auto DrawPoint = [&](const XMFLOAT3& pos, UINT color)
+    auto DrawPoint = [&](const XMFLOAT3& pos, UINT color, int radius = 1)
         {
-            int x = static_cast<int>(pos.x + textureSize / 2.0f);
-            int y = static_cast<int>(pos.z + textureSize / 2.0f);
-            if (x >= 0 && x < textureSize && y >= 0 && y < textureSize)
+            float u = (pos.x - stageMin.x) / (stageMax.x - stageMin.x);
+            float v = (pos.z - stageMin.z) / (stageMax.z - stageMin.z);
+
+            int cx = static_cast<int>(u * textureSize);
+            int cy = static_cast<int>(v * textureSize);
+
+            for (int dy = -radius; dy <= radius; ++dy)
             {
-                dynamicPixels[y * textureSize + x] = color;
+                for (int dx = -radius; dx <= radius; ++dx)
+                {
+                    int x = cx + dx;
+                    int y = cy + dy;
+
+                    if (x >= 0 && x < textureSize && y >= 0 && y < textureSize)
+                    {
+                        dynamicPixels[y * textureSize + x] = color;
+                    }
+                }
             }
         };
+    DrawPoint(Player::Instance().GetPosition(), 0xFFFFFFFF);
 
-    DrawPoint(Player::Instance().GetPosition(), 0xFF00FF00);
-
-    //for (auto& enemy : EnemyManager::Instance().GetEnemies())
-    //{
-    //    DrawPoint(enemy->GetPosition(), 0xFFFF0000);
-    //}
-
+    float EnemyCount = EnemyManager::Instance().GetEnemyCount();
+    for (int i = 0; i < EnemyCount; ++i)
+    {
+        Enemy* enemy = EnemyManager::Instance().GetEnemy(i);
+        if (enemy != nullptr)
+        {
+            DrawPoint(enemy->GetPosition(), 0xFFFF0000);
+        }
+    }
     UpdateTextureData(dc);
 }
 
@@ -159,6 +181,7 @@ void MiniMap::Render(ID3D11DeviceContext* dc)
     float mapSize = 200.0f;
     float mapX = screenWidth - mapSize - 50.0f;
     float mapY = 50.0f;
+
 
     if (mapSprite)
     {

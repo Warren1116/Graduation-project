@@ -37,4 +37,7 @@ private:
     std::vector<UINT> dynamicPixels;
 
     std::unique_ptr<Sprite> mapSprite;
+
+    DirectX::XMFLOAT3 stageMin;
+    DirectX::XMFLOAT3 stageMax;
 };
