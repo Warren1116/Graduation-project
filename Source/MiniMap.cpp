@@ -12,21 +12,29 @@ MiniMap& MiniMap::Instance()
     return instance;
 }
 
+//ミニマップの初期化
 void MiniMap::Initialize(ID3D11Device* device, int size)
 {
+    //テクスチャサイズを保存
     textureSize = size;
 
+    //スデージのワールド座標の最小値と最大値を取得
     stageMin = StageMain::Instance().GetVolumeMin();
     stageMax = StageMain::Instance().GetVolumeMax();
 
+    //ミニマップのベーステクスチャを生成
     CreateBaseTexture(device, size);
+    //スデージは静的なため、ベースマップを生成
     GenerateBaseMap();
+    // 毎フレーム更新されるダイナミックテクスチャを作成
     CreateTexture(device, size);
 
+    // スプライトの初期化とSRVの設定
     mapSprite = std::make_unique<Sprite>();
     mapSprite->SetShaderResourceView(shaderResourceView.Get(), size, size);
 }
 
+//静的テクスチャを作成
 void MiniMap::CreateBaseTexture(ID3D11Device* device, int size)
 {
     D3D11_TEXTURE2D_DESC desc = {};
@@ -45,8 +53,10 @@ void MiniMap::CreateBaseTexture(ID3D11Device* device, int size)
     initData.pSysMem = baseMapPixels.data();
     initData.SysMemPitch = sizeof(UINT) * size;
 
+    // テクスチャ作成
     device->CreateTexture2D(&desc, &initData, baseTexture.GetAddressOf());
 
+    // ShaderResourceViewの設定
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Format = desc.Format;
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -55,32 +65,38 @@ void MiniMap::CreateBaseTexture(ID3D11Device* device, int size)
     device->CreateShaderResourceView(baseTexture.Get(), &srvDesc, baseSRV.GetAddressOf());
 }
 
+// 地形構造を取得し、マップに色を塗る
 void MiniMap::GenerateBaseMap()
 {
-    float rayStartHeight = 100;
+    //レイの高さを設定
+    float rayStartHeight = 80;
 
     for (int y = 0; y < textureSize; ++y)
     {
         for (int x = 0; x < textureSize; ++x)
         {
+            // UV座標を計算
             float u = static_cast<float>(x) / (textureSize - 1);
             float v = static_cast<float>(y) / (textureSize - 1);
 
+            // ステージ座標に変換
             float worldX = stageMin.x + u * (stageMax.x - stageMin.x);
             float worldZ = stageMin.z + v * (stageMax.z - stageMin.z);
 
+            // レイキャストを使用して地形の高さを取得
             XMFLOAT3 origin(worldX, rayStartHeight, worldZ);
-            XMFLOAT3 direction(0.0f, -1.0f, 0.0f);
-
+            XMFLOAT3 end(worldX, stageMin.y, worldZ);
             HitResult hit;
-            if (StageManager::Instance().RayCast(origin, direction, hit))
+            if (StageManager::Instance().RayCast(origin, end, hit))
             {
-                if (hit.position.y > 1.0f)
+                if (hit.position.y > 5.0f)
                 {
+                    //ビルの判定
                     baseMapPixels[y * textureSize + x] = 0xFF606060;
                 }
                 else
                 {
+                    //地面の判定
                     baseMapPixels[y * textureSize + x] = 0xFF202020;
                 }
             }
@@ -89,6 +105,7 @@ void MiniMap::GenerateBaseMap()
     }
 }
 
+//テクスチャを作成
 void MiniMap::CreateTexture(ID3D11Device* device, int size)
 {
     D3D11_TEXTURE2D_DESC desc = {};
@@ -112,19 +129,25 @@ void MiniMap::CreateTexture(ID3D11Device* device, int size)
     device->CreateShaderResourceView(texture.Get(), &srvDesc, shaderResourceView.GetAddressOf());
 }
 
+//ミニマップの更新
 void MiniMap::Update(float elapsedtime)
 {
     ID3D11DeviceContext* dc = Graphics::Instance().GetDeviceContext();
+
+    //ベースマップを元に動的ピクセル配列を初期化
     dynamicPixels = baseMapPixels;
 
+    //ラムダ式で、プレイヤーと敵の位置を描画
     auto DrawPoint = [&](const XMFLOAT3& pos, UINT color, int radius = 1)
         {
+            //座標変換
             float u = (pos.x - stageMin.x) / (stageMax.x - stageMin.x);
             float v = (pos.z - stageMin.z) / (stageMax.z - stageMin.z);
 
             int cx = static_cast<int>(u * textureSize);
             int cy = static_cast<int>(v * textureSize);
 
+            
             for (int dy = -radius; dy <= radius; ++dy)
             {
                 for (int dx = -radius; dx <= radius; ++dx)
@@ -147,12 +170,15 @@ void MiniMap::Update(float elapsedtime)
         Enemy* enemy = EnemyManager::Instance().GetEnemy(i);
         if (enemy != nullptr)
         {
-            DrawPoint(enemy->GetPosition(), 0xFFFF0000);
+            DrawPoint(enemy->GetPosition(), 0xFF0000FF);
         }
     }
+
+    // テクスチャに動的ピクセル配列を書き込む
     UpdateTextureData(dc);
 }
 
+//テクスチャデータをGPUに転送
 void MiniMap::UpdateTextureData(ID3D11DeviceContext* dc)
 {
     D3D11_MAPPED_SUBRESOURCE mapped = {};
@@ -173,6 +199,7 @@ void MiniMap::UpdateTextureData(ID3D11DeviceContext* dc)
     }
 }
 
+//ミニマップの描画
 void MiniMap::Render(ID3D11DeviceContext* dc)
 {
     float screenWidth = Graphics::Instance().GetScreenWidth();
