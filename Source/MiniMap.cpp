@@ -75,7 +75,7 @@ void MiniMap::GenerateBaseMap()
             HitResult hit;
             if (StageManager::Instance().RayCast(origin, direction, hit))
             {
-                if (hit.position.y > Player::Instance().GetPosition().y)
+                if (hit.position.y > 1.0f)
                 {
                     baseMapPixels[y * textureSize + x] = 0xFF606060;
                 }
