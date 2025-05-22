@@ -26,7 +26,7 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 //#define TUTORIAL
-//#define DEBUG
+#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -570,7 +570,7 @@ void SceneGame::Render()
             ImGui::SliderFloat3("cameraAngle", &cameraAngle.x, 0.0f, 50.0f);
 
         }
-
+        ImGui::End();
         if (ImGui::Begin("Tutorial", nullptr, ImGuiWindowFlags_None))
         {
             ImGui::InputFloat("Tutorial", &tutorialTimer);
