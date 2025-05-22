@@ -1760,8 +1760,25 @@ void Player::SwingCollision(float elapsedTime)
                     float normalY = DirectX::XMVectorGetY(hitNormal);
                     if (fabsf(normalY) < 0.5f)
                     {
+                        //空気登るを避けるために、プレイヤーの向きを調整
+                        DirectX::XMVECTOR flatNormalVec = hitNormal;
+                        flatNormalVec = DirectX::XMVectorSetY(flatNormalVec, 0.0f);
+                        flatNormalVec = DirectX::XMVector3Normalize(flatNormalVec);
+
+                        // 角度計算のためにXMFLOAT3へ変換
+                        DirectX::XMFLOAT3 flatNormal;
+                        DirectX::XMStoreFloat3(&flatNormal, flatNormalVec);
+
+                        // 向きを反転して壁に向く
+                        flatNormal.x *= -1.0f;
+                        flatNormal.z *= -1.0f;
+                        // プレイヤーの向きを更新
+                        DirectX::XMFLOAT3 playerAngle = GetAngle();
+                        playerAngle.y = atan2f(flatNormal.x, flatNormal.z);
+                        SetAngle(playerAngle);
+
                         // 衝突位置を調整してプレイヤーを少し押し戻す
-                        DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.15f);
+                        DirectX::XMVECTOR backOffset = DirectX::XMVectorScale(hitNormal, 0.05f);
                         DirectX::XMVECTOR hitPosition = XMLoadFloat3(&hit.position);
                         DirectX::XMVECTOR adjustedPosition = DirectX::XMVectorAdd(hitPosition, backOffset);
                         DirectX::XMStoreFloat3(&position, adjustedPosition);

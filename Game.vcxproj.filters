@@ -280,9 +280,6 @@
     <ClInclude Include="Source\Renderer\SceneRenderer.h">
       <Filter>Source\Graphics\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Source\PrimitiveRenderer.h">
-      <Filter>Source\Graphics\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Graphics\LineRenderer.h">
       <Filter>Source\Graphics\Renderer</Filter>
     </ClInclude>
@@ -501,9 +498,6 @@
     <ClCompile Include="Source\Renderer\SceneRenderer.cpp">
       <Filter>Source\Graphics\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Source\PrimitiveRenderer.cpp">
-      <Filter>Source\Graphics\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Graphics\LineRenderer.cpp">
       <Filter>Source\Graphics\Renderer</Filter>
     </ClCompile>
@@ -557,12 +551,6 @@
     <None Include="HLSL\Finalpass.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\GaussianBlur.hlsli">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="HLSL\LuminanceExtraction.hlsli">
-      <Filter>HLSL</Filter>
-    </None>
     <None Include="HLSL\Phong.hlsli">
       <Filter>HLSL</Filter>
     </None>
@@ -575,16 +563,10 @@
     <None Include="HLSL\ShadowmapFunctions.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\geometric_primitive.hlsli">
-      <Filter>HLSL</Filter>
-    </None>
     <None Include="HLSL\Font.hlsli">
       <Filter>HLSL</Filter>
     </None>
     <None Include="HLSL\scene_constant_buffer.hlsli">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="HLSL\PrimitiveRenderer.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>
@@ -619,18 +601,6 @@
     <FxCompile Include="HLSL\FinalpassVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\GaussianBlurPS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\GaussianBlurVS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\LuminanceExtractionPS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\LuminanceExtractionVS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\PhongPS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
@@ -646,22 +616,10 @@
     <FxCompile Include="HLSL\SkyboxVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\geometric_primitive_vs.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\geometric_primitive_ps.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="HLSL\FontPS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\FontVS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\PrimitiveRendererPS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="HLSL\PrimitiveRendererVS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>

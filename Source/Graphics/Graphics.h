@@ -8,7 +8,7 @@
 #include "Graphics/LineRenderer.h"
 #include "Graphics/ImGuiRenderer.h"
 #include <mutex>
-#include "PrimitiveRenderer.h"
+
 
 
 enum class ModelShaderId
@@ -73,9 +73,6 @@ public:
 	// ImGuiレンダラ取得
 	ImGuiRenderer* GetImGuiRenderer() const { return imguiRenderer.get(); }
 
-	// プリミティブレンダラ取得
-	PrimitiveRenderer* GetPrimitiveRenderer() const { return primitiveRenderer.get(); }
-
 
 	// ミューテックス取得
 	std::mutex& GetMutex() { return mutex; }
@@ -95,7 +92,7 @@ private:
 	std::unique_ptr<DebugRenderer>					debugRenderer;
 	std::unique_ptr<LineRenderer>					lineRenderer;
 	std::unique_ptr<ImGuiRenderer>					imguiRenderer;
-	std::unique_ptr<PrimitiveRenderer>				primitiveRenderer;
+
 
 	float	screenWidth;
 	float	screenHeight;

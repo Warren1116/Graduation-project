@@ -166,7 +166,6 @@
     <ClInclude Include="Source\MiniMap.h" />
     <ClInclude Include="Source\Misc.h" />
     <ClInclude Include="Source\Player.h" />
-    <ClInclude Include="Source\PrimitiveRenderer.h" />
     <ClInclude Include="Source\Projectile.h" />
     <ClInclude Include="Source\ProjectileManager.h" />
     <ClInclude Include="Source\ProjectileStraight.h" />
@@ -243,7 +242,6 @@
     <ClCompile Include="Source\MetaAI.cpp" />
     <ClCompile Include="Source\MiniMap.cpp" />
     <ClCompile Include="Source\Player.cpp" />
-    <ClCompile Include="Source\PrimitiveRenderer.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\ProjectileManager.cpp" />
     <ClCompile Include="Source\ProjectileStraight.cpp" />
@@ -276,7 +274,6 @@
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\Line.hlsli" />
     <None Include="HLSL\Phong.hlsli" />
-    <None Include="HLSL\PrimitiveRenderer.hlsli" />
     <None Include="HLSL\scene_constant_buffer.hlsli" />
     <None Include="HLSL\ShadowmapCaster.hlsli" />
     <None Include="HLSL\ShadowmapFunctions.hlsli" />
@@ -377,14 +374,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\PhongVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\PrimitiveRendererPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="HLSL\PrimitiveRendererVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

@@ -149,7 +149,6 @@ Graphics::Graphics(HWND hWnd)
 
 	// ƒŒƒ“ƒ_ƒ‰
 	{
-		primitiveRenderer = std::make_unique<PrimitiveRenderer>(device.Get());
 		debugRenderer = std::make_unique<DebugRenderer>(device.Get());
 		lineRenderer = std::make_unique<LineRenderer>(device.Get());
 		imguiRenderer = std::make_unique<ImGuiRenderer>(hWnd, device.Get());
