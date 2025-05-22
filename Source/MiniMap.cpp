@@ -57,7 +57,7 @@ void MiniMap::CreateBaseTexture(ID3D11Device* device, int size)
 
 void MiniMap::GenerateBaseMap()
 {
-    float rayStartHeight = 100.0f;
+    float rayStartHeight = 100;
 
     for (int y = 0; y < textureSize; ++y)
     {

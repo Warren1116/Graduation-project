@@ -1596,6 +1596,7 @@ void Player::UpdateLandState(float elapsedTime)
 // スイングステート
 void Player::TransitionSwingState()
 {
+    if (onClimb) return;
     state = State::Swing;
     //  移動中スイングすると
     if (lastState == State::Move)

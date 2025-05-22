@@ -1,6 +1,6 @@
-#include "PrimitiveRenderer.hlsli"
+//#include "PrimitiveRenderer.hlsli"
 
-float4 main(VS_OUT pin) : SV_TARGET
-{
-    return pin.color;
-}
+//float4 main(VS_OUT pin) : SV_TARGET
+//{
+//    return pin.color;
+//}
