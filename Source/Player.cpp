@@ -1784,6 +1784,7 @@ void Player::SwingCollision(float elapsedTime)
                         DirectX::XMStoreFloat3(&position, adjustedPosition);
 
                         // クライミングステートへ遷移
+                        hitWall = true;
                         onClimb = true;
                         TransitionIdleState();
                         velocity = { 0, 0, 0 };
