@@ -131,6 +131,22 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
     //　集中線の描画
     RenderFocusingLine(dc, view, projection);
 
+    //カメラロックする時のLockOnScope
+    if (Player::Instance().GetlockonState() == Player::LockonState::Locked && Player::Instance().GetLockonEnemy())
+    {
+        DirectX::XMFLOAT3 enemyPos = Player::Instance().GetLockonEnemy()->GetPosition();
+        enemyPos.y += 0.5f; // 稍微往上偏移
+
+        RenderWorldSpriteToScreen(dc,
+            LockOnScope.get(),
+            enemyPos,
+            -15.0f, -60.0f,
+            30.0f, 30.0f,
+            1.0f,
+            view, projection);
+    }
+
+
 #ifdef TUTORIAL
     //  チュトリアルの描画
     RenderTutorial(dc, view, projection);
@@ -160,37 +176,24 @@ void UI::RenderSpiderSense(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
         PlayerHeadPos->worldTransform._43,
         1.0f);
 
-    // 3D座標を2D座標に変換
-    DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
-        playerHeadPos,
-        viewport.TopLeftX,
-        viewport.TopLeftY,
-        viewport.Width,
-        viewport.Height,
-        viewport.MinDepth,
-        viewport.MaxDepth,
-        Projection,
-        View,
-        World);
+    DirectX::XMFLOAT3 headPos;
+    DirectX::XMStoreFloat3(&headPos, playerHeadPos);
 
-    DirectX::XMFLOAT3 screenPosition;
-    DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
-
-    SpiderSense->Render(dc,
-        screenPosition.x - 55.0f, screenPosition.y - 40.0f,
+    RenderWorldSpriteToScreen(dc,
+        SpiderSense.get(),
+        headPos,
+        -55.0f, -40.0f,
         120.0f, 75.0f,
-        0, 0,
-        static_cast<float>(SpiderSense->GetTextureWidth()), static_cast<float>(SpiderSense->GetTextureHeight()),
-        0,
-        1, 1, 1, alpha);
+        alpha,
+        view, projection);
 
-    SpiderSense2->Render(dc,
-        screenPosition.x - 55.0f, screenPosition.y - 40.0f,
+    RenderWorldSpriteToScreen(dc,
+        SpiderSense2.get(),
+        headPos,
+        -55.0f, -40.0f,
         120.0f, 75.0f,
-        0, 0,
-        static_cast<float>(SpiderSense2->GetTextureWidth()), static_cast<float>(SpiderSense2->GetTextureHeight()),
-        0,
-        1, 1, 1, alphaColor);
+        alphaColor,
+        view, projection);
 
 }
 
@@ -411,45 +414,46 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
     UINT numViewports = 1;
     dc->RSGetViewports(&numViewports, &viewport);
 
-    //カメラロックする時のLockOnScope
-    if (Player::Instance().GetlockonState() == Player::LockonState::Locked && Player::Instance().GetLockonEnemy())
-    {
-        // 変換行列
-        DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
-        DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
-        DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
-        Enemy* enemy = Player::Instance().GetLockonEnemy();
-        DirectX::XMVECTOR enemyPosition = DirectX::XMVectorSet(
-            enemy->GetPosition().x,
-            enemy->GetPosition().y + 0.5f,
-            enemy->GetPosition().z,
-            1.0f);
-
-        DirectX::XMVECTOR ScreenPosition = DirectX::XMVector3Project(
-            enemyPosition,
-            viewport.TopLeftX,
-            viewport.TopLeftY,
-            viewport.Width,
-            viewport.Height,
-            viewport.MinDepth,
-            viewport.MaxDepth,
-            Projection,
-            View,
-            World);
-
-        DirectX::XMFLOAT3 screenPosition;
-        DirectX::XMStoreFloat3(&screenPosition, ScreenPosition);
-
-        LockOnScope->Render(dc,
-            screenPosition.x - 15.0f, screenPosition.y - 60.0f,
-            30.0f, 30.0f,
-            0, 0,
-            static_cast<float>(LockOnScope->GetTextureWidth()), static_cast<float>(LockOnScope->GetTextureHeight()),
-            0,
-            1, 1, 1, 1);
-    }
 }
 
+
+void UI::RenderWorldSpriteToScreen(ID3D11DeviceContext* dc, Sprite* sprite, const DirectX::XMFLOAT3& worldPosition, float offsetX, float offsetY, float width, float height, float alpha, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    // ビューポート取得
+    D3D11_VIEWPORT viewport;
+    UINT numViewports = 1;
+    dc->RSGetViewports(&numViewports, &viewport);
+
+    // 行列変換
+    DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(&view);
+    DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(&projection);
+    DirectX::XMMATRIX World = DirectX::XMMatrixIdentity();
+
+    // 3D座標をベクトルに
+    DirectX::XMVECTOR worldPos = DirectX::XMLoadFloat3(&worldPosition);
+
+    // スクリーン座標へ変換
+    DirectX::XMVECTOR screenPosVec = DirectX::XMVector3Project(
+        worldPos,
+        viewport.TopLeftX, viewport.TopLeftY,
+        viewport.Width, viewport.Height,
+        viewport.MinDepth, viewport.MaxDepth,
+        Projection, View, World);
+
+    DirectX::XMFLOAT3 screenPos;
+    DirectX::XMStoreFloat3(&screenPos, screenPosVec);
+
+    // スプライト描画
+    sprite->Render(dc,
+        screenPos.x + offsetX,
+        screenPos.y + offsetY,
+        width, height,
+        0, 0,
+        static_cast<float>(sprite->GetTextureWidth()),
+        static_cast<float>(sprite->GetTextureHeight()),
+        0,
+        1, 1, 1, alpha);
+}
 
 void UI::Clear()
 {

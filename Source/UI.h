@@ -37,6 +37,15 @@ public:
 
     void RenderHpBar(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+    void RenderWorldSpriteToScreen(
+        ID3D11DeviceContext* dc,
+        Sprite* sprite,
+        const DirectX::XMFLOAT3& worldPosition,
+        float offsetX, float offsetY,
+        float width, float height,
+        float alpha,
+        const DirectX::XMFLOAT4X4& view,
+        const DirectX::XMFLOAT4X4& projection);
     void Clear();
 
 
@@ -66,7 +75,6 @@ private:
     bool switchFocusingLine = false;
     int frameCounter = 0; // フレームカウンター
     const int frameThreshold = 30; // スプライトを切り替えるフレーム数の閾値
-
 
 
     std::unique_ptr<Sprite> HpBox;

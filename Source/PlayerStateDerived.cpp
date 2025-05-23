@@ -58,13 +58,13 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
     //移動入力処理
     if (owner->InputMove(elapsedTime))
     {
-        owner->SetState(Player::State::Move);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Move));
     }
 
     //ジャンプ入力処理
     if (owner->InputJump())
     {
-        owner->SetState(Player::State::Jump);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
 
     }
 
@@ -73,19 +73,19 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
         // 回避入力処理
         if (owner->InputDodge())
         {
-            owner->SetState(Player::State::Dodge);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Dodge));
         }
 
         //弾丸入力処理
         if (owner->InputProjectile())
         {
-            owner->SetState(Player::State::Shot);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
         }
 
         //攻撃入力処理
         if (owner->InputAttack())
         {
-            owner->SetState(Player::State::Attack);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
         }
     }
 
@@ -102,7 +102,7 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
         if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
         {
             owner->IsUseGrab = true;
-            owner->SetState(Player::State::Grab);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Grab));
         }
 
     }
@@ -112,7 +112,7 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
     {
         if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
         {
-            owner->SetState(Player::State::Ultimate);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Ultimate));
         }
     }
 
@@ -159,46 +159,46 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
             //  スイングステートへの遷移
             owner->canSwing = false;
             owner->swingCooldownTimer = owner->swingCooldown;
-            owner->SetState(Player::State::Swing);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Swing));
         }
     }
 
     if (owner->InputDodge())
     {
-        owner->SetState(Player::State::Dodge);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Dodge));
     }
 
     //  目の前に壁がある同時にSpeacキー押したら
     if (owner->hitWall && owner->onClimb)
     {
         //クライミングステートへの遷移
-        owner->SetState(Player::State::Climb);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Climb));
     }
 
     //  移動してないなら
     if (!owner->InputMove(elapsedTime))
     {
         //待機ステートへの遷移
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 
     //　もし目の前に壁がいない、ジャンプ入力処理
     if (!owner->hitWall && owner->InputJump())
     {
         //ジャンブステートへの遷移
-        owner->SetState(Player::State::Jump);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
     }
 
     // 弾丸入力処理
     if (owner->InputProjectile())
     {
-        owner->SetState(Player::State::Shot);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
     }
 
     // 攻撃入力処理
     if (owner->InputAttack())
     {
-        owner->SetState(Player::State::Attack);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
     }
 
     // 回復入力処理
@@ -212,7 +212,7 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
     {
         if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
         {
-            owner->SetState(Player::State::Ultimate);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Ultimate));
         }
     }
 
@@ -224,7 +224,7 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
         if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
         {
             owner->IsUseGrab = true;
-            owner->SetState(Player::State::Grab);
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::Grab));
         }
     }
 }
@@ -244,7 +244,7 @@ void PlayerStates::JumpState::Execute(float elapsedTime)
 {
     if (owner->InputAttack())
     {
-        owner->SetState(Player::State::SwingToKick);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::SwingToKick));
     }
 
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -254,7 +254,7 @@ void PlayerStates::JumpState::Execute(float elapsedTime)
     {
         owner->lastState = owner->state;
         //  スイングステートへの遷移
-        owner->SetState(Player::State::Swing);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Swing));
     }
 
     //  もしクライミング中なら、クライミング状態をキャンセルする
@@ -269,14 +269,14 @@ void PlayerStates::JumpState::Execute(float elapsedTime)
     if (!owner->model->IsPlayAnimation())
     {
         // 待機ステートへの遷移
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 
     //  弾丸の入力処理
     if (owner->InputProjectile())
     {
         //  発射ステートへの遷移
-        owner->SetState(Player::State::Shot);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
     }
 }
 
@@ -303,7 +303,7 @@ void PlayerStates::LandState::Execute(float elapsedTime)
     owner->onClimb = false;
     if (!owner->model->IsPlayAnimation())
     {
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 }
 
@@ -323,17 +323,17 @@ void PlayerStates::AttackState::Execute(float elapsedTime)
     //　モーションが終わったら待機ステートへ遷移
     if (!owner->model->IsPlayAnimation())
     {
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
     //　シュート入力処理
     if (owner->InputProjectile())
     {
-        owner->SetState(Player::State::Shot);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
     }
     //　Dodge入力処理
     if (owner->InputDodge())
     {
-        owner->SetState(Player::State::Dodge);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Dodge));
     }
 
     // アニメーションの再生時間を取得
@@ -405,7 +405,7 @@ void PlayerStates::ShotState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation())
     {
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 }
 void PlayerStates::ShotState::Exit()
@@ -467,7 +467,7 @@ void PlayerStates::DodgeState::Execute(float elapsedTime)
     DirectX::XMStoreFloat3(&owner->velocity, vel);
     DirectX::XMStoreFloat3(&owner->position, playerPos);
 
-    if (!owner->model->IsPlayAnimation()) owner->SetState(Player::State::Idle);
+    if (!owner->model->IsPlayAnimation()) owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
 }
 
 void PlayerStates::DodgeState::Exit()
@@ -493,19 +493,19 @@ void PlayerStates::ClimbState::Execute(float elapsedTime)
     //　クライミング中Spaceキー押せば元の状態に戻る
     if (owner->InputJump())
     {
-        owner->SetState(Player::State::Jump);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
     }
 
     //  移動してないなら待機ステートへの遷移
     if (!owner->InputMove(elapsedTime))
     {
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 
     //　壁の上に登れるかどうかの判定
     if (owner->IsNearWallTop())
     {
-        owner->SetState(Player::State::ClimbTop);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::ClimbTop));
     }
     else
     {
@@ -542,7 +542,7 @@ void PlayerStates::DamageState::Execute(float elapsedTime)
         GamePad& gamePad = Input::Instance().GetGamePad();
         gamePad.StopVibration();
 
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 }
 void PlayerStates::DamageState::Exit()
@@ -635,7 +635,7 @@ void PlayerStates::SwingState::Execute(float elapsedTime)
     if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
     {
         owner->lastState = owner->state;
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 }
 
@@ -651,7 +651,7 @@ void PlayerStates::ClimbTopState::Enter()
 
 void PlayerStates::ClimbTopState::Execute(float elapsedTime)
 {
-    if (!owner->model->IsPlayAnimation()) owner->SetState(Player::State::Idle);
+    if (!owner->model->IsPlayAnimation()) owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
 }
 
 void PlayerStates::ClimbTopState::Exit()
@@ -694,7 +694,7 @@ void PlayerStates::GrabState::Execute(float elapsedTime)
                 }
             }
         }
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
     //  カメラロック中の処理
     if (owner->lockonState == Player::LockonState::Locked && owner->lockonEnemy != nullptr)
@@ -757,7 +757,7 @@ void PlayerStates::CrouchIdleState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation())
     {
-        owner->SetState(Player::State::TitleIdle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::TitleIdle));
     }
 }
 
@@ -826,7 +826,7 @@ void PlayerStates::SwingToKickState::Execute(float elapsedTime)
     //　モーションが終わったら待機ステートへ遷移
     if (!owner->model->IsPlayAnimation())
     {
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
         owner->IsUseSwingKick = false;
     }
 }
@@ -852,7 +852,7 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
     // アニメーションが再生中でない場合、待機ステートに遷移
     if (!owner->model->IsPlayAnimation())
     {
-        owner->SetState(Player::State::Idle);
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
         timeSinceLastShot = 0.0f;
         currentDirectionIndex = 0;
         shotsPerDirection = 0;
@@ -922,7 +922,7 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
             // 全方向に発射し終わったら終了
             if (currentDirectionIndex >= directions.size())
             {
-                owner->SetState(Player::State::Idle);
+                owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
                 return;
             }
         }

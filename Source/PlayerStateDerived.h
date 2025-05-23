@@ -1,23 +1,23 @@
 #pragma once
-//#include "PlayerStateBase.h"
+#include "PlayerStateBase.h"
 #include "Graphics\LineRenderer.h"
 #include "Audio/Audio.h"
 
 
-#include "Player.h"
-class Player;
-
-class PlayerState
-{
-public:
-    PlayerState(Player* player) : owner(player) {}
-    virtual ~PlayerState() {}
-    virtual void Enter() = 0;
-    virtual void Execute(float elapsedTime) = 0;
-    virtual void Exit() = 0;
-protected:
-    Player* owner;
-};
+//#include "Player.h"
+//class Player;
+//
+//class PlayerState
+//{
+//public:
+//    PlayerState(Player* player) : owner(player) {}
+//    virtual ~PlayerState() {}
+//    virtual void Enter() = 0;
+//    virtual void Execute(float elapsedTime) = 0;
+//    virtual void Exit() = 0;
+//protected:
+//    Player* owner;
+//};
 
 
 namespace PlayerStates
