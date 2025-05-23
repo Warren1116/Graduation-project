@@ -1748,7 +1748,7 @@ bool Player::FindWallSwingPoint()
     forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
     upVec = DirectX::XMVectorScale(upVec, 12.0f);
 
-
+    SwingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
     DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
     SwingPoint = DirectX::XMVectorAdd(SwingPoint, SwingwebDirection);
     DirectX::XMStoreFloat3(&swingPoint, SwingPoint);

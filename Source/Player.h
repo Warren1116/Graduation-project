@@ -258,9 +258,6 @@ private:
 	//	投げ技ステートの更新
 	void UpdateGrabState(float elapsedTime);
 
-    //スイングポイントを更新
-	void UpdateSwingPoint();
-
 	//	壁端っこの判定
 	bool IsNearWallTop();
 
@@ -424,6 +421,7 @@ private:
     float swingCooldown = 0.3f;
     float swingCooldownTimer = 0.0f;
     bool canSwing = true;
+
 	//	前回のスイングポイントを記録
 	DirectX::XMFLOAT3 previousSwingPoint;
 	// 糸のタイマー
