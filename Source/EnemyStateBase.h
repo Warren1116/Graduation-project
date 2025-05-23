@@ -1,6 +1,5 @@
 #pragma once
 #include "EnemyThief.h"
-
 class EnemyThief;
 
 class EnemyState
@@ -50,6 +49,4 @@ public:
 protected:
     EnemyState* subState = nullptr;
     std::vector<EnemyState*> subStatePool;
-
-
 };

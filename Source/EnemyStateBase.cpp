@@ -1,4 +1,4 @@
-#include "StateBase.h"
+#include "EnemyStateBase.h"
 
 // HierarchicalStateクラスの関数定義を行う
 // 2層目ステートセット

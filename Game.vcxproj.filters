@@ -70,6 +70,15 @@
     <Filter Include="Source\System\MiniMap">
       <UniqueIdentifier>{35334444-a3f2-4d70-84d4-f6ada98dbfac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Character\Player\Projectile">
+      <UniqueIdentifier>{a6637a5e-7cfc-4413-a19e-8162bff99664}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Character\Player\StateMachine">
+      <UniqueIdentifier>{0c54b560-bde6-4c3d-94f9-70462e82884b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Character\Enemy\StateMachine">
+      <UniqueIdentifier>{a3c73c81-2d4d-47b7-8f8c-f3fd6291a104}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -204,13 +213,7 @@
     <ClInclude Include="Source\SceneClear.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\StateDerived.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
     <ClInclude Include="Source\MetaAI.h">
-      <Filter>Source\System\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\StateMachine.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Telegram.h">
@@ -232,9 +235,6 @@
       <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Source\BrokenProjectileManager.h">
-      <Filter>Source\Character\Player</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Enemy.h">
       <Filter>Source\Character\Enemy</Filter>
     </ClInclude>
@@ -245,18 +245,6 @@
       <Filter>Source\Character\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="Source\Player.h">
-      <Filter>Source\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Projectile.h">
-      <Filter>Source\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileManager.h">
-      <Filter>Source\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileStraight.h">
-      <Filter>Source\Character\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ProjectileWall.h">
       <Filter>Source\Character\Player</Filter>
     </ClInclude>
     <ClInclude Include="Source\SwingWeb.h">
@@ -309,6 +297,39 @@
     </ClInclude>
     <ClInclude Include="Source\MiniMap.h">
       <Filter>Source\System\MiniMap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyStateMachine.h">
+      <Filter>Source\Character\Enemy\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyStateDerived.h">
+      <Filter>Source\Character\Enemy\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BrokenProjectileManager.h">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Projectile.h">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileManager.h">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileStraight.h">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProjectileWall.h">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerStateMachine.h">
+      <Filter>Source\Character\Player\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerStateDerived.h">
+      <Filter>Source\Character\Player\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyStateBase.h">
+      <Filter>Source\Character\Enemy\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerStateBase.h">
+      <Filter>Source\Character\Player\StateMachine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -426,16 +447,7 @@
     <ClCompile Include="Source\SceneClear.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\StateBase.cpp">
-      <Filter>Source\System\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\StateDerived.cpp">
-      <Filter>Source\System\AI</Filter>
-    </ClCompile>
     <ClCompile Include="Source\MetaAI.cpp">
-      <Filter>Source\System\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\StateMachine.cpp">
       <Filter>Source\System\AI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Messenger.cpp">
@@ -450,9 +462,6 @@
     <ClCompile Include="Source\Graphics\Font.cpp">
       <Filter>Source\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BrokenProjectileManager.cpp">
-      <Filter>Source\Character\Player</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Enemy.cpp">
       <Filter>Source\Character\Enemy</Filter>
     </ClCompile>
@@ -463,18 +472,6 @@
       <Filter>Source\Character\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="Source\Player.cpp">
-      <Filter>Source\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Projectile.cpp">
-      <Filter>Source\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileManager.cpp">
-      <Filter>Source\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileStraight.cpp">
-      <Filter>Source\Character\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ProjectileWall.cpp">
       <Filter>Source\Character\Player</Filter>
     </ClCompile>
     <ClCompile Include="Source\SwingWeb.cpp">
@@ -527,6 +524,36 @@
     </ClCompile>
     <ClCompile Include="Source\MiniMap.cpp">
       <Filter>Source\System\MiniMap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyStateMachine.cpp">
+      <Filter>Source\Character\Enemy\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyStateDerived.cpp">
+      <Filter>Source\Character\Enemy\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BrokenProjectileManager.cpp">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Projectile.cpp">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileManager.cpp">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileStraight.cpp">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProjectileWall.cpp">
+      <Filter>Source\Character\Player\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerStateMachine.cpp">
+      <Filter>Source\Character\Player\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerStateDerived.cpp">
+      <Filter>Source\Character\Player\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyStateBase.cpp">
+      <Filter>Source\Character\Enemy\StateMachine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

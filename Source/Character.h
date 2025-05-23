@@ -71,6 +71,7 @@ public:
 
 	// スイングしてるフラグ
 	bool GetOnSwing() { return onSwing; }
+    bool SetOnSwing(bool onSwing) { this->onSwing = onSwing; }
 
     // プレイヤー壁登りフラグ
     bool GetOnClimb() { return onClimb; }

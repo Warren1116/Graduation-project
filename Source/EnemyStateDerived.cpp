@@ -1,4 +1,4 @@
-#include "StateDerived.h"
+#include "EnemyStateDerived.h"
 #include "Player.h"
 #include "Mathf.h"
 #include "MetaAI.h"
@@ -9,7 +9,7 @@
 //                                                          親SearchState
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // デストラクタ
-SearchState::~SearchState()
+EnemyStates::SearchState::~SearchState()
 {
     for (EnemyState* state : subStatePool)
     {
@@ -19,19 +19,19 @@ SearchState::~SearchState()
 }
 
 // サーチステートに入った時のメソッド
-void SearchState::Enter()
+void EnemyStates::SearchState::Enter()
 {
     SetSubState(static_cast<int>(EnemyThief::Search::Idle));
 }
 
 // サーチステートで実行するメソッド
-void SearchState::Execute(float elapsedTime)
+void EnemyStates::SearchState::Execute(float elapsedTime)
 {
     subState->Execute(elapsedTime);
 }
 
 // サーチステートから出ていくときのメソッド
-void SearchState::Exit()
+void EnemyStates::SearchState::Exit()
 {
 
 }
@@ -39,7 +39,7 @@ void SearchState::Exit()
 //                                                          子BattleState（SearchState）
 //----------------------------------------------------------------------------------------------------------------------------------------
 // 徘徊ステートに入った時のメソッド
-void WanderState::Enter()
+void EnemyStates::WanderState::Enter()
 {
     if (owner->GetHealth() <= 0)
         return;
@@ -49,7 +49,7 @@ void WanderState::Enter()
 }
 
 // 徘徊ステートで実行するメソッド
-void WanderState::Execute(float elapsedTime)
+void EnemyStates::WanderState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)
         return;
@@ -83,7 +83,7 @@ void WanderState::Execute(float elapsedTime)
 }
 
 // 徘徊ステートから出ていくときのメソッド
-void WanderState::Exit()
+void EnemyStates::WanderState::Exit()
 {
     //書かなくてよい
 }
@@ -91,7 +91,7 @@ void WanderState::Exit()
 // 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　子idleState（SearchState）
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // 待機ステートに入った時のメソッド
-void IdleState::Enter()
+void EnemyStates::IdleState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -101,7 +101,7 @@ void IdleState::Enter()
 }
 
 // 待機ステートで実行するメソッド
-void IdleState::Execute(float elapsedTime)
+void EnemyStates::IdleState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -120,7 +120,7 @@ void IdleState::Execute(float elapsedTime)
 }
 
 // 待機ステートから出ていくときのメソッド
-void IdleState::Exit()
+void EnemyStates::IdleState::Exit()
 {
 
 }
@@ -131,7 +131,7 @@ void IdleState::Exit()
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //                                                          親BattleState
 //-----------------------------------------------------------------------------------------------------------------------------------------
-BattleState::~BattleState()
+EnemyStates::BattleState::~BattleState()
 {
     for (EnemyState* state : subStatePool)
     {
@@ -140,17 +140,17 @@ BattleState::~BattleState()
     subStatePool.clear();
 }
 
-void BattleState::Enter()
+void EnemyStates::BattleState::Enter()
 {
     SetSubState(static_cast<int>(EnemyThief::Battle::Pursuit));
 }
 
-void BattleState::Execute(float elapsedTime)
+void EnemyStates::BattleState::Execute(float elapsedTime)
 {
     subState->Execute(elapsedTime);
 }
 
-void BattleState::Exit()
+void EnemyStates::BattleState::Exit()
 {
 }
 
@@ -158,7 +158,7 @@ void BattleState::Exit()
 //                                                          子PursuitState（BattleState）
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // 追跡ステートに入った時のメソッド
-void PursuitState::Enter()
+void EnemyStates::PursuitState::Enter()
 {
     if (owner->GetHealth() <= 0)
     {
@@ -179,7 +179,7 @@ void PursuitState::Enter()
 }
 
 // 追跡ステートで実行するメソッド
-void PursuitState::Execute(float elapsedTime)
+void EnemyStates::PursuitState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)
     {
@@ -218,7 +218,7 @@ void PursuitState::Execute(float elapsedTime)
 }
 
 // 追跡ステートから出ていくときのメソッド
-void PursuitState::Exit()
+void EnemyStates::PursuitState::Exit()
 {
     Player::Instance().SetgetAttackSoon(false);
     Player::Instance().SetgetShotSoon(false);
@@ -227,7 +227,7 @@ void PursuitState::Exit()
 //                                                          子AttackState（BattleState）
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // 攻撃ステートに入った時のメソッド
-void AttackState::Enter()
+void EnemyStates::AttackState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -247,7 +247,7 @@ void AttackState::Enter()
 }
 
 // 攻撃ステートで実行するメソッド
-void AttackState::Execute(float elapsedTime)
+void EnemyStates::AttackState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -272,7 +272,7 @@ void AttackState::Execute(float elapsedTime)
 }
 
 // 攻撃ステートから出ていくときのメソッド
-void AttackState::Exit()
+void EnemyStates::AttackState::Exit()
 {
 
 }
@@ -280,7 +280,7 @@ void AttackState::Exit()
 //                                                          子PunchState（BattleState）
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // パンチステートに入った時のメソッド
-void PunchState::Enter()
+void EnemyStates::PunchState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -304,7 +304,7 @@ void PunchState::Enter()
 }
 
 // パンチステートで実行するメソッド
-void PunchState::Execute(float elapsedTime)
+void EnemyStates::PunchState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -337,7 +337,7 @@ void PunchState::Execute(float elapsedTime)
 
 }
 // パンチステートから出ていくときのメソッド
-void PunchState::Exit()
+void EnemyStates::PunchState::Exit()
 {
     if (owner->GetAttackFlg())
     {
@@ -355,7 +355,7 @@ void PunchState::Exit()
 //                                                          子ShotState（BattleState）
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // シュートステートに入った時のメソッド
-void ShotState::Enter()
+void EnemyStates::ShotState::Enter()
 {
     Fire = Audio::Instance().LoadAudioSource("Data/Audio/Fire.wav");
 
@@ -393,7 +393,7 @@ void ShotState::Enter()
 }
 
 // シュートステートで実行するメソッド
-void ShotState::Execute(float elapsedTime)
+void EnemyStates::ShotState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -414,7 +414,7 @@ void ShotState::Execute(float elapsedTime)
 }
 
 // シュートステートから出ていくときのメソッド
-void ShotState::Exit()
+void EnemyStates::ShotState::Exit()
 {
     if (owner->GetAttackFlg())
     {
@@ -434,7 +434,7 @@ void ShotState::Exit()
 //                                                          子StandbyState（BattleState）
 // -----------------------------------------------------------------------------------------------------------------------------------------
 // 戦闘待機ステートに入った時のメソッド
-void StandbyState::Enter()
+void EnemyStates::StandbyState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -458,7 +458,7 @@ void StandbyState::Enter()
 }
 
 // 戦闘待機ステートで実行するメソッド
-void StandbyState::Execute(float elapsedTime)
+void EnemyStates::StandbyState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -510,7 +510,7 @@ void StandbyState::Execute(float elapsedTime)
 }
 
 // 戦闘待機ステートから出ていくときのメソッド
-void StandbyState::Exit()
+void EnemyStates::StandbyState::Exit()
 {
 
 }
@@ -518,7 +518,7 @@ void StandbyState::Exit()
 //                                                          子DamageState（BattleState）
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // ダメージステートに入った時のメソッド
-void DamageState::Enter()
+void EnemyStates::DamageState::Enter()
 {
     //　PlayerのSwingKickに攻撃される時
     if (Player::Instance().GetIsUseSwingKick() && owner->GetIsLockedOn())
@@ -533,7 +533,7 @@ void DamageState::Enter()
 
 
 // ダメージステートで実行するメソッド
-void DamageState::Execute(float elapsedTime)
+void EnemyStates::DamageState::Execute(float elapsedTime)
 {
     if (!owner->GetModel()->IsPlayAnimation() && owner->GetHealth() > 0)
     {
@@ -542,7 +542,7 @@ void DamageState::Execute(float elapsedTime)
 
 }
 // ダメージステートから出ていくときのメソッド
-void DamageState::Exit()
+void EnemyStates::DamageState::Exit()
 {
 
 }
@@ -551,7 +551,7 @@ void DamageState::Exit()
 //                                                          子DeadState（BattleState）
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // 死亡ステートに入った時のメソッド
-void DeadState::Enter()
+void EnemyStates::DeadState::Enter()
 {
     // 死亡モーション再生
     //if (owner->IsGetThrow())
@@ -570,7 +570,7 @@ void DeadState::Enter()
 }
 
 // 死亡ステートで実行するメソッド
-void DeadState::Execute(float elapsedTime)
+void EnemyStates::DeadState::Execute(float elapsedTime)
 {
 
     if (!owner->GetModel()->IsPlayAnimation())
@@ -581,7 +581,7 @@ void DeadState::Execute(float elapsedTime)
 }
 
 // 死亡ステートから出ていくときのメソッド
-void DeadState::Exit()
+void EnemyStates::DeadState::Exit()
 {
 }
 
@@ -590,7 +590,7 @@ void DeadState::Exit()
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // メタAIからメッセージを受信したときに呼ばれるステートを追加
 // デストラクタ
-RecieveState::~RecieveState()
+EnemyStates::RecieveState::~RecieveState()
 {
     for (EnemyState* state : subStatePool)
     {
@@ -600,14 +600,14 @@ RecieveState::~RecieveState()
 }
 
 // データ受信したときのステート
-void RecieveState::Enter()
+void EnemyStates::RecieveState::Enter()
 {
     // 初期ステートを設定
     SetSubState(static_cast<int>(EnemyThief::Recieve::Called));
 }
 
 // サーチステートで実行するメソッド
-void RecieveState::Execute(float elapsedTime)
+void EnemyStates::RecieveState::Execute(float elapsedTime)
 {
     // 子ステート実行
     subState->Execute(elapsedTime);
@@ -620,7 +620,7 @@ void RecieveState::Execute(float elapsedTime)
 }
 
 // サーチステートから出ていくときのメソッド
-void RecieveState::Exit()
+void EnemyStates::RecieveState::Exit()
 {
 }
 
@@ -628,7 +628,7 @@ void RecieveState::Exit()
 //                                                          子CalledState（RecieveState）
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // 他のエネミーから呼ばれたときのステートを追加
-void CalledState::Enter()
+void EnemyStates::CalledState::Enter()
 {
     if (owner->GetHealth() <= 0)return;
 
@@ -637,7 +637,7 @@ void CalledState::Enter()
 }
 
 // コールドステートで実行するメソッド
-void CalledState::Execute(float elapsedTime)
+void EnemyStates::CalledState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)
         return;
@@ -659,7 +659,7 @@ void CalledState::Execute(float elapsedTime)
 }
 
 // コールドステートから出ていくときのメソッド
-void CalledState::Exit()
+void EnemyStates::CalledState::Exit()
 {
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------

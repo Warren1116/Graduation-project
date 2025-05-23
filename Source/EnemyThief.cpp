@@ -2,7 +2,7 @@
 #include "Graphics/Graphics.h"
 #include "Mathf.h"
 #include "Player.h"
-#include "StateDerived.h"
+#include "EnemyStateDerived.h"
 #include "SceneGame.h"
 #include "MessageData.h"
 #include "Camera.h"
@@ -24,27 +24,27 @@ EnemyThief::EnemyThief()
     // StateMachineを生成し、階層型ステートマシンに対応するように登録ステートを変更していく。
     stateMachine = new EnemyStateMachine();
 
-    stateMachine->RegisterState(new SearchState(this));
-    stateMachine->RegisterState(new BattleState(this));
+    stateMachine->RegisterState(new EnemyStates::SearchState(this));
+    stateMachine->RegisterState(new EnemyStates::BattleState(this));
 
     // ステートマシンにメッセージを受信したときの１層目のステートを追加登録
-    stateMachine->RegisterState(new RecieveState(this));
+    stateMachine->RegisterState(new EnemyStates::RecieveState(this));
 
     // 各親ステートにサブステートを登録
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new WanderState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new IdleState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PursuitState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new AttackState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new PunchState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new ShotState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new DamageState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new DeadState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new EnemyStates::WanderState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new EnemyStates::IdleState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::PursuitState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::AttackState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::PunchState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::ShotState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::DamageState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::DeadState(this));
 
     // ステートマシンにメッセージを受信したときのサブステートを追加登録
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Recieve), new CalledState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Recieve), new EnemyStates::CalledState(this));
 
     // 戦闘中攻撃権の持っていない状態での待機ステートを追加登録
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new StandbyState(this));
+    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::StandbyState(this));
 
     // ステートをセット
     stateMachine->SetState(static_cast<int>(State::Search));

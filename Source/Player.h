@@ -15,11 +15,85 @@
 #include <memory.h>
 #include "Enemy.h"
 #include "EnemyThief.h"
+#include "PlayerStateMachine.h"
+#include "PlayerStateDerived.h"
 
+
+//アニメーション
+enum class PlayerAnimation
+{
+	Anim_Idle,
+	Anim_Walking,
+	Anim_GetHit1,
+	Anim_Death,
+	Anim_Running,
+	Anim_Climb,
+	Anim_Landing,
+	Anim_Jump,
+	Anim_HoldInWall,
+	Anim_Attack,
+	Anim_Attack2,
+	Anim_Kick,
+	Anim_StartSwing,
+	Anim_Swinging,
+	Anim_Swinging2,
+	Anim_Shoting,
+	Anim_Dodge,
+	Anim_ClimbUpWall,
+	Anim_ClimbDown,
+	Anim_SwingToLand,
+	Anim_GrabAndDrop,
+	Anim_CrouchIdle,
+	Anim_TitleIdle,
+	Anim_Crouch,
+	Anim_SwingToKick,
+	Anim_Ultimate,
+};
+
+class PlayerStateMachine;
+
+namespace PlayerStates 
+{
+	class IdleState;
+	class MoveState;
+	class JumpState;
+	class ClimbState;
+	class AttackState;
+	class DamageState;
+	class SwingState;
+	class SwingToKickState;
+	class LandState;
+	class ShotState;
+	class GrabState;
+	class DodgeState;
+	class ClimbTopState;
+	class UltimateState;
+	class DeathState;
+	class CrouchIdleState;
+	class TitleIdleState;
+}
 
 // プレイヤー
 class Player : public Character
 {
+	friend class PlayerStates::IdleState;
+	friend class PlayerStates::MoveState;
+	friend class PlayerStates::JumpState;
+	friend class PlayerStates::ClimbState;
+	friend class PlayerStates::AttackState;
+    friend class PlayerStates::DamageState;
+	friend class PlayerStates::SwingState;
+    friend class PlayerStates::SwingToKickState;
+    friend class PlayerStates::LandState;
+	friend class PlayerStates::ShotState;
+	friend class PlayerStates::GrabState;
+	friend class PlayerStates::DodgeState;
+	friend class PlayerStates::ClimbTopState;
+	friend class PlayerStates::UltimateState;
+    friend class PlayerStates::DeathState;
+	friend class PlayerStates::CrouchIdleState;
+	friend class PlayerStates::TitleIdleState;
+
 private:
 	struct CollisionMesh
 	{
@@ -37,6 +111,7 @@ private:
 		};
 		std::vector<Area>		areas;
 	};
+
 public:
 	Player(bool flag);
 	~Player();
@@ -45,8 +120,8 @@ public:
 	// 更新処理
 	void Update(float elapsedTime);
 
-	// 状態更新処理
-    void UpdateState(float elapsedTime);
+	//// 状態更新処理
+ //   void UpdateState(float elapsedTime);
 
 	// デバッグ用GUI描画
 	void DrawDebugGUI();
@@ -91,6 +166,7 @@ public:
 	DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }
 
 	bool GetFirstSwing() { return firstSwing; }
+    bool SetFirstSwing(bool first) { return firstSwing = first; }
 
 	//	記録されたスイングポイントを取得
 	DirectX::XMFLOAT3 GetPreviousSwingPoint() { return previousSwingPoint; }
@@ -117,10 +193,12 @@ public:
 	//  糸発射のタイマー
 	float GetWebTimer() const { return webTimer; }
 
-    void SetIdleState() { return TransitionIdleState(); }
+    //void SetIdleState() { return TransitionIdleState(); }
 
     void SetVelocity(const DirectX::XMFLOAT3& velocity) { this->velocity = velocity; }
 
+	PlayerStateMachine* stateMachine = nullptr;
+	
 
 	// ステート
 	enum class State
@@ -150,10 +228,11 @@ public:
 
 	// ステート取得
 	const State& GetState() const { return state; }
-	const State& GetAttackState() const { return State::Attack; }
+    State SetState(State state) { return this->state = state; }
 
 	float GetSkillTime() const { return skillTime; }
 
+	
 protected:
 
 	// ダメージを受けたときに呼ばれる
@@ -174,89 +253,89 @@ private:
 	// ノードとエネミーの衝突処理
 	void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);
 
-	// 待機ステートへ遷移
-	void TransitionIdleState();
+	//// 待機ステートへ遷移
+	//void TransitionIdleState();
 
-	// 待機ステート更新処理
-	void UpdateIdleState(float elapsedTime);
+	//// 待機ステート更新処理
+	//void UpdateIdleState(float elapsedTime);
 
-	// 移動ステートへ遷移
-	void TransitionMoveState();
+	//// 移動ステートへ遷移
+	//void TransitionMoveState();
 
-	// 移動ステート更新処理
-	void UpdateMoveState(float elapsedTime);
+	//// 移動ステート更新処理
+	//void UpdateMoveState(float elapsedTime);
 
-	// ジャンプステートへ遷移
-	void TransitionJumpState();
+	//// ジャンプステートへ遷移
+	//void TransitionJumpState();
 
-	// ジャンプステート更新処理
-	void UpdateJumpState(float elapsedTime);
+	//// ジャンプステート更新処理
+	//void UpdateJumpState(float elapsedTime);
 
-	// クランプステートへ遷移
-	void TransitionClimbWallState();
+	//// クランプステートへ遷移
+	//void TransitionClimbWallState();
 
-	// クランプステート更新処理
-	void UpdateClimbWallState(float elapsedTime);
+	//// クランプステート更新処理
+	//void UpdateClimbWallState(float elapsedTime);
 
-	// 攻撃ステートへ遷移
-	void TransitionAttackState();
+	//// 攻撃ステートへ遷移
+	//void TransitionAttackState();
 
-	// 攻撃ステート更新処理
-	void UpdateAttackState(float elapsedTime);
+	//// 攻撃ステート更新処理
+	//void UpdateAttackState(float elapsedTime);
 
-	// ダメージステートへ遷移
-	void TransitionDamageState();
+	//// ダメージステートへ遷移
+	//void TransitionDamageState();
 
-	// ダメージステート更新処理
-	void UpdateDamageState(float elapsedTime);
+	//// ダメージステート更新処理
+	//void UpdateDamageState(float elapsedTime);
 
-	// 死亡ステートへ遷移
-	void TransitionDeathState();
+	//// 死亡ステートへ遷移
+	//void TransitionDeathState();
 
-	// 死亡ステート更新処理
-	void UpdateDeathState(float elapsedTime);
+	//// 死亡ステート更新処理
+	//void UpdateDeathState(float elapsedTime);
 
-	// 着地ステートへ遷移 
-	void TransitionLandState();
+	//// 着地ステートへ遷移 
+	//void TransitionLandState();
 
-	// 着地ステート更新処理
-	void UpdateLandState(float elapsedTime);
+	//// 着地ステート更新処理
+	//void UpdateLandState(float elapsedTime);
 
-	// スイングステートへ遷移
-	void TransitionSwingState();
+	//// スイングステートへ遷移
+	//void TransitionSwingState();
 
-	// スイングステート更新処理
-	void UpdateSwingState(float elapsedTime);
+	//// スイングステート更新処理
+	//void UpdateSwingState(float elapsedTime);
 
 	// カメラステートの更新
 	void UpdateCameraState(float elapsedTime);
 
-	//	発射ステートをへ遷移
-	void TransitionShotingState();
+	////	発射ステートをへ遷移
+	//void TransitionShotingState();
 
-	//	発射ステート更新処理
-	void UpdateShotingState(float elapsedTime);
+	////	発射ステート更新処理
+	//void UpdateShotingState(float elapsedTime);
 
 	//	連撃攻撃のモーション
 	void PlayAttackAnimation();
 
-	//	回避ステートへ遷移
-	void TransitionDodgeState();
+	////	回避ステートへ遷移
+	//void TransitionDodgeState();
 
-	//	回避ステートの更新
-	void UpdateDodgeState(float elapsedTime);
+	////	回避ステートの更新
+	//void UpdateDodgeState(float elapsedTime);
 
-	//	登るステートへ遷移
-	void TransitionClimbTopState();
+	////	登るステートへ遷移
+	//void TransitionClimbTopState();
 
-	//	登るステートの更新
-	void UpdateClimbTopState(float elapsedTime);
+	////	登るステートの更新
+	//void UpdateClimbTopState(float elapsedTime);
 
-	//	投げ技ステートへ遷移
-	void TransitionGrabState();
+	////	投げ技ステートへ遷移
+	//void TransitionGrabState();
 
-	//	投げ技ステートの更新
-	void UpdateGrabState(float elapsedTime);
+	////	投げ技ステートの更新
+	//void UpdateGrabState(float elapsedTime);
 
 	//	壁端っこの判定
 	bool IsNearWallTop();
@@ -273,51 +352,18 @@ private:
 	//　投げ技Active
 	bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);
 
-    //	Titleステート用
-    void TransitionTitleIdleState();
-    void TransitionCrouchIdleState();
-    void UpdateCrouchIdleState(float elapsedTime);
+ //   //	Titleステート用
+ //   void TransitionTitleIdleState();
+ //   void TransitionCrouchIdleState();
+ //   void UpdateCrouchIdleState(float elapsedTime);
 
-    //  スイングキックステートへ遷移
-    void TransitionSwingToKickState();
-    void UpdateSwingToKickState(float elapsedTime);
+ //   //  スイングキックステートへ遷移
+ //   void TransitionSwingToKickState();
+ //   void UpdateSwingToKickState(float elapsedTime);
 
-    //  必殺技ステートへ遷移
-	void TransitionUltimateState();
-    void UpdateUltimateState(float elapsedTime);
-
-
-private:
-	//アニメーション
-	enum Animation
-	{
-		Anim_Idle,
-		Anim_Walking,
-		Anim_GetHit1,
-		Anim_Death,
-		Anim_Running,
-		Anim_Climb,
-		Anim_Landing,
-		Anim_Jump,
-		Anim_HoldInWall,
-		Anim_Attack,
-		Anim_Attack2,
-		Anim_Kick,
-		Anim_StartSwing,
-		Anim_Swinging,
-		Anim_Swinging2,
-		Anim_Shoting,
-		Anim_Dodge,
-		Anim_ClimbUpWall,
-		Anim_ClimbDown,
-		Anim_SwingToLand,
-		Anim_GrabAndDrop,
-		Anim_CrouchIdle,
-		Anim_TitleIdle,
-		Anim_Crouch,
-		Anim_SwingToKick,
-        Anim_Ultimate,
-	};
+ //   //  必殺技ステートへ遷移
+	//void TransitionUltimateState();
+ //   void UpdateUltimateState(float elapsedTime);
 
 
 private:
@@ -431,5 +477,6 @@ private:
 
 	float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
 
+	
 };
 

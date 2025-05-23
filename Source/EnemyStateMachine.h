@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "StateBase.h"
+#include "EnemyStateBase.h"
 class EnemyState;
 class EnemyHierarchicalState;
 

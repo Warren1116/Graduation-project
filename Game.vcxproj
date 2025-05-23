@@ -166,6 +166,9 @@
     <ClInclude Include="Source\MiniMap.h" />
     <ClInclude Include="Source\Misc.h" />
     <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\PlayerStateBase.h" />
+    <ClInclude Include="Source\PlayerStateDerived.h" />
+    <ClInclude Include="Source\PlayerStateMachine.h" />
     <ClInclude Include="Source\Projectile.h" />
     <ClInclude Include="Source\ProjectileManager.h" />
     <ClInclude Include="Source\ProjectileStraight.h" />
@@ -185,7 +188,8 @@
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageMain.h" />
     <ClInclude Include="Source\StageManager.h" />
-    <ClInclude Include="Source\StateDerived.h" />
+    <ClInclude Include="Source\EnemyStateBase.h" />
+    <ClInclude Include="Source\EnemyStateDerived.h" />
     <ClInclude Include="Source\EnemyStateMachine.h" />
     <ClInclude Include="Source\SwingWeb.h" />
     <ClInclude Include="Source\Telegram.h" />
@@ -242,6 +246,8 @@
     <ClCompile Include="Source\MetaAI.cpp" />
     <ClCompile Include="Source\MiniMap.cpp" />
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PlayerStateDerived.cpp" />
+    <ClCompile Include="Source\PlayerStateMachine.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\ProjectileManager.cpp" />
     <ClCompile Include="Source\ProjectileStraight.cpp" />
@@ -259,8 +265,8 @@
     <ClCompile Include="Source\SceneTitle.cpp" />
     <ClCompile Include="Source\StageMain.cpp" />
     <ClCompile Include="Source\StageManager.cpp" />
-    <ClCompile Include="Source\StateBase.cpp" />
-    <ClCompile Include="Source\StateDerived.cpp" />
+    <ClCompile Include="Source\EnemyStateBase.cpp" />
+    <ClCompile Include="Source\EnemyStateDerived.cpp" />
     <ClCompile Include="Source\EnemyStateMachine.cpp" />
     <ClCompile Include="Source\SwingWeb.cpp" />
     <ClCompile Include="Source\UI.cpp" />
