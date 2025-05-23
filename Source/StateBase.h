@@ -3,12 +3,12 @@
 
 class EnemyThief;
 
-class State
+class EnemyState
 {
 public:
     // コンストラクタ
-    State(EnemyThief* enemy) : owner(enemy) {}
-    virtual ~State() {}
+    EnemyState(EnemyThief* enemy) : owner(enemy) {}
+    virtual ~EnemyState() {}
     //全て継承先で実装させる必要があるため純粋仮想関数で実装
     //ステートに入った時のメソッド
     virtual void Enter() = 0;
@@ -17,20 +17,18 @@ public:
     //ステートから出ていくときのメソッド
     virtual void Exit() = 0;
 
-
 protected:
     EnemyThief* owner;
-
 
 };
 
 //  1層目のステートクラスの作成(StateBase.cppに関数定義をする)
 #include <vector>
-class HierarchicalState : public State
+class EnemyHierarchicalState : public EnemyState
 {
 public:
-    HierarchicalState(EnemyThief* enemy) : State(enemy) {}
-    virtual ~HierarchicalState() {}
+    EnemyHierarchicalState(EnemyThief* enemy) : EnemyState(enemy) {}
+    virtual ~EnemyHierarchicalState() {}
     //  全て継承先で実装させる必要があるため純粋仮想関数で実装
     //  ステートに入った時のメソッド
     virtual void Enter() = 0;
@@ -43,15 +41,15 @@ public:
     //  サブステート変更
     virtual void ChangeSubState(int newState);
     //  サブステート登録
-    virtual void RegisterSubState(State* state);
+    virtual void RegisterSubState(EnemyState* state);
     //  サブステート取得
-    virtual State* GetSubState() { return subState; }
+    virtual EnemyState* GetSubState() { return subState; }
     //  サブステート番号取得
     virtual int GetSubStateIndex();
 
 protected:
-    State* subState = nullptr;
-    std::vector<State*> subStatePool;
+    EnemyState* subState = nullptr;
+    std::vector<EnemyState*> subStatePool;
 
 
 };

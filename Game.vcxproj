@@ -186,7 +186,7 @@
     <ClInclude Include="Source\StageMain.h" />
     <ClInclude Include="Source\StageManager.h" />
     <ClInclude Include="Source\StateDerived.h" />
-    <ClInclude Include="Source\StateMachine.h" />
+    <ClInclude Include="Source\EnemyStateMachine.h" />
     <ClInclude Include="Source\SwingWeb.h" />
     <ClInclude Include="Source\Telegram.h" />
     <ClInclude Include="Source\UI.h" />
@@ -261,7 +261,7 @@
     <ClCompile Include="Source\StageManager.cpp" />
     <ClCompile Include="Source\StateBase.cpp" />
     <ClCompile Include="Source\StateDerived.cpp" />
-    <ClCompile Include="Source\StateMachine.cpp" />
+    <ClCompile Include="Source\EnemyStateMachine.cpp" />
     <ClCompile Include="Source\SwingWeb.cpp" />
     <ClCompile Include="Source\UI.cpp" />
   </ItemGroup>

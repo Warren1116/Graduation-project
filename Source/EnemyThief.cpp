@@ -22,7 +22,7 @@ EnemyThief::EnemyThief()
     height = 1.0f;
 
     // StateMachineを生成し、階層型ステートマシンに対応するように登録ステートを変更していく。
-    stateMachine = new StateMachine();
+    stateMachine = new EnemyStateMachine();
 
     stateMachine->RegisterState(new SearchState(this));
     stateMachine->RegisterState(new BattleState(this));

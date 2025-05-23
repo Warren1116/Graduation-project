@@ -11,7 +11,7 @@
 // デストラクタ
 SearchState::~SearchState()
 {
-    for (State* state : subStatePool)
+    for (EnemyState* state : subStatePool)
     {
         delete state;
     }
@@ -133,7 +133,7 @@ void IdleState::Exit()
 //-----------------------------------------------------------------------------------------------------------------------------------------
 BattleState::~BattleState()
 {
-    for (State* state : subStatePool)
+    for (EnemyState* state : subStatePool)
     {
         delete state;
     }
@@ -592,7 +592,7 @@ void DeadState::Exit()
 // デストラクタ
 RecieveState::~RecieveState()
 {
-    for (State* state : subStatePool)
+    for (EnemyState* state : subStatePool)
     {
         delete state;
     }

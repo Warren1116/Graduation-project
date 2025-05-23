@@ -2,7 +2,7 @@
 
 // HierarchicalStateクラスの関数定義を行う
 // 2層目ステートセット
-void HierarchicalState::SetSubState(int newState)
+void EnemyHierarchicalState::SetSubState(int newState)
 {
 	subState = subStatePool.at(newState);
 
@@ -10,7 +10,7 @@ void HierarchicalState::SetSubState(int newState)
 }
 
 // 2層目のステート切り替え
-void HierarchicalState::ChangeSubState(int newState)
+void EnemyHierarchicalState::ChangeSubState(int newState)
 {
 	if (newState >= 0 && newState < subStatePool.size())
 	{
@@ -25,16 +25,16 @@ void HierarchicalState::ChangeSubState(int newState)
 
 }
 // サブステート登録
-void HierarchicalState::RegisterSubState(State* state)
+void EnemyHierarchicalState::RegisterSubState(EnemyState* state)
 {
 	subStatePool.emplace_back(state);
 }
 
 // サブステートの番号取得
-int HierarchicalState::GetSubStateIndex()
+int EnemyHierarchicalState::GetSubStateIndex()
 {
 	int i = 0;
-	for (State* state : subStatePool)
+	for (EnemyState* state : subStatePool)
 	{
 		if (subState == state)return i;
 		++i;

@@ -1,9 +1,9 @@
-#include "StateMachine.h"
+#include "EnemyStateMachine.h"
 
-StateMachine::~StateMachine()
+EnemyStateMachine::~EnemyStateMachine()
 {
     //  登録したステートを削除する
-    for (State* state : statePool)
+    for (EnemyState* state : statePool)
     {
         delete state;
     }
@@ -11,13 +11,13 @@ StateMachine::~StateMachine()
 }
 
 //  更新処理
-void StateMachine::Update(float elapsedTime)
+void EnemyStateMachine::Update(float elapsedTime)
 {
     currentState->Execute(elapsedTime);
 }
 
 //  ステートの設定
-void StateMachine::SetState(int newState)
+void EnemyStateMachine::SetState(int newState)
 {
     currentState = statePool.at(newState);
 
@@ -25,7 +25,7 @@ void StateMachine::SetState(int newState)
 }
 
 //  ステートの変更
-void StateMachine::ChangeState(int newState)
+void EnemyStateMachine::ChangeState(int newState)
 {
     if (newState >= 0 && newState < statePool.size())
     {
@@ -43,10 +43,10 @@ void StateMachine::ChangeState(int newState)
 }
 
 //  ステートのインデックスを取得
-int StateMachine::GetStateIndex()
+int EnemyStateMachine::GetStateIndex()
 {
     int i = 0;
-    for (State* state : statePool)
+    for (EnemyState* state : statePool)
     {
         if (state == currentState)
         {
@@ -59,17 +59,17 @@ int StateMachine::GetStateIndex()
     return -1;
 }
 
-void StateMachine::RegisterState(HierarchicalState* state)
+void EnemyStateMachine::RegisterState(EnemyHierarchicalState* state)
 {
     statePool.emplace_back(state);
 }
 
-void StateMachine::ChangeSubState(int newState)
+void EnemyStateMachine::ChangeSubState(int newState)
 {
     currentState->ChangeSubState(newState);
 }
 
-void StateMachine::RegisterSubState(int index, State* subState)
+void EnemyStateMachine::RegisterSubState(int index, EnemyState* subState)
 {
     statePool.at(index)->RegisterSubState(subState);
 }

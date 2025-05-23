@@ -494,38 +494,6 @@ void Player::UpdateGrabState(float elapsedTime)
 
 }
 
-void Player::UpdateSwingPoint()
-{
-    // カメラベースの入力移動ベクトルを取得
-    DirectX::XMFLOAT3 moveVec = GetMoveVec();
-
-
-    // 現在の方向ベクトルを取得
-    DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
-    DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
-    forwardVec = DirectX::XMVector3Normalize(forwardVec);
-    upVec = DirectX::XMVector3Normalize(upVec);
-
-    // 右方向ベクトル
-    DirectX::XMVECTOR rightVec = DirectX::XMVector3Cross(upVec, forwardVec);
-    rightVec = DirectX::XMVector3Normalize(rightVec);
-
-    // 横方向偏移
-    float lateralStrength = moveVec.x;
-    DirectX::XMVECTOR lateralVec = DirectX::XMVectorScale(rightVec, lateralStrength * 4.0f);
-
-    // 現在のSwingPointをベースに再構築
-    DirectX::XMVECTOR originSwingPoint = DirectX::XMLoadFloat3(&position);
-    DirectX::XMVECTOR offsetVec = DirectX::XMVectorAdd(
-        DirectX::XMVectorScale(forwardVec, 8.0f),
-        DirectX::XMVectorScale(upVec, 12.0f)
-    );
-    offsetVec = DirectX::XMVectorAdd(offsetVec, lateralVec);
-
-    DirectX::XMVECTOR newSwingPoint = DirectX::XMVectorAdd(originSwingPoint, offsetVec);
-    DirectX::XMStoreFloat3(&swingPoint, newSwingPoint);
-}
-
 bool Player::IsNearWallTop()
 {
     //　頭の位置を取得

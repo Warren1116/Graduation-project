@@ -5,11 +5,11 @@
 
 
 // 徘徊ステートオブジェクト
-class WanderState : public State
+class WanderState : public EnemyState
 {
 public:
     //  コンストラクタ
-    WanderState(EnemyThief* enemy) : State(enemy) {};
+    WanderState(EnemyThief* enemy) : EnemyState(enemy) {};
     //  デストラクタ
     ~WanderState() {}
     //  ステートに入った時のメソッド
@@ -20,11 +20,11 @@ public:
     void Exit()override;
 };
 
-class IdleState : public State
+class IdleState : public EnemyState
 {
 public:
     //  コンストラクタ
-    IdleState(EnemyThief* enemy) : State(enemy) {};
+    IdleState(EnemyThief* enemy) : EnemyState(enemy) {};
     //  デストラクタ
     ~IdleState() {}
     //  ステートに入った時のメソッド
@@ -35,11 +35,11 @@ public:
     void Exit()override;
 };
 
-class PursuitState : public State
+class PursuitState : public EnemyState
 {
 public:
     //  コンストラクタ
-    PursuitState(EnemyThief* enemy) : State(enemy) {};
+    PursuitState(EnemyThief* enemy) : EnemyState(enemy) {};
     //  デストラクタ
     ~PursuitState() {}
     //  ステートに入った時のメソッド
@@ -55,11 +55,11 @@ private:
 
 };
 
-class AttackState : public State
+class AttackState : public EnemyState
 {
 public:
     //  コンストラクタ
-    AttackState(EnemyThief* enemy) : State(enemy) {};
+    AttackState(EnemyThief* enemy) : EnemyState(enemy) {};
     //  デストラクタ
     ~AttackState() {}
     //  ステートに入った時のメソッド
@@ -71,11 +71,11 @@ public:
 private:
 };
 
-class PunchState : public State
+class PunchState : public EnemyState
 {
 public:
     //  コンストラクタ
-    PunchState(EnemyThief* enemy) : State(enemy) {};
+    PunchState(EnemyThief* enemy) : EnemyState(enemy) {};
     //  デストラクタ
     ~PunchState() {}
     //  ステートに入った時のメソッド
@@ -86,11 +86,11 @@ public:
     void Exit()override;
 };
 
-class ShotState : public State
+class ShotState : public EnemyState
 {
 public:
     //  コンストラクタ
-    ShotState(EnemyThief* enemy) : State(enemy) {};
+    ShotState(EnemyThief* enemy) : EnemyState(enemy) {};
     //  デストラクタ
     ~ShotState() {}
     //  ステートに入った時のメソッド
@@ -104,10 +104,10 @@ public:
 
 };
 
-class SearchState : public HierarchicalState
+class SearchState : public EnemyHierarchicalState
 {
 public:
-    SearchState(EnemyThief* enemy) : HierarchicalState(enemy) {}
+    SearchState(EnemyThief* enemy) : EnemyHierarchicalState(enemy) {}
     //  デストラクタ
     ~SearchState();
     //  ステートに入った時のメソッド
@@ -118,10 +118,10 @@ public:
     void Exit();
 };
 
-class BattleState : public HierarchicalState
+class BattleState : public EnemyHierarchicalState
 {
 public:
-    BattleState(EnemyThief* enemy) : HierarchicalState(enemy) {}
+    BattleState(EnemyThief* enemy) : EnemyHierarchicalState(enemy) {}
     //  デストラクタ
     ~BattleState();
     //  ステートに入った時のメソッド
@@ -133,10 +133,10 @@ public:
 };
 
 // メタAIからメッセージを受信したときに呼ばれるステートを追加
-class RecieveState : public HierarchicalState
+class RecieveState : public EnemyHierarchicalState
 {
 public:
-    RecieveState(EnemyThief* enemy) : HierarchicalState(enemy) {}
+    RecieveState(EnemyThief* enemy) : EnemyHierarchicalState(enemy) {}
     ~RecieveState();
     // 全て継承先で実装させる必要があるため純粋仮想関数で実装
     // ステートに入ったときのメソッド
@@ -148,10 +148,10 @@ public:
 };
 
 // 他のエネミーから呼ばれたときのステートを追加
-class CalledState : public State
+class CalledState : public EnemyState
 {
 public:
-    CalledState(EnemyThief* enemy) :State(enemy) {};
+    CalledState(EnemyThief* enemy) :EnemyState(enemy) {};
     ~CalledState() {}
     // ステートに入ったときのメソッド
     void Enter() override;
@@ -162,11 +162,11 @@ public:
 };
 
 //  待機ステートオブジェクト
-class StandbyState : public State
+class StandbyState : public EnemyState
 {
 public:
 
-    StandbyState(EnemyThief* enemy) : State(enemy) {};
+    StandbyState(EnemyThief* enemy) : EnemyState(enemy) {};
     ~StandbyState() {}
     // ステートに入ったときのメソッド
     void Enter() override;
@@ -181,10 +181,10 @@ private:
 };
 
 // ダメージステートオブジェクト
-class  DamageState : public State
+class  DamageState : public EnemyState
 {
 public:
-    DamageState(EnemyThief* enemy) : State(enemy) {};
+    DamageState(EnemyThief* enemy) : EnemyState(enemy) {};
     ~DamageState() {}
     // ステートに入ったときのメソッド
     void Enter() override;
@@ -195,10 +195,10 @@ public:
 };
 
 // 死亡ステートオブジェクト
-class  DeadState : public State
+class  DeadState : public EnemyState
 {
 public:
-    DeadState(EnemyThief* enemy) : State(enemy) {};
+    DeadState(EnemyThief* enemy) : EnemyState(enemy) {};
     ~DeadState() {}
     // ステートに入ったときのメソッド
     void Enter() override;

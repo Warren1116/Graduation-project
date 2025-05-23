@@ -1,7 +1,7 @@
 #pragma once
 #include "Graphics/Model.h"
 #include "Enemy.h"
-#include "StateMachine.h"
+#include "EnemyStateMachine.h"
 #include "Telegram.h"
 #include "Audio/Audio.h"
 
@@ -20,7 +20,7 @@ enum class EnemyAnimation
     KickDown,
 };
 
-class StateMachine;
+class EnemyStateMachine;
 
 class EnemyThief :public Enemy
 {
@@ -79,7 +79,7 @@ public:
     float GetPunchRange() { return punchRange; }
 
     //ステートマシン取得
-    StateMachine* GetStateMachine() { return stateMachine; }
+    EnemyStateMachine* GetStateMachine() { return stateMachine; }
     //モデル取得
     Model* GetModel() { return model.get(); }
 
@@ -150,8 +150,7 @@ private:
     float				searchRange = 7.0f;
     float				attackRange = 10.0f;
     float				punchRange = 1.5f;
-    StateMachine* stateMachine = nullptr;
-
+    EnemyStateMachine* stateMachine = nullptr;
 
     //投げされる時用
     float timeElapsed = 0.0f;
