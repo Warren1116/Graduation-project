@@ -25,8 +25,8 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-//#define TUTORIAL
-#define DEBUG
+#define TUTORIAL
+//#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -684,51 +684,33 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         break;
         //  ジャンプのチュトリアル
     case SceneGame::TutorialState::Jump:
-        CheckTutorialTimeout(3.5f);
+        CheckTutorialTimeout(2.0f);
         if (Player::Instance().InputJump() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Attack);
         break;
         //  攻撃のチュトリアル
     case SceneGame::TutorialState::Attack:
-        CheckTutorialTimeout(3.5f);
+        CheckTutorialTimeout(2.0f);
         if (Player::Instance().InputAttack() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Shot);
         break;
         //  弾丸のチュトリアル
     case SceneGame::TutorialState::Shot:
-        CheckTutorialTimeout(3.5f);
+        CheckTutorialTimeout(2.0);
         if (Player::Instance().InputProjectile() && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::CameraLock);
         break;
         //  カメラロックのチュトリアル
     case SceneGame::TutorialState::CameraLock:
-        CheckTutorialTimeout(3.5f);
+        CheckTutorialTimeout(2.0f);
         if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_TAB || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB && canAcceptInput)
-            AdvanceTutorialState(SceneGame::TutorialState::LockAttack);
-        break;
-        //  ロックオン攻撃のチュトリアル
-    case SceneGame::TutorialState::LockAttack:
-        if (Player::Instance().GetLockonEnemy() != nullptr)
-        {
-            CheckTutorialTimeout(3.5f);
-            if (Player::Instance().InputAttack() && canAcceptInput)
-                AdvanceTutorialState(SceneGame::TutorialState::LockShot);
-        }
-        break;
-        //  ロックオン弾丸のチュトリアル
-    case SceneGame::TutorialState::LockShot:
-        if (Player::Instance().GetLockonEnemy() != nullptr)
-        {
-            CheckTutorialTimeout(3.5f);
-            if (Player::Instance().InputProjectile() && canAcceptInput)
-                AdvanceTutorialState(SceneGame::TutorialState::Grab);
-        }
+            AdvanceTutorialState(SceneGame::TutorialState::Grab);
         break;
         //  投げ技のチュトリアル
     case SceneGame::TutorialState::Grab:
         if (Player::Instance().GetLockonEnemy() != nullptr)
         {
-            CheckTutorialTimeout(3.5f);
+            CheckTutorialTimeout(2.0f);
             if (gamePad.GetButtonDown() & GamePad::BTN_Y || mouse.GetButtonDown() & Mouse::BTN_RIGHT && canAcceptInput)
                 AdvanceTutorialState(SceneGame::TutorialState::Swing);
         }

@@ -34,8 +34,6 @@ public:
         Attack,
         Shot,
         CameraLock,
-        LockAttack,
-        LockShot,
         Grab,
         Swing,
         Climb,
@@ -56,7 +54,6 @@ public:
 
     // 描画処理
     void Render() override;
-
 
     //　チュトリアル時用の判定
     bool tutorialPause = false;

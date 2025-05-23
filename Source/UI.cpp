@@ -372,12 +372,6 @@ void UI::RenderTutorial(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view
         case SceneGame::TutorialState::CameraLock:
             RenderTutorialSprite(TutorialCameraLock, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;
-        case SceneGame::TutorialState::LockAttack:
-            RenderTutorialSprite(TutorialAttack, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
-            break;
-        case SceneGame::TutorialState::LockShot:
-            RenderTutorialSprite(TutorialShot, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
-            break;
         case SceneGame::TutorialState::Grab:
             RenderTutorialSprite(TutorialGrab, dc, screenWidth * 0.48f, screenHeight, alpha, isController, -100, -300);
             break;

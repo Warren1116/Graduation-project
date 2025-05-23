@@ -209,7 +209,6 @@ void MiniMap::Render(ID3D11DeviceContext* dc)
     float mapX = screenWidth - mapSize - 50.0f;
     float mapY = 50.0f;
 
-
     if (mapSprite)
     {
         mapSprite->Render(dc,
