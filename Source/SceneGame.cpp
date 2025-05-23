@@ -25,8 +25,8 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-#define TUTORIAL
-//#define DEBUG
+//#define TUTORIAL
+#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -591,12 +591,6 @@ void SceneGame::Render()
                 break;
             case TutorialState::CameraLock:
                 str = "Tutorial CameraLock";
-                break;
-            case TutorialState::LockAttack:
-                str = "Tutorial LockAttack";
-                break;
-            case TutorialState::LockShot:
-                str = "Tutorial LockShot";
                 break;
             case TutorialState::Grab:
                 str = "Tutorial Grab";

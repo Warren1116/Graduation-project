@@ -494,6 +494,38 @@ void Player::UpdateGrabState(float elapsedTime)
 
 }
 
+void Player::UpdateSwingPoint()
+{
+    // カメラベースの入力移動ベクトルを取得
+    DirectX::XMFLOAT3 moveVec = GetMoveVec();
+
+
+    // 現在の方向ベクトルを取得
+    DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+    DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+    forwardVec = DirectX::XMVector3Normalize(forwardVec);
+    upVec = DirectX::XMVector3Normalize(upVec);
+
+    // 右方向ベクトル
+    DirectX::XMVECTOR rightVec = DirectX::XMVector3Cross(upVec, forwardVec);
+    rightVec = DirectX::XMVector3Normalize(rightVec);
+
+    // 横方向偏移
+    float lateralStrength = moveVec.x;
+    DirectX::XMVECTOR lateralVec = DirectX::XMVectorScale(rightVec, lateralStrength * 4.0f);
+
+    // 現在のSwingPointをベースに再構築
+    DirectX::XMVECTOR originSwingPoint = DirectX::XMLoadFloat3(&position);
+    DirectX::XMVECTOR offsetVec = DirectX::XMVectorAdd(
+        DirectX::XMVectorScale(forwardVec, 8.0f),
+        DirectX::XMVectorScale(upVec, 12.0f)
+    );
+    offsetVec = DirectX::XMVectorAdd(offsetVec, lateralVec);
+
+    DirectX::XMVECTOR newSwingPoint = DirectX::XMVectorAdd(originSwingPoint, offsetVec);
+    DirectX::XMStoreFloat3(&swingPoint, newSwingPoint);
+}
+
 bool Player::IsNearWallTop()
 {
     //　頭の位置を取得
@@ -1161,12 +1193,27 @@ void Player::TransitionMoveState()
 // 移動ステート更新処理
 void Player::UpdateMoveState(float elapsedTime)
 {
+    if (!canSwing)
+    {
+        swingCooldownTimer -= elapsedTime;
+        if (swingCooldownTimer <= 0.0f)
+        {
+            canSwing = true;
+        }
+    }
+
     GamePad& gamePad = Input::Instance().GetGamePad();
     //  移動中SHIFTキー同時に押すと
     if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && InputMove(elapsedTime) && firstSwing)
     {
         lastState = state;
-        TransitionSwingState();
+        if (canSwing)
+        {
+            //  スイングステートへの遷移
+            canSwing = false;
+            swingCooldownTimer = swingCooldown;
+            TransitionSwingState();
+        }
     }
 
     if (InputDodge())
@@ -1674,6 +1721,7 @@ void Player::UpdateSwingState(float elapsedTime)
     //スイングの当たり判定
     SwingCollision(elapsedTime);
 
+
     //振り子運動の計算
     HandleSwingPhysics(elapsedTime, 10.0f, 10.0f, 0.005f);
 
@@ -1700,7 +1748,7 @@ bool Player::FindWallSwingPoint()
     forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f);
     upVec = DirectX::XMVectorScale(upVec, 12.0f);
 
-    SwingwebDirection = DirectX::XMVectorAdd(forwardVec, upVec);
+
     DirectX::XMVECTOR SwingPoint = DirectX::XMLoadFloat3(&position);
     SwingPoint = DirectX::XMVectorAdd(SwingPoint, SwingwebDirection);
     DirectX::XMStoreFloat3(&swingPoint, SwingPoint);
@@ -1708,6 +1756,7 @@ bool Player::FindWallSwingPoint()
     previousSwingPoint = swingPoint;
 
     return false;
+
 }
 
 void Player::SwingCollision(float elapsedTime)

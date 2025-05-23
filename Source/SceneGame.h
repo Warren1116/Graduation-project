@@ -17,7 +17,6 @@
 #include "Enemy.h"
 #include "CharacterManager.h"
 
-
 // ƒQ[ƒ€ƒV[ƒ“
 class SceneGame : public Scene
 {
