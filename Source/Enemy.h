@@ -10,51 +10,38 @@ class EnemyManager;
 class Enemy : public Character
 {
 public:
-	Enemy() {}
-	~Enemy() override {}
+    Enemy() {}
+    ~Enemy() override {}
 
-	// 更新処理
-	virtual void Update(float elapsedTime) = 0;
+    // 関数
+    virtual void Update(float elapsedTime) = 0;	    // 更新処理
+    void Destroy();	                                // 破棄
+    virtual void DrawDebugPrimitive();	            // デバッグプリミティブ描画
+    virtual void DrawDebugGUI() {}                  // デバッグGUI描画
+    virtual bool OnMessage(const Telegram& msg);	// メッセージ受信したときの処理
+    void OnDamaged() override {};	                // ダメージを受けたときに呼ばれる
+    void OnDead() override {};	                    // 死亡したときに呼ばれる
 
-	// 破棄
-	void Destroy();
-
-	// デバッグプリミティブ描画
-	virtual void DrawDebugPrimitive();
-
-	virtual void DrawDebugGUI() {}
-
-	// 攻撃フラグ取得
-	virtual bool	GetAttackFlg() { return attackFlg; }
-	// 攻撃フラグセット
-	virtual void	SetAttackFlg(bool flg) { attackFlg = flg; };
-	virtual void	SetId(int id) { this->id = id; }
-	virtual int		GetId() { return id; }
-	// 攻撃範囲取得
-	virtual float GetAttackRange() { return attackRange; }
-
-	// メッセージ受信したときの処理
-	virtual bool OnMessage(const Telegram& msg);
-
-	// モデル取得
-	Model* GetModel() const { return model; }
-
-	// ダメージを受けたときに呼ばれる
-	void OnDamaged() override {};
-
-	// 死亡したときに呼ばれる
-	void OnDead() override {};
+    ///////////////////////////////////////////////////////////////////////////////////
+    //                              ゲッター・セッター                               //
+    ///////////////////////////////////////////////////////////////////////////////////
+    virtual bool	GetAttackFlg() { return attackFlg; }	        // 攻撃フラグ取得
+    virtual void	SetAttackFlg(bool flg) { attackFlg = flg; };	// 攻撃フラグセット
+    virtual void	SetId(int id) { this->id = id; }
+    virtual int		GetId() { return id; }
+    virtual float GetAttackRange() { return attackRange; }	        // 攻撃範囲取得
+    Model* GetModel() const { return model; }	                    // モデル取得
 
 protected:
-	Model* model = nullptr;
-	bool		camerashake = false;
-	EnemyManager* manager = nullptr;
+    Model* model = nullptr;
+    bool		camerashake = false;
+    EnemyManager* manager = nullptr;
 
-	int	state = 0;
-	bool attackFlg = false;
-	int id = 0;
-	float searchRange = 0.0f;
-	float attackRange = 0.0f;
+    int	state = 0;
+    bool attackFlg = false;
+    int id = 0;
+    float searchRange = 0.0f;
+    float attackRange = 0.0f;
 
 };
 

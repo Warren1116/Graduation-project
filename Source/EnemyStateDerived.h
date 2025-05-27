@@ -21,6 +21,7 @@ namespace EnemyStates
         void Exit()override;
     };
 
+    // 待機ステートオブジェクト
     class IdleState : public EnemyState
     {
     public:
@@ -36,6 +37,7 @@ namespace EnemyStates
         void Exit()override;
     };
 
+    // 追跡ステートオブジェクト
     class PursuitState : public EnemyState
     {
     public:
@@ -56,6 +58,7 @@ namespace EnemyStates
 
     };
 
+    // 攻撃ステートオブジェクト
     class AttackState : public EnemyState
     {
     public:
@@ -72,6 +75,7 @@ namespace EnemyStates
     private:
     };
 
+    // 攻撃ステートの子オブジェクト（パンチ）
     class PunchState : public EnemyState
     {
     public:
@@ -87,6 +91,7 @@ namespace EnemyStates
         void Exit()override;
     };
 
+    // 攻撃ステートの子オブジェクト（シュート）
     class ShotState : public EnemyState
     {
     public:
@@ -105,6 +110,8 @@ namespace EnemyStates
 
     };
 
+    // 階層型ステートマシンの親ステートクラス
+    // 索敵ステート
     class SearchState : public EnemyHierarchicalState
     {
     public:
@@ -119,6 +126,7 @@ namespace EnemyStates
         void Exit();
     };
 
+    // 戦闘ステート
     class BattleState : public EnemyHierarchicalState
     {
     public:

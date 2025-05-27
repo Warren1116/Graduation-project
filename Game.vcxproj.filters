@@ -46,9 +46,6 @@
     <Filter Include="Source\Graphics\Shader">
       <UniqueIdentifier>{299213e9-1eed-4d6d-a2e6-9444c3762147}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\UI">
-      <UniqueIdentifier>{2a6f9028-dfd6-4505-9da3-334498146ea1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Character\Enemy">
       <UniqueIdentifier>{e6df2e2b-d334-4dec-85c3-37513fde6b15}</UniqueIdentifier>
     </Filter>
@@ -78,6 +75,9 @@
     </Filter>
     <Filter Include="Source\Character\Enemy\StateMachine">
       <UniqueIdentifier>{a3c73c81-2d4d-47b7-8f8c-f3fd6291a104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\UI">
+      <UniqueIdentifier>{2a6f9028-dfd6-4505-9da3-334498146ea1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -229,7 +229,7 @@
       <Filter>Source\Character</Filter>
     </ClInclude>
     <ClInclude Include="Source\UI.h">
-      <Filter>Source\UI</Filter>
+      <Filter>Source\System\UI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Font.h">
       <Filter>Source\Graphics</Filter>
@@ -457,7 +457,7 @@
       <Filter>Source\Character</Filter>
     </ClCompile>
     <ClCompile Include="Source\UI.cpp">
-      <Filter>Source\UI</Filter>
+      <Filter>Source\System\UI</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Font.cpp">
       <Filter>Source\Graphics</Filter>

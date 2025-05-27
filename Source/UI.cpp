@@ -109,17 +109,8 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
     //  “G‚©‚çeŒ‚‚ðŽó‚¯‚éŽž‚É‘_‚¢‚ð
     if (Player::Instance().GetShotSoon())
     {
-        LineRenderer* lineRender = Graphics::Instance().GetLineRenderer();
-
-        auto enemyModel = Player::Instance().GetAttackEnemy()->GetModel();
-        Model::Node* GunPos = enemyModel->FindNode("slide");
-
-        DirectX::XMFLOAT3 attackEnemyPos = Player::Instance().GetAttackEnemy()->GetPosition();
-        DirectX::XMFLOAT3 position = Player::Instance().GetPosition();
-
-        lineRender->DrawLine({ GunPos->worldTransform._41 ,GunPos->worldTransform._42 ,GunPos->worldTransform._43 },
-            DirectX::XMFLOAT3(position.x, position.y + 1.0f, position.z),
-            DirectX::XMFLOAT4(1, 0, 0, 1));
+        //  “G‚ÌeŒ‚‚Ìü‚ð•`‰æ
+        RenderEnemyShotLine();
     }
 
     // @WaveƒJƒEƒ“ƒ^[‚Ì•`‰æ
@@ -131,20 +122,8 @@ void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const 
     //@W’†ü‚Ì•`‰æ
     RenderFocusingLine(dc, view, projection);
 
-    //ƒJƒƒ‰ƒƒbƒN‚·‚éŽž‚ÌLockOnScope
-    if (Player::Instance().GetlockonState() == Player::LockonState::Locked && Player::Instance().GetLockonEnemy())
-    {
-        DirectX::XMFLOAT3 enemyPos = Player::Instance().GetLockonEnemy()->GetPosition();
-        enemyPos.y += 0.5f; // âc”÷‰ã•ÎˆÚ
-
-        RenderWorldSpriteToScreen(dc,
-            LockOnScope.get(),
-            enemyPos,
-            -15.0f, -60.0f,
-            30.0f, 30.0f,
-            1.0f,
-            view, projection);
-    }
+    //  ƒƒbƒNƒIƒ“ƒXƒR[ƒv‚Ì•`‰æ
+    RenderLockOnScope(dc, view, projection);
 
 
 #ifdef TUTORIAL
@@ -292,6 +271,39 @@ void UI::RenderFocusingLine(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& 
 
     }
 
+}
+
+void UI::RenderLockOnScope(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
+{
+    //ƒJƒƒ‰ƒƒbƒN‚·‚éŽž‚ÌLockOnScope
+    if (Player::Instance().GetlockonState() == Player::LockonState::Locked && Player::Instance().GetLockonEnemy())
+    {
+        DirectX::XMFLOAT3 enemyPos = Player::Instance().GetLockonEnemy()->GetPosition();
+        enemyPos.y += 0.5f;
+
+        RenderWorldSpriteToScreen(dc,
+            LockOnScope.get(),
+            enemyPos,
+            -15.0f, -60.0f,
+            30.0f, 30.0f,
+            1.0f,
+            view, projection);
+    }
+}
+
+void UI::RenderEnemyShotLine()
+{
+    LineRenderer* lineRender = Graphics::Instance().GetLineRenderer();
+
+    auto enemyModel = Player::Instance().GetAttackEnemy()->GetModel();
+    Model::Node* GunPos = enemyModel->FindNode("slide");
+
+    DirectX::XMFLOAT3 attackEnemyPos = Player::Instance().GetAttackEnemy()->GetPosition();
+    DirectX::XMFLOAT3 position = Player::Instance().GetPosition();
+
+    lineRender->DrawLine({ GunPos->worldTransform._41 ,GunPos->worldTransform._42 ,GunPos->worldTransform._43 },
+        DirectX::XMFLOAT3(position.x, position.y + 1.0f, position.z),
+        DirectX::XMFLOAT4(1, 0, 0, 1));
 }
 
 //  HP‚ÌUI•\Œ»

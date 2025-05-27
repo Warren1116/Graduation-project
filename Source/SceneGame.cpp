@@ -25,8 +25,8 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-//#define TUTORIAL
-#define DEBUG
+#define TUTORIAL
+//#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -60,7 +60,6 @@ void SceneGame::Initialize()
         const SRVHandleList	list = sceneRenderer->GetRenderTargetShaderResourceViews();
         SRVHandle	depth = sceneRenderer->GetDepthStencilShaderResourceView();
         postprocessingRenderer->SetSceneData({ list[0], depth, width, height });
-
     }
 
     // カメラ初期設定

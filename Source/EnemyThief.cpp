@@ -163,7 +163,6 @@ void EnemyThief::OnDead()
 void EnemyThief::OnDamaged()
 {
     stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Damage));
-
 }
 
 

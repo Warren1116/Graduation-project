@@ -8,56 +8,40 @@
 class EnemyManager
 {
 private:
-	EnemyManager() {}
-	~EnemyManager() {}
+    EnemyManager() {}
+    ~EnemyManager() {}
 
 public:
-	// 唯一のインスタンス取得
-	static EnemyManager& Instance()
-	{
-		static EnemyManager instance;
-		return instance;
-	}
+    // 唯一のインスタンス取得
+    static EnemyManager& Instance()
+    {
+        static EnemyManager instance;
+        return instance;
+    }
 
-	// 更新処理
-	void Update(float elapsedTime);
+    int identity = 0;	// 付与するIDの値(この値にMetaAI::Identity::Enemyを加算して付与する)
 
-	// エネミー登録
-	void Register(Enemy* enemy);
+    //　関数
+    void Update(float elapsedTime);	// 更新処理
+    void Register(Enemy* enemy);	// エネミー登録
+    void Clear();	// エネミー全削除
+    void DrawDebugPrimitive();	// デバッグプリミティブ描画
+    void DrawDebugGUI();    // デバッグGUI描画
+    void Remove(Enemy* enemy);    // エネミー削除
 
-	// エネミー全削除
-	void Clear();
-
-	// デバッグプリミティブ描画
-	void DrawDebugPrimitive();
-
-    // デバッグGUI描画
-	void DrawDebugGUI();
-
-	// エネミー数取得
-	int GetEnemyCount() const { return static_cast<int>(enemies.size()); }
-
-	// エネミー取得
-	Enemy* GetEnemy(int index) { return enemies.at(index); }
-	
-    // エネミーモデル取得
-	Model* GetEnemyModel(int index);
-
-	// エネミー削除
-	void Remove(Enemy* enemy);
-
-	// 付与したIDからエネミーを取得
-	Enemy* GetEnemyFromId(int id);
-
+    ///////////////////////////////////////////////////////////////////////////////////
+    //                              ゲッター・セッター                               //
+    ///////////////////////////////////////////////////////////////////////////////////
+    int GetEnemyCount() const { return static_cast<int>(enemies.size()); }   // エネミー数取得
+    Enemy* GetEnemy(int index) { return enemies.at(index); }    // エネミー取得
+    Model* GetEnemyModel(int index);    // エネミーモデル取得
+    Enemy* GetEnemyFromId(int id);    // 付与したIDからエネミーを取得
 
 private:
-	// エネミー同士の衝突処理
-	void CollisionEnemyVsEnemies();
-	std::vector<Enemy*> enemies;
-	std::set<Enemy*> removes;
+    std::vector<Enemy*> enemies;
+    std::set<Enemy*> removes;
 
-public:
-	int identity = 0;	// 付与するIDの値(この値にMetaAI::Identity::Enemyを加算して付与する)
-
+    // エネミー同士の衝突処理
+    void CollisionEnemyVsEnemies();
 };
 

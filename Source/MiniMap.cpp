@@ -62,6 +62,7 @@ void MiniMap::CreateBaseTexture(ID3D11Device* device, int size)
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = 1;
 
+    // ShaderResourceViewの作成
     device->CreateShaderResourceView(baseTexture.Get(), &srvDesc, baseSRV.GetAddressOf());
 }
 
@@ -119,6 +120,7 @@ void MiniMap::CreateTexture(ID3D11Device* device, int size)
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
+    // テクスチャ作成
     device->CreateTexture2D(&desc, nullptr, texture.GetAddressOf());
 
     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -126,6 +128,7 @@ void MiniMap::CreateTexture(ID3D11Device* device, int size)
     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
     srvDesc.Texture2D.MipLevels = 1;
 
+    // ShaderResourceViewの作成
     device->CreateShaderResourceView(texture.Get(), &srvDesc, shaderResourceView.GetAddressOf());
 }
 
@@ -147,7 +150,6 @@ void MiniMap::Update(float elapsedtime)
             int cx = static_cast<int>(u * textureSize);
             int cy = static_cast<int>(v * textureSize);
 
-            
             for (int dy = -radius; dy <= radius; ++dy)
             {
                 for (int dx = -radius; dx <= radius; ++dx)

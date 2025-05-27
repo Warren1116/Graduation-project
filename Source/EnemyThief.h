@@ -6,20 +6,12 @@
 #include "Audio/Audio.h"
 
 // エネミーアニメーション
-enum class EnemyAnimation
-{
-    Idle,
-    Walk,
-    Run,
-    AttackShot,
-    Die,
-    GetHit,
-    AttackPunch,
-    GetThrow,
-    HoldGun,
-    KickDown,
+enum class EnemyAnimation {
+    Idle, Walk, Run, AttackShot, Die, GetHit,
+    AttackPunch, GetThrow, HoldGun, KickDown
 };
 
+//ステートマシン
 class EnemyStateMachine;
 
 class EnemyThief :public Enemy
@@ -28,129 +20,80 @@ public:
     EnemyThief();
     ~EnemyThief()override;
 
-    // 攻撃タイプ
-    enum class AttackType
-    {
-        Null,
-        Punch,
-        Shot,
-    };
+    // ステート
+    enum class State { Search, Battle, Recieve, Max };  //親ステート
+    enum class Search { Wander, Idle, Max };            //子 (Search用)
+    enum class Battle { Pursuit, Attack, Punch, Shot,
+        Damage, Dead, Standby, Max };                   //子 (Battle用)
+    enum class Recieve { Called, Max };                 //子（MetaAI用）
+
+    enum class AttackType { Null, Punch, Shot };        //攻撃の種類
     AttackType randomType = AttackType::Null;
 
+    float				stateTimer = 0.0f;  // ステートタイマー
 
-    // 更新処理
-    void Update(float elapsedTime)override;
+    //関数
+    void Update(float elapsedTime)override;             // 更新処理
+    void DrawDebugPrimitive() override;                 // デバッグプリミティブ描画
+    void SetTerritory(const DirectX::XMFLOAT3& origin,
+        float range);                                   // 縄張り設定
+    void DrawDebugGUI();                                // デバッグエネミー情報表示
+    void SetRandomTargetPosition();                     // ターゲット位置をランダム設定
+    void MoveToTarget(float elapsedTime,
+        float speedRate);                               // 目標地点へ移動
+    bool SearchPlayer();                                // プレイヤー索敵
+    void SetTargetPosition(DirectX::XMFLOAT3 position)
+    { targetPosition = position; }                      // ターゲットポジション設定
+    void OnDead();                                      // 死亡したときに呼ばれる      
+    void OnDamaged() override;                          // ダメージを受けたときに呼ばれる
+    bool OnMessage(const Telegram& msg);                //　メッセージ受信関数を追加
 
-    // デバッグプリミティブ描画
-    void DrawDebugPrimitive() override;
+    ///////////////////////////////////////////////////////////////////////////////////
+    //                              ゲッター・セッター                               //
+    ///////////////////////////////////////////////////////////////////////////////////
+    DirectX::XMFLOAT3 GetPosition() { return position; }    // ポジション取得
 
-    // 縄張り設定
-    void SetTerritory(const DirectX::XMFLOAT3& origin, float range);
+    //攻撃
+    DirectX::XMFLOAT3 GetTargetPosition() { return targetPosition; }        // ターゲットポジション取得
+    float GetAttackRange() { return attackRange; }    // 攻撃範囲取得
+    float GetPunchRange() { return punchRange; }    // パンチ範囲取得
 
-    // デバッグエネミー情報表示
-    void DrawDebugGUI();
-    // ターゲット位置をランダム設定
-    void SetRandomTargetPosition();
-
-    // 目標地点へ移動
-    void MoveToTarget(float elapsedTime, float speedRate);
-
-    // プレイヤー索敵
-    bool SearchPlayer();
-
-    // ターゲットポジション設定
-    void SetTargetPosition(DirectX::XMFLOAT3 position) { targetPosition = position; }
-
-    // ターゲットポジション取得
-    DirectX::XMFLOAT3 GetTargetPosition() { return targetPosition; }
-
-    // ポジション取得
-    DirectX::XMFLOAT3 GetPosition() { return position; }
-
-    // ステートタイマー設定
-    void SetStateTimer(float timer) {
-        stateTimer = timer;
-    }
-    // ステートタイマー取得
-    float GetStateTimer() { return stateTimer; }
-
-    // 攻撃範囲取得
-    float GetAttackRange() { return attackRange; }
-    float GetPunchRange() { return punchRange; }
-
-    //ステートマシン取得
-    EnemyStateMachine* GetStateMachine() { return stateMachine; }
-    //モデル取得
-    Model* GetModel() { return model.get(); }
-
-    //メッセージ受信関数を追加
-    bool OnMessage(const Telegram& msg);
-
+    //投げされる
     void SetThrow(bool thown) { GetThrowFlag = thown; }
     bool IsGetThrow() const { return GetThrowFlag; }
 
-protected:
-    void OnDead();
+    //ステートマシン
+    EnemyStateMachine* GetStateMachine() { return stateMachine; }    //ステートマシン取得
 
-    void OnDamaged() override;
+    //モデル
+    Model* GetModel() { return model.get(); }    //モデル取得
 
-
-public:
-    enum class State
-    {
-        Search,
-        Battle,
-        // MetaAIからメッセージを受信したときのステートを追加
-        Recieve,
-        Max
-    };
-
-    enum class Search
-    {
-        Wander,
-        Idle,
-        Max
-    };
-
-    enum class Battle
-    {
-        Pursuit,
-        Attack,
-        Punch,
-        Shot,
-        Damage,
-        Dead,
-        // 戦闘中に攻撃権を持っていないときの処理を追加
-        Standby,
-        Max
-    };
-
-    //を経由して他のエネミーから呼ばれたときの処理
-    enum class Recieve
-    {
-        Called,
-        Max
-    };
-
-
-    float				stateTimer = 0.0f;
-
-
+    //ステート
+    void SetStateTimer(float timer) {stateTimer = timer;}    // ステートタイマー設定
+    float GetStateTimer() { return stateTimer; }    // ステートタイマー取得
 private:
+    // モデル
     std::unique_ptr<Model> model;
+
+    // ステートマシン
+    EnemyStateMachine* stateMachine = nullptr;
+
+    //ステート
     State				state = State::Search;
 
-
+    //索敵
     DirectX::XMFLOAT3	targetPosition = { 0.0f,0.0f,0.0f };
     DirectX::XMFLOAT3	territoryOrigin = { 0.0f,0.0f,0.0f };
     float				territoryRange = 7.0f;
+    float				searchRange = 7.0f;
+
+    //移動
     float				moveSpeed = 3.5f;
     float				turnSpeed = DirectX::XMConvertToRadians(360);
 
-    float				searchRange = 7.0f;
+    //攻撃
     float				attackRange = 10.0f;
     float				punchRange = 1.5f;
-    EnemyStateMachine* stateMachine = nullptr;
 
     //投げされる時用
     float timeElapsed = 0.0f;

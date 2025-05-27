@@ -22,363 +22,242 @@
 //アニメーション
 enum class PlayerAnimation
 {
-	Anim_Idle,
-	Anim_Walking,
-	Anim_GetHit1,
-	Anim_Death,
-	Anim_Running,
-	Anim_Climb,
-	Anim_Landing,
-	Anim_Jump,
-	Anim_HoldInWall,
-	Anim_Attack,
-	Anim_Attack2,
-	Anim_Kick,
-	Anim_StartSwing,
-	Anim_Swinging,
-	Anim_Swinging2,
-	Anim_Shoting,
-	Anim_Dodge,
-	Anim_ClimbUpWall,
-	Anim_ClimbDown,
-	Anim_SwingToLand,
-	Anim_GrabAndDrop,
-	Anim_CrouchIdle,
-	Anim_TitleIdle,
-	Anim_Crouch,
-	Anim_SwingToKick,
-	Anim_Ultimate,
+    Anim_Idle, Anim_Walking, Anim_GetHit1, Anim_Death, Anim_Running,
+    Anim_Climb, Anim_Landing, Anim_Jump, Anim_HoldInWall, Anim_Attack,
+    Anim_Attack2, Anim_Kick, Anim_StartSwing, Anim_Swinging, Anim_Swinging2,
+    Anim_Shoting, Anim_Dodge, Anim_ClimbUpWall, Anim_ClimbDown, Anim_SwingToLand,
+    Anim_GrabAndDrop, Anim_CrouchIdle, Anim_TitleIdle, Anim_Crouch,
+    Anim_SwingToKick, Anim_Ultimate
 };
 
+//　ステートマシン
 class PlayerStateMachine;
 
-namespace PlayerStates 
+// プレイヤーの状態を管理するクラス
+namespace PlayerStates
 {
-	class IdleState;
-	class MoveState;
-	class JumpState;
-	class ClimbState;
-	class AttackState;
-	class DamageState;
-	class SwingState;
-	class SwingToKickState;
-	class LandState;
-	class ShotState;
-	class GrabState;
-	class DodgeState;
-	class ClimbTopState;
-	class UltimateState;
-	class DeathState;
-	class CrouchIdleState;
-	class TitleIdleState;
+    class IdleState; class MoveState; class JumpState; class ClimbState;
+    class AttackState; class DamageState; class SwingState; class SwingToKickState;
+    class LandState; class ShotState; class GrabState; class DodgeState;
+    class ClimbTopState; class UltimateState; class DeathState;
+    class CrouchIdleState; class TitleIdleState;
 }
+
 
 // プレイヤー
 class Player : public Character
 {
-	friend class PlayerStates::IdleState;
-	friend class PlayerStates::MoveState;
-	friend class PlayerStates::JumpState;
-	friend class PlayerStates::ClimbState;
-	friend class PlayerStates::AttackState;
+    //　Friendクラス宣言
+    friend class PlayerStates::IdleState;
+    friend class PlayerStates::MoveState;
+    friend class PlayerStates::JumpState;
+    friend class PlayerStates::ClimbState;
+    friend class PlayerStates::AttackState;
     friend class PlayerStates::DamageState;
-	friend class PlayerStates::SwingState;
+    friend class PlayerStates::SwingState;
     friend class PlayerStates::SwingToKickState;
     friend class PlayerStates::LandState;
-	friend class PlayerStates::ShotState;
-	friend class PlayerStates::GrabState;
-	friend class PlayerStates::DodgeState;
-	friend class PlayerStates::ClimbTopState;
-	friend class PlayerStates::UltimateState;
+    friend class PlayerStates::ShotState;
+    friend class PlayerStates::GrabState;
+    friend class PlayerStates::DodgeState;
+    friend class PlayerStates::ClimbTopState;
+    friend class PlayerStates::UltimateState;
     friend class PlayerStates::DeathState;
-	friend class PlayerStates::CrouchIdleState;
-	friend class PlayerStates::TitleIdleState;
-
-private:
-	struct CollisionMesh
-	{
-		struct Triangle
-		{
-			DirectX::XMFLOAT3	positions[3];
-			DirectX::XMFLOAT3	normal;
-		};
-		std::vector<Triangle>	triangles;
-
-		struct Area
-		{
-			DirectX::BoundingBox	boundingBox;
-			std::vector<int>		triangleIndices;
-		};
-		std::vector<Area>		areas;
-	};
+    friend class PlayerStates::CrouchIdleState;
+    friend class PlayerStates::TitleIdleState;
 
 public:
-	Player(bool flag);
-	~Player();
-	static Player& Instance() { return *instance; }
+    // ステート
+    enum class State
+    {
+        Idle, Move, Jump, Land, Attack, Damage, Death, Dodge,
+        Climb, Swing, Shot, ClimbTop, Grab, CrouchIdle, TitleIdle,
+        SwingToKick, Ultimate, EventMode
+    };
 
-	// 更新処理
-	void Update(float elapsedTime);
+    // ロックオンステート
+    enum class LockonState
+    {
+        NotLocked,
+        Locked,
+    };
 
-	// デバッグ用GUI描画
-	void DrawDebugGUI();
+    Player(bool flag);
+    ~Player();
+    static Player& Instance() { return *instance; }
 
-	// 移動入力処理
-	bool InputMove(float elapsedTime);
+    // ステートマシン
+    PlayerStateMachine* stateMachine = nullptr;
+    //　モデル
+    std::unique_ptr<Model> model = nullptr;
 
-	// ジャンプ入力処理
-	bool InputJump();
+    // 関数
+    void Update(float elapsedTime);     // 更新処理
+    void DrawDebugGUI();                // デバッグ用GUI描画
+    bool InputMove(float elapsedTime);  // 移動入力処理
+    bool InputJump();                   // ジャンプ入力処理
+    bool InputProjectile();             //　弾丸の入力処理
+    bool InputAttack();                 // 攻撃入力処理
+    bool InputDodge();                  // Dodge入力処理
+    bool InputHealing();                //　回復入力処理
+    void DrawDebugPrimitive();          // デバッグプリミティブ描画
 
-	//　弾丸の入力処理
-	bool InputProjectile();
+    ///////////////////////////////////////////////////////////////////////////////////
+    //                              ゲッター・セッター                               //
+    ///////////////////////////////////////////////////////////////////////////////////
+    //弾丸
+    ProjectileManager& GetProjectileManager() { return projectileManager; }    //	弾丸のマネージャーを取る
+    BrokenProjectileManager& GetBrokenProjectileManager() { return brokenprojectileManager; }    //	破壊した弾丸のマネージャーを取る
 
-	// 攻撃入力処理
-	bool InputAttack();
-
-	// Dodge入力処理
-	bool InputDodge();
-
-    //　回復入力処理
-	bool InputHealing();
-
-	// ロックオンステート
-	enum class LockonState
-	{
-		NotLocked,
-		Locked,
-	};
-
-	// デバッグプリミティブ描画
-	void DrawDebugPrimitive();
-
-	//	弾丸のマネージャーを取る
-	ProjectileManager& GetProjectileManager() { return projectileManager; }
-	//	破壊した弾丸のマネージャーを取る（仮）
-	BrokenProjectileManager& GetBrokenProjectileManager() { return brokenprojectileManager; }
-	//	プレイヤーのロックステートを取る
-	LockonState GetlockonState() { return lockonState; }
-	//　ロック中の敵を取得
-	Enemy* GetLockonEnemy() const { return static_cast<Enemy*>(lockonEnemy); }
-	//	スイング位置を取得（仮）
-	DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }
-
-	bool GetFirstSwing() { return firstSwing; }
-    bool SetFirstSwing(bool first) { return firstSwing = first; }
-
-	//	記録されたスイングポイントを取得
-	DirectX::XMFLOAT3 GetPreviousSwingPoint() { return previousSwingPoint; }
-
-    //	攻撃予知フラグを取る
-	bool GetAttackSoon() { return getAttacksoon; }
-	void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
-    //  攻撃予知フラグを取る(Shot)
-    bool GetShotSoon() { return getShotsoon; }
+    //敵
+    Enemy* GetLockonEnemy() const { return static_cast<Enemy*>(lockonEnemy); }    //　ロック中の敵を取得
+    EnemyThief* GetAttackEnemy() { return attackEnemy; }                          //　今攻撃するの敵を取得する
+    void SetAttackEnemy(EnemyThief* enemy) { attackEnemy = enemy; }
+    bool GetAttackSoon() { return getAttacksoon; }                                //　攻撃予知フラグを取る
+    void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
+    bool GetShotSoon() { return getShotsoon; }                                    //  攻撃予知フラグを取る(Shot)
     void SetgetShotSoon(bool getshot) { getShotsoon = getshot; }
 
-	//　今攻撃するの敵を取得する	
-	EnemyThief* GetAttackEnemy() { return attackEnemy; }
-    void SetAttackEnemy(EnemyThief* enemy) { attackEnemy = enemy; }
+    //スイング
+    DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }    //	スイング位置を取得
+    DirectX::XMFLOAT3 GetPreviousSwingPoint() { return previousSwingPoint; }    //	記録されたスイングポイントを取得
 
-    //    投げ技フラグを取る
-	bool GetIsUseGrab() { return IsUseGrab; }
-    //    スイングキックフラグを取る
-    bool GetIsUseSwingKick() { return IsUseSwingKick; }
+    //　スキル
+    bool GetIsUseGrab() { return IsUseGrab; }               //    投げ技フラグを取る
+    bool GetIsUseSwingKick() { return IsUseSwingKick; }    //    スイングキックフラグを取る
+    float GetWebTimer() const { return webTimer; }    //  糸発射のタイマー
+    float GetSkillTime() const { return skillTime; }    //  スキルの回数を取る
 
-	std::unique_ptr<Model> model = nullptr;
-
-	//  糸発射のタイマー
-	float GetWebTimer() const { return webTimer; }
-
-    void SetVelocity(const DirectX::XMFLOAT3& velocity) { this->velocity = velocity; }
-
-	PlayerStateMachine* stateMachine = nullptr;
-
-	// ステート
-	enum class State
-	{
-		Idle,
-		Move,
-		Jump,
-		Land,
-		Attack,
-		Damage,
-		Death,
-		Dodge,
-		Climb,
-		Swing,
-		Shot,
-		ClimbTop,
-		Grab,
-		CrouchIdle,
-		TitleIdle,
-		SwingToKick,
-		Ultimate,
-
-		EventMode,
-	};
-
-
-	// ステート取得
-	const State& GetState() const { return state; }
+    // ステート
+    const State& GetState() const { return state; }
     State SetState(State state) { return this->state = state; }
     State ChangeState(State state) { return this->state = state; }
+    LockonState GetlockonState() { return lockonState; }    //	プレイヤーのロックステートを取る
 
-	float GetSkillTime() const { return skillTime; }
-
-	
 protected:
-
-	// ダメージを受けたときに呼ばれる
-	void OnDamaged() override;
-
-	// 死亡したときに呼ばれる
-	void OnDead() override;
-
-	//　着地の時に呼ばれる
-	void OnLanding() override;
+    // ダメージを受けたときに呼ばれる
+    void OnDamaged() override;
+    // 死亡したときに呼ばれる
+    void OnDead() override;
+    //　着地の時に呼ばれる
+    void OnLanding() override;
 
 private:
-	// プレイヤーとエネミーとの衝突処理
-	void CollisionPlayerVsEnemies();
-	//	弾丸と敵との衝突処理
-	void CollisionProjectileVsEnemies();
+    // コリジョンメッシュ
+    struct CollisionMesh
+    {
+        struct Triangle
+        {
+            DirectX::XMFLOAT3	positions[3];
+            DirectX::XMFLOAT3	normal;
+        };
+        std::vector<Triangle>	triangles;
 
-	// ノードとエネミーの衝突処理
-	void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);
+        struct Area
+        {
+            DirectX::BoundingBox	boundingBox;
+            std::vector<int>		triangleIndices;
+        };
+        std::vector<Area>		areas;
+    };
 
-	// カメラステートの更新
-	void UpdateCameraState(float elapsedTime);
+    // 唯一のinstance
+    static Player* instance;
+    //モデルノード
+    std::vector<Model::NodePose> nodePoses;
 
-	//	連撃攻撃のモーション
-	void PlayAttackAnimation();
+    ///////////////////////////////////////////////////////////////////////////////////
+    //                                   プレイヤー                                  //
+    ///////////////////////////////////////////////////////////////////////////////////
+    // ステート
+    State state = State::Idle;
+    State lastState;
 
-	//	壁端っこの判定
-	bool IsNearWallTop();
+    // 戦闘
+    bool attacking = false;    // 攻撃判定
+    float attackTimer = 0;
+    int attackCount = 0;    // 攻撃の回数
+    const int attackLimit = 3;
+    float attackRadius = 0.4f;    // 攻撃半径
+    bool attackCollisionFlag = false;
+    float maxAngleX = DirectX::XMConvertToRadians(35);
+    float mixAngleX = DirectX::XMConvertToRadians(-35);
+    bool getAttacksoon = false;    //	攻撃予知
+    bool getShotsoon = false;    //	攻撃予知
 
-	//	スイングポイントを探す
-	bool FindWallSwingPoint();
-
-    //	スイングの当たり判定
-    void SwingCollision(float elapsedTime);
-
-	// スイングの計算
-	void HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient);
-
-	//　投げ技Active
-	bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);
-
-
-private:
-	// 唯一のinstance
-	static Player* instance;
-	ProjectileManager projectileManager;
-	BrokenProjectileManager brokenprojectileManager;
-
-private:
-	// 移動ベクトル取得
-	DirectX::XMFLOAT3 GetMoveVec() const;
-	//　移動スビート
-	float moveSpeed = 5.0f;
-	//	クライミングスビート
-	float climbSpeed = 5.0f;
-	//	回転スビート
-	float turnSpeed = DirectX::XMConvertToRadians(720);
-	//　ジャンブスビート
-	float jumpSpeed = 16.0f;
-	//　ヒットエフェクト
-	std::unique_ptr<Effect> hitEffect = nullptr;
-    //	攻撃音
-	std::unique_ptr<AudioSource> punch = nullptr;
-	std::unique_ptr<AudioSource> punch2 = nullptr;
-	std::unique_ptr<AudioSource> kick = nullptr;
-	//  落とす音
-	std::unique_ptr<AudioSource> Fall = nullptr;
-	bool fallSoundPlayed = false;
-	//  スパイダーセンス
-    std::unique_ptr<AudioSource> spiderSense = nullptr;
-    bool spiderSensePlayed = false;
-
-    //　シュート音
-	std::unique_ptr<AudioSource> FirstSwing = nullptr;
-	std::unique_ptr<AudioSource> Swing = nullptr;
-	std::unique_ptr<AudioSource> ShotWeb = nullptr;
-	bool shotWebPlayed = false;
-
-    //  回復音
-	std::unique_ptr<AudioSource> Healing = nullptr;
-
-	//	ダメージ音
-	std::unique_ptr<AudioSource> Damage = nullptr;
-
-	// ステート
-	State state = State::Idle;
-	bool attackCollisionFlag = false;
-	float maxAngleX = DirectX::XMConvertToRadians(35);
-	float mixAngleX = DirectX::XMConvertToRadians(-35);
-	State lastState;
-
-	//モデルノード
-	std::vector<Model::NodePose> nodePoses;
-
-	// 攻撃半径
-	float attackRadius = 0.4f;
-	// 攻撃の回数
-	int attackCount = 0;
-	const int attackLimit = 3;
-	float attackTimer = 0;
-	//	攻撃判定
-	bool attacking = false;
-	//	攻撃予知
-	bool getAttacksoon = false;
-    bool getShotsoon = false;
-
-    //	攻撃対象
-    EnemyThief* attackEnemy = nullptr;
-
-	//	投げ技
-	bool IsUseGrab = false;
-
-    //　スイングキック
-    bool IsUseSwingKick = false;
-    //  回避の方向
-    DirectX::XMFLOAT3 dodgeDirection;
-
-
-	//カメラロック用
-	LockonState			lockonState = LockonState::NotLocked;
-	float				lockonTargetChangeTime = 0;
-	float				lockonTargetChangeTimeMax = 8;
-	Character*			lockonEnemy = nullptr;
-	DirectX::XMFLOAT3	lockDirection;
-	const float MAX_LOCKON_DISTANCE = 15.0f;
-
-private:
-	//壁当たり判定のチェック
-	DirectX::XMFLOAT3 checkpos;
-	DirectX::XMVECTOR checkDirection;
-
-	//糸用
-	//	スイングポイントの位置
-	DirectX::XMFLOAT3 swingPoint;
-	//	スイングポイントの方向
-	DirectX::XMFLOAT3 swingwebDirection;
-	DirectX::XMVECTOR SwingwebDirection;
-	//	初回のスイングを判定
-	bool firstSwing = true;
-    //連続スイングを避けるため
-    float swingCooldown = 0.3f;
+    // スイング
+    DirectX::XMFLOAT3 previousSwingPoint;        //	前回のスイングポイントを記録
+    DirectX::XMFLOAT3 swingPoint;    //	スイングポイントの位置
+    DirectX::XMFLOAT3 swingwebDirection;    //	スイングポイントの方向
+    DirectX::XMVECTOR SwingwebDirection;
+    bool firstSwing = true;    //	初回のスイングを判定
+    float swingCooldown = 0.3f;    //連続スイングを避けるため
     float swingCooldownTimer = 0.0f;
     bool canSwing = true;
 
-	//	前回のスイングポイントを記録
-	DirectX::XMFLOAT3 previousSwingPoint;
-	// 糸のタイマー
-	float webTimer;
-	float skillTime;
-    float skillTimeMax = 5.0f;
+    // カメラロック用
+    LockonState			lockonState = LockonState::NotLocked;
+    float				lockonTargetChangeTime = 0;
+    float				lockonTargetChangeTimeMax = 8;
+    Character* lockonEnemy = nullptr;
+    DirectX::XMFLOAT3	lockDirection;
+    const float MAX_LOCKON_DISTANCE = 15.0f;
 
-	float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
+    // 投げ技・必殺技用
+    bool IsUseGrab = false;         // 投げ技
+    float webTimer;                 // 糸のタイマー
+    bool IsUseSwingKick = false;    // スイングキック
+    float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
+    float skillTime;                // 
+    float skillTimeMax = 5.0f;      // 
 
-	
+    // 音・エフェクト
+    std::unique_ptr<Effect> hitEffect = nullptr;        //　ヒットエフェクト
+    std::unique_ptr<AudioSource> punch = nullptr;       //	攻撃音
+    std::unique_ptr<AudioSource> punch2 = nullptr;      //	攻撃音
+    std::unique_ptr<AudioSource> kick = nullptr;        //	攻撃音
+    std::unique_ptr<AudioSource> Fall = nullptr;        //  落とす音
+    bool fallSoundPlayed = false;
+    std::unique_ptr<AudioSource> spiderSense = nullptr; //  スパイダーセンス
+    bool spiderSensePlayed = false;
+    std::unique_ptr<AudioSource> FirstSwing = nullptr;  //　シュート音
+    std::unique_ptr<AudioSource> Swing = nullptr;       //　シュート音
+    std::unique_ptr<AudioSource> ShotWeb = nullptr;     //　シュート音
+    bool shotWebPlayed = false;
+    std::unique_ptr<AudioSource> Healing = nullptr;     //  回復音
+    std::unique_ptr<AudioSource> Damage = nullptr;      //	ダメージ音
+
+    // 弾丸
+    ProjectileManager projectileManager;
+    BrokenProjectileManager brokenprojectileManager;
+
+    // 壁当たり判定のチェック
+    DirectX::XMFLOAT3 checkpos;
+    DirectX::XMVECTOR checkDirection;
+
+    // 移動
+    float moveSpeed = 5.0f;                                //　移動スビート
+    float climbSpeed = 5.0f;                               //　クライミングスビート
+    float turnSpeed = DirectX::XMConvertToRadians(720);    //　回転スビート
+    float jumpSpeed = 16.0f;                               //　ジャンブスビート
+    DirectX::XMFLOAT3 dodgeDirection;                      //  回避の方向
+
+    // 敵
+    EnemyThief* attackEnemy = nullptr;                     //　攻撃対象
+
+    // 関数
+    void CollisionPlayerVsEnemies();    // プレイヤーとエネミーとの衝突処理
+    void CollisionProjectileVsEnemies();    //	弾丸と敵との衝突処理
+    void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);    // ノードとエネミーの衝突処理
+    void UpdateCameraState(float elapsedTime);    // カメラステートの更新
+    void PlayAttackAnimation();    //	連撃攻撃のモーション
+    bool IsNearWallTop();    //	壁端っこの判定
+    bool FindWallSwingPoint();    //	スイングポイントを探す
+    void SwingCollision(float elapsedTime);    //	スイングの当たり判定
+    // スイングの計算
+    void HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient);
+    //　投げ技Active
+    bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);
+    DirectX::XMFLOAT3 GetMoveVec() const;    // 移動ベクトル取得
 };
 

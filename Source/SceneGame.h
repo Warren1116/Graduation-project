@@ -25,58 +25,40 @@ public:
     ~SceneGame() override {}
     static SceneGame& Instance() { return *instance; }
 
-    enum class TutorialState
-    {
-        First,
-        Move,
-        Jump,
-        Attack,
-        Shot,
-        CameraLock,
-        Grab,
-        Swing,
-        Climb,
-        Dodge,
-        Healing,
-        Ultimate,
+    // チュートリアルステート
+    enum class TutorialState {
+        First, Move, Jump, Attack, Shot, CameraLock,
+        Grab, Swing, Climb, Dodge, Healing, Ultimate,
         Finish,
     };
 
-    // 初期化
-    void Initialize() override;
+    //関数
+    void Initialize() override;                 // 初期化
+    void Finalize() override;                   // 終了化
+    void Update(float elapsedTime) override;    // 更新処理
+    void Render() override;                     // 描画処理
 
-    // 終了化
-    void Finalize() override;
 
-    // 更新処理
-    void Update(float elapsedTime) override;
-
-    // 描画処理
-    void Render() override;
-
-    //　チュトリアル時用の判定
-    bool tutorialPause = false;
-    bool GetIsTutorialPaused() { return tutorialPause; }
-    //  チュトリアルステートの更新処理
-    void UpdateTutorialState(float elapsedTime);
-    //  チュトリアル始まる時にの設定
-    void SceneGame::StartTutorial(TutorialState newState);
-    //  チュトリアルステートの変更
-    void SceneGame::AdvanceTutorialState(TutorialState newState);
-    //  チュトリアルのタイマーチェック
-    void SceneGame::CheckTutorialTimeout(float timeout);
-
-    //  チュトリアル
-    TutorialState GetTutorialState() { return tutorialState; }
-    void SetTutorialState(TutorialState newstate) { tutorialState = newstate; }
+    //　チュトリアル
+    void UpdateTutorialState(float elapsedTime);        //  チュトリアルステートの更新処理
+    void StartTutorial(TutorialState newState);         //  チュトリアル始まる時にの設定
+    void AdvanceTutorialState(TutorialState newState);    //  チュトリアルステートの変更
+    void CheckTutorialTimeout(float timeout);           //  チュトリアルのタイマーチェック
+    TutorialState GetTutorialState()
+    { return tutorialState; }                           //  チュトリアルの状態を取得
+    void SetTutorialState(TutorialState newstate)
+    { tutorialState = newstate; }                       //  チュトリアルの状態を設定
+    bool GetIsTutorialPaused() 
+    { return tutorialPause; }                           //  チュトリアルが一時停止中かどうかを取得
     void UnpauseGame();
     void PauseGame();
 
-    //  pause中の操作方法
-    bool isTutorial = false;
-    //  pause
-    bool isPaused = false;
+    bool tutorialPause = false;     //　チュトリアル時用の判定
+    bool isTutorial = false;        //  pause中の操作方法
+    bool isPaused = false;          //  pause
 
+    //  カメラの状態を更新
+    void UpdateCameraState(float elapsedTime);
 
     //  コントローラーの使用判定
     bool GetIsUseController() { return UseController; }
@@ -94,25 +76,19 @@ public:
     int GetTotalWaves() { return totalWaves; }
     bool IsNextWave() const;
 
-    //  カメラの状態を更新
-    void UpdateCameraState(float elapsedTime);
-
+    // レンダラー
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 
-    //	シャドウマップ用深度ステンシルバッファ
-    std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];
-    //	ライトビュープロジェクション行列
-    DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];
-    //	深度比較用のオフセット値
-    float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };
-    //	影の色
-    DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
-
+    // シャドウ情報
+    std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];    //	シャドウマップ用深度ステンシルバッファ
+    DirectX::XMFLOAT4X4 lightViewProjection[ShadowmapCount];                //	ライトビュープロジェクション行列
+    float shadowBias[ShadowmapCount] = { 0.001f,0.002f,0.004f,0.01f };      //	深度比較用のオフセット値
+    DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };                     //	影の色
     float shadowDrawRect = 500.0f;
 
-    // COLLISION_MESH
+    // コリジョンメッシュ
     DirectX::XMFLOAT4X4 transform;
     DirectX::XMFLOAT3 intersection_position;
     DirectX::XMFLOAT3 intersection_normal;
@@ -123,8 +99,11 @@ public:
     static bool tutorialCompleted;
 
 private:
+    //  プレイヤーとカメラコントローラー
     std::unique_ptr<Player> player;
     std::unique_ptr<CameraController> cameraController;
+
+    // UIスプライト
     std::unique_ptr<Sprite> Pause;
     std::unique_ptr<Sprite> PauseBackGround;
     std::unique_ptr<Sprite> ToTitle;
@@ -133,14 +112,14 @@ private:
     std::unique_ptr<Sprite> ControllerFont;
     std::unique_ptr<Sprite> KeyBoardPicture;
     std::unique_ptr<Sprite> KeyBoardFont;
-    bool ControllerButton = false;
-    bool KeyBoardButton = false;
-    DirectX::XMFLOAT3 cameraPos;
-    DirectX::XMFLOAT3 cameraAngle;
 
     //BGM
     std::unique_ptr<AudioSource> Bgm = nullptr;
 
+    bool ControllerButton = false;
+    bool KeyBoardButton = false;
+    DirectX::XMFLOAT3 cameraPos;
+    DirectX::XMFLOAT3 cameraAngle;
 
     // ボタンの透明度
     float alpha = 1.0f;
@@ -153,15 +132,11 @@ private:
     //  メインライト
     Light* mainDirectionalLight = nullptr;
 
-private:
-    //  ウェーブのカウンター
-    int currentWave = -1;
-    //  ウェーブの最大数
-    int totalWaves = 5;
-    //  ウェーブ進行中かどうか
-    bool waveInProgress = false;
-    //  次のウェーブのタイマー
-    float nextWaveTimer = 0.0f;
+    //Wave
+    int currentWave = -1;           //  ウェーブのカウンター
+    int totalWaves = 5;             //  ウェーブの最大数
+    bool waveInProgress = false;    //  ウェーブ進行中かどうか
+    float nextWaveTimer = 0.0f;     //  次のウェーブのタイマー
 
     //  ウェーブの敵を生成する
     void SpawnEnemiesForWave(int wave);
@@ -169,11 +144,6 @@ private:
     void StartNextWave();
     //  ウェーブのクリアチェック
     void CheckWaveClear();
-
-
-private:
-    static SceneGame* instance;
-    Light* spotLights[3];
 
     //  MetaAIオブジェクト追加
     std::unique_ptr<Meta> meta = nullptr;
@@ -187,7 +157,6 @@ private:
     bool firstTimeHealing = true;
     bool firstTimeUltimate = true;
 
-
     //pause時コントローラーの選択判定
     DirectX::XMFLOAT2 controllerPos;
     bool UseController;
@@ -197,4 +166,7 @@ private:
 
     //  カメラタイマー
     float cameraTimer;
+
+    // インスタンス
+    static SceneGame* instance;
 };

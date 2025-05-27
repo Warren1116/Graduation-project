@@ -3,25 +3,9 @@
 #include "Graphics\LineRenderer.h"
 #include "Audio/Audio.h"
 
-
-//#include "Player.h"
-//class Player;
-//
-//class PlayerState
-//{
-//public:
-//    PlayerState(Player* player) : owner(player) {}
-//    virtual ~PlayerState() {}
-//    virtual void Enter() = 0;
-//    virtual void Execute(float elapsedTime) = 0;
-//    virtual void Exit() = 0;
-//protected:
-//    Player* owner;
-//};
-
-
 namespace PlayerStates
 {
+    //待機ステート
     class IdleState : public PlayerState
     {
     public:
@@ -32,6 +16,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //移動ステート
     class MoveState : public PlayerState
     {
     public:
@@ -42,6 +27,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //ジャンプステート
     class JumpState : public PlayerState
     {
     public:
@@ -52,6 +38,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //着地ステート
     class LandState : public PlayerState
     {
     public:
@@ -62,6 +49,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //攻撃ステート
     class AttackState : public PlayerState
     {
     public:
@@ -72,6 +60,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //ダメージステート
     class DamageState : public PlayerState
     {
     public:
@@ -82,6 +71,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //死亡ステート
     class DeathState : public PlayerState
     {
     public:
@@ -92,6 +82,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //回避ステート
     class DodgeState : public PlayerState
     {
     public:
@@ -102,6 +93,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //クライミングステート
     class ClimbState : public PlayerState
     {
     public:
@@ -112,6 +104,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //スイングステート
     class SwingState : public PlayerState
     {
     public:
@@ -122,6 +115,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //ショットステート
     class ShotState : public PlayerState
     {
     public:
@@ -132,6 +126,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //クライムトップステート
     class ClimbTopState : public PlayerState
     {
     public:
@@ -142,6 +137,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //グラブステート
     class GrabState : public PlayerState
     {
     public:
@@ -152,6 +148,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //待機用
     class CrouchIdleState : public PlayerState
     {
     public:
@@ -162,6 +159,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //待機用
     class TitleIdleState : public PlayerState
     {
     public:
@@ -172,6 +170,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //スイングキックステート
     class SwingToKickState : public PlayerState
     {
     public:
@@ -182,6 +181,7 @@ namespace PlayerStates
         void Exit()override;
     };
 
+    //必殺技ステート
     class UltimateState : public PlayerState
     {
     public:

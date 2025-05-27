@@ -932,9 +932,7 @@ void Player::DrawDebugPrimitive()
                 attackRadius,
                 DirectX::XMFLOAT4(1, 0, 0, 1));
         }
-
     }
-
 }
 
 // ƒWƒƒƒ“ƒv“ü—Íˆ—
@@ -983,7 +981,6 @@ bool Player::FindWallSwingPoint()
     previousSwingPoint = swingPoint;
 
     return false;
-
 }
 
 void Player::SwingCollision(float elapsedTime)

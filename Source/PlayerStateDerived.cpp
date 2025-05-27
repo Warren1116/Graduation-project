@@ -6,6 +6,7 @@
 #include "scenemanager.h"
 #include "SceneLoading.h"
 
+// 待機ステート
 void PlayerStates::IdleState::Enter()
 {
     owner->state = Player::State::Idle;
@@ -28,7 +29,6 @@ void PlayerStates::IdleState::Enter()
         DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&owner->velocity);
         velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
         DirectX::XMStoreFloat3(&owner->velocity, velocityVec);
-
     }
 
     //　クライミング中なら別の待機モーション
@@ -46,10 +46,10 @@ void PlayerStates::IdleState::Enter()
         owner->attackTimer = 0;
         owner->attackCount = 0;
         owner->attacking = false;
-
     }
-
 }
+
+// 待機ステートで実行するメソッド
 void PlayerStates::IdleState::Execute(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -62,10 +62,9 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
     }
 
     //ジャンプ入力処理
-    if (owner->InputJump())
+    if (owner->isGround && owner->InputJump())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
-
     }
 
     if (!owner->onClimb)
@@ -104,7 +103,6 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
             owner->IsUseGrab = true;
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Grab));
         }
-
     }
 
     //  必殺技入力処理
@@ -115,14 +113,13 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Ultimate));
         }
     }
-
-
-
 }
 void PlayerStates::IdleState::Exit()
 {
+    //なんもしないので
 }
 
+// 移動ステート
 void PlayerStates::MoveState::Enter()
 {
     if (!owner->attacking)
@@ -138,6 +135,7 @@ void PlayerStates::MoveState::Enter()
     }
 }
 
+// 移動ステートで実行するメソッド
 void PlayerStates::MoveState::Execute(float elapsedTime)
 {
     if (!owner->canSwing)
@@ -183,7 +181,7 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
     }
 
     //　もし目の前に壁がいない、ジャンプ入力処理
-    if (!owner->hitWall && owner->InputJump())
+    if (!owner->hitWall && owner->isGround && owner->InputJump() )
     {
         //ジャンブステートへの遷移
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
@@ -231,8 +229,10 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
 
 void PlayerStates::MoveState::Exit()
 {
+    // なんもしないので
 }
 
+// ジャンプステート
 void PlayerStates::JumpState::Enter()
 {
     owner->state = Player::State::Jump;
@@ -240,6 +240,7 @@ void PlayerStates::JumpState::Enter()
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Jump), false);
 }
 
+// ジャンプステートで実行するメソッド
 void PlayerStates::JumpState::Execute(float elapsedTime)
 {
     if (owner->InputAttack())
@@ -284,6 +285,7 @@ void PlayerStates::JumpState::Exit()
 {
 }
 
+// 着地ステート
 void PlayerStates::LandState::Enter()
 {
     //  スイング同時に着地すると、velocityの影響で床に滑るので
@@ -298,6 +300,7 @@ void PlayerStates::LandState::Enter()
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Landing), false);
 }
 
+// 着地ステートで実行するメソッド
 void PlayerStates::LandState::Execute(float elapsedTime)
 {
     owner->onClimb = false;
@@ -311,6 +314,7 @@ void PlayerStates::LandState::Exit()
 {
 }
 
+// スイングステート
 void PlayerStates::AttackState::Enter()
 {
     owner->state = Player::State::Attack;
@@ -387,20 +391,22 @@ void PlayerStates::AttackState::Execute(float elapsedTime)
         case 3:
             owner->CollisionNodeVsEnemies("mixamorig:RightFoot", owner->attackRadius + 0.2f);
             break;
-
         }
-
     }
 }
+
 void PlayerStates::AttackState::Exit()
 {
 }
 
+// ショットステート
 void PlayerStates::ShotState::Enter()
 {
     owner->state = Player::State::Shot;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Shoting), false);
 }
+
+// ショットステートで実行するメソッド
 void PlayerStates::ShotState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation())
@@ -408,11 +414,13 @@ void PlayerStates::ShotState::Execute(float elapsedTime)
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 }
+
 void PlayerStates::ShotState::Exit()
 {
 
 }
 
+// 死亡ステート
 void PlayerStates::DeathState::Enter()
 {
     //  死亡したらHPを0にする
@@ -427,6 +435,7 @@ void PlayerStates::DeathState::Enter()
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Death), false);
 }
 
+// 死亡ステートで実行するメソッド
 void PlayerStates::DeathState::Execute(float elapsedTime)
 {
     //　モーションが終わったらシーンを切り替える
@@ -440,7 +449,7 @@ void PlayerStates::DeathState::Exit()
 {
 }
 
-
+// 回避ステート
 void PlayerStates::DodgeState::Enter()
 {
     owner->state = Player::State::Dodge;
@@ -451,6 +460,7 @@ void PlayerStates::DodgeState::Enter()
 
 }
 
+// 回避ステートで実行するメソッド
 void PlayerStates::DodgeState::Execute(float elapsedTime)
 {
     //無敵時間
@@ -474,6 +484,7 @@ void PlayerStates::DodgeState::Exit()
 {
 }
 
+// クライミングステート
 void PlayerStates::ClimbState::Enter()
 {
     owner->state = Player::State::Climb;
@@ -488,6 +499,7 @@ void PlayerStates::ClimbState::Enter()
     owner->onSwing = false;
 }
 
+// クライミングステートで実行するメソッド
 void PlayerStates::ClimbState::Execute(float elapsedTime)
 {
     //　クライミング中Spaceキー押せば元の状態に戻る
@@ -517,6 +529,7 @@ void PlayerStates::ClimbState::Exit()
 {
 }
 
+// ダメージステート
 void PlayerStates::DamageState::Enter()
 {
     owner->state = Player::State::Damage;
@@ -533,6 +546,8 @@ void PlayerStates::DamageState::Enter()
     GamePad& gamePad = Input::Instance().GetGamePad();
     gamePad.SetVibration(0.5f, 0.5f);
 }
+
+// ダメージステートで実行するメソッド
 void PlayerStates::DamageState::Execute(float elapsedTime)
 {
     // ダメージアニメーションが終わったら待機ステートへ遷移
@@ -545,10 +560,12 @@ void PlayerStates::DamageState::Execute(float elapsedTime)
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 }
+
 void PlayerStates::DamageState::Exit()
 {
 }
 
+// スイングステート
 void PlayerStates::SwingState::Enter()
 {
     if (owner->onClimb) return;
@@ -621,6 +638,7 @@ void PlayerStates::SwingState::Enter()
     }
 }
 
+// スイングステートで実行するメソッド
 void PlayerStates::SwingState::Execute(float elapsedTime)
 {
     //スイングの当たり判定
@@ -643,12 +661,14 @@ void PlayerStates::SwingState::Exit()
 {
 }
 
+// クライミングの頂上ステート
 void PlayerStates::ClimbTopState::Enter()
 {
     owner->state = Player::State::ClimbTop;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_ClimbUpWall), false);
 }
 
+// クライミングの頂上ステートで実行するメソッド
 void PlayerStates::ClimbTopState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation()) owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
@@ -658,6 +678,7 @@ void PlayerStates::ClimbTopState::Exit()
 {
 }
 
+// 投げ技ステート
 void PlayerStates::GrabState::Enter()
 {
     owner->state = Player::State::Grab;
@@ -667,6 +688,7 @@ void PlayerStates::GrabState::Enter()
     owner->getShotsoon = false;
 }
 
+// 投げ技ステートで実行するメソッド
 void PlayerStates::GrabState::Execute(float elapsedTime)
 {
     owner->webTimer += elapsedTime;
@@ -747,12 +769,14 @@ void PlayerStates::GrabState::Exit()
 {
 }
 
+// タイトル待機ステート
 void PlayerStates::CrouchIdleState::Enter()
 {
     owner->state = Player::State::CrouchIdle;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_CrouchIdle), false);
 }
 
+// 待機ステートで実行するメソッド
 void PlayerStates::CrouchIdleState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation())
@@ -766,6 +790,7 @@ void PlayerStates::CrouchIdleState::Exit()
 
 }
 
+// タイトル待機ステート
 void PlayerStates::TitleIdleState::Enter()
 {
     owner->state = Player::State::TitleIdle;
@@ -781,6 +806,7 @@ void PlayerStates::TitleIdleState::Exit()
 {
 }
 
+// スイングキックステート
 void PlayerStates::SwingToKickState::Enter()
 {
     owner->state = Player::State::SwingToKick;
@@ -809,6 +835,7 @@ void PlayerStates::SwingToKickState::Enter()
     }
 }
 
+// スイングキックステートで実行するメソッド
 void PlayerStates::SwingToKickState::Execute(float elapsedTime)
 {
     //スイングの当たり判定
@@ -835,6 +862,7 @@ void PlayerStates::SwingToKickState::Exit()
 {
 }
 
+// 必殺技ステート
 void PlayerStates::UltimateState::Enter()
 {
     owner->state = Player::State::Ultimate;
@@ -842,6 +870,7 @@ void PlayerStates::UltimateState::Enter()
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Ultimate), false);
 }
 
+// 必殺技ステートで実行するメソッド
 void PlayerStates::UltimateState::Execute(float elapsedTime)
 {
     static float timeSinceLastShot = 0.0f;
@@ -881,7 +910,6 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
             directions.push_back({ x, y, z });
         }
     }
-
     // プレイヤーの位置を取得
     DirectX::XMFLOAT3 playerPos = { owner->position.x,owner->position.y + 1.0f,owner->position.z };
 
@@ -910,7 +938,6 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
             {
                 sceneGame.RegisterRenderModel(projectile->GetModel());
             }
-
             shotsPerDirection++;
         }
         else
@@ -947,7 +974,6 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
             enemy->ApplyDamage(50, 0.5f); // ダメージ量と無敵時間を設定
         }
     }
-
 }
 
 void PlayerStates::UltimateState::Exit()
