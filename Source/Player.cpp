@@ -42,7 +42,10 @@ Player::Player(bool flag)
 
     scale.x = scale.y = scale.z = 0.01f;
 
+    // ステートマシン
     stateMachine = new PlayerStateMachine();
+
+    // ステートの登録
     stateMachine->RegisterState(new PlayerStates::IdleState(this));
     stateMachine->RegisterState(new PlayerStates::MoveState(this));
     stateMachine->RegisterState(new PlayerStates::JumpState(this));
@@ -61,8 +64,10 @@ Player::Player(bool flag)
     stateMachine->RegisterState(new PlayerStates::SwingToKickState(this));
     stateMachine->RegisterState(new PlayerStates::UltimateState(this));
 
+    // 初期状態設定
     stateMachine->SetState(static_cast<int>(State::CrouchIdle));
 
+    // エフェクト
     hitEffect = std::make_unique<Effect>("Data/Effect/hitEffect.efk");
 
     // サウンド読み込み
@@ -86,7 +91,6 @@ Player::Player(bool flag)
     Damage = Audio::Instance().LoadAudioSource("Data/Audio/Damage.wav");
 
     skillTime = 5.0f;
-
 }
 
 
@@ -250,7 +254,6 @@ void Player::CollisionPlayerVsEnemies()
 
             // 押し出し後の位置設定
             enemy->SetPosition(outPosition);
-
         }
     }
 }
@@ -332,7 +335,6 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                             {
                                 skillTime += 0.1f;
                             }
-
                         }
                     }
                 }
@@ -366,6 +368,7 @@ bool Player::IsNearWallTop()
     const float frontCheckDistance = 1.0f;
     const float verticalOffset = 0.5f;
 
+    //　前方のチェック位置を計算
     DirectX::XMFLOAT3 front = GetFront();
     DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
     DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
@@ -401,7 +404,6 @@ bool Player::IsNearWallTop()
         return true;
     }
     return false;
-
 }
 
 //　カメラステート更新処理
@@ -437,6 +439,7 @@ void Player::UpdateCameraState(float elapsedTime)
         return;
     }
 
+    // ステートに応じてカメラの状態を更新
     switch (state)
     {
     case State::Idle:
@@ -481,6 +484,7 @@ void Player::UpdateCameraState(float elapsedTime)
                         if (character == this || character->GetHealth() <= 0 || character == nullptr)
                             continue;
 
+                        //　ロックオンじゃなかったら
                         if (lockonState != LockonState::NotLocked)
                         {
                             p = DirectX::XMLoadFloat3(&position);
@@ -504,6 +508,7 @@ void Player::UpdateCameraState(float elapsedTime)
                         }
                         else
                         {
+                            //　一番近い敵を設定する
                             p = DirectX::XMLoadFloat3(&position);
                             t = DirectX::XMLoadFloat3(&character->GetPosition());
                             v = DirectX::XMVectorSubtract(t, p);
@@ -519,6 +524,7 @@ void Player::UpdateCameraState(float elapsedTime)
                         }
                     }
 
+                    // ロックオン敵が見つかったらカメラをロックオンモードに変更
                     if (lockonEnemy)
                     {
                         lockonState = LockonState::Locked;
@@ -728,7 +734,6 @@ bool Player::InputProjectile()
             sceneGame.RegisterRenderModel(projectile->GetModel());
 
         }
-
         return true;
     }
     return false;
@@ -782,7 +787,6 @@ void Player::CollisionProjectileVsEnemies()
                         impulse.z = vz * power;
                         enemy->AddImpulse(impulse);
                     }
-
                     //エフェクト生成
                     {
                         DirectX::XMFLOAT3 e = enemy->GetPosition();
@@ -886,7 +890,6 @@ void Player::DrawDebugPrimitive()
     debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
 
     projectileManager.DrawDebugPrimitive();
-
 
     //  SwingToKick攻撃範囲
     {
@@ -1167,8 +1170,6 @@ void Player::HandleSwingPhysics(float elapsedTime, float ropeLength, float gravi
             DirectX::XMStoreFloat3(&front, swingDir);
         }
     }
-
-
 }
 
 //　投げ技Active
@@ -1261,7 +1262,6 @@ void Player::DrawDebugGUI()
             }
             ImGui::Text(u8"State　%s", str.c_str());
         }
-
     }
     ImGui::End();
 }
