@@ -29,7 +29,7 @@ EnemyThief::EnemyThief()
 
     // ステートマシンにメッセージを受信したときの１層目のステートを追加登録
     stateMachine->RegisterState(new EnemyStates::RecieveState(this));
-    stateMachine->RegisterState(new EnemyStates::DeadState(this));
+
 
     // 各親ステートにサブステートを登録
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new EnemyStates::WanderState(this));
@@ -69,7 +69,6 @@ void EnemyThief::Update(float elapsedTime)
             SceneGame::Instance().UnregisterRenderModel(model.get());
             Destroy();
         }
-        
     }
 
     //　PlayerのGrabに攻撃される時

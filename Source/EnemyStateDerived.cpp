@@ -548,39 +548,6 @@ void EnemyStates::DamageState::Exit()
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
-//                                                          子DeadState（BattleState）
-//-----------------------------------------------------------------------------------------------------------------------------------------
-// 死亡ステートに入った時のメソッド
-void EnemyStates::DeadState::Enter()
-{
-    // 死亡モーション再生
-    {
-        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
-    }
-    // 攻撃権を放棄
-    Meta::Instance().SendMessaging(
-        owner->GetId(),
-        static_cast<int>(Meta::Identity::Meta),
-        MESSAGE_TYPE::MsgChangeAttackRight);
-}
-
-// 死亡ステートで実行するメソッド
-void EnemyStates::DeadState::Execute(float elapsedTime)
-{
-
-    if (!owner->GetModel()->IsPlayAnimation())
-    {
-        SceneGame::Instance().UnregisterRenderModel(owner->GetModel());
-        owner->Destroy();
-    }
-}
-
-// 死亡ステートから出ていくときのメソッド
-void EnemyStates::DeadState::Exit()
-{
-}
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
 //                                                          親RecieveState
 //-----------------------------------------------------------------------------------------------------------------------------------------
 // メタAIからメッセージを受信したときに呼ばれるステートを追加

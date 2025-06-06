@@ -203,17 +203,4 @@ namespace EnemyStates
         void Exit() override;
     };
 
-    // 死亡ステートオブジェクト
-    class  DeadState : public EnemyHierarchicalState
-    {
-    public:
-        DeadState(EnemyThief* enemy) : EnemyHierarchicalState(enemy) {};
-        ~DeadState() {}
-        // ステートに入ったときのメソッド
-        void Enter() override;
-        // ステートで実行するのメソッド
-        void Execute(float elapsedTime) override;
-        // ステートから出ていくときのメソッド
-        void Exit() override;
-    };
 }
