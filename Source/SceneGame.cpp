@@ -25,8 +25,8 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-#define TUTORIAL
-//#define DEBUG
+//#define TUTORIAL
+#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;

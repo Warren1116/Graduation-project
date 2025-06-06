@@ -5,6 +5,7 @@
 #include "SceneGame.h"
 
 
+
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //                                                          親SearchState
 //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -142,6 +143,11 @@ EnemyStates::BattleState::~BattleState()
 
 void EnemyStates::BattleState::Enter()
 {
+    if (owner->GetHealth() <= 0)
+    {
+        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Dead));
+        return;
+    }
     SetSubState(static_cast<int>(EnemyThief::Battle::Pursuit));
 }
 
@@ -160,12 +166,6 @@ void EnemyStates::BattleState::Exit()
 // 追跡ステートに入った時のメソッド
 void EnemyStates::PursuitState::Enter()
 {
-    if (owner->GetHealth() <= 0)
-    {
-        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
-        return;
-    }
-
     owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Run), true);
     owner->SetStateTimer(Mathf::RandomRange(3.0f, 5.0f));
 
@@ -183,7 +183,7 @@ void EnemyStates::PursuitState::Execute(float elapsedTime)
 {
     if (owner->GetHealth() <= 0)
     {
-        owner->GetStateMachine()->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
+        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Dead));
         return;
     }
     if (!owner->IsGetThrow())
@@ -554,11 +554,6 @@ void EnemyStates::DamageState::Exit()
 void EnemyStates::DeadState::Enter()
 {
     // 死亡モーション再生
-    //if (owner->IsGetThrow())
-    //{
-    //    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GetThrow), false);
-    //}
-    //else
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
     }

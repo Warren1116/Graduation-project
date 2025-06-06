@@ -29,6 +29,7 @@ EnemyThief::EnemyThief()
 
     // ステートマシンにメッセージを受信したときの１層目のステートを追加登録
     stateMachine->RegisterState(new EnemyStates::RecieveState(this));
+    stateMachine->RegisterState(new EnemyStates::DeadState(this));
 
     // 各親ステートにサブステートを登録
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new EnemyStates::WanderState(this));
@@ -38,7 +39,6 @@ EnemyThief::EnemyThief()
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::PunchState(this));
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::ShotState(this));
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::DamageState(this));
-    stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Battle), new EnemyStates::DeadState(this));
 
     // ステートマシンにメッセージを受信したときのサブステートを追加登録
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Recieve), new EnemyStates::CalledState(this));
@@ -61,6 +61,17 @@ EnemyThief::~EnemyThief()
 
 void EnemyThief::Update(float elapsedTime)
 {
+    if (!isAlive)
+    {
+        deadTimer++;
+        if (deadTimer > deadTimerMax)
+        {
+            SceneGame::Instance().UnregisterRenderModel(model.get());
+            Destroy();
+        }
+        
+    }
+
     //　PlayerのGrabに攻撃される時
     if (Player::Instance().GetIsUseGrab() && IsLockedOn)
     {
@@ -120,10 +131,9 @@ void EnemyThief::Update(float elapsedTime)
 
             GetThrowFlag = false;
         }
-
     }
 
-    //  HPは0以上と投げ技されてないならステージマシン更新
+    //  投げ技されてないならステージマシン更新
     if (!Player::Instance().GetIsUseGrab())
     {
         stateMachine->Update(elapsedTime);
@@ -154,10 +164,15 @@ void EnemyThief::Update(float elapsedTime)
 // 死亡した時に呼ばれる
 void EnemyThief::OnDead()
 {
+    isAlive = false;
     CharacterManager::Instance().Remove(this);
     Player::Instance().SetgetShotSoon(false);
-    stateMachine->SetState(static_cast<int>(State::Battle));
-    stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Dead));
+    model->PlayAnimation(static_cast<int>(EnemyAnimation::Die), false);
+
+    Meta::Instance().SendMessaging(
+        GetId(),
+        static_cast<int>(Meta::Identity::Meta),
+        MESSAGE_TYPE::MsgChangeAttackRight);
 }
 
 void EnemyThief::OnDamaged()
@@ -314,10 +329,7 @@ void EnemyThief::DrawDebugGUI()
         {
             subStr = "Damage";
         }
-        if (stateMachine->GetState()->GetSubStateIndex() == static_cast<int>(EnemyThief::Battle::Dead))
-        {
-            subStr = "Dead";
-        }
+
         break;
     case State::Recieve:
         if (stateMachine->GetStateIndex() == static_cast<int>(EnemyThief::Recieve::Called))

@@ -21,10 +21,10 @@ public:
     ~EnemyThief()override;
 
     // ステート
-    enum class State { Search, Battle, Recieve, Max };  //親ステート
+    enum class State { Search, Battle, Recieve, Dead, Max };  //親ステート
     enum class Search { Wander, Idle, Max };            //子 (Search用)
     enum class Battle { Pursuit, Attack, Punch, Shot,
-        Damage, Dead, Standby, Max };                   //子 (Battle用)
+        Damage, Standby, Max };                   //子 (Battle用)
     enum class Recieve { Called, Max };                 //子（MetaAI用）
 
     enum class AttackType { Null, Punch, Shot };        //攻撃の種類
@@ -101,6 +101,8 @@ private:
     float webTimer;
     bool GetThrowFlag;
 
+    float deadTimer = 0.0f;    // 死亡時のタイマー
+    float deadTimerMax = 120.0f;    // 死亡時のタイマー最大値
 
 
 };

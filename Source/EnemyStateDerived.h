@@ -204,10 +204,10 @@ namespace EnemyStates
     };
 
     // 死亡ステートオブジェクト
-    class  DeadState : public EnemyState
+    class  DeadState : public EnemyHierarchicalState
     {
     public:
-        DeadState(EnemyThief* enemy) : EnemyState(enemy) {};
+        DeadState(EnemyThief* enemy) : EnemyHierarchicalState(enemy) {};
         ~DeadState() {}
         // ステートに入ったときのメソッド
         void Enter() override;

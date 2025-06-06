@@ -45,6 +45,7 @@ bool Character::ApplyDamage(int damage, float invincibleTime)
     // 死亡通知
     if (health <= 0)
     {
+        isAlive = false;
         OnDead();
     }
     // ダメージ通知
