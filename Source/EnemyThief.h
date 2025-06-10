@@ -21,7 +21,7 @@ public:
     ~EnemyThief()override;
 
     // ステート
-    enum class State { Search, Battle, Recieve, Dead, Max };  //親ステート
+    enum class State { Search, Battle, Recieve, Max };  //親ステート
     enum class Search { Wander, Idle, Max };            //子 (Search用)
     enum class Battle { Pursuit, Attack, Punch, Shot,
         Damage, Standby, Max };                   //子 (Battle用)

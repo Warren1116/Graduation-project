@@ -179,7 +179,6 @@ void EnemyThief::OnDamaged()
     stateMachine->ChangeSubState(static_cast<int>(EnemyThief::Battle::Damage));
 }
 
-
 void EnemyThief::DrawDebugPrimitive()
 {
     // 基底クラスのデバッグプリミティブ描画

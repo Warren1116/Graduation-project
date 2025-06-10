@@ -40,7 +40,7 @@ namespace PlayerStates
     class AttackState; class DamageState; class SwingState; class SwingToKickState;
     class LandState; class ShotState; class GrabState; class DodgeState;
     class ClimbTopState; class UltimateState; class DeathState;
-    class CrouchIdleState; class TitleIdleState;
+    class CrouchIdleState; class TitleIdleState; class BounceState;
 }
 
 
@@ -65,6 +65,7 @@ class Player : public Character
     friend class PlayerStates::DeathState;
     friend class PlayerStates::CrouchIdleState;
     friend class PlayerStates::TitleIdleState;
+    friend class PlayerStates::BounceState;
 
 public:
     // ステート
@@ -72,7 +73,7 @@ public:
     {
         Idle, Move, Jump, Land, Attack, Damage, Death, Dodge,
         Climb, Swing, Shot, ClimbTop, Grab, CrouchIdle, TitleIdle,
-        SwingToKick, Ultimate, EventMode
+        SwingToKick, Ultimate, Bounce, EventMode
     };
 
     // ロックオンステート
@@ -194,6 +195,11 @@ private:
     float swingCooldown = 0.3f;    //連続スイングを避けるため
     float swingCooldownTimer = 0.0f;
     bool canSwing = true;
+
+    // バウンス
+    bool ropeAttached = false;
+    float bounceTimer = 0.0f;
+    const float ropeCoolDown = 0.3f;
 
     // カメラロック用
     LockonState			lockonState = LockonState::NotLocked;

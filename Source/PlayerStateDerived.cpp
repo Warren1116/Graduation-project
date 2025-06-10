@@ -645,7 +645,7 @@ void PlayerStates::SwingState::Execute(float elapsedTime)
     owner->SwingCollision(elapsedTime);
 
     //振り子運動の計算
-    owner->HandleSwingPhysics(elapsedTime, 10.0f, 10.0f, 0.005f);
+    owner->HandleSwingPhysics(elapsedTime, 10.0f, 15.0f, 0.003f);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
@@ -739,9 +739,7 @@ void PlayerStates::GrabState::Execute(float elapsedTime)
         {
             //敵の位置を取得
             auto enemyPos = Player::Instance().GetLockonEnemy()->GetPosition();
-            float animationProgress = (owner->model->GetCurrentAnimationSeconds() / owner->model->GetCurrentAnimationLength()) * 0.2f;
             enemyPos.y += 1.0f;
-            enemyPos.y = enemyPos.y * (1.0f + animationProgress);
 
             //手の位置を取得
             Model::Node* RightHandPos = owner->model->FindNode("mixamorig:RightHand");
@@ -977,5 +975,43 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
 }
 
 void PlayerStates::UltimateState::Exit()
+{
+}
+
+void PlayerStates::BounceState::Enter()
+{
+    owner->state = Player::State::Bounce;
+    owner->ropeAttached = false;
+    owner->bounceTimer = 0.0f;
+}
+
+void PlayerStates::BounceState::Execute(float elapsedTime)
+{
+    const float g = 15.0f;                       // Swing と同じ gravityStrength
+    DirectX::XMFLOAT3 vel = owner->GetVelocity();
+    vel.y -= g * elapsedTime;                             // Vy に重力加速度
+    DirectX::XMStoreFloat3(&owner->velocity, DirectX::XMLoadFloat3(&vel));
+
+    // 位置更新
+    DirectX::XMFLOAT3 pos = owner->GetPosition();
+    pos.x += vel.x * elapsedTime;
+    pos.y += vel.y * elapsedTime;
+    pos.z += vel.z * elapsedTime;
+    owner->SetPosition(pos);
+
+    owner->bounceTimer += elapsedTime;
+    bool timeOut = (owner->bounceTimer >= owner->ropeCoolDown);
+    bool descending = (vel.y < 0.0f);
+
+    if (timeOut || descending)
+    {
+        owner->FindWallSwingPoint();
+        owner->ropeAttached = true;
+        owner->stateMachine->ChangeState(
+            static_cast<int>(Player::State::Swing));
+    }
+}
+
+void PlayerStates::BounceState::Exit()
 {
 }

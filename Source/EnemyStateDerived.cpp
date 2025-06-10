@@ -143,11 +143,7 @@ EnemyStates::BattleState::~BattleState()
 
 void EnemyStates::BattleState::Enter()
 {
-    if (owner->GetHealth() <= 0)
-    {
-        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Dead));
-        return;
-    }
+    if (owner->GetHealth() <= 0)return;
     SetSubState(static_cast<int>(EnemyThief::Battle::Pursuit));
 }
 
@@ -181,11 +177,7 @@ void EnemyStates::PursuitState::Enter()
 // 追跡ステートで実行するメソッド
 void EnemyStates::PursuitState::Execute(float elapsedTime)
 {
-    if (owner->GetHealth() <= 0)
-    {
-        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Dead));
-        return;
-    }
+    if (owner->GetHealth() <= 0)return;
     if (!owner->IsGetThrow())
     {
         // 各種Execute関数の内容は各Update○○State関数を参考に

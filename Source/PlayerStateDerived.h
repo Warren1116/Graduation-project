@@ -191,4 +191,15 @@ namespace PlayerStates
         void Execute(float elapsedTime)override;
         void Exit()override;
     };
+
+    // バウンスステート
+    class BounceState : public PlayerState
+    {
+    public:
+        BounceState(Player* player) : PlayerState(player) {};
+        ~BounceState() {}
+        void Enter() override;
+        void Execute(float elapsedTime)override;
+        void Exit()override;
+    };
 }
