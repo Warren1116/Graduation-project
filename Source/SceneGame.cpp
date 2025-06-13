@@ -24,7 +24,7 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-#define TUTORIAL
+//#define TUTORIAL
 //#define DEBUG
 
 //	チュートリアルの状態
@@ -96,26 +96,17 @@ void SceneGame::Initialize()
     StartNextWave();
 
     //	モデルを各レンダラーに登録
-    Model* list[] =
-    {
-        player->model.get(),
-        stageMain->GetCityModel(),
-        stageMain->GetGroundModel(),
-    };
-    for (Model* model : list)
-    {
-        RegisterRenderModel(model);
-    }
+    RegisterRenderModel(player->model.get());
+    RegisterRenderModel(stageMain->GetCityModel());
+    RegisterRenderModel(stageMain->GetGroundModel());
 
     //// キャラクター生成処理
     CharacterManager& characterManager = CharacterManager::Instance();
-    {
-        // プレイヤー
-        characterManager.Register(player.get());
 
-        // カメラコントローラー初期化
-        cameraController = std::make_unique<CameraController>();
-    }
+    // プレイヤー
+    characterManager.Register(player.get());
+    // カメラコントローラー初期化
+    cameraController = std::make_unique<CameraController>();
 
     // 平行光源を追加
     {
@@ -168,8 +159,8 @@ void SceneGame::Initialize()
 // 終了化
 void SceneGame::Finalize()
 {
-    ////キャラクター終了化
-    //CharacterManager::Instance().Clear();
+    //キャラクター終了化
+    CharacterManager::Instance().Clear();
     // エネミー終了化
     EnemyManager::Instance().Clear();
     // ステージ終了化
@@ -373,7 +364,7 @@ void SceneGame::Update(float elapsedTime)
     // エフェクト更新処理
     EffectManager::Instance().Update(elapsedTime);
 
-     // キャラクターマネージャーの更新
+    // キャラクターマネージャーの更新
     CharacterManager::Instance().Update(elapsedTime);
 
     // カメラコントローラー更新処理
@@ -927,14 +918,7 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         EnemyManager::Instance().Register(thief);
 
         //	モデルを各レンダラーに登録
-        Model* list[] =
-        {
-            thief->GetModel(),
-        };
-        for (Model* model : list)
-        {
-            RegisterRenderModel(model);
-        }
+        RegisterRenderModel(thief->GetModel());
 
         // キャラクター生成処理
         CharacterManager& characterManager = CharacterManager::Instance();
@@ -984,20 +968,12 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         EnemyManager::Instance().Register(thief6);
 
         //	モデルを各レンダラーに登録
-        Model* list[] =
-        {
-            thief->GetModel(),
-            thief2->GetModel(),
-            thief3->GetModel(),
-            thief4->GetModel(),
-            thief5->GetModel(),
-            thief6->GetModel(),
-
-        };
-        for (Model* model : list)
-        {
-            RegisterRenderModel(model);
-        }
+        RegisterRenderModel(thief->GetModel());
+        RegisterRenderModel(thief2->GetModel());
+        RegisterRenderModel(thief3->GetModel());
+        RegisterRenderModel(thief4->GetModel());
+        RegisterRenderModel(thief5->GetModel());
+        RegisterRenderModel(thief6->GetModel());
 
         // キャラクター生成処理
         CharacterManager& characterManager = CharacterManager::Instance();
@@ -1051,20 +1027,13 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         thief6->SetAngle(DirectX::XMFLOAT3(0, DirectX::XMConvertToRadians(90), 0));
         EnemyManager::Instance().Register(thief6);
 
-        Model* list[] =
-        {
-            thief->GetModel(),
-            thief2->GetModel(),
-            thief3->GetModel(),
-            thief4->GetModel(),
-            thief5->GetModel(),
-            thief6->GetModel(),
-
-        };
-        for (Model* model : list)
-        {
-            RegisterRenderModel(model);
-        }
+        //	モデルを各レンダラーに登録
+        RegisterRenderModel(thief->GetModel());
+        RegisterRenderModel(thief2->GetModel());
+        RegisterRenderModel(thief3->GetModel());
+        RegisterRenderModel(thief4->GetModel());
+        RegisterRenderModel(thief5->GetModel());
+        RegisterRenderModel(thief6->GetModel());
 
         // キャラクター生成処理
         CharacterManager& characterManager = CharacterManager::Instance();
@@ -1119,20 +1088,12 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         EnemyManager::Instance().Register(thief6);
 
         //	モデルを各レンダラーに登録
-        Model* list[] =
-        {
-            thief->GetModel(),
-            thief2->GetModel(),
-            thief3->GetModel(),
-            thief4->GetModel(),
-            thief5->GetModel(),
-            thief6->GetModel(),
-
-        };
-        for (Model* model : list)
-        {
-            RegisterRenderModel(model);
-        }
+        RegisterRenderModel(thief->GetModel());
+        RegisterRenderModel(thief2->GetModel());
+        RegisterRenderModel(thief3->GetModel());
+        RegisterRenderModel(thief4->GetModel());
+        RegisterRenderModel(thief5->GetModel());
+        RegisterRenderModel(thief6->GetModel());
 
         // キャラクター生成処理
         CharacterManager& characterManager = CharacterManager::Instance();
@@ -1192,21 +1153,14 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         EnemyManager::Instance().Register(thief7);
 
         //	モデルを各レンダラーに登録
-        Model* list[] =
-        {
-            thief->GetModel(),
-            thief2->GetModel(),
-            thief3->GetModel(),
-            thief4->GetModel(),
-            thief5->GetModel(),
-            thief6->GetModel(),
-            thief7->GetModel(),
+        RegisterRenderModel(thief->GetModel());
+        RegisterRenderModel(thief2->GetModel());
+        RegisterRenderModel(thief3->GetModel());
+        RegisterRenderModel(thief4->GetModel());
+        RegisterRenderModel(thief5->GetModel());
+        RegisterRenderModel(thief6->GetModel());
+        RegisterRenderModel(thief7->GetModel());
 
-        };
-        for (Model* model : list)
-        {
-            RegisterRenderModel(model);
-        }
 
         // キャラクター生成処理
         CharacterManager& characterManager = CharacterManager::Instance();
@@ -1285,24 +1239,17 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         EnemyManager::Instance().Register(thief10);
 
         //	モデルを各レンダラーに登録
-        Model* list[] =
-        {
-            thief->GetModel(),
-            thief2->GetModel(),
-            thief3->GetModel(),
-            thief4->GetModel(),
-            thief5->GetModel(),
-            thief6->GetModel(),
-            thief7->GetModel(),
-            thief8->GetModel(),
-            thief9->GetModel(),
-            thief10->GetModel(),
+        RegisterRenderModel(thief->GetModel());
+        RegisterRenderModel(thief2->GetModel());
+        RegisterRenderModel(thief3->GetModel());
+        RegisterRenderModel(thief4->GetModel());
+        RegisterRenderModel(thief5->GetModel());
+        RegisterRenderModel(thief6->GetModel());
+        RegisterRenderModel(thief7->GetModel());
+        RegisterRenderModel(thief8->GetModel());
+        RegisterRenderModel(thief9->GetModel());
+        RegisterRenderModel(thief10->GetModel());
 
-        };
-        for (Model* model : list)
-        {
-            RegisterRenderModel(model);
-        }
 
         // キャラクター生成処理
         CharacterManager& characterManager = CharacterManager::Instance();
@@ -1338,8 +1285,6 @@ void SceneGame::StartNextWave()
         SpawnEnemiesForWave(currentWave); //  Waveによって敵を生成
         Player::Instance().SetgetAttackSoon(false);
     }
-
-
 }
 
 //  Waveがクリアされたかどうかのチェック

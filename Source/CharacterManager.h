@@ -3,6 +3,7 @@
 #include <vector>
 #include "Graphics/Shader.h"
 #include "Character.h"
+#include <set>
 
 // キャラクターマネージャー
 class CharacterManager
@@ -48,6 +49,8 @@ private:
 	void CollisionCharacterVsCharacter();
 
 private:
+	//std::vector<std::unique_ptr<Character>>	characters;
+	//std::set<Character*>	removes;
 	std::vector<Character*>	characters;
 	std::vector<Character*>	removes;
 };

@@ -18,7 +18,6 @@
 #include "PlayerStateMachine.h"
 #include "PlayerStateDerived.h"
 
-
 //アニメーション
 enum class PlayerAnimation
 {

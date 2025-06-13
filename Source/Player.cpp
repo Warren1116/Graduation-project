@@ -104,10 +104,10 @@ Player::~Player()
 // 更新処理
 void Player::Update(float elapsedTime)
 {
+    // ステートマシンの更新
+    stateMachine->Update(elapsedTime);
     //  カメラステートの更新処理
     UpdateCameraState(elapsedTime);
-
-    stateMachine->Update(elapsedTime);
 
     //弾丸更新処理
     projectileManager.Update(elapsedTime);
@@ -139,12 +139,15 @@ void Player::Update(float elapsedTime)
     if (EnemyManager::Instance().GetEnemyCount() == 0) getAttacksoon = false;
 
     // spiderSenseの再生状態を管理
-    if (getAttacksoon && !spiderSensePlayed)
+    if (getAttacksoon)
     {
-        spiderSense->Play(false, 0.8f);
-        spiderSensePlayed = true;
+        if (!spiderSensePlayed)
+        {
+            spiderSense->Play(false, 0.8f);
+            spiderSensePlayed = true;
+        }
     }
-    else if (!getAttacksoon)
+    else
     {
         spiderSensePlayed = false;
     }
@@ -889,7 +892,6 @@ void Player::DrawDebugPrimitive()
     //衝突判定用のデバッグ円柱を描画
     debugRender->DrawCylinder(position, radius, height, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(swingPoint, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
-    debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
     debugRender->DrawSphere(checkpos, radius, DirectX::XMFLOAT4(0, 0, 0, 1));
 
     projectileManager.DrawDebugPrimitive();
