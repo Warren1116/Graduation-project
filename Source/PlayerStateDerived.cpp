@@ -641,6 +641,7 @@ void PlayerStates::SwingState::Enter()
 // スイングステートで実行するメソッド
 void PlayerStates::SwingState::Execute(float elapsedTime)
 {
+
     //スイングの当たり判定
     owner->SwingCollision(elapsedTime);
 
@@ -983,27 +984,41 @@ void PlayerStates::BounceState::Enter()
     owner->state = Player::State::Bounce;
     owner->ropeAttached = false;
     owner->bounceTimer = 0.0f;
+
+    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&owner->velocity);
+    DirectX::XMFLOAT3 front = owner->GetFront();
+    DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
+
+    //// 前方に進むためのベクトルを計算
+    DirectX::XMVECTOR boost = DirectX::XMVectorAdd(
+        DirectX::XMVectorScale(frontVec, 8.0f),
+        DirectX::XMVectorScale(DirectX::XMLoadFloat3(&owner->GetUp()), 14.0f));
+    velocityVec = DirectX::XMLoadFloat3(&owner->velocity);
+    velocityVec = DirectX::XMVectorAdd(velocityVec, boost);
+    //// 速度に加算
+    DirectX::XMStoreFloat3(&owner->velocity, velocityVec);
+
 }
 
 void PlayerStates::BounceState::Execute(float elapsedTime)
 {
-    const float g = 15.0f;                       // Swing と同じ gravityStrength
-    DirectX::XMFLOAT3 vel = owner->GetVelocity();
-    vel.y -= g * elapsedTime;                             // Vy に重力加速度
-    DirectX::XMStoreFloat3(&owner->velocity, DirectX::XMLoadFloat3(&vel));
 
-    // 位置更新
-    DirectX::XMFLOAT3 pos = owner->GetPosition();
-    pos.x += vel.x * elapsedTime;
-    pos.y += vel.y * elapsedTime;
-    pos.z += vel.z * elapsedTime;
-    owner->SetPosition(pos);
+
+
+    const float g = 5.0f;
+    DirectX::XMVECTOR vel = XMLoadFloat3(&owner->velocity);
+    vel = DirectX::XMVectorAdd(vel, DirectX::XMVectorSet(0.0f, -g * elapsedTime, 0.0f, 0.0f));
+    DirectX::XMStoreFloat3(&owner->velocity, vel); 
+
+    DirectX::XMVECTOR pos = XMLoadFloat3(&owner->position);
+    pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorScale(vel, elapsedTime));
+    DirectX::XMStoreFloat3(&owner->position, pos); 
 
     owner->bounceTimer += elapsedTime;
     bool timeOut = (owner->bounceTimer >= owner->ropeCoolDown);
-    bool descending = (vel.y < 0.0f);
+    bool descending = (DirectX::XMVectorGetY(vel) < 0.0f);
 
-    if (timeOut || descending)
+    if (descending && timeOut) 
     {
         owner->FindWallSwingPoint();
         owner->ropeAttached = true;

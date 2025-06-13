@@ -199,7 +199,7 @@ private:
     // バウンス
     bool ropeAttached = false;
     float bounceTimer = 0.0f;
-    const float ropeCoolDown = 0.3f;
+    const float ropeCoolDown = 1.0f;
 
     // カメラロック用
     LockonState			lockonState = LockonState::NotLocked;
@@ -215,7 +215,7 @@ private:
     bool IsUseSwingKick = false;    // スイングキック
     float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
     float skillTime;                // 
-    float skillTimeMax = 5.0f;      // 
+    float skillTimeMax = 500.0f;      // 
 
     // 音・エフェクト
     std::unique_ptr<Effect> hitEffect = nullptr;        //　ヒットエフェクト

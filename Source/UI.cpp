@@ -98,6 +98,7 @@ void UI::Update(float elapsedtime)
 //  UI‚Ì•`‰æ
 void UI::DrawUI(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)
 {
+    // ƒ~ƒjƒ}ƒbƒv‚ð•`‰æ
     MiniMap::Instance().Render(dc);
 
     //  UŒ‚‚ðŽó‚¯‚éŽž‚ÉSpiderSense‚ð•`‰æ‚·‚é
@@ -252,6 +253,7 @@ void UI::RenderWaveCounter(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& v
             0,
             1.0f, 1.0f, 1.0f, 0.3f);
         TextFont->textout(dc, "Complete", screenWidth * 0.45f, screenHeight * 0.12f, 17, 24, { 1,1,1,1 });
+
 
     }
 }

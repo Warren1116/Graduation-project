@@ -137,6 +137,8 @@ private:
     int totalWaves = 5;             //  ウェーブの最大数
     bool waveInProgress = false;    //  ウェーブ進行中かどうか
     float nextWaveTimer = 0.0f;     //  次のウェーブのタイマー
+    float restartTimer = 5.0f;    //  リスタートのタイマー
+
 
     //  ウェーブの敵を生成する
     void SpawnEnemiesForWave(int wave);

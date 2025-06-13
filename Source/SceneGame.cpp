@@ -26,7 +26,7 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 //#define TUTORIAL
-#define DEBUG
+//#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -35,6 +35,7 @@ bool SceneGame::tutorialCompleted = false;
 void SceneGame::Initialize()
 {
     instance = this;
+    restartTimer = 5.0f;
     Graphics& graphics = Graphics::Instance();
 
     //シャドウマップ用に深度ステンシルの生成
@@ -378,6 +379,15 @@ void SceneGame::Update(float elapsedTime)
     // カメラコントローラー更新処理
     Camera& camera = Camera::Instance();
     cameraController->Update(elapsedTime);
+
+    if (currentWave == 5 && EnemyManager::Instance().GetEnemyCount() == 0)
+    {
+        restartTimer -= elapsedTime;
+        if (restartTimer <= 0.0f)
+        {
+            SceneManager::Instance().ChangeScene(new SceneTitle);
+        }
+    }
 
 #ifdef DEBUG
 
