@@ -98,6 +98,7 @@ Player::Player(bool flag)
 // デストラクタ
 Player::~Player()
 {
+    if(instance == this)instance = nullptr;
 }
 
 // 更新処理

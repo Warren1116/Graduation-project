@@ -6,7 +6,6 @@
 #include "Input/Input.h"
 #include "StageManager.h"
 #include "StageMain.h"
-#include "SceneClear.h"
 #include "SceneTitle.h"
 #include "System.h"
 #include "Graphics\LightManager.h"
@@ -25,7 +24,7 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-//#define TUTORIAL
+#define TUTORIAL
 //#define DEBUG
 
 //	チュートリアルの状態
@@ -169,9 +168,10 @@ void SceneGame::Initialize()
 // 終了化
 void SceneGame::Finalize()
 {
+    ////キャラクター終了化
+    //CharacterManager::Instance().Clear();
     // エネミー終了化
     EnemyManager::Instance().Clear();
-
     // ステージ終了化
     StageManager::Instance().Clear();
 
@@ -656,21 +656,21 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
     {
         if (player->GetAttackSoon() && tutorialState != SceneGame::TutorialState::Dodge && firstTimeGetAttack)
         {
-            lastState = tutorialState;
+            tutorialStack.push_back(tutorialState);
             firstTimeGetAttack = false;
             SetTutorialState(SceneGame::TutorialState::Dodge);
         }
 
         if (player->GetHealth() < 50 && tutorialState != SceneGame::TutorialState::Healing && firstTimeHealing)
         {
-            lastState = tutorialState;
+            tutorialStack.push_back(tutorialState);
             firstTimeHealing = false;
             SetTutorialState(SceneGame::TutorialState::Healing);
         }
 
         if (currentWave == 1 && player->GetSkillTime() >= 3 && tutorialState != SceneGame::TutorialState::Ultimate && firstTimeUltimate)
         {
-            lastState = tutorialState;
+            tutorialStack.push_back(tutorialState);
             firstTimeUltimate = false;
             SetTutorialState(SceneGame::TutorialState::Ultimate);
         }
@@ -733,7 +733,12 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         CheckTutorialTimeout(0.3f);
         if (gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_CTLR || gamePad.GetButtonDown() & GamePad::BTN_B)
         {
-            AdvanceTutorialState(lastState);
+            TutorialState ret = TutorialState::Finish;
+            if (!tutorialStack.empty()) {
+                ret = tutorialStack.back();
+                tutorialStack.pop_back();
+            }
+            AdvanceTutorialState(ret);
         }
         break;
         //  回復のチュトリアル
@@ -741,14 +746,24 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         CheckTutorialTimeout(0.3f);
         if (player->InputHealing())
         {
-            AdvanceTutorialState(lastState);
+            TutorialState ret = TutorialState::Finish;
+            if (!tutorialStack.empty()) {
+                ret = tutorialStack.back();
+                tutorialStack.pop_back();
+            }
+            AdvanceTutorialState(ret);
         }
         break;
         //  必殺技のチュトリアル
     case SceneGame::TutorialState::Ultimate:
         if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
         {
-            AdvanceTutorialState(lastState);
+            TutorialState ret = TutorialState::Finish;
+            if (!tutorialStack.empty()) {
+                ret = tutorialStack.back();
+                tutorialStack.pop_back();
+            }
+            AdvanceTutorialState(ret);
         }
         break;
         //  チュトリアル終了

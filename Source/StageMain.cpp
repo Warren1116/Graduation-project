@@ -148,6 +148,7 @@ StageMain::StageMain()
 // デストラクタ
 StageMain::~StageMain()
 {
+    instance = nullptr;
 }
 
 // 更新処理

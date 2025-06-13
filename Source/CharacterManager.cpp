@@ -4,7 +4,7 @@
 // 更新処理
 void CharacterManager::Update(float elapsedTime)
 {
-	for (Character* character : characteres)
+	for (Character* character : characters)
 	{
 		if (character != nullptr)
 		{
@@ -22,14 +22,12 @@ void CharacterManager::Update(float elapsedTime)
 	for (Character* character : removes)
 	{
 		// std::vectorから要素を削除する場合はイテレーターで削除しなければならない
-		std::vector<Character*>::iterator it = std::find(characteres.begin(), characteres.end(), character);
-		if (it != characteres.end())
+		std::vector<Character*>::iterator it = std::find(characters.begin(), characters.end(), character);
+		if (it != characters.end())
 		{
-			characteres.erase(it);
+			characters.erase(it);
 		}
 
-		//// 削除
-		//delete character;
 	}
 	// 破棄リストをクリア
 	removes.clear();
@@ -41,7 +39,7 @@ void CharacterManager::Update(float elapsedTime)
 // デバッグプリミティブ描画
 void CharacterManager::DrawDebugPrimitive()
 {
-	for (Character* character : characteres)
+	for (Character* character : characters)
 	{
 		character->DrawDebugPrimitive();
 	}
@@ -50,7 +48,7 @@ void CharacterManager::DrawDebugPrimitive()
 // デバッグ用GUI描画
 void CharacterManager::DrawDebugGUI()
 {
-	for (Character* character : characteres)
+	for (Character* character : characters)
 	{
 		character->DrawDebugGUI();
 	}
@@ -59,17 +57,17 @@ void CharacterManager::DrawDebugGUI()
 // キャラクター登録
 void CharacterManager::Register(Character* character)
 {
-	characteres.emplace_back(character);
+	characters.emplace_back(character);
 }
 
 // キャラクター全削除
 void CharacterManager::Clear()
 {
-	for (Character* character : characteres)
+	for (Character* character : characters)
 	{
 		delete character;
 	}
-	characteres.clear();
+	characters.clear();
 }
 
 // キャラクター削除
@@ -81,26 +79,18 @@ void CharacterManager::Remove(Character* character)
 		// 破棄リストに追加
 		removes.emplace_back(character);
 	}
-
-	//for (auto& it : removes)
-	//{
-	//	if (it == character)
-	//		break;
-	//}
-	//// 破棄リストに追加
-	//removes.emplace_back(character);
 }
 
 // キャラクター同士の衝突処理
 void CharacterManager::CollisionCharacterVsCharacter()
 {
-	size_t count = characteres.size();
+	size_t count = characters.size();
 	for (int i = 0; i < count; ++i)
 	{
-		Character* characterA = characteres.at(i);
+		Character* characterA = characters.at(i);
 		for (int j = i + 1; j < count; ++j)
 		{
-			Character* characterB = characteres.at(j);
+			Character* characterB = characters.at(j);
 
 			DirectX::XMFLOAT3 outPositionA, outPositionB;
 			if (Collision::IntersectSphereVsSphere(

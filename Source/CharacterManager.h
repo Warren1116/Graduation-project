@@ -38,16 +38,16 @@ public:
 	void Remove(Character* enemy);
 
 	// キャラクター数取得
-	int GetCharacterCount() const { return static_cast<int>(characteres.size()); }
+	int GetCharacterCount() const { return static_cast<int>(characters.size()); }
 
 	// キャラクター取得
-	Character* GetCharacter(int index) { return characteres.at(index); }
+	Character* GetCharacter(int index) { return characters.at(index); }
 
 private:
 	// キャラクター同士の衝突処理
 	void CollisionCharacterVsCharacter();
 
 private:
-	std::vector<Character*>	characteres;
+	std::vector<Character*>	characters;
 	std::vector<Character*>	removes;
 };

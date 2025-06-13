@@ -867,6 +867,7 @@ void PlayerStates::UltimateState::Enter()
     owner->state = Player::State::Ultimate;
     owner->skillTime -= 3;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Ultimate), false);
+
 }
 
 // 必殺技ステートで実行するメソッド

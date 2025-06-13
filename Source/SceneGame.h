@@ -158,6 +158,8 @@ private:
     TutorialState lastState;
     bool firstTimeHealing = true;
     bool firstTimeUltimate = true;
+    std::vector<TutorialState>  tutorialStack;
+
 
     //pause時コントローラーの選択判定
     DirectX::XMFLOAT2 controllerPos;

@@ -180,7 +180,6 @@
     <ClInclude Include="Source\Renderer\ShadowmapRenderer.h" />
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\Scene.h" />
-    <ClInclude Include="Source\SceneClear.h" />
     <ClInclude Include="Source\SceneGame.h" />
     <ClInclude Include="Source\SceneLoading.h" />
     <ClInclude Include="Source\SceneManager.h" />
@@ -258,7 +257,6 @@
     <ClCompile Include="Source\Renderer\SceneRenderer.cpp" />
     <ClCompile Include="Source\Renderer\ShadowmapRenderer.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
-    <ClCompile Include="Source\SceneClear.cpp" />
     <ClCompile Include="Source\SceneGame.cpp" />
     <ClCompile Include="Source\SceneLoading.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />

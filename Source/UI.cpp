@@ -270,9 +270,7 @@ void UI::RenderFocusingLine(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& 
         float srcHeight = FocusingLineB->GetTextureHeight();
 
         FocusingLineB->Render(dc, 0, 0, screenWidth, screenHeight, 0, 0, srcWidth, srcHeight, 0, 1, 1, 1, alpha);
-
     }
-
 }
 
 void UI::RenderLockOnScope(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection)

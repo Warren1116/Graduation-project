@@ -215,7 +215,7 @@ private:
     bool IsUseSwingKick = false;    // スイングキック
     float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
     float skillTime;                // 
-    float skillTimeMax = 500.0f;      // 
+    float skillTimeMax = 5.0f;      // 
 
     // 音・エフェクト
     std::unique_ptr<Effect> hitEffect = nullptr;        //　ヒットエフェクト

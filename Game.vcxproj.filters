@@ -210,9 +210,6 @@
     <ClInclude Include="Source\Graphics\Texture.h">
       <Filter>Source\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\SceneClear.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\MetaAI.h">
       <Filter>Source\System\AI</Filter>
     </ClInclude>
@@ -443,9 +440,6 @@
     </ClCompile>
     <ClCompile Include="Source\Graphics\Texture.cpp">
       <Filter>Source\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\SceneClear.cpp">
-      <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\MetaAI.cpp">
       <Filter>Source\System\AI</Filter>
