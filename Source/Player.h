@@ -24,9 +24,9 @@ enum class PlayerAnimation
     Anim_Idle, Anim_Walking, Anim_GetHit1, Anim_Death, Anim_Running,
     Anim_Climb, Anim_Landing, Anim_Jump, Anim_HoldInWall, Anim_Attack,
     Anim_Attack2, Anim_Kick, Anim_StartSwing, Anim_Swinging, Anim_Swinging2,
-    Anim_Shoting, Anim_Dodge, Anim_ClimbUpWall, Anim_ClimbDown, Anim_SwingToLand,
-    Anim_GrabAndDrop, Anim_CrouchIdle, Anim_TitleIdle, Anim_Crouch,
-    Anim_SwingToKick, Anim_Ultimate
+    Anim_Shoting, Anim_Dodge, Anim_ClimbUpWall, Anim_ClimbDown, Anim_GrabAndDrop,
+    Anim_CrouchIdle, Anim_TitleIdle, Anim_Crouch,
+    Anim_SwingToKick, Anim_Ultimate, Anim_SwingFilp
 };
 
 //　ステートマシン
@@ -198,7 +198,7 @@ private:
     // バウンス
     bool ropeAttached = false;
     float bounceTimer = 0.0f;
-    const float ropeCoolDown = 1.0f;
+    const float ropeCoolDown = 0.5f;
 
     // カメラロック用
     LockonState			lockonState = LockonState::NotLocked;

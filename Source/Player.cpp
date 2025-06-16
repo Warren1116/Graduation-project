@@ -98,7 +98,7 @@ Player::Player(bool flag)
 // デストラクタ
 Player::~Player()
 {
-    if(instance == this)instance = nullptr;
+    if (instance == this)instance = nullptr;
 }
 
 // 更新処理
@@ -1079,6 +1079,87 @@ void Player::SwingCollision(float elapsedTime)
     }
 }
 
+
+//// 振り子運動の計算 ＋ バウンス移行処理
+//void Player::HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient)
+//{
+//    if (!ropeAttached && state == State::Bounce) return;
+//
+//    // スイング位置・糸の向き
+//    DirectX::XMVECTOR P = DirectX::XMLoadFloat3(&swingPoint);
+//    DirectX::XMVECTOR Q = DirectX::XMLoadFloat3(&position);
+//    DirectX::XMVECTOR displacement = DirectX::XMVectorSubtract(Q, P);
+//    float currentLength = DirectX::XMVectorGetX(DirectX::XMVector3Length(displacement));
+//    DirectX::XMVECTOR ropeDirection = DirectX::XMVector3Normalize(displacement);
+//
+//    // 重力
+//    DirectX::XMVECTOR gravity = DirectX::XMVectorSet(0.0f, -gravityStrength, 0.0f, 0.0f);
+//
+//    // 速度の更新
+//    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+//    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorScale(gravity, elapsedTime));
+//    velocityVec = DirectX::XMVectorScale(velocityVec, (1.0f - dragCoefficient));
+//
+//    // ロープ長を超えてたら補正
+//    if (currentLength > ropeLength)
+//    {
+//        float correctionFactor = (currentLength - ropeLength) * 0.5f;
+//        DirectX::XMVECTOR correction = DirectX::XMVectorScale(ropeDirection, -correctionFactor);
+//        DirectX::XMVECTOR targetPosition = DirectX::XMVectorAdd(Q, correction);
+//        float smoothFactor = 0.1f;
+//        Q = DirectX::XMVectorLerp(Q, targetPosition, smoothFactor);
+//    }
+//
+//    // ロープに沿った速度成分を除去して“接線速度”に
+//    DirectX::XMVECTOR tangentVelocity = DirectX::XMVectorSubtract(
+//        velocityVec,
+//        DirectX::XMVectorMultiply(DirectX::XMVector3Dot(velocityVec, ropeDirection), ropeDirection)
+//    );
+//
+//    // 位置更新
+//    DirectX::XMVECTOR newPosition = DirectX::XMVectorAdd(Q, DirectX::XMVectorScale(tangentVelocity, elapsedTime));
+//    DirectX::XMStoreFloat3(&position, newPosition);
+//    DirectX::XMStoreFloat3(&velocity, tangentVelocity);
+//
+//    // ──────────────────────────────
+//    // 最高点通過判定＋バウンス移行処理
+//    static float prevVelY = 0.0f;
+//    float curVelY = DirectX::XMVectorGetY(tangentVelocity);
+//    bool passedLowest = (prevVelY < 0.0f && curVelY >= 0.0f); // 下→上
+//    prevVelY = curVelY;
+//
+//    if (state == State::Swing && passedLowest)
+//    {
+//        ropeAttached = false; // ロープ解除
+//
+//        // ─ 前＋上方向へ強ブースト ─
+//        DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+//        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+//        forwardVec = DirectX::XMVector3Normalize(forwardVec);
+//        upVec = DirectX::XMVector3Normalize(upVec);
+//
+//        forwardVec = DirectX::XMVectorScale(forwardVec, 8.0f); // 調整可能
+//        upVec = DirectX::XMVectorScale(upVec, 14.0f);
+//
+//        velocityVec = DirectX::XMLoadFloat3(&velocity);
+//        velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
+//        DirectX::XMStoreFloat3(&velocity, velocityVec);
+//
+//        bounceTimer = 0.0f;
+//        stateMachine->ChangeState(static_cast<int>(State::Bounce));
+//        return;
+//    }
+//
+//    // スイングキックなど他分岐も必要ならここで追加
+//
+//    // キャラクターの向きを更新
+//    DirectX::XMFLOAT3 front = GetFront();
+//    DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(
+//        DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&swingPoint), DirectX::XMLoadFloat3(&position)));
+//    DirectX::XMStoreFloat3(&front, swingDir);
+//}
+
+
 //振り子運動の計算
 void Player::HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient)
 {    
@@ -1132,32 +1213,47 @@ void Player::HandleSwingPhysics(float elapsedTime, float ropeLength, float gravi
     if (state == State::Swing)
     {
         //  自動で連続スイングする
+        //if (dotProduct <= 0)
+        //{
+        //    // 前方に進むためのベクトルを計算
+        //    DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
+        //    DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
+
+        //    forwardVec = DirectX::XMVector3Normalize(forwardVec);
+        //    upVec = DirectX::XMVector3Normalize(upVec);
+
+        //    forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // 勢いを調整
+        //    upVec = DirectX::XMVectorScale(upVec, 8.0f);
+
+        //    // 速度に加算
+        //    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
+        //    velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
+        //    DirectX::XMStoreFloat3(&velocity, velocityVec);
+
+        //    stateMachine->ChangeState(static_cast<int>(State::Bounce));
+        //}
+
+        //　スイング終わったらちょっとバウンスする
         if (dotProduct <= 0)
         {
-            // 前方に進むためのベクトルを計算
+            ropeAttached = false;
+
             DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&GetFront());
             DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&GetUp());
-
             forwardVec = DirectX::XMVector3Normalize(forwardVec);
             upVec = DirectX::XMVector3Normalize(upVec);
 
-            forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // 勢いを調整
-            upVec = DirectX::XMVectorScale(upVec, 8.0f);
+            forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f);
+            upVec = DirectX::XMVectorScale(upVec, 15.0f);
 
-            // 速度に加算
             DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&velocity);
             velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
             DirectX::XMStoreFloat3(&velocity, velocityVec);
 
-            stateMachine->ChangeState(static_cast<int>(State::Swing));
+            bounceTimer = 0.0f;
+            stateMachine->ChangeState(static_cast<int>(State::Bounce));
+            return;
         }
-
-        //　スイング終わったらちょっとバウンスする
-        //if (dotProduct <= 0)
-        //{
-        //    stateMachine->ChangeState(static_cast<int>(State::Bounce));
-        //    return;
-        //}
 
         //キャラクターの向きを更新
         DirectX::XMVECTOR swingDir = DirectX::XMVector3Normalize(

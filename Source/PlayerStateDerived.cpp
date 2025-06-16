@@ -181,7 +181,7 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
     }
 
     //　もし目の前に壁がいない、ジャンプ入力処理
-    if (!owner->hitWall && owner->isGround && owner->InputJump() )
+    if (!owner->hitWall && owner->isGround && owner->InputJump())
     {
         //ジャンブステートへの遷移
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
@@ -985,47 +985,32 @@ void PlayerStates::BounceState::Enter()
     owner->state = Player::State::Bounce;
     owner->ropeAttached = false;
     owner->bounceTimer = 0.0f;
-
-    DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&owner->velocity);
-    DirectX::XMFLOAT3 front = owner->GetFront();
-    DirectX::XMVECTOR frontVec = DirectX::XMLoadFloat3(&front);
-
-    //// 前方に進むためのベクトルを計算
-    DirectX::XMVECTOR boost = DirectX::XMVectorAdd(
-        DirectX::XMVectorScale(frontVec, 8.0f),
-        DirectX::XMVectorScale(DirectX::XMLoadFloat3(&owner->GetUp()), 14.0f));
-    velocityVec = DirectX::XMLoadFloat3(&owner->velocity);
-    velocityVec = DirectX::XMVectorAdd(velocityVec, boost);
-    //// 速度に加算
-    DirectX::XMStoreFloat3(&owner->velocity, velocityVec);
-
+    owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_SwingFilp), false);
 }
 
 void PlayerStates::BounceState::Execute(float elapsedTime)
 {
+    const float g = 1.0f; // スイングと同じ重力に
+    auto vel = DirectX::XMLoadFloat3(&owner->velocity);
+    vel = DirectX::XMVectorAdd(vel, DirectX::XMVectorSet(0, -g * elapsedTime, 0, 0));
+    DirectX::XMStoreFloat3(&owner->velocity, vel);
 
-
-
-    const float g = 5.0f;
-    DirectX::XMVECTOR vel = XMLoadFloat3(&owner->velocity);
-    vel = DirectX::XMVectorAdd(vel, DirectX::XMVectorSet(0.0f, -g * elapsedTime, 0.0f, 0.0f));
-    DirectX::XMStoreFloat3(&owner->velocity, vel); 
-
-    DirectX::XMVECTOR pos = XMLoadFloat3(&owner->position);
+    auto pos = DirectX::XMLoadFloat3(&owner->position);
     pos = DirectX::XMVectorAdd(pos, DirectX::XMVectorScale(vel, elapsedTime));
-    DirectX::XMStoreFloat3(&owner->position, pos); 
+    DirectX::XMStoreFloat3(&owner->position, pos);
 
     owner->bounceTimer += elapsedTime;
-    bool timeOut = (owner->bounceTimer >= owner->ropeCoolDown);
-    bool descending = (DirectX::XMVectorGetY(vel) < 0.0f);
+    bool descending = DirectX::XMVectorGetY(vel) < 0.0f;
+    bool coolEnded = owner->bounceTimer >= owner->ropeCoolDown;
 
-    if (descending && timeOut) 
+    // 頂点を超え、かつクールダウン経過で自動再スイング
+    if (descending && coolEnded)
     {
         owner->FindWallSwingPoint();
         owner->ropeAttached = true;
-        owner->stateMachine->ChangeState(
-            static_cast<int>(Player::State::Swing));
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Swing));
     }
+
 }
 
 void PlayerStates::BounceState::Exit()
