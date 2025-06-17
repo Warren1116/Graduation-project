@@ -61,10 +61,6 @@ void CharacterManager::Register(Character* character)
 // キャラクター全削除
 void CharacterManager::Clear()
 {
-    //for (Character* character : characters)
-    //{
-    //    delete character;
-    //}
     characters.clear();
     removes.clear();
 }
