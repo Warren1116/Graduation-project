@@ -199,6 +199,9 @@ private:
     bool ropeAttached = false;
     float bounceTimer = 0.0f;
     const float ropeCoolDown = 0.5f;
+    float bounceBoostTime = 0.4f;   // ブーストを加える合計時間（秒）
+    float boostElapsed = 0.0f;       // 経過時間
+    bool boostActive = true;
 
     // カメラロック用
     LockonState			lockonState = LockonState::NotLocked;
@@ -213,8 +216,8 @@ private:
     float webTimer;                 // 糸のタイマー
     bool IsUseSwingKick = false;    // スイングキック
     float ultimateAttackRadius = 5.0f;// 攻撃範囲の半径
-    float skillTime;                // 
-    float skillTimeMax = 5.0f;      // 
+    float skillTime;                // スキル回数
+    float skillTimeMax = 5.0f;      // スキル最大値
 
     // 音・エフェクト
     std::unique_ptr<Effect> hitEffect = nullptr;        //　ヒットエフェクト

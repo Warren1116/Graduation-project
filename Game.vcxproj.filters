@@ -79,6 +79,12 @@
     <Filter Include="Source\System\UI">
       <UniqueIdentifier>{2a6f9028-dfd6-4505-9da3-334498146ea1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\System\Collision">
+      <UniqueIdentifier>{69448bee-59d9-4349-b58b-833e02137d65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\System\MessageData">
+      <UniqueIdentifier>{a14d5873-0f6a-49ba-8f87-78ceada547b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h">
@@ -134,9 +140,6 @@
     </ClInclude>
     <ClInclude Include="Source\Input\Mouse.h">
       <Filter>Source\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Collision.h">
-      <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\Character.h">
       <Filter>Source\Character</Filter>
@@ -215,12 +218,6 @@
     </ClInclude>
     <ClInclude Include="Source\Telegram.h">
       <Filter>Source\System\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Messenger.h">
-      <Filter>Source\System</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\MessageData.h">
-      <Filter>Source\System</Filter>
     </ClInclude>
     <ClInclude Include="Source\CharacterManager.h">
       <Filter>Source\Character</Filter>
@@ -328,6 +325,15 @@
     <ClInclude Include="Source\PlayerStateBase.h">
       <Filter>Source\Character\Player\StateMachine</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Collision.h">
+      <Filter>Source\System\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Messenger.h">
+      <Filter>Source\System\MessageData</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MessageData.h">
+      <Filter>Source\System\MessageData</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -374,9 +380,6 @@
     </ClCompile>
     <ClCompile Include="Source\Input\Mouse.cpp">
       <Filter>Source\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Collision.cpp">
-      <Filter>Source\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\Character.cpp">
       <Filter>Source\Character</Filter>
@@ -443,9 +446,6 @@
     </ClCompile>
     <ClCompile Include="Source\MetaAI.cpp">
       <Filter>Source\System\AI</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Messenger.cpp">
-      <Filter>Source\System</Filter>
     </ClCompile>
     <ClCompile Include="Source\CharacterManager.cpp">
       <Filter>Source\Character</Filter>
@@ -548,6 +548,12 @@
     </ClCompile>
     <ClCompile Include="Source\EnemyStateBase.cpp">
       <Filter>Source\Character\Enemy\StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Collision.cpp">
+      <Filter>Source\System\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Messenger.cpp">
+      <Filter>Source\System\MessageData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

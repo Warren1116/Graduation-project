@@ -980,17 +980,60 @@ void PlayerStates::UltimateState::Exit()
 {
 }
 
+// バウンスステート
 void PlayerStates::BounceState::Enter()
 {
     owner->state = Player::State::Bounce;
     owner->ropeAttached = false;
     owner->bounceTimer = 0.0f;
+    owner->boostElapsed = 0.0f;
+    owner->boostActive = true;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_SwingFilp), false);
 }
 
+
 void PlayerStates::BounceState::Execute(float elapsedTime)
 {
-    const float g = 1.0f; // スイングと同じ重力に
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    // キーを押されてない時スイングをキャンセルする
+    if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
+    {
+        owner->lastState = owner->state;
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
+    }
+    //スイングの当たり判定
+    owner->SwingCollision(elapsedTime);
+    //boostの処理
+    if (owner->boostActive) 
+    {
+        DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&owner->GetFront());
+        DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&owner->GetUp());
+        forwardVec = DirectX::XMVector3Normalize(forwardVec);
+        upVec = DirectX::XMVector3Normalize(upVec);
+ 
+        // boostの進行度に応じて力を調整
+        float progress = owner->boostElapsed / owner->bounceBoostTime; // 0～1
+        float forwardPower = (1.0f - progress) * 3.0f * elapsedTime / owner->bounceBoostTime;
+        float upPower = 13.0f * elapsedTime / owner->bounceBoostTime;
+
+        // 前方と上方の力を加える
+        DirectX::XMVECTOR addVelocity = DirectX::XMVectorAdd(
+            DirectX::XMVectorScale(forwardVec, forwardPower),
+            DirectX::XMVectorScale(upVec, upPower)
+        );
+        DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&owner->velocity);
+        velocityVec = DirectX::XMVectorAdd(velocityVec, addVelocity);
+        DirectX::XMStoreFloat3(&owner->velocity, velocityVec);
+
+        // boostの経過時間を更新
+        owner->boostElapsed += elapsedTime;
+        if (owner->boostElapsed >= owner->bounceBoostTime) {
+            owner->boostActive = false;
+        }
+    }
+
+    // --- あとは普通のバウンス物理 ---
+    const float g = 15.0f;
     auto vel = DirectX::XMLoadFloat3(&owner->velocity);
     vel = DirectX::XMVectorAdd(vel, DirectX::XMVectorSet(0, -g * elapsedTime, 0, 0));
     DirectX::XMStoreFloat3(&owner->velocity, vel);
@@ -1003,9 +1046,7 @@ void PlayerStates::BounceState::Execute(float elapsedTime)
     bool descending = DirectX::XMVectorGetY(vel) < 0.0f;
     bool coolEnded = owner->bounceTimer >= owner->ropeCoolDown;
 
-    // 頂点を超え、かつクールダウン経過で自動再スイング
-    if (descending && coolEnded)
-    {
+    if (descending && coolEnded) {
         owner->FindWallSwingPoint();
         owner->ropeAttached = true;
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Swing));
