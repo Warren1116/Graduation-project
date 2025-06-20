@@ -9,19 +9,19 @@ class Character
 public:
 	Character() {};
 	virtual ~Character() {};
-	// XVˆ—
+	// æ›´æ–°å‡¦ç†
 	virtual void Update(float elapsedTime) = 0;
 
-	// ƒfƒoƒbƒO—pGUI•`‰æ
+	// ãƒ‡ãƒãƒƒã‚°ç”¨GUIæç”»
 	virtual	void DrawDebugGUI() {}
 
-	// ƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu•`‰æ
+	// ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–æç”»
 	virtual	void DrawDebugPrimitive() {}
 
-	// s—ñXVˆ—
+	// è¡Œåˆ—æ›´æ–°å‡¦ç†
 	void UpdateTransform();
 
-	// ˆÊ’uæ“¾
+	// ä½ç½®å–å¾—
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
 	void SetTrianglePosition(const DirectX::XMFLOAT3& position, int index) { this->position = position; }
 
@@ -30,55 +30,55 @@ public:
 	const DirectX::XMFLOAT3& GetFront() const { return { transform._31, transform._32, transform._33 }; }
     void SetFront(const DirectX::XMFLOAT3& front) { transform._31 = front.x; transform._32 = front.y; transform._33 = front.z; }
 
-	// ˆÊ’uİ’è
+	// ä½ç½®è¨­å®š
 	void SetPosition(const DirectX::XMFLOAT3& position) { this->position = position; }
 
-	// ‰ñ“]æ“¾
+	// å›è»¢å–å¾—
 	const DirectX::XMFLOAT3& GetAngle() const { return angle; }
-	// ‰ñ“]İ’è
+	// å›è»¢è¨­å®š
 	void SetAngle(const DirectX::XMFLOAT3& angle) { this->angle = angle; }
 
-	// ƒXƒP[ƒ‹æ“¾
+	// ã‚¹ã‚±ãƒ¼ãƒ«å–å¾—
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
-	// ƒXƒP[ƒ‹İ’è
+	// ã‚¹ã‚±ãƒ¼ãƒ«è¨­å®š
 	void SetScale(const DirectX::XMFLOAT3& scale) { this->scale = scale; }
 
-	// ”¼Œaæ“¾
+	// åŠå¾„å–å¾—
 	float GetRadius() const { return radius; }
 
-	// ‚‚³æ“¾
+	// é«˜ã•å–å¾—
 	float GetHeight() const { return height; }
 
 	DirectX::XMFLOAT3 GetVelocity() const { return velocity; }
 
-	// ’n–Ê‚ÉÚ’n‚µ‚Ä‚¢‚é‚©
+	// åœ°é¢ã«æ¥åœ°ã—ã¦ã„ã‚‹ã‹
 	bool IsGround() const { return isGround; }
 
-	// ƒ_ƒ[ƒW‚ğ—^‚¦‚é
+	// ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’ä¸ãˆã‚‹
 	bool ApplyDamage(int damage, float invincibleTime);
 
-	// ÕŒ‚‚ğ—^‚¦‚é
+	// è¡æ’ƒã‚’ä¸ãˆã‚‹
 	void AddImpulse(const DirectX::XMFLOAT3& impulse);
 
-	// Œ’Nó‘Ô‚ğæ“¾
+	// å¥åº·çŠ¶æ…‹ã‚’å–å¾—
 	int GetHealth() const { return health; }
 
-	// Å‘åŒ’Nó‘Ô‚ğæ“¾
+	// æœ€å¤§å¥åº·çŠ¶æ…‹ã‚’å–å¾—
 	int GetMaxHealth() const { return maxHealth; }
 
-	// ¶€”»’èƒtƒ‰ƒO
+	// ç”Ÿæ­»åˆ¤å®šãƒ•ãƒ©ã‚°
 	bool GetAlive() { return isAlive; }
 
-	// ƒXƒCƒ“ƒO‚µ‚Ä‚éƒtƒ‰ƒO
+	// ã‚¹ã‚¤ãƒ³ã‚°ã—ã¦ã‚‹ãƒ•ãƒ©ã‚°
 	bool GetOnSwing() { return onSwing; }
     bool SetOnSwing(bool onSwing) { this->onSwing = onSwing; }
 
-    // ƒvƒŒƒCƒ„[•Ç“o‚èƒtƒ‰ƒO
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å£ç™»ã‚Šãƒ•ãƒ©ã‚°
     bool GetOnClimb() { return onClimb; }
 
     bool GetHitWall() { return hitWall; }
 
-	//ƒƒbƒNƒIƒ“‚³‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	//ãƒ­ãƒƒã‚¯ã‚ªãƒ³ã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹
 	bool GetIsLockedOn() const { return IsLockedOn; }
 	void SetLockedOn(bool lockStatus) { IsLockedOn = lockStatus; }
 
@@ -86,52 +86,54 @@ public:
 
 private:
 
-	// ‚’¼‘¬—ÍXVˆ—@
+        // roll axis rotation
+        void Roll(float elapsedTime, float direction, float speed);
+	// å‚ç›´é€ŸåŠ›æ›´æ–°å‡¦ç†ã€€
 	void UpdateVerticalVelocity(float elapsedFrame);
 
-	// ‚’¼ˆÚ“®XVˆ—
+	// å‚ç›´ç§»å‹•æ›´æ–°å‡¦ç†
 	void UpdateVerticalMove(float elapsedTime);
 
-	// …•½‘¬—ÍXVˆ—@
+	// æ°´å¹³é€ŸåŠ›æ›´æ–°å‡¦ç†ã€€
 	void UpdateHorizontalVelocity(float elapsedFrame);
 
-	// …•½ˆÚ“®XVˆ—
+	// æ°´å¹³ç§»å‹•æ›´æ–°å‡¦ç†
 	void UpdateHorizontalMove(float elapsedTime);
 
-    // ‘O•ûƒŒƒC”ò‚Î‚µ‚Ä‚È‚¢‘Î‰i“G—pj
+    // å‰æ–¹ãƒ¬ã‚¤é£›ã°ã—ã¦ãªã„æ™‚å¯¾å¿œï¼ˆæ•µç”¨ï¼‰
     void CheckWallCollision(float elapsedTime);
 
 
 
 protected:
-	// ˆÚ“®ˆ—
+	// ç§»å‹•å‡¦ç†
 	void Move(float vx, float vy, float vz, float speed);
 	void Move(float vx, float vz, float speed);
 
-	// ù‰ñˆ—
+	// æ—‹å›å‡¦ç†
 	void Turn(float elapsedTime, float vx, float vz, float speed);
 
-	// ƒWƒƒƒ“ƒvˆ—
+	// ã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†
 	void Jump(float speed);
 
-	// ‘¬“xˆ—XV
+	// é€Ÿåº¦å‡¦ç†æ›´æ–°
 	void UpdateVelocity(float elapsedTime);
 
-	// –³“GŠÔXV
+	// ç„¡æ•µæ™‚é–“æ›´æ–°
 	void UpdateInvincibleTimer(float elapsedTime);
 
-	// ’…’n‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
+	// ç€åœ°ã—ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹
 	virtual void OnLanding() {}
 
-	// ƒ_ƒ[ƒW‚ğó‚¯‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
+	// ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹
 	virtual void OnDamaged() {}
 
-	// €–S‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
+	// æ­»äº¡ã—ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹
 	virtual void OnDead() {}
 
 
 protected:
-    // Šî–{î•ñİ’è
+    // åŸºæœ¬æƒ…å ±è¨­å®š
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT3 angle = { 0, 0, 0 };
 	DirectX::XMFLOAT3 scale = { 1, 1, 1 };
@@ -165,10 +167,10 @@ protected:
 	float skinWidth = 0.01f;
 	float slopeLimit = 45.0f;
 
-    //@¶€”»’è
+    //ã€€ç”Ÿæ­»åˆ¤å®š
 	bool isAlive = true;
 
-	//@ƒvƒŒƒCƒ„[”»’è—p
+	//ã€€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åˆ¤å®šç”¨
 	bool hitWall = false;
 	bool onClimb = false;
 	bool CanClimb = false;
@@ -176,11 +178,11 @@ protected:
 	bool isThrown = false;
 	bool IsLockedOn = false;
 
-    //@•Ç“o‚è—p
+    //ã€€å£ç™»ã‚Šç”¨
 	float fallStartHeight = 0.0f;
 	float landingHeightThreshold = 1.0f;
 
-	// ƒNƒH[ƒ^ƒjƒIƒ“‚ğg‚Á‚½‰ñ“]‚ğŠÇ—‚·‚é‚½‚ß‚Ìƒƒ“ƒo•Ï”
+	// ã‚¯ã‚©ãƒ¼ã‚¿ãƒ‹ã‚ªãƒ³ã‚’ä½¿ã£ãŸå›è»¢ã‚’ç®¡ç†ã™ã‚‹ãŸã‚ã®ãƒ¡ãƒ³ãƒå¤‰æ•°
 	DirectX::XMFLOAT4 climbRotationQuaternion;
 	DirectX::XMFLOAT3 wallNormal;
 
