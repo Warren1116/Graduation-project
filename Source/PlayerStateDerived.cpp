@@ -6,7 +6,7 @@
 #include "scenemanager.h"
 #include "SceneLoading.h"
 
-// ‘Ò‹@ƒXƒe[ƒg
+// å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::IdleState::Enter()
 {
     owner->state = Player::State::Idle;
@@ -15,28 +15,28 @@ void PlayerStates::IdleState::Enter()
 
     if (owner->lastState == Player::State::Swing)
     {
-        // ‘O•û‚Éi‚Ş‚½‚ß‚ÌƒxƒNƒgƒ‹‚ğŒvZ
+        // å‰æ–¹ã«é€²ã‚€ãŸã‚ã®ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¨ˆç®—
         DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&owner->GetFront());
         DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&owner->GetUp());
 
         forwardVec = DirectX::XMVector3Normalize(forwardVec);
         upVec = DirectX::XMVector3Normalize(upVec);
 
-        forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // ¨‚¢‚ğ’²®
+        forwardVec = DirectX::XMVectorScale(forwardVec, 5.0f); // å‹¢ã„ã‚’èª¿æ•´
         upVec = DirectX::XMVectorScale(upVec, 8.0f);
 
-        // ‘¬“x‚É‰ÁZ
+        // é€Ÿåº¦ã«åŠ ç®—
         DirectX::XMVECTOR velocityVec = DirectX::XMLoadFloat3(&owner->velocity);
         velocityVec = DirectX::XMVectorAdd(velocityVec, DirectX::XMVectorAdd(forwardVec, upVec));
         DirectX::XMStoreFloat3(&owner->velocity, velocityVec);
     }
 
-    //@ƒNƒ‰ƒCƒ~ƒ“ƒO’†‚È‚ç•Ê‚Ì‘Ò‹@ƒ‚[ƒVƒ‡ƒ“
+    //ã€€ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ä¸­ãªã‚‰åˆ¥ã®å¾…æ©Ÿãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³
     if (owner->onClimb)
     {
         owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_HoldInWall), true);
     }
-    //@•’Ê‚à‘Ò‹@ƒ‚[ƒVƒ‡ƒ“
+    //ã€€æ™®é€šã‚‚å¾…æ©Ÿãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³
     else
     {
         owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Idle), true);
@@ -49,19 +49,19 @@ void PlayerStates::IdleState::Enter()
     }
 }
 
-// ‘Ò‹@ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::IdleState::Execute(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
 
     owner->lastState = owner->state;
-    //ˆÚ“®“ü—Íˆ—
+    //ç§»å‹•å…¥åŠ›å‡¦ç†
     if (owner->InputMove(elapsedTime))
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Move));
     }
 
-    //ƒWƒƒƒ“ƒv“ü—Íˆ—
+    //ã‚¸ãƒ£ãƒ³ãƒ—å…¥åŠ›å‡¦ç†
     if (owner->isGround && owner->InputJump())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
@@ -69,32 +69,32 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
 
     if (!owner->onClimb)
     {
-        // ‰ñ”ğ“ü—Íˆ—
+        // å›é¿å…¥åŠ›å‡¦ç†
         if (owner->InputDodge())
         {
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Dodge));
         }
 
-        //’eŠÛ“ü—Íˆ—
+        //å¼¾ä¸¸å…¥åŠ›å‡¦ç†
         if (owner->InputProjectile())
         {
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
         }
 
-        //UŒ‚“ü—Íˆ—
+        //æ”»æ’ƒå…¥åŠ›å‡¦ç†
         if (owner->InputAttack())
         {
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
         }
     }
 
-    // ‰ñ•œ“ü—Íˆ—
+    // å›å¾©å…¥åŠ›å‡¦ç†
     if (owner->skillTime > 1.0f)
     {
         owner->InputHealing();
     }
 
-    //  “Š‚°‹Z“ü—Íˆ—
+    //  æŠ•ã’æŠ€å…¥åŠ›å‡¦ç†
     if (owner->lockonEnemy && owner->skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
@@ -105,7 +105,7 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
         }
     }
 
-    //  •KE‹Z“ü—Íˆ—
+    //  å¿…æ®ºæŠ€å…¥åŠ›å‡¦ç†
     if (owner->skillTime >= 3)
     {
         if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
@@ -116,10 +116,10 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
 }
 void PlayerStates::IdleState::Exit()
 {
-    //‚È‚ñ‚à‚µ‚È‚¢‚Ì‚Å
+    //ãªã‚“ã‚‚ã—ãªã„ã®ã§
 }
 
-// ˆÚ“®ƒXƒe[ƒg
+// ç§»å‹•ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::MoveState::Enter()
 {
     if (!owner->attacking)
@@ -135,7 +135,7 @@ void PlayerStates::MoveState::Enter()
     }
 }
 
-// ˆÚ“®ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ç§»å‹•ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::MoveState::Execute(float elapsedTime)
 {
     if (!owner->canSwing)
@@ -148,13 +148,13 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
     }
 
     GamePad& gamePad = Input::Instance().GetGamePad();
-    //  ˆÚ“®’†SHIFTƒL[“¯‚É‰Ÿ‚·‚Æ
+    //  ç§»å‹•ä¸­SHIFTã‚­ãƒ¼åŒæ™‚ã«æŠ¼ã™ã¨
     if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && owner->InputMove(elapsedTime) && owner->firstSwing)
     {
         owner->lastState = owner->state;
         if (owner->canSwing)
         {
-            //  ƒXƒCƒ“ƒOƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+            //  ã‚¹ã‚¤ãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
             owner->canSwing = false;
             owner->swingCooldownTimer = owner->swingCooldown;
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Swing));
@@ -166,46 +166,46 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Dodge));
     }
 
-    //  –Ú‚Ì‘O‚É•Ç‚ª‚ ‚é“¯‚ÉSpeacƒL[‰Ÿ‚µ‚½‚ç
+    //  ç›®ã®å‰ã«å£ãŒã‚ã‚‹åŒæ™‚ã«Speacã‚­ãƒ¼æŠ¼ã—ãŸã‚‰
     if (owner->hitWall && owner->onClimb)
     {
-        //ƒNƒ‰ƒCƒ~ƒ“ƒOƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+        //ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Climb));
     }
 
-    //  ˆÚ“®‚µ‚Ä‚È‚¢‚È‚ç
+    //  ç§»å‹•ã—ã¦ãªã„ãªã‚‰
     if (!owner->InputMove(elapsedTime))
     {
-        //‘Ò‹@ƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+        //å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 
-    //@‚à‚µ–Ú‚Ì‘O‚É•Ç‚ª‚¢‚È‚¢AƒWƒƒƒ“ƒv“ü—Íˆ—
+    //ã€€ã‚‚ã—ç›®ã®å‰ã«å£ãŒã„ãªã„ã€ã‚¸ãƒ£ãƒ³ãƒ—å…¥åŠ›å‡¦ç†
     if (!owner->hitWall && owner->isGround && owner->InputJump())
     {
-        //ƒWƒƒƒ“ƒuƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+        //ã‚¸ãƒ£ãƒ³ãƒ–ã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
     }
 
-    // ’eŠÛ“ü—Íˆ—
+    // å¼¾ä¸¸å…¥åŠ›å‡¦ç†
     if (owner->InputProjectile())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
     }
 
-    // UŒ‚“ü—Íˆ—
+    // æ”»æ’ƒå…¥åŠ›å‡¦ç†
     if (owner->InputAttack())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
     }
 
-    // ‰ñ•œ“ü—Íˆ—
+    // å›å¾©å…¥åŠ›å‡¦ç†
     if (owner->skillTime > 1.0f)
     {
         owner->InputHealing();
     }
 
-    //  •KE‹Z“ü—Íˆ—
+    //  å¿…æ®ºæŠ€å…¥åŠ›å‡¦ç†
     if (owner->skillTime >= 3)
     {
         if (gamePad.GetButtonDown() & GamePad::BTN_LEFT_SHOULDER || gamePad.GetButtonDown() & GamePad::BTN_KEYBOARD_V)
@@ -214,7 +214,7 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
         }
     }
 
-    //@“Š‚°‹Z“ü—Íˆ—
+    //ã€€æŠ•ã’æŠ€å…¥åŠ›å‡¦ç†
     if (owner->lockonEnemy && owner->skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
@@ -229,10 +229,10 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
 
 void PlayerStates::MoveState::Exit()
 {
-    // ‚È‚ñ‚à‚µ‚È‚¢‚Ì‚Å
+    // ãªã‚“ã‚‚ã—ãªã„ã®ã§
 }
 
-// ƒWƒƒƒ“ƒvƒXƒe[ƒg
+// ã‚¸ãƒ£ãƒ³ãƒ—ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::JumpState::Enter()
 {
     owner->state = Player::State::Jump;
@@ -240,7 +240,7 @@ void PlayerStates::JumpState::Enter()
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Jump), false);
 }
 
-// ƒWƒƒƒ“ƒvƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ã‚¸ãƒ£ãƒ³ãƒ—ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::JumpState::Execute(float elapsedTime)
 {
     if (owner->InputAttack())
@@ -250,33 +250,33 @@ void PlayerStates::JumpState::Execute(float elapsedTime)
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    //  ƒWƒƒƒ“ƒu’†ˆÚ“®‚ÆSHIFTƒL[“¯‚É‰Ÿ‚·‚Æ
+    //  ã‚¸ãƒ£ãƒ³ãƒ–ä¸­ç§»å‹•ã¨SHIFTã‚­ãƒ¼åŒæ™‚ã«æŠ¼ã™ã¨
     if ((gamePad.GetButton() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButton() & GamePad::BTN_RIGHT_TRIGGER) && owner->InputMove(elapsedTime))
     {
         owner->lastState = owner->state;
-        //  ƒXƒCƒ“ƒOƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+        //  ã‚¹ã‚¤ãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Swing));
     }
 
-    //  ‚à‚µƒNƒ‰ƒCƒ~ƒ“ƒO’†‚È‚çAƒNƒ‰ƒCƒ~ƒ“ƒOó‘Ô‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é
+    //  ã‚‚ã—ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ä¸­ãªã‚‰ã€ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°çŠ¶æ…‹ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹
     if (owner->onClimb)
     {
         owner->onClimb = false;
     }
 
-    //ˆÚ“®“ü—Íˆ—
+    //ç§»å‹•å…¥åŠ›å‡¦ç†
     owner->InputMove(elapsedTime);
 
     if (!owner->model->IsPlayAnimation())
     {
-        // ‘Ò‹@ƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+        // å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 
-    //  ’eŠÛ‚Ì“ü—Íˆ—
+    //  å¼¾ä¸¸ã®å…¥åŠ›å‡¦ç†
     if (owner->InputProjectile())
     {
-        //  ”­ËƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+        //  ç™ºå°„ã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
     }
 }
@@ -285,22 +285,22 @@ void PlayerStates::JumpState::Exit()
 {
 }
 
-// ’…’nƒXƒe[ƒg
+// ç€åœ°ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::LandState::Enter()
 {
-    //  ƒXƒCƒ“ƒO“¯‚É’…’n‚·‚é‚ÆAvelocity‚Ì‰e‹¿‚Å°‚ÉŠŠ‚é‚Ì‚Å
-    //‚±‚Ìó‹µ‚ğ–h‚®‚½‚ß velocity‚ğ0‚É‚·‚é
+    //  ã‚¹ã‚¤ãƒ³ã‚°åŒæ™‚ã«ç€åœ°ã™ã‚‹ã¨ã€velocityã®å½±éŸ¿ã§åºŠã«æ»‘ã‚‹ã®ã§
+    //ã“ã®çŠ¶æ³ã‚’é˜²ããŸã‚ velocityã‚’0ã«ã™ã‚‹
     owner->velocity.x = 0;
     owner->velocity.y = 0;
     owner->velocity.z = 0;
-    //  Å‰‚Ì”»’è‚ª‚È‚¢‚ÆA–³ŒÀ‚É”ò‚Ñ‘±‚¯‚é‚Ì‚Å
+    //  æœ€åˆã®åˆ¤å®šãŒãªã„ã¨ã€ç„¡é™ã«é£›ã³ç¶šã‘ã‚‹ã®ã§
     owner->firstSwing = true;
     owner->state = Player::State::Land;
 
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Landing), false);
 }
 
-// ’…’nƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ç€åœ°ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::LandState::Execute(float elapsedTime)
 {
     owner->onClimb = false;
@@ -314,48 +314,48 @@ void PlayerStates::LandState::Exit()
 {
 }
 
-// ƒXƒCƒ“ƒOƒXƒe[ƒg
+// ã‚¹ã‚¤ãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::AttackState::Enter()
 {
     owner->state = Player::State::Attack;
     owner->attacking = true;
-    // UŒ‚ƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+    // æ”»æ’ƒã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿ
     owner->PlayAttackAnimation();
 }
 void PlayerStates::AttackState::Execute(float elapsedTime)
 {
-    //@ƒ‚[ƒVƒ‡ƒ“‚ªI‚í‚Á‚½‚ç‘Ò‹@ƒXƒe[ƒg‚Ö‘JˆÚ
+    //ã€€ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒçµ‚ã‚ã£ãŸã‚‰å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã¸é·ç§»
     if (!owner->model->IsPlayAnimation())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
-    //@ƒVƒ…[ƒg“ü—Íˆ—
+    //ã€€ã‚·ãƒ¥ãƒ¼ãƒˆå…¥åŠ›å‡¦ç†
     if (owner->InputProjectile())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
     }
-    //@Dodge“ü—Íˆ—
+    //ã€€Dodgeå…¥åŠ›å‡¦ç†
     if (owner->InputDodge())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Dodge));
     }
 
-    // ƒAƒjƒ[ƒVƒ‡ƒ“‚ÌÄ¶ŠÔ‚ğæ“¾
+    // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®å†ç”Ÿæ™‚é–“ã‚’å–å¾—
     float animationTime = owner->model->GetCurrentAnimationSeconds();
     float animationSpeed = owner->model->GetCurrentAnimationSpeed();
 
-    // ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì‘¬“x‚É‰‚¶‚ÄUŒ‚‚Ì“–‚½‚è”»’è‚ğ’²®
+    // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®é€Ÿåº¦ã«å¿œã˜ã¦æ”»æ’ƒã®å½“ãŸã‚Šåˆ¤å®šã‚’èª¿æ•´
     float adjustedStartTime = 0.3f / animationSpeed;
     float adjustedEndTime = 1.0f / animationSpeed;
     owner->attackCollisionFlag = animationTime >= adjustedStartTime && animationTime <= adjustedEndTime;
 
-    //  UŒ‚‚Ì“–‚½‚è”»’è
+    //  æ”»æ’ƒã®å½“ãŸã‚Šåˆ¤å®š
     if (owner->attackCollisionFlag)
     {
-        //  ƒJƒƒ‰ƒƒbƒN’†UŒ‚‚·‚é‚Æ
+        //  ã‚«ãƒ¡ãƒ©ãƒ­ãƒƒã‚¯ä¸­æ”»æ’ƒã™ã‚‹ã¨
         if (owner->lockonState == Player::LockonState::Locked && owner->lockonEnemy != nullptr)
         {
-            //  ‚¿‚å‚Á‚Æ‚¾‚¯“G‚Ì•ûŒüˆÚ“®‚·‚é
+            //  ã¡ã‚‡ã£ã¨ã ã‘æ•µã®æ–¹å‘ç§»å‹•ã™ã‚‹
             DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&owner->position);
             DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&owner->lockonEnemy->GetPosition());
             DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
@@ -379,7 +379,7 @@ void PlayerStates::AttackState::Execute(float elapsedTime)
             }
         }
 
-        //  ˜AŒ‚‚É‚æ‚Á‚ÄAƒm[ƒh‚ÆƒGƒlƒ~[‚ÌÕ“Ëˆ—
+        //  é€£æ’ƒã«ã‚ˆã£ã¦ã€ãƒãƒ¼ãƒ‰ã¨ã‚¨ãƒãƒŸãƒ¼ã®è¡çªå‡¦ç†
         switch (owner->attackCount)
         {
         case 1:
@@ -399,14 +399,14 @@ void PlayerStates::AttackState::Exit()
 {
 }
 
-// ƒVƒ‡ƒbƒgƒXƒe[ƒg
+// ã‚·ãƒ§ãƒƒãƒˆã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::ShotState::Enter()
 {
     owner->state = Player::State::Shot;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Shoting), false);
 }
 
-// ƒVƒ‡ƒbƒgƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ã‚·ãƒ§ãƒƒãƒˆã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::ShotState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation())
@@ -420,10 +420,10 @@ void PlayerStates::ShotState::Exit()
 
 }
 
-// €–SƒXƒe[ƒg
+// æ­»äº¡ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::DeathState::Enter()
 {
-    //  €–S‚µ‚½‚çHP‚ğ0‚É‚·‚é
+    //  æ­»äº¡ã—ãŸã‚‰HPã‚’0ã«ã™ã‚‹
     if (owner->health <= 0)
     {
         owner->health = 0;
@@ -431,14 +431,14 @@ void PlayerStates::DeathState::Enter()
 
     owner->state = Player::State::Death;
 
-    // €–SƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
+    // æ­»äº¡ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿ
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Death), false);
 }
 
-// €–SƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// æ­»äº¡ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::DeathState::Execute(float elapsedTime)
 {
-    //@ƒ‚[ƒVƒ‡ƒ“‚ªI‚í‚Á‚½‚çƒV[ƒ“‚ğØ‚è‘Ö‚¦‚é
+    //ã€€ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒçµ‚ã‚ã£ãŸã‚‰ã‚·ãƒ¼ãƒ³ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
     if (!owner->model->IsPlayAnimation())
     {
         SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
@@ -449,28 +449,28 @@ void PlayerStates::DeathState::Exit()
 {
 }
 
-// ‰ñ”ğƒXƒe[ƒg
+// å›é¿ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::DodgeState::Enter()
 {
     owner->state = Player::State::Dodge;
-    float attackAnimationSpeed = 1.2f; // ƒAƒjƒ[ƒVƒ‡ƒ“‘¬“x‚ğ‘¬‚­‚·‚é‚½‚ß‚Ì”{—¦
+    float attackAnimationSpeed = 1.2f; // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é€Ÿåº¦ã‚’é€Ÿãã™ã‚‹ãŸã‚ã®å€ç‡
 
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Dodge), false, 0.2, attackAnimationSpeed);
     owner->getAttacksoon = false;
 
 }
 
-// ‰ñ”ğƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// å›é¿ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::DodgeState::Execute(float elapsedTime)
 {
-    //–³“GŠÔ
+    //ç„¡æ•µæ™‚é–“
     owner->invincibleTimer = 2.0f;
 
-    // ƒhƒbƒW‚Ì•ûŒü‚ÉŠî‚Ã‚¢‚ÄˆÚ“®
+    // ãƒ‰ãƒƒã‚¸ã®æ–¹å‘ã«åŸºã¥ã„ã¦ç§»å‹•
     DirectX::XMVECTOR vel = DirectX::XMLoadFloat3(&owner->velocity);
     vel = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&owner->dodgeDirection), 1.2f);
 
-    // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğXV
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’æ›´æ–°
     DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&owner->position);
     playerPos = DirectX::XMVectorAdd(playerPos, DirectX::XMVectorScale(vel, elapsedTime));
 
@@ -484,7 +484,13 @@ void PlayerStates::DodgeState::Exit()
 {
 }
 
-// ƒNƒ‰ƒCƒ~ƒ“ƒOƒXƒe[ƒg
+    GamePad& gamePad = Input::Instance().GetGamePad();
+    float lx = gamePad.GetAxisLX();
+    if (lx > 0.01f || lx < -0.01f)
+    {
+        owner->Roll(elapsedTime, lx, owner->rollSpeed);
+    }
+// ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::ClimbState::Enter()
 {
     owner->state = Player::State::Climb;
@@ -499,22 +505,22 @@ void PlayerStates::ClimbState::Enter()
     owner->onSwing = false;
 }
 
-// ƒNƒ‰ƒCƒ~ƒ“ƒOƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::ClimbState::Execute(float elapsedTime)
 {
-    //@ƒNƒ‰ƒCƒ~ƒ“ƒO’†SpaceƒL[‰Ÿ‚¹‚ÎŒ³‚Ìó‘Ô‚É–ß‚é
+    //ã€€ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ä¸­Spaceã‚­ãƒ¼æŠ¼ã›ã°å…ƒã®çŠ¶æ…‹ã«æˆ»ã‚‹
     if (owner->InputJump())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Jump));
     }
 
-    //  ˆÚ“®‚µ‚Ä‚È‚¢‚È‚ç‘Ò‹@ƒXƒe[ƒg‚Ö‚Ì‘JˆÚ
+    //  ç§»å‹•ã—ã¦ãªã„ãªã‚‰å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã¸ã®é·ç§»
     if (!owner->InputMove(elapsedTime))
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
 
-    //@•Ç‚Ìã‚É“o‚ê‚é‚©‚Ç‚¤‚©‚Ì”»’è
+    //ã€€å£ã®ä¸Šã«ç™»ã‚Œã‚‹ã‹ã©ã†ã‹ã®åˆ¤å®š
     if (owner->IsNearWallTop())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::ClimbTop));
@@ -529,31 +535,31 @@ void PlayerStates::ClimbState::Exit()
 {
 }
 
-// ƒ_ƒ[ƒWƒXƒe[ƒg
+// ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::DamageState::Enter()
 {
     owner->state = Player::State::Damage;
     owner->Damage->Play(false, 0.4f);
 
-    // ƒ_ƒ[ƒWƒAƒjƒ[ƒVƒ‡ƒ“Ä¶
-    float attackAnimationSpeed = 1.5f; // ƒAƒjƒ[ƒVƒ‡ƒ“‘¬“x‚ğ‘¬‚­‚·‚é‚½‚ß‚Ì”{—¦
+    // ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å†ç”Ÿ
+    float attackAnimationSpeed = 1.5f; // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é€Ÿåº¦ã‚’é€Ÿãã™ã‚‹ãŸã‚ã®å€ç‡
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_GetHit1), false, 0.2f, attackAnimationSpeed);
 
     MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
     Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
 
-    // ƒ_ƒ[ƒWƒRƒ“ƒgƒ[ƒ‰[U“®
+    // ãƒ€ãƒ¡ãƒ¼ã‚¸æ™‚ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼æŒ¯å‹•
     GamePad& gamePad = Input::Instance().GetGamePad();
     gamePad.SetVibration(0.5f, 0.5f);
 }
 
-// ƒ_ƒ[ƒWƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::DamageState::Execute(float elapsedTime)
 {
-    // ƒ_ƒ[ƒWƒAƒjƒ[ƒVƒ‡ƒ“‚ªI‚í‚Á‚½‚ç‘Ò‹@ƒXƒe[ƒg‚Ö‘JˆÚ
+    // ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãŒçµ‚ã‚ã£ãŸã‚‰å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã¸é·ç§»
     if (!owner->model->IsPlayAnimation())
     {
-        // ƒRƒ“ƒgƒ[ƒ‰[U“®’â~
+        // ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ©ãƒ¼æŒ¯å‹•åœæ­¢
         GamePad& gamePad = Input::Instance().GetGamePad();
         gamePad.StopVibration();
 
@@ -565,12 +571,12 @@ void PlayerStates::DamageState::Exit()
 {
 }
 
-// ƒXƒCƒ“ƒOƒXƒe[ƒg
+// ã‚¹ã‚¤ãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::SwingState::Enter()
 {
     if (owner->onClimb) return;
     owner->state = Player::State::Swing;
-    //  ˆÚ“®’†ƒXƒCƒ“ƒO‚·‚é‚Æ
+    //  ç§»å‹•ä¸­ã‚¹ã‚¤ãƒ³ã‚°ã™ã‚‹ã¨
     if (owner->lastState == Player::State::Move)
     {
         if (owner->firstSwing)
@@ -578,12 +584,12 @@ void PlayerStates::SwingState::Enter()
             owner->FirstSwing->Play(false, 0.8f);
             owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_StartSwing), false);
             owner->firstSwing = false;
-            //  ƒXƒCƒ“ƒOƒ‚ƒfƒ‹iŒ»İ‰¼AGeometric‚É•ÏX—\’èj
+            //  ã‚¹ã‚¤ãƒ³ã‚°ãƒ¢ãƒ‡ãƒ«ï¼ˆç¾åœ¨ä»®ã€Geometricã«å¤‰æ›´äºˆå®šï¼‰
             SwingWeb* swingWebRight = new SwingWeb(&owner->projectileManager, false);
             SceneGame& sceneGame = SceneGame::Instance();
             if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
-                //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+                //  ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
         }
@@ -594,63 +600,63 @@ void PlayerStates::SwingState::Enter()
             SceneGame& sceneGame = SceneGame::Instance();
             if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
-                //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+                //  ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
                 sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
             }
 
         }
-        //  ƒXƒCƒ“ƒOˆÊ’u‚ğ’T‚·
+        //  ã‚¹ã‚¤ãƒ³ã‚°ä½ç½®ã‚’æ¢ã™
         owner->FindWallSwingPoint();
         owner->onSwing = true;
     }
-    //  ƒWƒƒƒ“ƒv’†ƒXƒCƒ“ƒO‚·‚é‚Æ
+    //  ã‚¸ãƒ£ãƒ³ãƒ—ä¸­ã‚¹ã‚¤ãƒ³ã‚°ã™ã‚‹ã¨
     else if (owner->lastState == Player::State::Jump)
     {
-        //˜A‘±ƒXƒCƒ“ƒO‚Ìƒ‚[ƒVƒ‡ƒ“
+        //é€£ç¶šã‚¹ã‚¤ãƒ³ã‚°ã®ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³
         if (!owner->onSwing)
         {
             owner->FirstSwing->Play(false, 0.8f);
-            //  ƒXƒCƒ“ƒOƒ‚ƒfƒ‹iŒ»İ‰¼AGeometric‚É•ÏX—\’èj
+            //  ã‚¹ã‚¤ãƒ³ã‚°ãƒ¢ãƒ‡ãƒ«ï¼ˆç¾åœ¨ä»®ã€Geometricã«å¤‰æ›´äºˆå®šï¼‰
             SwingWeb* swingWebLeft = new SwingWeb(&owner->projectileManager, true);
             SceneGame& sceneGame = SceneGame::Instance();
             if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
-                //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+                //  ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
                 sceneGame.RegisterRenderModel(swingWebLeft->GetModel());
             }
 
         }
-        //@‰‰ñƒXƒCƒ“ƒO‚Ìƒ‚[ƒVƒ‡ƒ“  
+        //ã€€åˆå›ã‚¹ã‚¤ãƒ³ã‚°ã®ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³  
         {
             owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Swinging), false);
-            //  ƒXƒCƒ“ƒOƒ‚ƒfƒ‹iŒ»İ‰¼AGeometric‚É•ÏX—\’èj
+            //  ã‚¹ã‚¤ãƒ³ã‚°ãƒ¢ãƒ‡ãƒ«ï¼ˆç¾åœ¨ä»®ã€Geometricã«å¤‰æ›´äºˆå®šï¼‰
             SwingWeb* swingWebRight = new SwingWeb(&owner->projectileManager, false);
             SceneGame& sceneGame = SceneGame::Instance();
             if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
-                //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+                //  ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
                 sceneGame.RegisterRenderModel(swingWebRight->GetModel());
             }
         }
-        //  ƒXƒCƒ“ƒOˆÊ’u‚ğ’T‚·
+        //  ã‚¹ã‚¤ãƒ³ã‚°ä½ç½®ã‚’æ¢ã™
         owner->FindWallSwingPoint();
         owner->onSwing = true;
     }
 }
 
-// ƒXƒCƒ“ƒOƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ã‚¹ã‚¤ãƒ³ã‚°ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::SwingState::Execute(float elapsedTime)
 {
 
-    //ƒXƒCƒ“ƒO‚Ì“–‚½‚è”»’è
+    //ã‚¹ã‚¤ãƒ³ã‚°ã®å½“ãŸã‚Šåˆ¤å®š
     owner->SwingCollision(elapsedTime);
 
-    //U‚èq‰^“®‚ÌŒvZ
+    //æŒ¯ã‚Šå­é‹å‹•ã®è¨ˆç®—
     owner->HandleSwingPhysics(elapsedTime, 10.0f, 15.0f, 0.003f);
 
     GamePad& gamePad = Input::Instance().GetGamePad();
 
-    //  ƒL[‚ğ‰Ÿ‚³‚ê‚Ä‚È‚¢ƒXƒCƒ“ƒO‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é
+    //  ã‚­ãƒ¼ã‚’æŠ¼ã•ã‚Œã¦ãªã„æ™‚ã‚¹ã‚¤ãƒ³ã‚°ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹
     if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
     {
         owner->lastState = owner->state;
@@ -662,14 +668,14 @@ void PlayerStates::SwingState::Exit()
 {
 }
 
-// ƒNƒ‰ƒCƒ~ƒ“ƒO‚Ì’¸ãƒXƒe[ƒg
+// ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ã®é ‚ä¸Šã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::ClimbTopState::Enter()
 {
     owner->state = Player::State::ClimbTop;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_ClimbUpWall), false);
 }
 
-// ƒNƒ‰ƒCƒ~ƒ“ƒO‚Ì’¸ãƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ã®é ‚ä¸Šã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::ClimbTopState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation()) owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
@@ -679,7 +685,7 @@ void PlayerStates::ClimbTopState::Exit()
 {
 }
 
-// “Š‚°‹ZƒXƒe[ƒg
+// æŠ•ã’æŠ€ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::GrabState::Enter()
 {
     owner->state = Player::State::Grab;
@@ -689,7 +695,7 @@ void PlayerStates::GrabState::Enter()
     owner->getShotsoon = false;
 }
 
-// “Š‚°‹ZƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// æŠ•ã’æŠ€ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::GrabState::Execute(float elapsedTime)
 {
     owner->webTimer += elapsedTime;
@@ -704,7 +710,7 @@ void PlayerStates::GrabState::Execute(float elapsedTime)
 
         if (owner->lockonEnemy)
         {
-            // lockonEnemy ‚ª Character ‚Æ“™‚µ‚¢ê‡‚ÉƒNƒŠƒA
+            // lockonEnemy ãŒ Character ã¨ç­‰ã—ã„å ´åˆã«ã‚¯ãƒªã‚¢
             CharacterManager& manager = CharacterManager::Instance();
             for (int ii = 0; ii < manager.GetCharacterCount(); ++ii)
             {
@@ -719,12 +725,12 @@ void PlayerStates::GrabState::Execute(float elapsedTime)
         }
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
-    //  ƒJƒƒ‰ƒƒbƒN’†‚Ìˆ—
+    //  ã‚«ãƒ¡ãƒ©ãƒ­ãƒƒã‚¯ä¸­ã®å‡¦ç†
     if (owner->lockonState == Player::LockonState::Locked && owner->lockonEnemy != nullptr)
     {
         if (owner->webTimer <= 0.82)
         {
-            //ƒvƒŒƒCƒ„[Œü‚«‚ğXVˆ—
+            //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å‘ãã‚’æ›´æ–°å‡¦ç†
             DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&owner->position);
             DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&owner->lockonEnemy->GetPosition());
             DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
@@ -738,17 +744,17 @@ void PlayerStates::GrabState::Execute(float elapsedTime)
 
         if (owner->webTimer > 0.82f)
         {
-            //“G‚ÌˆÊ’u‚ğæ“¾
+            //æ•µã®ä½ç½®ã‚’å–å¾—
             auto enemyPos = Player::Instance().GetLockonEnemy()->GetPosition();
             enemyPos.y += 1.0f;
 
-            //è‚ÌˆÊ’u‚ğæ“¾
+            //æ‰‹ã®ä½ç½®ã‚’å–å¾—
             Model::Node* RightHandPos = owner->model->FindNode("mixamorig:RightHand");
             DirectX::XMFLOAT3 pos;
             pos.x = RightHandPos->worldTransform._41;
             pos.y = RightHandPos->worldTransform._42;
             pos.z = RightHandPos->worldTransform._43;
-            //…‚ğ¶¬
+            //ç³¸ã‚’ç”Ÿæˆ
             if (owner->ActiveGrabWeb(pos, enemyPos) && !owner->shotWebPlayed)
             {
                 owner->ShotWeb->Play(false, 0.8f);
@@ -759,7 +765,7 @@ void PlayerStates::GrabState::Execute(float elapsedTime)
         if (owner->webTimer >= 3.8f && !owner->fallSoundPlayed)
         {
             owner->Fall->Play(false);
-            owner->fallSoundPlayed = true; // ‰¹º‚ªÄ¶‚³‚ê‚½‚±‚Æ‚ğ‹L˜^
+            owner->fallSoundPlayed = true; // éŸ³å£°ãŒå†ç”Ÿã•ã‚ŒãŸã“ã¨ã‚’è¨˜éŒ²
         }
     }
 }
@@ -768,14 +774,14 @@ void PlayerStates::GrabState::Exit()
 {
 }
 
-// ƒ^ƒCƒgƒ‹‘Ò‹@ƒXƒe[ƒg
+// ã‚¿ã‚¤ãƒˆãƒ«å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::CrouchIdleState::Enter()
 {
     owner->state = Player::State::CrouchIdle;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_CrouchIdle), false);
 }
 
-// ‘Ò‹@ƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::CrouchIdleState::Execute(float elapsedTime)
 {
     if (!owner->model->IsPlayAnimation())
@@ -789,7 +795,7 @@ void PlayerStates::CrouchIdleState::Exit()
 
 }
 
-// ƒ^ƒCƒgƒ‹‘Ò‹@ƒXƒe[ƒg
+// ã‚¿ã‚¤ãƒˆãƒ«å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::TitleIdleState::Enter()
 {
     owner->state = Player::State::TitleIdle;
@@ -805,7 +811,7 @@ void PlayerStates::TitleIdleState::Exit()
 {
 }
 
-// ƒXƒCƒ“ƒOƒLƒbƒNƒXƒe[ƒg
+// ã‚¹ã‚¤ãƒ³ã‚°ã‚­ãƒƒã‚¯ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::SwingToKickState::Enter()
 {
     owner->state = Player::State::SwingToKick;
@@ -814,7 +820,7 @@ void PlayerStates::SwingToKickState::Enter()
     SceneGame& sceneGame = SceneGame::Instance();
     if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
     {
-        //  ƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+        //  ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
         sceneGame.RegisterRenderModel(swingWebRight->GetModel());
     }
 
@@ -824,7 +830,7 @@ void PlayerStates::SwingToKickState::Enter()
     if (owner->lockonEnemy)
     {
         DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&owner->lockonEnemy->GetPosition());
-        DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 13.0f, 0.0f, 0.0f); // ã•û‚É12.0f‚ÌƒIƒtƒZƒbƒg
+        DirectX::XMVECTOR upVec = DirectX::XMVectorSet(0.0f, 13.0f, 0.0f, 0.0f); // ä¸Šæ–¹ã«12.0fã®ã‚ªãƒ•ã‚»ãƒƒãƒˆ
         DirectX::XMVECTOR swingPointVec = DirectX::XMVectorAdd(enemyPos, upVec);
         DirectX::XMStoreFloat3(&owner->swingPoint, swingPointVec);
     }
@@ -834,22 +840,22 @@ void PlayerStates::SwingToKickState::Enter()
     }
 }
 
-// ƒXƒCƒ“ƒOƒLƒbƒNƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// ã‚¹ã‚¤ãƒ³ã‚°ã‚­ãƒƒã‚¯ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::SwingToKickState::Execute(float elapsedTime)
 {
-    //ƒXƒCƒ“ƒO‚Ì“–‚½‚è”»’è
+    //ã‚¹ã‚¤ãƒ³ã‚°ã®å½“ãŸã‚Šåˆ¤å®š
     owner->SwingCollision(elapsedTime);
 
-    //U‚èq‰^“®‚ÌŒvZ
+    //æŒ¯ã‚Šå­é‹å‹•ã®è¨ˆç®—
     owner->HandleSwingPhysics(elapsedTime, 12.0f, 20.0f, 0.0001f);
 
-    // ƒAƒjƒ[ƒVƒ‡ƒ“‚ÌÄ¶ŠÔ‚ğæ“¾
+    // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ã®å†ç”Ÿæ™‚é–“ã‚’å–å¾—
     float animationTime = owner->model->GetCurrentAnimationSeconds();
 
-    //@‰E‘«‚ÌUŒ‚”»’è
+    //ã€€å³è¶³ã®æ”»æ’ƒåˆ¤å®š
     owner->CollisionNodeVsEnemies("mixamorig:RightToeBase", owner->attackRadius);
 
-    //@ƒ‚[ƒVƒ‡ƒ“‚ªI‚í‚Á‚½‚ç‘Ò‹@ƒXƒe[ƒg‚Ö‘JˆÚ
+    //ã€€ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³ãŒçµ‚ã‚ã£ãŸã‚‰å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã¸é·ç§»
     if (!owner->model->IsPlayAnimation())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
@@ -861,7 +867,7 @@ void PlayerStates::SwingToKickState::Exit()
 {
 }
 
-// •KE‹ZƒXƒe[ƒg
+// å¿…æ®ºæŠ€ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::UltimateState::Enter()
 {
     owner->state = Player::State::Ultimate;
@@ -870,7 +876,7 @@ void PlayerStates::UltimateState::Enter()
 
 }
 
-// •KE‹ZƒXƒe[ƒg‚ÅÀs‚·‚éƒƒ\ƒbƒh
+// å¿…æ®ºæŠ€ã‚¹ãƒ†ãƒ¼ãƒˆã§å®Ÿè¡Œã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰
 void PlayerStates::UltimateState::Execute(float elapsedTime)
 {
     static float timeSinceLastShot = 0.0f;
@@ -878,7 +884,7 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
     static int shotsPerDirection = 0;
     static std::vector<DirectX::XMFLOAT3> directions;
 
-    // ƒAƒjƒ[ƒVƒ‡ƒ“‚ªÄ¶’†‚Å‚È‚¢ê‡A‘Ò‹@ƒXƒe[ƒg‚É‘JˆÚ
+    // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãŒå†ç”Ÿä¸­ã§ãªã„å ´åˆã€å¾…æ©Ÿã‚¹ãƒ†ãƒ¼ãƒˆã«é·ç§»
     if (!owner->model->IsPlayAnimation())
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
@@ -889,7 +895,7 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
         return;
     }
 
-    // ‰‰ñ‚Ì‚İƒ‰ƒ“ƒ_ƒ€‚È•ûŒü‚ğ¶¬
+    // åˆå›ã®ã¿ãƒ©ãƒ³ãƒ€ãƒ ãªæ–¹å‘ã‚’ç”Ÿæˆ
     if (directions.empty())
     {
         for (int i = 0; i < 8; ++i)
@@ -900,7 +906,7 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
                 x = static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f;
                 y = static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f;
                 z = static_cast<float>(rand()) / RAND_MAX * 2.0f - 1.0f;
-            } while (x * x + y * y + z * z > 1.0f || y < 0.0f); // ”¼‹…ó‚É§ŒÀ
+            } while (x * x + y * y + z * z > 1.0f || y < 0.0f); // åŠçƒçŠ¶ã«åˆ¶é™
 
             float length = sqrtf(x * x + y * y + z * z);
             x /= length;
@@ -910,29 +916,29 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
             directions.push_back({ x, y, z });
         }
     }
-    // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğæ“¾
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’å–å¾—
     DirectX::XMFLOAT3 playerPos = { owner->position.x,owner->position.y + 1.0f,owner->position.z };
 
-    // ”­ËŠÔŠu‚ğİ’è
+    // ç™ºå°„é–“éš”ã‚’è¨­å®š
     const float shotInterval = 0.2f;
 
-    // ŠÔ‚ğXV
+    // æ™‚é–“ã‚’æ›´æ–°
     timeSinceLastShot += elapsedTime;
 
-    // ”­ËŠÔŠu‚ªŒo‰ß‚µ‚½‚ç’eŠÛ‚ğ”­Ë
+    // ç™ºå°„é–“éš”ãŒçµŒéã—ãŸã‚‰å¼¾ä¸¸ã‚’ç™ºå°„
     if (timeSinceLastShot >= shotInterval)
     {
         timeSinceLastShot = 0.0f;
 
-        // Œ»İ‚Ì•ûŒü‚É’eŠÛ‚ğ”­Ë
+        // ç¾åœ¨ã®æ–¹å‘ã«å¼¾ä¸¸ã‚’ç™ºå°„
         if (shotsPerDirection < 2)
         {
             owner->ShotWeb->Play(false, 0.8f);
-            // ’eŠÛ‚ğ¶¬‚µ‚Ä”­Ë
+            // å¼¾ä¸¸ã‚’ç”Ÿæˆã—ã¦ç™ºå°„
             ProjectileStraight* projectile = new ProjectileStraight(&owner->projectileManager);
             projectile->Launch(directions[currentDirectionIndex], playerPos);
 
-            // ƒ‚ƒfƒ‹‚ğƒŒƒ“ƒ_ƒ‰[‚É“o˜^
+            // ãƒ¢ãƒ‡ãƒ«ã‚’ãƒ¬ãƒ³ãƒ€ãƒ©ãƒ¼ã«ç™»éŒ²
             SceneGame& sceneGame = SceneGame::Instance();
             if (sceneGame.shadowmapRenderer && sceneGame.sceneRenderer)
             {
@@ -942,11 +948,11 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
         }
         else
         {
-            // Ÿ‚Ì•ûŒü‚ÉˆÚ“®
+            // æ¬¡ã®æ–¹å‘ã«ç§»å‹•
             currentDirectionIndex++;
             shotsPerDirection = 0;
 
-            // ‘S•ûŒü‚É”­Ë‚µI‚í‚Á‚½‚çI—¹
+            // å…¨æ–¹å‘ã«ç™ºå°„ã—çµ‚ã‚ã£ãŸã‚‰çµ‚äº†
             if (currentDirectionIndex >= directions.size())
             {
                 owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
@@ -954,7 +960,7 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
             }
         }
     }
-    // UŒ‚”ÍˆÍ‚Ìİ’è
+    // æ”»æ’ƒç¯„å›²ã®è¨­å®š
     EnemyManager& enemyManager = EnemyManager::Instance();
     int enemyCount = enemyManager.GetEnemyCount();
 
@@ -963,15 +969,15 @@ void PlayerStates::UltimateState::Execute(float elapsedTime)
         Enemy* enemy = enemyManager.GetEnemy(i);
         DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
 
-        // ƒvƒŒƒCƒ„[‚Æ“G‚Ì‹——£‚ğŒvZ
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨æ•µã®è·é›¢ã‚’è¨ˆç®—
         float dx = enemyPos.x - owner->position.x;
         float dz = enemyPos.z - owner->position.z;
         float distance = sqrtf(dx * dx + dz * dz);
 
-        // “G‚ªUŒ‚”ÍˆÍ“à‚É‚¢‚éê‡Aƒ_ƒ[ƒW‚ğ—^‚¦‚é
+        // æ•µãŒæ”»æ’ƒç¯„å›²å†…ã«ã„ã‚‹å ´åˆã€ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’ä¸ãˆã‚‹
         if (distance <= owner->ultimateAttackRadius)
         {
-            enemy->ApplyDamage(50, 0.5f); // ƒ_ƒ[ƒW—Ê‚Æ–³“GŠÔ‚ğİ’è
+            enemy->ApplyDamage(50, 0.5f); // ãƒ€ãƒ¡ãƒ¼ã‚¸é‡ã¨ç„¡æ•µæ™‚é–“ã‚’è¨­å®š
         }
     }
 }
@@ -980,7 +986,7 @@ void PlayerStates::UltimateState::Exit()
 {
 }
 
-// ƒoƒEƒ“ƒXƒXƒe[ƒg
+// ãƒã‚¦ãƒ³ã‚¹ã‚¹ãƒ†ãƒ¼ãƒˆ
 void PlayerStates::BounceState::Enter()
 {
     owner->state = Player::State::Bounce;
@@ -995,15 +1001,15 @@ void PlayerStates::BounceState::Enter()
 void PlayerStates::BounceState::Execute(float elapsedTime)
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
-    // ƒL[‚ğ‰Ÿ‚³‚ê‚Ä‚È‚¢ƒXƒCƒ“ƒO‚ğƒLƒƒƒ“ƒZƒ‹‚·‚é
+    // ã‚­ãƒ¼ã‚’æŠ¼ã•ã‚Œã¦ãªã„æ™‚ã‚¹ã‚¤ãƒ³ã‚°ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã™ã‚‹
     if (gamePad.GetButtonUp() & GamePad::BTN_KEYBOARD_SHIFT || gamePad.GetButtonUp() & GamePad::BTN_RIGHT_TRIGGER)
     {
         owner->lastState = owner->state;
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
-    //ƒXƒCƒ“ƒO‚Ì“–‚½‚è”»’è
+    //ã‚¹ã‚¤ãƒ³ã‚°ã®å½“ãŸã‚Šåˆ¤å®š
     owner->SwingCollision(elapsedTime);
-    //boost‚Ìˆ—
+    //boostã®å‡¦ç†
     if (owner->boostActive) 
     {
         DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&owner->GetFront());
@@ -1011,12 +1017,12 @@ void PlayerStates::BounceState::Execute(float elapsedTime)
         forwardVec = DirectX::XMVector3Normalize(forwardVec);
         upVec = DirectX::XMVector3Normalize(upVec);
  
-        // boost‚Ìis“x‚É‰‚¶‚Ä—Í‚ğ’²®
-        float progress = owner->boostElapsed / owner->bounceBoostTime; // 0`1
+        // boostã®é€²è¡Œåº¦ã«å¿œã˜ã¦åŠ›ã‚’èª¿æ•´
+        float progress = owner->boostElapsed / owner->bounceBoostTime; // 0ï½1
         float forwardPower = (1.0f - progress) * 3.0f * elapsedTime / owner->bounceBoostTime;
         float upPower = 13.0f * elapsedTime / owner->bounceBoostTime;
 
-        // ‘O•û‚Æã•û‚Ì—Í‚ğ‰Á‚¦‚é
+        // å‰æ–¹ã¨ä¸Šæ–¹ã®åŠ›ã‚’åŠ ãˆã‚‹
         DirectX::XMVECTOR addVelocity = DirectX::XMVectorAdd(
             DirectX::XMVectorScale(forwardVec, forwardPower),
             DirectX::XMVectorScale(upVec, upPower)
@@ -1025,14 +1031,14 @@ void PlayerStates::BounceState::Execute(float elapsedTime)
         velocityVec = DirectX::XMVectorAdd(velocityVec, addVelocity);
         DirectX::XMStoreFloat3(&owner->velocity, velocityVec);
 
-        // boost‚ÌŒo‰ßŠÔ‚ğXV
+        // boostã®çµŒéæ™‚é–“ã‚’æ›´æ–°
         owner->boostElapsed += elapsedTime;
         if (owner->boostElapsed >= owner->bounceBoostTime) {
             owner->boostActive = false;
         }
     }
 
-    // --- ‚ ‚Æ‚Í•’Ê‚ÌƒoƒEƒ“ƒX•¨— ---
+    // --- ã‚ã¨ã¯æ™®é€šã®ãƒã‚¦ãƒ³ã‚¹ç‰©ç† ---
     const float g = 15.0f;
     auto vel = DirectX::XMLoadFloat3(&owner->velocity);
     vel = DirectX::XMVectorAdd(vel, DirectX::XMVectorSet(0, -g * elapsedTime, 0, 0));

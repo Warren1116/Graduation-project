@@ -18,7 +18,7 @@
 #include "PlayerStateMachine.h"
 #include "PlayerStateDerived.h"
 
-//ƒAƒjƒ[ƒVƒ‡ƒ“
+//ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 enum class PlayerAnimation
 {
     Anim_Idle, Anim_Walking, Anim_GetHit1, Anim_Death, Anim_Running,
@@ -29,10 +29,10 @@ enum class PlayerAnimation
     Anim_SwingToKick, Anim_Ultimate, Anim_SwingFilp
 };
 
-//@ƒXƒe[ƒgƒ}ƒVƒ“
+//ã€€ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³
 class PlayerStateMachine;
 
-// ƒvƒŒƒCƒ„[‚Ìó‘Ô‚ğŠÇ—‚·‚éƒNƒ‰ƒX
+// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®çŠ¶æ…‹ã‚’ç®¡ç†ã™ã‚‹ã‚¯ãƒ©ã‚¹
 namespace PlayerStates
 {
     class IdleState; class MoveState; class JumpState; class ClimbState;
@@ -43,10 +43,10 @@ namespace PlayerStates
 }
 
 
-// ƒvƒŒƒCƒ„[
+// ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
 class Player : public Character
 {
-    //@FriendƒNƒ‰ƒXéŒ¾
+    //ã€€Friendã‚¯ãƒ©ã‚¹å®£è¨€
     friend class PlayerStates::IdleState;
     friend class PlayerStates::MoveState;
     friend class PlayerStates::JumpState;
@@ -67,7 +67,7 @@ class Player : public Character
     friend class PlayerStates::BounceState;
 
 public:
-    // ƒXƒe[ƒg
+    // ã‚¹ãƒ†ãƒ¼ãƒˆ
     enum class State
     {
         Idle, Move, Jump, Land, Attack, Damage, Death, Dodge,
@@ -75,7 +75,7 @@ public:
         SwingToKick, Ultimate, Bounce, EventMode
     };
 
-    // ƒƒbƒNƒIƒ“ƒXƒe[ƒg
+    // ãƒ­ãƒƒã‚¯ã‚ªãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆ
     enum class LockonState
     {
         NotLocked,
@@ -86,64 +86,64 @@ public:
     ~Player();
     static Player& Instance() { return *instance; }
 
-    // ƒXƒe[ƒgƒ}ƒVƒ“
+    // ã‚¹ãƒ†ãƒ¼ãƒˆãƒã‚·ãƒ³
     PlayerStateMachine* stateMachine = nullptr;
-    //@ƒ‚ƒfƒ‹
+    //ã€€ãƒ¢ãƒ‡ãƒ«
     std::unique_ptr<Model> model = nullptr;
 
-    // ŠÖ”
-    void Update(float elapsedTime);     // XVˆ—
-    void DrawDebugGUI();                // ƒfƒoƒbƒO—pGUI•`‰æ
-    bool InputMove(float elapsedTime);  // ˆÚ“®“ü—Íˆ—
-    bool InputJump();                   // ƒWƒƒƒ“ƒv“ü—Íˆ—
-    bool InputProjectile();             //@’eŠÛ‚Ì“ü—Íˆ—
-    bool InputAttack();                 // UŒ‚“ü—Íˆ—
-    bool InputDodge();                  // Dodge“ü—Íˆ—
-    bool InputHealing();                //@‰ñ•œ“ü—Íˆ—
-    void DrawDebugPrimitive();          // ƒfƒoƒbƒOƒvƒŠƒ~ƒeƒBƒu•`‰æ
+    // é–¢æ•°
+    void Update(float elapsedTime);     // æ›´æ–°å‡¦ç†
+    void DrawDebugGUI();                // ãƒ‡ãƒãƒƒã‚°ç”¨GUIæç”»
+    bool InputMove(float elapsedTime);  // ç§»å‹•å…¥åŠ›å‡¦ç†
+    bool InputJump();                   // ã‚¸ãƒ£ãƒ³ãƒ—å…¥åŠ›å‡¦ç†
+    bool InputProjectile();             //ã€€å¼¾ä¸¸ã®å…¥åŠ›å‡¦ç†
+    bool InputAttack();                 // æ”»æ’ƒå…¥åŠ›å‡¦ç†
+    bool InputDodge();                  // Dodgeå…¥åŠ›å‡¦ç†
+    bool InputHealing();                //ã€€å›å¾©å…¥åŠ›å‡¦ç†
+    void DrawDebugPrimitive();          // ãƒ‡ãƒãƒƒã‚°ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–æç”»
 
     ///////////////////////////////////////////////////////////////////////////////////
-    //                              ƒQƒbƒ^[EƒZƒbƒ^[                               //
+    //                              ã‚²ãƒƒã‚¿ãƒ¼ãƒ»ã‚»ãƒƒã‚¿ãƒ¼                               //
     ///////////////////////////////////////////////////////////////////////////////////
-    //’eŠÛ
-    ProjectileManager& GetProjectileManager() { return projectileManager; }    //	’eŠÛ‚Ìƒ}ƒl[ƒWƒƒ[‚ğæ‚é
-    BrokenProjectileManager& GetBrokenProjectileManager() { return brokenprojectileManager; }    //	”j‰ó‚µ‚½’eŠÛ‚Ìƒ}ƒl[ƒWƒƒ[‚ğæ‚é
+    //å¼¾ä¸¸
+    ProjectileManager& GetProjectileManager() { return projectileManager; }    //	å¼¾ä¸¸ã®ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã‚’å–ã‚‹
+    BrokenProjectileManager& GetBrokenProjectileManager() { return brokenprojectileManager; }    //	ç ´å£Šã—ãŸå¼¾ä¸¸ã®ãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã‚’å–ã‚‹
 
-    //“G
-    Enemy* GetLockonEnemy() const { return static_cast<Enemy*>(lockonEnemy); }    //@ƒƒbƒN’†‚Ì“G‚ğæ“¾
-    EnemyThief* GetAttackEnemy() { return attackEnemy; }                          //@¡UŒ‚‚·‚é‚Ì“G‚ğæ“¾‚·‚é
+    //æ•µ
+    Enemy* GetLockonEnemy() const { return static_cast<Enemy*>(lockonEnemy); }    //ã€€ãƒ­ãƒƒã‚¯ä¸­ã®æ•µã‚’å–å¾—
+    EnemyThief* GetAttackEnemy() { return attackEnemy; }                          //ã€€ä»Šæ”»æ’ƒã™ã‚‹ã®æ•µã‚’å–å¾—ã™ã‚‹
     void SetAttackEnemy(EnemyThief* enemy) { attackEnemy = enemy; }
-    bool GetAttackSoon() { return getAttacksoon; }                                //@UŒ‚—\’mƒtƒ‰ƒO‚ğæ‚é
+    bool GetAttackSoon() { return getAttacksoon; }                                //ã€€æ”»æ’ƒäºˆçŸ¥ãƒ•ãƒ©ã‚°ã‚’å–ã‚‹
     void SetgetAttackSoon(bool getattack) { getAttacksoon = getattack; }
-    bool GetShotSoon() { return getShotsoon; }                                    //  UŒ‚—\’mƒtƒ‰ƒO‚ğæ‚é(Shot)
+    bool GetShotSoon() { return getShotsoon; }                                    //  æ”»æ’ƒäºˆçŸ¥ãƒ•ãƒ©ã‚°ã‚’å–ã‚‹(Shot)
     void SetgetShotSoon(bool getshot) { getShotsoon = getshot; }
 
-    //ƒXƒCƒ“ƒO
-    DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }    //	ƒXƒCƒ“ƒOˆÊ’u‚ğæ“¾
-    DirectX::XMFLOAT3 GetPreviousSwingPoint() { return previousSwingPoint; }    //	‹L˜^‚³‚ê‚½ƒXƒCƒ“ƒOƒ|ƒCƒ“ƒg‚ğæ“¾
+    //ã‚¹ã‚¤ãƒ³ã‚°
+    DirectX::XMFLOAT3 GetswingPoint() { return swingPoint; }    //	ã‚¹ã‚¤ãƒ³ã‚°ä½ç½®ã‚’å–å¾—
+    DirectX::XMFLOAT3 GetPreviousSwingPoint() { return previousSwingPoint; }    //	è¨˜éŒ²ã•ã‚ŒãŸã‚¹ã‚¤ãƒ³ã‚°ãƒã‚¤ãƒ³ãƒˆã‚’å–å¾—
 
-    //@ƒXƒLƒ‹
-    bool GetIsUseGrab() { return IsUseGrab; }               //    “Š‚°‹Zƒtƒ‰ƒO‚ğæ‚é
-    bool GetIsUseSwingKick() { return IsUseSwingKick; }    //    ƒXƒCƒ“ƒOƒLƒbƒNƒtƒ‰ƒO‚ğæ‚é
-    float GetWebTimer() const { return webTimer; }    //  …”­Ë‚Ìƒ^ƒCƒ}[
-    float GetSkillTime() const { return skillTime; }    //  ƒXƒLƒ‹‚Ì‰ñ”‚ğæ‚é
+    //ã€€ã‚¹ã‚­ãƒ«
+    bool GetIsUseGrab() { return IsUseGrab; }               //    æŠ•ã’æŠ€ãƒ•ãƒ©ã‚°ã‚’å–ã‚‹
+    bool GetIsUseSwingKick() { return IsUseSwingKick; }    //    ã‚¹ã‚¤ãƒ³ã‚°ã‚­ãƒƒã‚¯ãƒ•ãƒ©ã‚°ã‚’å–ã‚‹
+    float GetWebTimer() const { return webTimer; }    //  ç³¸ç™ºå°„ã®ã‚¿ã‚¤ãƒãƒ¼
+    float GetSkillTime() const { return skillTime; }    //  ã‚¹ã‚­ãƒ«ã®å›æ•°ã‚’å–ã‚‹
 
-    // ƒXƒe[ƒg
+    // ã‚¹ãƒ†ãƒ¼ãƒˆ
     const State& GetState() const { return state; }
     State SetState(State state) { return this->state = state; }
     State ChangeState(State state) { return this->state = state; }
-    LockonState GetlockonState() { return lockonState; }    //	ƒvƒŒƒCƒ„[‚ÌƒƒbƒNƒXƒe[ƒg‚ğæ‚é
+    LockonState GetlockonState() { return lockonState; }    //	ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ãƒ­ãƒƒã‚¯ã‚¹ãƒ†ãƒ¼ãƒˆã‚’å–ã‚‹
 
 protected:
-    // ƒ_ƒ[ƒW‚ğó‚¯‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
+    // ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹
     void OnDamaged() override;
-    // €–S‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
+    // æ­»äº¡ã—ãŸã¨ãã«å‘¼ã°ã‚Œã‚‹
     void OnDead() override;
-    //@’…’n‚Ì‚ÉŒÄ‚Î‚ê‚é
+    //ã€€ç€åœ°ã®æ™‚ã«å‘¼ã°ã‚Œã‚‹
     void OnLanding() override;
 
 private:
-    // ƒRƒŠƒWƒ‡ƒ“ƒƒbƒVƒ…
+    // ã‚³ãƒªã‚¸ãƒ§ãƒ³ãƒ¡ãƒƒã‚·ãƒ¥
     struct CollisionMesh
     {
         struct Triangle
@@ -161,49 +161,49 @@ private:
         std::vector<Area>		areas;
     };
 
-    // —Bˆê‚Ìinstance
+    // å”¯ä¸€ã®instance
     static Player* instance;
-    //ƒ‚ƒfƒ‹ƒm[ƒh
+    //ãƒ¢ãƒ‡ãƒ«ãƒãƒ¼ãƒ‰
     std::vector<Model::NodePose> nodePoses;
 
     ///////////////////////////////////////////////////////////////////////////////////
-    //                                   ƒvƒŒƒCƒ„[                                  //
+    //                                   ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼                                  //
     ///////////////////////////////////////////////////////////////////////////////////
-    // ƒXƒe[ƒg
+    // ã‚¹ãƒ†ãƒ¼ãƒˆ
     State state = State::Idle;
     State lastState;
 
-    // í“¬
-    bool attacking = false;    // UŒ‚”»’è
+    // æˆ¦é—˜
+    bool attacking = false;    // æ”»æ’ƒåˆ¤å®š
     float attackTimer = 0;
-    int attackCount = 0;    // UŒ‚‚Ì‰ñ”
+    int attackCount = 0;    // æ”»æ’ƒã®å›æ•°
     const int attackLimit = 3;
-    float attackRadius = 0.4f;    // UŒ‚”¼Œa
+    float attackRadius = 0.4f;    // æ”»æ’ƒåŠå¾„
     bool attackCollisionFlag = false;
     float maxAngleX = DirectX::XMConvertToRadians(35);
     float mixAngleX = DirectX::XMConvertToRadians(-35);
-    bool getAttacksoon = false;    //	UŒ‚—\’m
-    bool getShotsoon = false;    //	UŒ‚—\’m
+    bool getAttacksoon = false;    //	æ”»æ’ƒäºˆçŸ¥
+    bool getShotsoon = false;    //	æ”»æ’ƒäºˆçŸ¥
 
-    // ƒXƒCƒ“ƒO
-    DirectX::XMFLOAT3 previousSwingPoint;        //	‘O‰ñ‚ÌƒXƒCƒ“ƒOƒ|ƒCƒ“ƒg‚ğ‹L˜^
-    DirectX::XMFLOAT3 swingPoint;    //	ƒXƒCƒ“ƒOƒ|ƒCƒ“ƒg‚ÌˆÊ’u
-    DirectX::XMFLOAT3 swingwebDirection;    //	ƒXƒCƒ“ƒOƒ|ƒCƒ“ƒg‚Ì•ûŒü
+    // ã‚¹ã‚¤ãƒ³ã‚°
+    DirectX::XMFLOAT3 previousSwingPoint;        //	å‰å›ã®ã‚¹ã‚¤ãƒ³ã‚°ãƒã‚¤ãƒ³ãƒˆã‚’è¨˜éŒ²
+    DirectX::XMFLOAT3 swingPoint;    //	ã‚¹ã‚¤ãƒ³ã‚°ãƒã‚¤ãƒ³ãƒˆã®ä½ç½®
+    DirectX::XMFLOAT3 swingwebDirection;    //	ã‚¹ã‚¤ãƒ³ã‚°ãƒã‚¤ãƒ³ãƒˆã®æ–¹å‘
     DirectX::XMVECTOR SwingwebDirection;
-    bool firstSwing = true;    //	‰‰ñ‚ÌƒXƒCƒ“ƒO‚ğ”»’è
-    float swingCooldown = 0.3f;    //˜A‘±ƒXƒCƒ“ƒO‚ğ”ğ‚¯‚é‚½‚ß
+    bool firstSwing = true;    //	åˆå›ã®ã‚¹ã‚¤ãƒ³ã‚°ã‚’åˆ¤å®š
+    float swingCooldown = 0.3f;    //é€£ç¶šã‚¹ã‚¤ãƒ³ã‚°ã‚’é¿ã‘ã‚‹ãŸã‚
     float swingCooldownTimer = 0.0f;
     bool canSwing = true;
 
-    // ƒoƒEƒ“ƒX
+    // ãƒã‚¦ãƒ³ã‚¹
     bool ropeAttached = false;
     float bounceTimer = 0.0f;
     const float ropeCoolDown = 0.5f;
-    float bounceBoostTime = 0.4f;   // ƒu[ƒXƒg‚ğ‰Á‚¦‚é‡ŒvŠÔi•bj
-    float boostElapsed = 0.0f;       // Œo‰ßŠÔ
+    float bounceBoostTime = 0.4f;   // ãƒ–ãƒ¼ã‚¹ãƒˆã‚’åŠ ãˆã‚‹åˆè¨ˆæ™‚é–“ï¼ˆç§’ï¼‰
+    float boostElapsed = 0.0f;       // çµŒéæ™‚é–“
     bool boostActive = true;
 
-    // ƒJƒƒ‰ƒƒbƒN—p
+    // ã‚«ãƒ¡ãƒ©ãƒ­ãƒƒã‚¯ç”¨
     LockonState			lockonState = LockonState::NotLocked;
     float				lockonTargetChangeTime = 0;
     float				lockonTargetChangeTimeMax = 8;
@@ -211,61 +211,62 @@ private:
     DirectX::XMFLOAT3	lockDirection;
     const float MAX_LOCKON_DISTANCE = 15.0f;
 
-    // “Š‚°‹ZE•KE‹Z—p
-    bool IsUseGrab = false;         // “Š‚°‹Z
-    float webTimer;                 // …‚Ìƒ^ƒCƒ}[
-    bool IsUseSwingKick = false;    // ƒXƒCƒ“ƒOƒLƒbƒN
-    float ultimateAttackRadius = 5.0f;// UŒ‚”ÍˆÍ‚Ì”¼Œa
-    float skillTime;                // ƒXƒLƒ‹‰ñ”
-    float skillTimeMax = 5.0f;      // ƒXƒLƒ‹Å‘å’l
+    // æŠ•ã’æŠ€ãƒ»å¿…æ®ºæŠ€ç”¨
+    bool IsUseGrab = false;         // æŠ•ã’æŠ€
+    float webTimer;                 // ç³¸ã®ã‚¿ã‚¤ãƒãƒ¼
+    bool IsUseSwingKick = false;    // ã‚¹ã‚¤ãƒ³ã‚°ã‚­ãƒƒã‚¯
+    float ultimateAttackRadius = 5.0f;// æ”»æ’ƒç¯„å›²ã®åŠå¾„
+    float skillTime;                // ã‚¹ã‚­ãƒ«å›æ•°
+    float skillTimeMax = 5.0f;      // ã‚¹ã‚­ãƒ«æœ€å¤§å€¤
 
-    // ‰¹EƒGƒtƒFƒNƒg
-    std::unique_ptr<Effect> hitEffect = nullptr;        //@ƒqƒbƒgƒGƒtƒFƒNƒg
-    std::unique_ptr<AudioSource> punch = nullptr;       //	UŒ‚‰¹
-    std::unique_ptr<AudioSource> punch2 = nullptr;      //	UŒ‚‰¹
-    std::unique_ptr<AudioSource> kick = nullptr;        //	UŒ‚‰¹
-    std::unique_ptr<AudioSource> Fall = nullptr;        //  —‚Æ‚·‰¹
+    // éŸ³ãƒ»ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+    std::unique_ptr<Effect> hitEffect = nullptr;        //ã€€ãƒ’ãƒƒãƒˆã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+    std::unique_ptr<AudioSource> punch = nullptr;       //	æ”»æ’ƒéŸ³
+    std::unique_ptr<AudioSource> punch2 = nullptr;      //	æ”»æ’ƒéŸ³
+    float rollSpeed = DirectX::XMConvertToRadians(360);    //@Roll speed
+    std::unique_ptr<AudioSource> kick = nullptr;        //	æ”»æ’ƒéŸ³
+    std::unique_ptr<AudioSource> Fall = nullptr;        //  è½ã¨ã™éŸ³
     bool fallSoundPlayed = false;
-    std::unique_ptr<AudioSource> spiderSense = nullptr; //  ƒXƒpƒCƒ_[ƒZƒ“ƒX
+    std::unique_ptr<AudioSource> spiderSense = nullptr; //  ã‚¹ãƒ‘ã‚¤ãƒ€ãƒ¼ã‚»ãƒ³ã‚¹
     bool spiderSensePlayed = false;
-    std::unique_ptr<AudioSource> FirstSwing = nullptr;  //@ƒVƒ…[ƒg‰¹
-    std::unique_ptr<AudioSource> Swing = nullptr;       //@ƒVƒ…[ƒg‰¹
-    std::unique_ptr<AudioSource> ShotWeb = nullptr;     //@ƒVƒ…[ƒg‰¹
+    std::unique_ptr<AudioSource> FirstSwing = nullptr;  //ã€€ã‚·ãƒ¥ãƒ¼ãƒˆéŸ³
+    std::unique_ptr<AudioSource> Swing = nullptr;       //ã€€ã‚·ãƒ¥ãƒ¼ãƒˆéŸ³
+    std::unique_ptr<AudioSource> ShotWeb = nullptr;     //ã€€ã‚·ãƒ¥ãƒ¼ãƒˆéŸ³
     bool shotWebPlayed = false;
-    std::unique_ptr<AudioSource> Healing = nullptr;     //  ‰ñ•œ‰¹
-    std::unique_ptr<AudioSource> Damage = nullptr;      //	ƒ_ƒ[ƒW‰¹
+    std::unique_ptr<AudioSource> Healing = nullptr;     //  å›å¾©éŸ³
+    std::unique_ptr<AudioSource> Damage = nullptr;      //	ãƒ€ãƒ¡ãƒ¼ã‚¸éŸ³
 
-    // ’eŠÛ
+    // å¼¾ä¸¸
     ProjectileManager projectileManager;
     BrokenProjectileManager brokenprojectileManager;
 
-    // •Ç“–‚½‚è”»’è‚Ìƒ`ƒFƒbƒN
+    // å£å½“ãŸã‚Šåˆ¤å®šã®ãƒã‚§ãƒƒã‚¯
     DirectX::XMFLOAT3 checkpos;
     DirectX::XMVECTOR checkDirection;
 
-    // ˆÚ“®
-    float moveSpeed = 5.0f;                                //@ˆÚ“®ƒXƒr[ƒg
-    float climbSpeed = 5.0f;                               //@ƒNƒ‰ƒCƒ~ƒ“ƒOƒXƒr[ƒg
-    float turnSpeed = DirectX::XMConvertToRadians(720);    //@‰ñ“]ƒXƒr[ƒg
-    float jumpSpeed = 16.0f;                               //@ƒWƒƒƒ“ƒuƒXƒr[ƒg
-    DirectX::XMFLOAT3 dodgeDirection;                      //  ‰ñ”ğ‚Ì•ûŒü
+    // ç§»å‹•
+    float moveSpeed = 5.0f;                                //ã€€ç§»å‹•ã‚¹ãƒ“ãƒ¼ãƒˆ
+    float climbSpeed = 5.0f;                               //ã€€ã‚¯ãƒ©ã‚¤ãƒŸãƒ³ã‚°ã‚¹ãƒ“ãƒ¼ãƒˆ
+    float turnSpeed = DirectX::XMConvertToRadians(720);    //ã€€å›è»¢ã‚¹ãƒ“ãƒ¼ãƒˆ
+    float jumpSpeed = 16.0f;                               //ã€€ã‚¸ãƒ£ãƒ³ãƒ–ã‚¹ãƒ“ãƒ¼ãƒˆ
+    DirectX::XMFLOAT3 dodgeDirection;                      //  å›é¿ã®æ–¹å‘
 
-    // “G
-    EnemyThief* attackEnemy = nullptr;                     //@UŒ‚‘ÎÛ
+    // æ•µ
+    EnemyThief* attackEnemy = nullptr;                     //ã€€æ”»æ’ƒå¯¾è±¡
 
-    // ŠÖ”
-    void CollisionPlayerVsEnemies();    // ƒvƒŒƒCƒ„[‚ÆƒGƒlƒ~[‚Æ‚ÌÕ“Ëˆ—
-    void CollisionProjectileVsEnemies();    //	’eŠÛ‚Æ“G‚Æ‚ÌÕ“Ëˆ—
-    void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);    // ƒm[ƒh‚ÆƒGƒlƒ~[‚ÌÕ“Ëˆ—
-    void UpdateCameraState(float elapsedTime);    // ƒJƒƒ‰ƒXƒe[ƒg‚ÌXV
-    void PlayAttackAnimation();    //	˜AŒ‚UŒ‚‚Ìƒ‚[ƒVƒ‡ƒ“
-    bool IsNearWallTop();    //	•Ç’[‚Á‚±‚Ì”»’è
-    bool FindWallSwingPoint();    //	ƒXƒCƒ“ƒOƒ|ƒCƒ“ƒg‚ğ’T‚·
-    void SwingCollision(float elapsedTime);    //	ƒXƒCƒ“ƒO‚Ì“–‚½‚è”»’è
-    // ƒXƒCƒ“ƒO‚ÌŒvZ
+    // é–¢æ•°
+    void CollisionPlayerVsEnemies();    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã‚¨ãƒãƒŸãƒ¼ã¨ã®è¡çªå‡¦ç†
+    void CollisionProjectileVsEnemies();    //	å¼¾ä¸¸ã¨æ•µã¨ã®è¡çªå‡¦ç†
+    void CollisionNodeVsEnemies(const char* nodeName, float nodeRadius);    // ãƒãƒ¼ãƒ‰ã¨ã‚¨ãƒãƒŸãƒ¼ã®è¡çªå‡¦ç†
+    void UpdateCameraState(float elapsedTime);    // ã‚«ãƒ¡ãƒ©ã‚¹ãƒ†ãƒ¼ãƒˆã®æ›´æ–°
+    void PlayAttackAnimation();    //	é€£æ’ƒæ”»æ’ƒã®ãƒ¢ãƒ¼ã‚·ãƒ§ãƒ³
+    bool IsNearWallTop();    //	å£ç«¯ã£ã“ã®åˆ¤å®š
+    bool FindWallSwingPoint();    //	ã‚¹ã‚¤ãƒ³ã‚°ãƒã‚¤ãƒ³ãƒˆã‚’æ¢ã™
+    void SwingCollision(float elapsedTime);    //	ã‚¹ã‚¤ãƒ³ã‚°ã®å½“ãŸã‚Šåˆ¤å®š
+    // ã‚¹ã‚¤ãƒ³ã‚°ã®è¨ˆç®—
     void HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient);
-    //@“Š‚°‹ZActive
+    //ã€€æŠ•ã’æŠ€Active
     bool ActiveGrabWeb(DirectX::XMFLOAT3 startPos, DirectX::XMFLOAT3 endPos);
-    DirectX::XMFLOAT3 GetMoveVec() const;    // ˆÚ“®ƒxƒNƒgƒ‹æ“¾
+    DirectX::XMFLOAT3 GetMoveVec() const;    // ç§»å‹•ãƒ™ã‚¯ãƒˆãƒ«å–å¾—
 };
 
