@@ -8,7 +8,8 @@
 // エネミーアニメーション
 enum class EnemyAnimation {
     Idle, Walk, Run, AttackShot, Die, GetHit,
-    AttackPunch, GetThrow, HoldGun, KickDown
+    AttackPunch, GetThrow, HoldGun, KickDown,
+    Bodage
 };
 
 //ステートマシン
@@ -21,7 +22,7 @@ public:
     ~EnemyThief()override;
 
     // ステート
-    enum class State { Search, Battle, Recieve, Max };  //親ステート
+    enum class State { Search, Battle, Recieve, Bodage, Max };  //親ステート
     enum class Search { Wander, Idle, Max };            //子 (Search用)
     enum class Battle { Pursuit, Attack, Punch, Shot,
         Damage, Standby, Max };                   //子 (Battle用)

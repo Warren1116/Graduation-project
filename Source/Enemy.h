@@ -43,5 +43,7 @@ protected:
     float searchRange = 0.0f;
     float attackRange = 0.0f;
 
+
+
 };
 

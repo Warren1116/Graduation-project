@@ -517,6 +517,10 @@ void EnemyStates::DamageState::Enter()
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false);
     }
+    //else if (owner->GetIsBodage())
+    //{
+    //    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Bodage), false);
+    //}
     else
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GetHit), false);
@@ -616,4 +620,30 @@ void EnemyStates::CalledState::Execute(float elapsedTime)
 void EnemyStates::CalledState::Exit()
 {
 }
-//-----------------------------------------------------------------------------------------------------------------------------------------
+
+EnemyStates::BodageState::~BodageState()
+{
+}
+
+void EnemyStates::BodageState::Enter()
+{
+    if (owner->GetIsBodage())
+    {
+        owner->SetIsBodage(false);
+        owner->SetWebCount(0);
+        owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Bodage), false);
+    }
+
+}
+
+void EnemyStates::BodageState::Execute(float elapsedTime)
+{
+    if (!owner->GetModel()->IsPlayAnimation())
+    {
+        owner->GetStateMachine()->ChangeState(static_cast<int>(EnemyThief::State::Search));
+    }
+}
+
+void EnemyStates::BodageState::Exit()
+{
+}

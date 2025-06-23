@@ -84,6 +84,13 @@ public:
 
 	void Roll(float elapsedTime, float direction, float speed);
 
+	//　縛られているかどうか
+    void SetIsBodage(bool isBodage) { IsBodage = isBodage; }
+    bool GetIsBodage() const { return IsBodage; }
+    void AddWebCount(int count) { WebCount += count; }
+    void SetWebCount(int count) { WebCount = count; }
+    int GetWebCount() const { return WebCount; }
+
 private:
 
 	// 垂直速力更新処理　
@@ -100,8 +107,6 @@ private:
 
     // 前方レイ飛ばしてない時対応（敵用）
     void CheckWallCollision(float elapsedTime);
-
-
 
 protected:
 	// 移動処理
@@ -183,6 +188,10 @@ protected:
 	// クォータニオンを使った回転を管理するためのメンバ変数
 	DirectX::XMFLOAT4 climbRotationQuaternion;
 	DirectX::XMFLOAT3 wallNormal;
+
+	//縛られる（敵）
+	bool IsBodage = false;    // 縛られるフラグ
+	int WebCount = 0;
 
 };
 

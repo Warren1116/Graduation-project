@@ -106,8 +106,6 @@ namespace EnemyStates
         //ステートから出ていくときのメソッド
         void Exit()override;
         std::unique_ptr<AudioSource> Fire = nullptr;
-
-
     };
 
     // 階層型ステートマシンの親ステートクラス
@@ -156,6 +154,19 @@ namespace EnemyStates
         void Exit();
     };
 
+    class BodageState : public EnemyHierarchicalState
+    {
+    public:
+        BodageState(EnemyThief* enemy) : EnemyHierarchicalState(enemy) {}
+        ~BodageState();
+        void Enter();
+        // ステートで実行するのメソッド
+        void Execute(float elapsedTime);
+        // ステートから出ていくときのメソッド
+        void Exit();
+    };
+
+
     // 他のエネミーから呼ばれたときのステートを追加
     class CalledState : public EnemyState
     {
@@ -202,5 +213,4 @@ namespace EnemyStates
         // ステートから出ていくときのメソッド
         void Exit() override;
     };
-
 }

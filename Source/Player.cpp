@@ -770,23 +770,10 @@ void Player::CollisionProjectileVsEnemies()
 
                 if (enemy->ApplyDamage(15, 1.0f))
                 {
-                    //吹き飛ばす
+                    enemy->AddWebCount(1);
+                    if (enemy->GetWebCount() == 3)
                     {
-                        DirectX::XMFLOAT3 impulse;
-                        const float power = 10.0f;
-                        const DirectX::XMFLOAT3& e = enemy->GetPosition();
-                        const DirectX::XMFLOAT3& p = projectile->GetPosition();
-
-                        float vx = e.x - p.x;
-                        float vz = e.z - p.z;
-                        float lengthXZ = sqrtf(vx * vx + vz * vz);
-                        vx /= lengthXZ;
-                        vz /= lengthXZ;
-
-                        impulse.x = vx * power;
-                        impulse.y = power * 0.5f;
-                        impulse.z = vz * power;
-                        enemy->AddImpulse(impulse);
+                        enemy->SetIsBodage(true);
                     }
                     //エフェクト生成
                     {

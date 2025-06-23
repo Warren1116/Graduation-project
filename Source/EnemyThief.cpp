@@ -30,6 +30,7 @@ EnemyThief::EnemyThief()
     // ステートマシンにメッセージを受信したときの１層目のステートを追加登録
     stateMachine->RegisterState(new EnemyStates::RecieveState(this));
 
+    stateMachine->RegisterState(new EnemyStates::BodageState(this));
 
     // 各親ステートにサブステートを登録
     stateMachine->RegisterSubState(static_cast<int>(EnemyThief::State::Search), new EnemyStates::WanderState(this));
@@ -132,6 +133,12 @@ void EnemyThief::Update(float elapsedTime)
         }
     }
 
+    if(GetIsBodage())
+    {
+        //  縄で縛られている時の処理
+        stateMachine->ChangeState(static_cast<int>(State::Bodage));
+    }
+
     //  投げ技されてないならステージマシン更新
     if (!Player::Instance().GetIsUseGrab())
     {
@@ -157,7 +164,6 @@ void EnemyThief::Update(float elapsedTime)
 
     // モデル行列更新
     model->UpdateTransform(transform);
-
 }
 
 // 死亡した時に呼ばれる
