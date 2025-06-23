@@ -77,6 +77,14 @@ void Character::UpdateInvincibleTimer(float elapsedTime)
 }
 
 
+void Character::Roll(float elapsedTime, float direction, float speed)
+{
+    float rot = speed * elapsedTime * direction;
+    angle.z += rot;
+    if (angle.z < -DirectX::XM_PI) angle.z += DirectX::XM_2PI;
+    if (angle.z > DirectX::XM_PI) angle.z -= DirectX::XM_2PI;
+}
+
 // 垂直速力更新処理
 void Character::UpdateVerticalVelocity(float elapsedFrame)
 {
@@ -182,7 +190,6 @@ void Character::UpdateVerticalMove(float elapsedTime)
 // 水平速力更新処理　
 void Character::UpdateHorizontalVelocity(float elapsedFrame)
 {
-
     // XZ平面の速力を減速する
     float length = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
     if (!onSwing && length > 0.0f)

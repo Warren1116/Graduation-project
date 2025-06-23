@@ -10,7 +10,6 @@
 #include <mutex>
 
 
-
 enum class ModelShaderId
 {
 	Phong,

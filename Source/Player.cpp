@@ -157,77 +157,74 @@ void Player::Update(float elapsedTime)
 // 移動入力処理
 bool Player::InputMove(float elapsedTime)
 {
-    GamePad& gamePad = Input::Instance().GetGamePad();
-
-    //進行ベクトル取得
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
-    //移動処理
+
     Move(moveVec.x, moveVec.y, moveVec.z, moveSpeed);
     if (!onClimb)
     {
         Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
     }
-    else
-    {
-        moveVec.x = 0;
-        moveVec.z = 0;
-    }
+
     return moveVec.x != 0 || moveVec.y != 0 || moveVec.z != 0;
 }
 
 
-// スティック入力値から移動ベクトルを取得
 DirectX::XMFLOAT3 Player::GetMoveVec() const
 {
-    // 入力情報を取得
     GamePad& gamePad = Input::Instance().GetGamePad();
     float ax = gamePad.GetAxisLX();
     float ay = gamePad.GetAxisLY();
 
-    // カメラ方向とスティックの入力値によって進行方向を計算する
-    Camera& camera = Camera::Instance();
-    const DirectX::XMFLOAT3& cameraRight = camera.GetRight();
-    const DirectX::XMFLOAT3& cameraFront = camera.GetFront();
-    const DirectX::XMFLOAT3& cameraUp = camera.GetUp();
+    if (ax == 0 && ay == 0)
+        return { 0, 0, 0 };
 
-    // カメラ右方向ベクトルをXZ単位ベクトルに変換
-    float cameraRightX = cameraRight.x;
-    float cameraRightZ = cameraRight.z;
-    float cameraRightLenght =
-        sqrtf(cameraRightX * cameraRightX + cameraRightZ * cameraRightZ);
-    if (cameraRightLenght > 0.0f)
+    if (!onClimb)
     {
-        // 単位ベクトル化
-        cameraRightX /= cameraRightLenght;
-        cameraRightZ /= cameraRightLenght;
-    }
+        Camera& camera = Camera::Instance();
+        const DirectX::XMFLOAT3& cameraRight = camera.GetRight();
+        const DirectX::XMFLOAT3& cameraFront = camera.GetFront();
+        const DirectX::XMFLOAT3& cameraUp = camera.GetUp();
 
-    // カメラ前方向ベクトルをXZ単位ベクトルに変換
-    float cameraFrontX = cameraFront.x;
-    float cameraFrontZ = cameraFront.z;
-    float cameraFrontLenght =
-        sqrtf(cameraFrontX * cameraFrontX + cameraFrontZ * cameraFrontZ);
-    if (cameraFrontLenght > 0.0f)
-    {
-        // 単位ベクトル化
-        cameraFrontX /= cameraFrontLenght;
-        cameraFrontZ /= cameraFrontLenght;
-    }
+        float cameraRightX = cameraRight.x;
+        float cameraRightZ = cameraRight.z;
+        float cameraFrontX = cameraFront.x;
+        float cameraFrontZ = cameraFront.z;
 
-    float cameraUpY = cameraUp.y;
+        float lenRight = sqrtf(cameraRightX * cameraRightX + cameraRightZ * cameraRightZ);
+        float lenFront = sqrtf(cameraFrontX * cameraFrontX + cameraFrontZ * cameraFrontZ);
 
-    DirectX::XMFLOAT3 vec;
-    {
-        // スティックの水平入力値をカメラ右方向に反映し、
-        // スティックの垂直入力値をカメラ前方向に反映し、
-        // 進行ベクトルを計算する
+        if (lenRight > 0.0f) {
+            cameraRightX /= lenRight;
+            cameraRightZ /= lenRight;
+        }
+
+        if (lenFront > 0.0f) {
+            cameraFrontX /= lenFront;
+            cameraFrontZ /= lenFront;
+        }
+
+        DirectX::XMFLOAT3 vec;
         vec.x = (ax * cameraRightX) + (ay * cameraFrontX);
         vec.z = (ax * cameraRightZ) + (ay * cameraFrontZ);
-        // Y軸
-        vec.y = ay * cameraUpY * 3.0f;
+        vec.y = 0;
+
+        return vec;
     }
 
-    return vec;
+    DirectX::XMVECTOR right = DirectX::XMLoadFloat3(&GetRight());
+    DirectX::XMVECTOR up = DirectX::XMLoadFloat3(&GetUp());
+
+    DirectX::XMVECTOR move =
+        DirectX::XMVectorAdd(
+            DirectX::XMVectorScale(right, ax),
+            DirectX::XMVectorScale(up, ay)
+        );
+
+    move = DirectX::XMVector3Normalize(move);
+
+    DirectX::XMFLOAT3 result;
+    DirectX::XMStoreFloat3(&result, move);
+    return result;
 }
 
 // プレイヤーとエネミーとの衝突処理
@@ -1079,7 +1076,7 @@ void Player::SwingCollision(float elapsedTime)
 
 //振り子運動の計算
 void Player::HandleSwingPhysics(float elapsedTime, float ropeLength, float gravityStrength, float dragCoefficient)
-{    
+{
     // バウンスステートならなんもしない
     if (!ropeAttached && state == State::Bounce)return;
 

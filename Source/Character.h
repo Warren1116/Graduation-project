@@ -82,7 +82,7 @@ public:
 	bool GetIsLockedOn() const { return IsLockedOn; }
 	void SetLockedOn(bool lockStatus) { IsLockedOn = lockStatus; }
 
-
+	void Roll(float elapsedTime, float direction, float speed);
 
 private:
 

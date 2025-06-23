@@ -242,13 +242,16 @@ private:
     // 壁当たり判定のチェック
     DirectX::XMFLOAT3 checkpos;
     DirectX::XMVECTOR checkDirection;
+    DirectX::XMFLOAT3 climbUpDir = { 0,1,0 };
 
     // 移動
     float moveSpeed = 5.0f;                                //　移動スビート
-    float climbSpeed = 5.0f;                               //　クライミングスビート
+    float climbSpeed = 10.0f;                               //　クライミングスビート
     float turnSpeed = DirectX::XMConvertToRadians(720);    //　回転スビート
     float jumpSpeed = 16.0f;                               //　ジャンブスビート
     DirectX::XMFLOAT3 dodgeDirection;                      //  回避の方向
+    float rollSpeed = DirectX::XMConvertToRadians(100);
+
 
     // 敵
     EnemyThief* attackEnemy = nullptr;                     //　攻撃対象
