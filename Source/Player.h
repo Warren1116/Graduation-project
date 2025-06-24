@@ -221,6 +221,7 @@ private:
 
     // 音・エフェクト
     std::unique_ptr<Effect> hitEffect = nullptr;        //　ヒットエフェクト
+    std::unique_ptr<Effect> webEffect = nullptr;        //　糸エフェクト
     std::unique_ptr<AudioSource> punch = nullptr;       //	攻撃音
     std::unique_ptr<AudioSource> punch2 = nullptr;      //	攻撃音
     std::unique_ptr<AudioSource> kick = nullptr;        //	攻撃音

@@ -9,6 +9,8 @@ public:
 	Effect(const char* filename);
 	~Effect() {}
 
+
+
 	// çƒê∂
 	Effekseer::Handle Play(const DirectX::XMFLOAT3& position, float scale = 1.0f);
 

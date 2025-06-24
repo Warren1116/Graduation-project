@@ -341,6 +341,9 @@ void EnemyThief::DrawDebugGUI()
             subStr = "Called";
         }
         break;
+    case State::Bodage:
+        str = "Bodage";
+        break;
 
     }
 

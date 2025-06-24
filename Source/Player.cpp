@@ -19,6 +19,7 @@
 #include "SceneLoading.h"
 #include "EnemyThief.h"
 #include "PlayerStateDerived.h"
+#include "Effect.h"
 
 Player* Player::instance = nullptr;
 
@@ -70,6 +71,7 @@ Player::Player(bool flag)
 
     // エフェクト
     hitEffect = std::make_unique<Effect>("Data/Effect/hitEffect.efk");
+    webEffect = std::make_unique<Effect>("Data/Effect/webEffect.efk");
 
     // サウンド読み込み
     // 攻撃音
@@ -767,19 +769,20 @@ void Player::CollisionProjectileVsEnemies()
                 outPosition))
             {
                 //ダメージを与える
-
                 if (enemy->ApplyDamage(15, 1.0f))
                 {
                     enemy->AddWebCount(1);
+                    DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();
+                    enemyPos.y += enemy->GetHeight();
+                    //敵がWebで3回受けたら拘束状態にする
                     if (enemy->GetWebCount() == 3)
-                    {
+                    {   
+                        webEffect->Play(enemyPos,2.0f);
                         enemy->SetIsBodage(true);
                     }
                     //エフェクト生成
                     {
-                        DirectX::XMFLOAT3 e = enemy->GetPosition();
-                        e.y += enemy->GetHeight() * 1.5f;
-                        hitEffect->Play(e);
+                        hitEffect->Play(enemyPos);
                     }
                     //弾丸破棄
                     projectile->Destroy();

@@ -517,10 +517,6 @@ void EnemyStates::DamageState::Enter()
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::KickDown), false);
     }
-    //else if (owner->GetIsBodage())
-    //{
-    //    owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::Bodage), false);
-    //}
     else
     {
         owner->GetModel()->PlayAnimation(static_cast<int>(EnemyAnimation::GetHit), false);
@@ -646,4 +642,13 @@ void EnemyStates::BodageState::Execute(float elapsedTime)
 
 void EnemyStates::BodageState::Exit()
 {
+    if (owner->GetAttackFlg())
+    {
+        // UŒ‚Œ ‚Ì•úŠü
+        owner->SetAttackFlg(false);
+        Meta::Instance().SendMessaging(
+            owner->GetId(),
+            static_cast<int>(Meta::Identity::Meta),
+            MESSAGE_TYPE::MsgChangeAttackRight);
+    }
 }
