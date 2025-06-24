@@ -25,8 +25,8 @@ enum class PlayerAnimation
     Anim_Climb, Anim_Landing, Anim_Jump, Anim_HoldInWall, Anim_Attack,
     Anim_Attack2, Anim_Kick, Anim_StartSwing, Anim_Swinging, Anim_Swinging2,
     Anim_Shoting, Anim_Dodge, Anim_ClimbUpWall, Anim_ClimbDown, Anim_GrabAndDrop,
-    Anim_CrouchIdle, Anim_TitleIdle, Anim_Crouch,
-    Anim_SwingToKick, Anim_Ultimate, Anim_SwingFilp
+    Anim_CrouchIdle, Anim_TitleIdle, Anim_Crouch, Anim_SwingToKick,
+    Anim_Ultimate, Anim_SwingFilp, Anim_FlyPounch
 };
 
 //　ステートマシン
@@ -38,8 +38,8 @@ namespace PlayerStates
     class IdleState; class MoveState; class JumpState; class ClimbState;
     class AttackState; class DamageState; class SwingState; class SwingToKickState;
     class LandState; class ShotState; class GrabState; class DodgeState;
-    class ClimbTopState; class UltimateState; class DeathState;
-    class CrouchIdleState; class TitleIdleState; class BounceState;
+    class ClimbTopState; class UltimateState; class DeathState; class CrouchIdleState;
+    class TitleIdleState; class BounceState; 
 }
 
 

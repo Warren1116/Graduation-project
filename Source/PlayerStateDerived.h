@@ -202,4 +202,15 @@ namespace PlayerStates
         void Execute(float elapsedTime)override;
         void Exit()override;
     };
+
+    // フライパンチステート
+    class FlyPunchState : public PlayerState
+    {
+    public:
+        FlyPunchState(Player* player) : PlayerState(player) {};
+        ~FlyPunchState() {}
+        void Enter() override;
+        void Execute(float elapsedTime)override;
+        void Exit()override;
+    };
 }

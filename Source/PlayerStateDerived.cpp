@@ -1057,3 +1057,15 @@ void PlayerStates::BounceState::Execute(float elapsedTime)
 void PlayerStates::BounceState::Exit()
 {
 }
+
+void PlayerStates::FlyPunchState::Enter()
+{
+}
+
+void PlayerStates::FlyPunchState::Execute(float elapsedTime)
+{
+}
+
+void PlayerStates::FlyPunchState::Exit()
+{
+}
