@@ -7,7 +7,6 @@
 enum class LightType
 {
 	Directional,	// 平行光源
-	Spot,			// スポットライト
 };
 
 // 光源クラス

@@ -12,7 +12,7 @@
 #include "StageManager.h"
 #include "CharacterManager.h"
 
-//#define DEBUG
+#define DEBUG
 
 SceneTitle* SceneTitle::instance = nullptr;
 
@@ -22,6 +22,9 @@ void SceneTitle::Initialize()
     Graphics& graphics = Graphics::Instance();
     // カメラコントローラー初期化
     cameraController = std::make_unique<CameraController>();
+
+    particleShader = std::make_unique<ParticleShader>(Graphics::Instance().GetDevice());
+
 
     //	各種レンダラー生成
     {
@@ -131,6 +134,8 @@ void SceneTitle::Finalize()
 //更新処理
 void SceneTitle::Update(float elapsedTime)
 {
+    particleShader->UpdateParticles(elapsedTime);
+
     Bgm->Play(true, 0.1f);
     // カメラコントローラー更新処理
     Camera::Instance().SetLookAt(cameraPos, cameraAngle, DirectX::XMFLOAT3(0, 1, 0));
@@ -223,7 +228,7 @@ void SceneTitle::Render()
     ID3D11DepthStencilView* dsv = graphics.GetDepthStencilView();
 
     // 画面クリア＆レンダーターゲット設定
-    FLOAT color[] = { 1.0f, 0.0f, 0.0f, 1.0f };	// RGBA(0.0～1.0)
+    FLOAT color[] = { 0.0f, 0.0f, 0.0f, 1.0f };	// RGBA(0.0～1.0)
     dc->ClearRenderTargetView(rtv, color);
     dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     dc->OMSetRenderTargets(1, &rtv, dsv);
@@ -247,6 +252,10 @@ void SceneTitle::Render()
 
     // 3D
     {
+        particleShader->Begin(rc);
+        particleShader->Draw(rc);
+
+
         //シャドウマップの描画
         shadowmapRenderer->Render(dc);
 

@@ -7,7 +7,7 @@
 // cbuffer CbScene
 // {
 //
-//   float4 viewPosition;               // Offset:    0 Size:    16 [unused]
+//   float4 viewPosition;               // Offset:    0 Size:    16
 //   row_major float4x4 viewProjection; // Offset:   16 Size:    64 [unused]
 //   float4 ambientLightColor;          // Offset:   80 Size:    16
 //   
@@ -50,7 +50,7 @@
 // Name                 Index   Mask Register SysValue  Format   Used
 // -------------------- ----- ------ -------- -------- ------- ------
 // SV_POSITION              0   xyzw        0      POS   float       
-// POSITION                 0   xyz         1     NONE   float       
+// POSITION                 0   xyz         1     NONE   float   xyz 
 // NORMAL                   0   xyz         2     NONE   float   xyz 
 // TANGENT                  0   xyz         3     NONE   float   xyz 
 // BINORMAL                 0   xyz         4     NONE   float   xyz 
@@ -74,6 +74,7 @@ dcl_sampler s1, mode_default
 dcl_resource_texture2d (float,float,float,float) t0
 dcl_resource_texture2d (float,float,float,float) t1
 dcl_resource_texture2d (float,float,float,float) t2
+dcl_input_ps linear v1.xyz
 dcl_input_ps linear v2.xyz
 dcl_input_ps linear v3.xyz
 dcl_input_ps linear v4.xyz
@@ -81,7 +82,7 @@ dcl_input_ps linear v5.xy
 dcl_input_ps linear v6.xyzw
 dcl_input_ps linear v7.xyz
 dcl_output o0.xyzw
-dcl_temps 5
+dcl_temps 6
 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v5.xyxx, t0.xyzw, s0
 mul r0.xyzw, r0.xyzw, v6.xyzw
 sample_indexable(texture2d)(float,float,float,float) r1.xyz, v5.xyxx, t1.xyzw, s0
@@ -101,42 +102,70 @@ mad r1.xyz, r1.zzzz, r4.xyzx, r1.xywx
 dp3 r1.w, r1.xyzx, r1.xyzx
 rsq r1.w, r1.w
 mul r1.xyz, r1.wwww, r1.xyzx
-dp3 r1.w, cb0[6].xyzx, cb0[6].xyzx
+dp3 r1.w, -cb0[6].xyzx, -cb0[6].xyzx
 rsq r1.w, r1.w
-mul r2.xyz, r1.wwww, cb0[6].xyzx
-dp3_sat r1.x, r1.xyzx, -r2.xyzx
-mul r1.xyz, r1.xxxx, cb0[7].xyzx
-resinfo_indexable(texture2d)(float,float,float,float)_uint r2.xy, l(0), t2.xyzw
-utof r2.xy, r2.xyxx
-div r2.xy, l(1.000000, 1.000000, 1.000000, 1.000000), r2.xyxx
-mov r1.w, l(0)
-mov r2.z, l(-2)
+mul r2.xyz, r1.wwww, -cb0[6].xyzx
+add r3.xyz, -v1.xyzx, cb0[0].xyzx
+dp3 r2.w, r3.xyzx, r3.xyzx
+rsq r2.w, r2.w
+mul r3.xyz, r2.wwww, r3.xyzx
+resinfo_indexable(texture2d)(float,float,float,float)_uint r4.xy, l(0), t2.xyzw
+utof r4.xy, r4.xyxx
+div r4.xy, l(1.000000, 1.000000, 1.000000, 1.000000), r4.xyxx
+mov r2.w, l(0)
+mov r3.w, l(-2)
 loop 
-  ilt r2.w, l(2), r2.z
-  breakc_nz r2.w
-  itof r3.x, r2.z
-  mov r2.w, r1.w
-  mov r3.z, l(-2)
+  ilt r4.z, l(2), r3.w
+  breakc_nz r4.z
+  itof r5.x, r3.w
+  mov r4.z, r2.w
+  mov r4.w, l(-2)
   loop 
-    ilt r3.w, l(2), r3.z
-    breakc_nz r3.w
-    itof r3.y, r3.z
-    mad r3.yw, r2.xxxy, r3.xxxy, v7.xxxy
-    sample_indexable(texture2d)(float,float,float,float) r3.y, r3.ywyy, t2.yxzw, s1
-    add r3.y, -r3.y, v7.z
-    ge r3.y, cb3[4].w, r3.y
-    and r3.y, r3.y, l(0x3f800000)
-    add r2.w, r2.w, r3.y
-    iadd r3.z, r3.z, l(1)
+    ilt r5.z, l(2), r4.w
+    breakc_nz r5.z
+    itof r5.y, r4.w
+    mad r5.yz, r4.xxyx, r5.xxyx, v7.xxyx
+    sample_indexable(texture2d)(float,float,float,float) r5.y, r5.yzyy, t2.yxzw, s1
+    add r5.y, -r5.y, v7.z
+    ge r5.y, cb3[4].w, r5.y
+    and r5.y, r5.y, l(0x3f800000)
+    add r4.z, r4.z, r5.y
+    iadd r4.w, r4.w, l(1)
   endloop 
-  mov r1.w, r2.w
-  iadd r2.z, r2.z, l(1)
+  mov r2.w, r4.z
+  iadd r3.w, r3.w, l(1)
 endloop 
-mul r1.w, r1.w, l(0.040000)
-add r2.xyz, -cb3[4].xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
-mad r2.xyz, r1.wwww, r2.xyzx, cb3[4].xyzx
-mad r1.xyz, r1.xyzx, r2.xyzx, cb0[5].xyzx
-mul o0.xyz, r0.xyzx, r1.xyzx
+mul r2.w, r2.w, l(0.040000)
+add r4.xyz, -cb3[4].xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
+mad r4.xyz, r2.wwww, r4.xyzx, cb3[4].xyzx
+dp3 r2.x, r1.xyzx, r2.xyzx
+lt r2.x, l(0.500000), r2.x
+movc r2.x, r2.x, l(1.000000), l(0.300000)
+mad r2.yzw, -cb0[6].xxyz, r1.wwww, r3.xxyz
+dp3 r1.w, r2.yzwy, r2.yzwy
+rsq r1.w, r1.w
+mul r2.yzw, r1.wwww, r2.yyzw
+dp3 r1.w, r1.xyzx, r2.yzwy
+ge r1.w, r1.w, l(0.980000)
+and r1.w, r1.w, l(0x3f800000)
+mul r2.yzw, r1.wwww, cb0[7].xxyz
+mul r2.yzw, r2.yyzw, l(0.000000, 0.500000, 0.500000, 0.500000)
+lt r5.xy, l(0.900000, 0.950000, 0.000000, 0.000000), r1.yyyy
+movc r2.yzw, r5.xxxx, l(0,0,0,0), r2.yyzw
+dp3_sat r1.x, r3.xyzx, r1.xyzx
+add r1.x, -r1.x, l(1.000000)
+log r1.x, r1.x
+mul r1.x, r1.x, l(2.500000)
+exp r1.x, r1.x
+lt r1.y, |r1.y|, l(0.600000)
+mul r1.x, r1.x, l(0.700000)
+and r1.x, r1.x, r1.y
+mad r1.yzw, cb0[7].xxyz, r2.xxxx, r2.yyzw
+mul r1.yzw, r4.xxyz, r1.yyzw
+mad r1.yzw, cb0[5].xxyz, l(0.000000, 0.500000, 0.500000, 0.500000), r1.yyzw
+mad r0.xyz, r0.xyzx, r1.yzwy, r1.xxxx
+mul r1.xyz, r0.xyzx, l(0.900000, 0.900000, 0.900000, 0.000000)
+movc o0.xyz, r5.yyyy, r1.xyzx, r0.xyzx
 mov o0.w, r0.w
 ret 
-// Approximately 57 instruction slots used
+// Approximately 85 instruction slots used

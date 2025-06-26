@@ -10,6 +10,7 @@
 #include "Renderer\PostprocessingRenderer.h"
 #include "Player.h"
 #include "Graphics\Light.h"
+#include "Graphics\Shader\ParticleShader.h"
 
 
 // タイトルシーン
@@ -41,6 +42,7 @@ private:
 	std::unique_ptr<SceneRenderer>			sceneRenderer;
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
+	std::unique_ptr<ParticleShader> particleShader;
 
 	std::unique_ptr<Sprite> Title;
 	std::unique_ptr<Sprite> Start;
@@ -67,7 +69,6 @@ private:
 
 private:
 	static SceneTitle* instance;
-
 
 };
 

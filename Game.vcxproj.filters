@@ -334,6 +334,9 @@
     <ClInclude Include="Source\MessageData.h">
       <Filter>Source\System\MessageData</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader\ParticleShader.h">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\imgui\imgui.cpp">
@@ -555,6 +558,9 @@
     <ClCompile Include="Source\Messenger.cpp">
       <Filter>Source\System\MessageData</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\Shader\ParticleShader.cpp">
+      <Filter>Source\Graphics\Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Debug.hlsli">
@@ -594,6 +600,9 @@
       <Filter>HLSL</Filter>
     </None>
     <None Include="HLSL\scene_constant_buffer.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\Particle.hlsli">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>
@@ -647,6 +656,15 @@
       <Filter>HLSL</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\FontVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ParticleVS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ParticlePS.hlsl">
+      <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ParticleGS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
   </ItemGroup>

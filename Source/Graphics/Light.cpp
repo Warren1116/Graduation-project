@@ -48,19 +48,6 @@ void Light::DrawDebugGUI()
 				ImGui::DragFloat("intensity", &color.w, 0.1f, 0, FLT_MAX);
 				break;
 			}
-			case LightType::Spot:
-			{
-				ImGui::DragFloat3("position", &position.x);
-				ImGui::DragFloat3("direction", &direction.x, 0.01f);
-				DirectX::XMStoreFloat3(&direction,
-									DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&direction)));
-				ImGui::ColorEdit3("color", &color.x);
-				ImGui::DragFloat("intensity", &color.w, 0.1f, 0, FLT_MAX);
-				ImGui::DragFloat("range", &range, 0.1f, 0, FLT_MAX);
-				ImGui::SliderFloat("innerCorn", &innerCorn, 0, 1.0f);
-				ImGui::SliderFloat("outerCorn", &outerCorn, 0, 1.0f);
-				break;
-			}
 		}
 		ImGui::TreePop();
 	}

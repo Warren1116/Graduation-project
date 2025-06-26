@@ -8,8 +8,6 @@ LightManager::LightManager()
 	
 	//sky
 	skyTexture = std::make_unique<Texture>("Data/Texture/incskies_046_16k.jpg");
-	//city
-	//skyTexture = std::make_unique<Texture>("Data/Texture/buikslotermeerplein.jpg");
 
 }
 

@@ -149,6 +149,7 @@
     <ClInclude Include="Source\Graphics\Shader.h" />
     <ClInclude Include="Source\Graphics\Shader\DefaultSpriteShader.h" />
     <ClInclude Include="Source\Graphics\Shader\FinalpassShader.h" />
+    <ClInclude Include="Source\Graphics\Shader\ParticleShader.h" />
     <ClInclude Include="Source\Graphics\Shader\PhongShader.h" />
     <ClInclude Include="Source\Graphics\Shader\ShadowmapCasterShader.h" />
     <ClInclude Include="Source\Graphics\Shader\SkyboxShader.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="Source\Graphics\Shader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\DefaultSpriteShader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\FinalpassShader.cpp" />
+    <ClCompile Include="Source\Graphics\Shader\ParticleShader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\PhongShader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\ShadowmapCasterShader.cpp" />
     <ClCompile Include="Source\Graphics\Shader\SkyboxShader.cpp" />
@@ -277,6 +279,7 @@
     <None Include="HLSL\Font.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\Line.hlsli" />
+    <None Include="HLSL\Particle.hlsli" />
     <None Include="HLSL\Phong.hlsli" />
     <None Include="HLSL\scene_constant_buffer.hlsli" />
     <None Include="HLSL\ShadowmapCaster.hlsli" />
@@ -372,6 +375,20 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Shader\%(Filename).cso</ObjectFileOutput>
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AssemblyCode</AssemblerOutput>
       <AssemblerOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Shader\%(Filename).cod</AssemblerOutputFile>
+    </FxCompile>
+    <FxCompile Include="HLSL\ParticleGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="HLSL\ParticlePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\ParticleVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\PhongPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
