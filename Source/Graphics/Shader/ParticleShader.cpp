@@ -55,6 +55,24 @@ ParticleShader::ParticleShader(ID3D11Device* device)
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 
+    {
+        FILE* fp = nullptr;
+        fopen_s(&fp, "Shader\\ParticleGS.cso", "rb");
+        _ASSERT_EXPR_A(fp, "GS CSO File not found");
+
+        fseek(fp, 0, SEEK_END);
+        long csoSize = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+
+        std::unique_ptr<u_char[]> csoData = std::make_unique<u_char[]>(csoSize);
+        fread(csoData.get(), csoSize, 1, fp);
+        fclose(fp);
+
+        HRESULT hr = device->CreateGeometryShader(csoData.get(), csoSize, nullptr,
+            geometryShader.GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+    }
+
     D3D11_BUFFER_DESC desc = {};
     desc.ByteWidth = sizeof(DirectX::XMFLOAT4X4);
     desc.Usage = D3D11_USAGE_DEFAULT;
@@ -109,6 +127,7 @@ void ParticleShader::Begin(const RenderContext& rc)
 {
     rc.deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
     rc.deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
+    rc.deviceContext->GSSetShader(geometryShader.Get(), nullptr, 0);
     rc.deviceContext->IASetInputLayout(inputLayout.Get());
     rc.deviceContext->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
     rc.deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
@@ -136,5 +155,6 @@ void ParticleShader::End(const RenderContext& rc)
 {
     rc.deviceContext->VSSetShader(nullptr, nullptr, 0);
     rc.deviceContext->PSSetShader(nullptr, nullptr, 0);
+    rc.deviceContext->GSSetShader(nullptr, nullptr, 0);
     rc.deviceContext->IASetInputLayout(nullptr);
 }
