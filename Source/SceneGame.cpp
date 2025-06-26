@@ -37,8 +37,6 @@ void SceneGame::Initialize()
     restartTimer = 5.0f;
     Graphics& graphics = Graphics::Instance();
 
-    particleShader = std::make_unique<ParticleShader>(Graphics::Instance().GetDevice());
-
     //シャドウマップ用に深度ステンシルの生成
     {
         for (auto& it : shadowmapDepthStencil)
@@ -418,10 +416,6 @@ void SceneGame::Render()
     // シャドウマップの描画
     shadowmapRenderer->Render(rc.deviceContext);
 
-    particleShader->Begin(rc);
-    particleShader->Draw(rc);
-
-
 
     // シーンの描画
     sceneRenderer->SetShadowmapData(rc.shadowMapData);
@@ -450,7 +444,7 @@ void SceneGame::Render()
         if (isPaused)
         {
             //  ポーズ背景色の描画
-            //Pause->Render(dc, 0, 0, screenWidth, screenHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0.5f);
+            Pause->Render(dc, 0, 0, screenWidth, screenHeight, 0, 0, 0, 0, 0, 0, 0, 0, 0.5f);
 
 
             Mouse& mouse = Input::Instance().GetMouse();

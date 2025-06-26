@@ -664,9 +664,6 @@
     <FxCompile Include="HLSL\ParticlePS.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\ParticleGS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc">

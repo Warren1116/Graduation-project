@@ -23,7 +23,7 @@ void SceneTitle::Initialize()
     // カメラコントローラー初期化
     cameraController = std::make_unique<CameraController>();
 
-    particleShader = std::make_unique<ParticleShader>(Graphics::Instance().GetDevice());
+    particleShader = std::make_unique<ParticleShader>(graphics.GetDevice());
 
 
     //	各種レンダラー生成
@@ -134,7 +134,14 @@ void SceneTitle::Finalize()
 //更新処理
 void SceneTitle::Update(float elapsedTime)
 {
+    RenderContext rc;
+    Camera& camera = Camera::Instance();
+    rc.view = camera.GetView();
+    rc.projection = camera.GetProjection();
+    rc.viewPosition = { camera.GetEye().x, camera.GetEye().y, camera.GetEye().z, 1.0f };
+
     particleShader->UpdateParticles(elapsedTime);
+
 
     Bgm->Play(true, 0.1f);
     // カメラコントローラー更新処理
@@ -250,12 +257,13 @@ void SceneTitle::Render()
     float screenWidth = static_cast<float>(graphics.GetScreenWidth());
     float screenHeight = static_cast<float>(graphics.GetScreenHeight());
 
+    particleShader->Begin(rc);
+    particleShader->Draw(rc);
+    particleShader->End(rc);
+
+
     // 3D
     {
-        particleShader->Begin(rc);
-        particleShader->Draw(rc);
-
-
         //シャドウマップの描画
         shadowmapRenderer->Render(dc);
 

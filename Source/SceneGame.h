@@ -16,7 +16,6 @@
 #include "EnemyThief.h"
 #include "Enemy.h"
 #include "CharacterManager.h"
-#include "Graphics\Shader\ParticleShader.h"
 
 
 // ゲームシーン
@@ -82,7 +81,6 @@ public:
     std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
     std::unique_ptr<SceneRenderer>			sceneRenderer;
     std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
-    std::unique_ptr<ParticleShader> particleShader;
 
     // シャドウ情報
     std::unique_ptr<DepthStencil> shadowmapDepthStencil[ShadowmapCount];    //	シャドウマップ用深度ステンシルバッファ
