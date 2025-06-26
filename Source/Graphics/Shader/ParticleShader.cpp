@@ -76,7 +76,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
     }
 
     D3D11_BUFFER_DESC desc = {};
-    desc.ByteWidth = sizeof(DirectX::XMFLOAT4X4);
+    desc.ByteWidth = sizeof(CbScene);
     desc.Usage = D3D11_USAGE_DEFAULT;
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     device->CreateBuffer(&desc, nullptr, constantBuffer.GetAddressOf());
@@ -131,6 +131,8 @@ ParticleShader::ParticleShader(ID3D11Device* device)
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
     HRESULT hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+
+
 }
 
 void ParticleShader::UpdateParticles(float elapsedTime)
@@ -176,9 +178,8 @@ void ParticleShader::Begin(const RenderContext& rc)
     cbScene.view = rc.view;
     DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.view);
     DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.projection);
-    DirectX::XMMATRIX VP = V * P;
+    DirectX::XMStoreFloat4x4(&cbScene.viewProjection, V * P);
 
-    DirectX::XMStoreFloat4x4(&cbScene.viewProjection, VP);
     rc.deviceContext->UpdateSubresource(constantBuffer.Get(), 0, nullptr, &cbScene, 0, 0);
 
     rc.deviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());

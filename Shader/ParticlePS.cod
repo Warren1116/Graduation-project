@@ -40,13 +40,13 @@ dcl_temps 1
 //   v1.x <- input.uv.x; v1.y <- input.uv.y; v1.z <- input.life; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 12 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ParticlePS.hlsl"
+#line 9 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ParticlePS.hlsl"
 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v1.xyxx, t0.xyzw, s0  // r0.x <- texColor.x; r0.y <- texColor.y; r0.z <- texColor.z; r0.w <- texColor.w
 
-#line 13
+#line 10
 mul r0.w, r0.w, v1.z
 
-#line 14
+#line 11
 mov o0.xyz, r0.xyzx
 mov o0.w, r0.w
 ret 

@@ -265,9 +265,6 @@ void SceneTitle::Render()
 
     // 3D
     {
-        particleShader->Begin(rc);
-        particleShader->Draw(rc);
-        particleShader->End(rc);
 
         //シャドウマップの描画
         shadowmapRenderer->Render(dc);
@@ -278,6 +275,9 @@ void SceneTitle::Render()
 
         postprocessingRenderer->Render(dc);
 
+        particleShader->Begin(rc);
+        particleShader->Draw(rc);
+        particleShader->End(rc);
 
     }
 
