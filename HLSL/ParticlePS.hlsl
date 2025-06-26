@@ -1,10 +1,15 @@
 #include "Particle.hlsli"
 
-//float4 main(float4 pos : SV_POSITION, float life : LIFE) : SV_TARGET
-//{
-//    return float4(1, 1, 1, life);
-//}
+Texture2D particleTexture : register(t0);
+SamplerState particleSampler : register(s0);
+
+
 float4 main(PS_IN input) : SV_TARGET
 {
-    return float4(1, 1, 1, input.life);
+    float4 texColor = particleTexture.Sample(particleSampler, input.uv);
+    texColor.a *= input.life;
+    return texColor;
+    
+    //float4 color = particleTexture.Sample(particleSampler, input.uv);
+    //return float4(color.rgb, color.a * input.life);
 }

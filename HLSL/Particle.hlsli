@@ -19,6 +19,6 @@ struct PS_IN
 
 cbuffer CbScene : register(b0)
 {
-    matrix view;
-    matrix viewProjection;
+    row_major float4x4 view;
+    row_major float4x4 viewProjection;
 };

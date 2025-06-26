@@ -11,7 +11,6 @@ struct Particle
     float life;
 };
 
-struct RenderContext;
 
 class ParticleShader
 {
@@ -23,6 +22,12 @@ public:
     void UpdateParticles(float elapsedTime);
 
 private:
+    struct CbScene
+    {
+        DirectX::XMFLOAT4X4 view;
+        DirectX::XMFLOAT4X4 viewProjection;
+    };
+
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
@@ -34,6 +39,9 @@ private:
     Microsoft::WRL::ComPtr<ID3D11BlendState> blendState;
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
 
     std::vector<Particle> particles;
 };

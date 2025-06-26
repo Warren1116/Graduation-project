@@ -42,7 +42,7 @@ private:
 	std::unique_ptr<SceneRenderer>			sceneRenderer;
 	std::unique_ptr<PostprocessingRenderer>	postprocessingRenderer;
 	std::unique_ptr<ShadowmapRenderer>		shadowmapRenderer;
-    std::unique_ptr<ParticleShader> particleShader;
+	std::unique_ptr<ParticleShader> particleShader;
 
 	std::unique_ptr<Sprite> Title;
 	std::unique_ptr<Sprite> Start;
