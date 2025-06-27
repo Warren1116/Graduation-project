@@ -229,6 +229,10 @@ void Character::UpdateHorizontalVelocity(float elapsedFrame)
         {
             // ‰Á‘¬—Í
             float acceleration = this->acceleration * elapsedFrame;
+            if (onClimb) 
+            {
+                acceleration = 3.0f;
+            }
 
             // ‹ó’†‚É‚¢‚é‚Æ‚«‰Á‘¬—Í‚ðŒ¸‚ç‚·
             if (!isGround) acceleration *= airControl;

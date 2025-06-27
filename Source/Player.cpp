@@ -161,7 +161,7 @@ bool Player::InputMove(float elapsedTime)
 {
     DirectX::XMFLOAT3 moveVec = GetMoveVec();
 
-    Move(moveVec.x, moveVec.y, moveVec.z, moveSpeed);
+    Move(moveVec.x, moveVec.y, moveVec.z, onClimb ? climbSpeed : moveSpeed);
     if (!onClimb)
     {
         Turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);

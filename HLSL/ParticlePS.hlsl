@@ -10,6 +10,4 @@ float4 main(PS_IN input) : SV_TARGET
     texColor.a *= input.life;
     return texColor;
     
-    //float4 color = particleTexture.Sample(particleSampler, input.uv);
-    //return float4(color.rgb, color.a * input.life);
 }

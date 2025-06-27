@@ -134,12 +134,11 @@ ParticleShader::ParticleShader(ID3D11Device* device)
     HRESULT hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
     _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
 
-
 }
 
 void ParticleShader::UpdateParticles(float elapsedTime)
 {
-    particles.resize(100);
+    particles.resize(1000);
     for (auto& p : particles)
     {
         if (p.life > 0.0f)
@@ -150,8 +149,7 @@ void ParticleShader::UpdateParticles(float elapsedTime)
             p.life -= elapsedTime;
         }
     }
-
-
+    EmitRandomParticles(100);
 }
 
 void ParticleShader::EmitRandomParticles(int count)
@@ -167,19 +165,20 @@ void ParticleShader::EmitRandomParticles(int count)
             {
                 float randX = min.x + ((rand() / (float)RAND_MAX) * (max.x - min.x));
                 //float randY = min.y + ((rand() / (float)RAND_MAX) * (max.y - min.y));
-                float randY = ((rand() % 2000) - 100) * 0.1f;
+                float randY = ((rand() % 2480) - 100) * 0.1f;
                 float randZ = min.z + ((rand() / (float)RAND_MAX) * (max.z - min.z));
                 
                 p.position = { randX, randY, randZ };
 
                 p.velocity = {
-                    ((rand() % 200) - 100) * 0.001f,
-                    //((rand() % 200) - 100) * 0.001f,
-                    -1.2f,
-                    ((rand() % 200) - 100) * 0.001f
+                    ((rand() % 200) - 100) * 0.01f,  
+                    -0.8f + ((rand() % 20) * 0.01f), 
+                    ((rand() % 200) - 100) * 0.01f  
                 };
 
-                p.life = 2.0f;
+
+                p.life = 1.0f + ((rand() % 100) * 0.02f);
+
                 break;
             }
         }

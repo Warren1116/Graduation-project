@@ -194,10 +194,6 @@ void SceneGame::Update(float elapsedTime)
     RenderContext rc;
     Camera& camera = Camera::Instance();
 
-    //パーティクルを生成・Update
-    particleShader->EmitRandomParticles(1000);
-    particleShader->UpdateParticles(elapsedTime);
-
     UpdateCameraState(elapsedTime);
 
     //　背景音楽
@@ -382,6 +378,9 @@ void SceneGame::Update(float elapsedTime)
     // カメラコントローラー更新処理
     cameraController->Update(elapsedTime);
 
+    //パーティクルを生成・Update
+    particleShader->EmitRandomParticles(100);
+    particleShader->UpdateParticles(elapsedTime);
 
     if (currentWave == 5 && EnemyManager::Instance().GetEnemyCount() == 0)
     {

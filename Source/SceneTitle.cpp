@@ -144,7 +144,7 @@ void SceneTitle::Update(float elapsedTime)
 
 
     //パーティクルを生成・Update
-    particleShader->EmitRandomParticles(1000);
+    particleShader->EmitRandomParticles(100);
     particleShader->UpdateParticles(elapsedTime);
 
 
