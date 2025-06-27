@@ -292,7 +292,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                 outPosition))
             {
                 // ダメージを与える
-                if (enemy->ApplyDamage(15, 0.5f))
+                if (enemy->ApplyDamage(15, 0.3f))
                 {
                     // 吹き飛ばす
                     {
@@ -769,7 +769,7 @@ void Player::CollisionProjectileVsEnemies()
                 outPosition))
             {
                 //ダメージを与える
-                if (enemy->ApplyDamage(15, 1.0f))
+                if (enemy->ApplyDamage(10, 0.3f))
                 {
                     enemy->AddWebCount(1);
                     DirectX::XMFLOAT3 enemyPos = enemy->GetPosition();

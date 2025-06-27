@@ -382,11 +382,13 @@ void SceneGame::Update(float elapsedTime)
     particleShader->EmitRandomParticles(100);
     particleShader->UpdateParticles(elapsedTime);
 
+    //ƒQ[ƒ€I—¹
     if (currentWave == 5 && EnemyManager::Instance().GetEnemyCount() == 0)
     {
         restartTimer -= elapsedTime;
         if (restartTimer <= 0.0f)
         {
+            tutorialCompleted = true;
             SceneManager::Instance().ChangeScene(new SceneTitle);
         }
     }
