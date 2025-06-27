@@ -1,17 +1,15 @@
 #include "Particle.hlsli"
 
-
 [maxvertexcount(6)]
 void main(point VS_OUT input[1], inout TriangleStream<PS_IN> triStream)
 {
     float3 pos = input[0].worldPos;
+    float size = 0.5f;
 
-    float size = lerp(0.2f, 0.8f, input[0].life);
-    
     float3 right = float3(view._11, view._21, view._31);
     float3 up = float3(view._12, view._22, view._32);
 
-    float3 offsets[4] =
+    float3 offset[] =
     {
         -right + up,
          right + up,
@@ -19,7 +17,7 @@ void main(point VS_OUT input[1], inout TriangleStream<PS_IN> triStream)
          right - up
     };
 
-    float2 uvs[4] =
+    float2 uv[] =
     {
         float2(0, 0),
         float2(1, 0),
@@ -27,16 +25,30 @@ void main(point VS_OUT input[1], inout TriangleStream<PS_IN> triStream)
         float2(1, 1)
     };
 
-    PS_IN v0 = { mul(float4(pos + offsets[0] * size, 1), viewProjection), uvs[0], input[0].life };
-    PS_IN v1 = { mul(float4(pos + offsets[1] * size, 1), viewProjection), uvs[1], input[0].life };
-    PS_IN v2 = { mul(float4(pos + offsets[2] * size, 1), viewProjection), uvs[2], input[0].life };
-    PS_IN v3 = { mul(float4(pos + offsets[3] * size, 1), viewProjection), uvs[3], input[0].life };
+    PS_IN v0, v1, v2;
 
+    v0.pos = mul(float4(pos + offset[0] * size, 1.0f), viewProjection);
+    v1.pos = mul(float4(pos + offset[1] * size, 1.0f), viewProjection);
+    v2.pos = mul(float4(pos + offset[2] * size, 1.0f), viewProjection);
+    v0.uv = uv[0];
+    v1.uv = uv[1];
+    v2.uv = uv[2];
+    v0.life = v1.life = v2.life = input[0].life;
     triStream.Append(v0);
     triStream.Append(v1);
     triStream.Append(v2);
-    triStream.Append(v2);
-    triStream.Append(v1);
+
+    PS_IN v3, v4, v5;
+    v3.pos = mul(float4(pos + offset[2] * size, 1.0f), viewProjection);
+    v4.pos = mul(float4(pos + offset[1] * size, 1.0f), viewProjection);
+    v5.pos = mul(float4(pos + offset[3] * size, 1.0f), viewProjection);
+    v3.uv = uv[2];
+    v4.uv = uv[1];
+    v5.uv = uv[3];
+    v3.life = v4.life = v5.life = input[0].life;
     triStream.Append(v3);
+    triStream.Append(v4);
+    triStream.Append(v5);
+
     triStream.RestartStrip();
 }

@@ -48,56 +48,55 @@ dcl_output_siv o0.xyzw, position
 dcl_output o1.xy
 dcl_output o1.z
 dcl_maxout 6
-mad r0.x, v[0][0].w, l(0.600000), l(0.200000)
-mov r1.x, cb0[0].x
-mov r1.y, cb0[1].x
-mov r1.z, cb0[2].x
-mov r2.x, cb0[0].y
-mov r2.y, cb0[1].y
-mov r2.z, cb0[2].y
-add r0.yzw, -r1.xxyz, r2.xxyz
-mad r0.yzw, r0.yyzw, r0.xxxx, v[0][0].xxyz
-mul r3.xyzw, r0.zzzz, cb0[5].xyzw
-mad r3.xyzw, r0.yyyy, cb0[4].xyzw, r3.xyzw
-mad r3.xyzw, r0.wwww, cb0[6].xyzw, r3.xyzw
-add r3.xyzw, r3.xyzw, cb0[7].xyzw
-mov o0.xyzw, r3.xyzw
+mov r0.x, cb0[0].x
+mov r0.y, cb0[1].x
+mov r0.z, cb0[2].x
+mov r1.x, cb0[0].y
+mov r1.y, cb0[1].y
+mov r1.z, cb0[2].y
+add r2.xyz, -r0.xyzx, r1.xyzx
+mad r2.xyz, r2.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), v[0][0].xyzx
+mul r3.xyzw, r2.yyyy, cb0[5].xyzw
+mad r3.xyzw, r2.xxxx, cb0[4].xyzw, r3.xyzw
+mad r2.xyzw, r2.zzzz, cb0[6].xyzw, r3.xyzw
+add r2.xyzw, r2.xyzw, cb0[7].xyzw
+mov o0.xyzw, r2.xyzw
 mov o1.xy, l(0,0,0,0)
 mov o1.z, v[0][0].w
 emit 
-add r0.yzw, r1.xxyz, r2.xxyz
-mad r0.yzw, r0.yyzw, r0.xxxx, v[0][0].xxyz
-mul r3.xyzw, r0.zzzz, cb0[5].xyzw
-mad r3.xyzw, r0.yyyy, cb0[4].xyzw, r3.xyzw
-mad r3.xyzw, r0.wwww, cb0[6].xyzw, r3.xyzw
-add r3.xyzw, r3.xyzw, cb0[7].xyzw
-mov o0.xyzw, r3.xyzw
+add r2.xyz, r0.xyzx, r1.xyzx
+mad r2.xyz, r2.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), v[0][0].xyzx
+mul r3.xyzw, r2.yyyy, cb0[5].xyzw
+mad r3.xyzw, r2.xxxx, cb0[4].xyzw, r3.xyzw
+mad r2.xyzw, r2.zzzz, cb0[6].xyzw, r3.xyzw
+add r2.xyzw, r2.xyzw, cb0[7].xyzw
+mov o0.xyzw, r2.xyzw
 mov o1.xy, l(1.000000,0,0,0)
 mov o1.z, v[0][0].w
 emit 
-add r0.yzw, -r1.xxyz, -r2.xxyz
-add r1.xyz, r1.xyzx, -r2.xyzx
-mad r1.xyz, r1.xyzx, r0.xxxx, v[0][0].xyzx
-mad r0.xyz, r0.yzwy, r0.xxxx, v[0][0].xyzx
-mul r2.xyzw, r0.yyyy, cb0[5].xyzw
-mad r2.xyzw, r0.xxxx, cb0[4].xyzw, r2.xyzw
-mad r0.xyzw, r0.zzzz, cb0[6].xyzw, r2.xyzw
-add r0.xyzw, r0.xyzw, cb0[7].xyzw
-mov o0.xyzw, r0.xyzw
+add r3.xyz, -r0.xyzx, -r1.xyzx
+add r0.xyz, r0.xyzx, -r1.xyzx
+mad r0.xyz, r0.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), v[0][0].xyzx
+mad r1.xyz, r3.xyzx, l(0.500000, 0.500000, 0.500000, 0.000000), v[0][0].xyzx
+mul r3.xyzw, r1.yyyy, cb0[5].xyzw
+mad r3.xyzw, r1.xxxx, cb0[4].xyzw, r3.xyzw
+mad r1.xyzw, r1.zzzz, cb0[6].xyzw, r3.xyzw
+add r1.xyzw, r1.xyzw, cb0[7].xyzw
+mov o0.xyzw, r1.xyzw
 mov o1.xy, l(0,1.000000,0,0)
 mov o1.z, v[0][0].w
 emit 
-mov o0.xyzw, r0.xyzw
+mov o0.xyzw, r1.xyzw
 mov o1.xy, l(0,1.000000,0,0)
 mov o1.z, v[0][0].w
 emit 
-mov o0.xyzw, r3.xyzw
+mov o0.xyzw, r2.xyzw
 mov o1.xy, l(1.000000,0,0,0)
 mov o1.z, v[0][0].w
 emit 
-mul r0.xyzw, r1.yyyy, cb0[5].xyzw
-mad r0.xyzw, r1.xxxx, cb0[4].xyzw, r0.xyzw
-mad r0.xyzw, r1.zzzz, cb0[6].xyzw, r0.xyzw
+mul r1.xyzw, r0.yyyy, cb0[5].xyzw
+mad r1.xyzw, r0.xxxx, cb0[4].xyzw, r1.xyzw
+mad r0.xyzw, r0.zzzz, cb0[6].xyzw, r1.xyzw
 add r0.xyzw, r0.xyzw, cb0[7].xyzw
 mov o0.xyzw, r0.xyzw
 mov o1.xy, l(1.000000,1.000000,0,0)
@@ -105,4 +104,4 @@ mov o1.z, v[0][0].w
 emit 
 cut 
 ret 
-// Approximately 57 instruction slots used
+// Approximately 56 instruction slots used
