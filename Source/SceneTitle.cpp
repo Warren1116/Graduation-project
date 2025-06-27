@@ -12,7 +12,7 @@
 #include "StageManager.h"
 #include "CharacterManager.h"
 
-#define DEBUG
+//#define DEBUG
 
 SceneTitle* SceneTitle::instance = nullptr;
 
@@ -24,6 +24,7 @@ void SceneTitle::Initialize()
     cameraController = std::make_unique<CameraController>();
 
 
+    //パーティクルシェーダー生成
     particleShader = std::make_unique<ParticleShader>(graphics.GetDevice());
 
 
@@ -142,7 +143,8 @@ void SceneTitle::Update(float elapsedTime)
     rc.viewPosition = { camera.GetEye().x, camera.GetEye().y, camera.GetEye().z, 1.0f };
 
 
-    particleShader->EmitRandomParticles(100, camera.GetEye());
+    //パーティクルを生成・Update
+    particleShader->EmitRandomParticles(1000);
     particleShader->UpdateParticles(elapsedTime);
 
 
@@ -275,6 +277,7 @@ void SceneTitle::Render()
 
         postprocessingRenderer->Render(dc);
 
+        // パーティクル描画
         particleShader->Begin(rc);
         particleShader->Draw(rc);
         particleShader->End(rc);

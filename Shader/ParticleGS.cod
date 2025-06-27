@@ -41,157 +41,68 @@ gs_4_0
 dcl_constantbuffer CB0[8], immediateIndexed
 dcl_input v[1][0].xyz
 dcl_input v[1][0].w
-dcl_temps 9
-dcl_indexableTemp x0[4], 4
-dcl_indexableTemp x1[4], 4
+dcl_temps 4
 dcl_inputprimitive point 
 dcl_outputtopology trianglestrip 
 dcl_output_siv o0.xyzw, position
 dcl_output o1.xy
 dcl_output o1.z
 dcl_maxout 6
-//
-// Initial variable locations:
-//   m0 <- triStream; 
-//   v[0][0].x <- input[0].worldPos.x; v[0][0].y <- input[0].worldPos.y; v[0][0].z <- input[0].worldPos.z; v[0][0].w <- input[0].life; 
-//   x0 <- offsets; x1 <- uvs
-//
-#line 7 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ParticleGS.hlsl"
-mov r0.xyz, v[0][0].xyzx  // r0.x <- pos.x; r0.y <- pos.y; r0.z <- pos.z
-
-#line 10
-mov r0.w, l(-0.200000)
-add r0.w, r0.w, l(1.000000)
-mul r0.w, r0.w, v[0][0].w
-add r0.w, r0.w, l(0.200000)  // r0.w <- size
-
-#line 12
-mov r1.x, cb0[0].x  // r1.x <- right.x
-mov r1.y, cb0[1].x  // r1.y <- right.y
-mov r1.z, cb0[2].x  // r1.z <- right.z
-
-#line 13
-mov r2.x, cb0[0].y  // r2.x <- up.x
-mov r2.y, cb0[1].y  // r2.y <- up.y
-mov r2.z, cb0[2].y  // r2.z <- up.z
-
-#line 15
-mov r3.xyz, -r1.xyzx
-add r3.xyz, r2.xyzx, r3.xyzx
-add r4.xyz, r1.xyzx, r2.xyzx
-mov r5.xyz, -r1.xyzx
-mov r6.xyz, -r2.xyzx
-add r5.xyz, r5.xyzx, r6.xyzx
-mov r2.xyz, -r2.xyzx
-add r1.xyz, r1.xyzx, r2.xyzx
-mov x0[0].xyz, r3.xyzx
-mov x0[1].xyz, r4.xyzx
-mov x0[2].xyz, r5.xyzx
-mov x0[3].xyz, r1.xyzx
-
-#line 23
-itof r1.xy, l(0, 0, 0, 0)
-itof r1.zw, l(0, 0, 1, 0)
-itof r2.xy, l(0, 1, 0, 0)
-itof r2.zw, l(0, 0, 1, 1)
-mov x1[0].xy, r1.xyxx
-mov x1[1].xy, r1.zwzz
-mov x1[2].xy, r2.xyxx
-mov x1[3].xy, r2.zwzz
-
-#line 31
-mov r1.xyz, x0[0].xyzx
-mul r1.xyz, r0.wwww, r1.xyzx
-add r1.xyz, r0.xyzx, r1.xyzx
-itof r1.w, l(1)
-mul r2.xyzw, r1.xxxx, cb0[4].xyzw
-mul r3.xyzw, r1.yyyy, cb0[5].xyzw
-add r2.xyzw, r2.xyzw, r3.xyzw
-mul r3.xyzw, r1.zzzz, cb0[6].xyzw
-add r2.xyzw, r2.xyzw, r3.xyzw
-mul r1.xyzw, r1.wwww, cb0[7].xyzw
-add r1.xyzw, r1.xyzw, r2.xyzw  // r1.x <- v0.pos.x; r1.y <- v0.pos.y; r1.z <- v0.pos.z; r1.w <- v0.pos.w
-mov r2.xy, x1[0].xyxx  // r2.x <- v0.uv.x; r2.y <- v0.uv.y
-mov r2.z, v[0][0].w  // r2.z <- v0.life
-
-#line 32
-mov r3.xyz, x0[1].xyzx
-mul r3.xyz, r0.wwww, r3.xyzx
-add r3.xyz, r0.xyzx, r3.xyzx
-itof r2.w, l(1)
-mul r4.xyzw, r3.xxxx, cb0[4].xyzw
-mul r5.xyzw, r3.yyyy, cb0[5].xyzw
-add r4.xyzw, r4.xyzw, r5.xyzw
-mul r3.xyzw, r3.zzzz, cb0[6].xyzw
-add r3.xyzw, r3.xyzw, r4.xyzw
-mul r4.xyzw, r2.wwww, cb0[7].xyzw
-add r3.xyzw, r3.xyzw, r4.xyzw  // r3.x <- v1.pos.x; r3.y <- v1.pos.y; r3.z <- v1.pos.z; r3.w <- v1.pos.w
-mov r4.xy, x1[1].xyxx  // r4.x <- v1.uv.x; r4.y <- v1.uv.y
-mov r4.z, v[0][0].w  // r4.z <- v1.life
-
-#line 33
-mov r5.xyz, x0[2].xyzx
-mul r5.xyz, r0.wwww, r5.xyzx
-add r5.xyz, r0.xyzx, r5.xyzx
-itof r2.w, l(1)
-mul r6.xyzw, r5.xxxx, cb0[4].xyzw
-mul r7.xyzw, r5.yyyy, cb0[5].xyzw
-add r6.xyzw, r6.xyzw, r7.xyzw
-mul r5.xyzw, r5.zzzz, cb0[6].xyzw
-add r5.xyzw, r5.xyzw, r6.xyzw
-mul r6.xyzw, r2.wwww, cb0[7].xyzw
-add r5.xyzw, r5.xyzw, r6.xyzw  // r5.x <- v2.pos.x; r5.y <- v2.pos.y; r5.z <- v2.pos.z; r5.w <- v2.pos.w
-mov r6.xy, x1[2].xyxx  // r6.x <- v2.uv.x; r6.y <- v2.uv.y
-mov r6.z, v[0][0].w  // r6.z <- v2.life
-
-#line 34
-mov r7.xyz, x0[3].xyzx
-mul r7.xyz, r0.wwww, r7.xyzx
-add r0.xyz, r0.xyzx, r7.xyzx
-itof r0.w, l(1)
-mul r7.xyzw, r0.xxxx, cb0[4].xyzw
-mul r8.xyzw, r0.yyyy, cb0[5].xyzw
-add r7.xyzw, r7.xyzw, r8.xyzw
-mul r8.xyzw, r0.zzzz, cb0[6].xyzw
-add r7.xyzw, r7.xyzw, r8.xyzw
-mul r0.xyzw, r0.wwww, cb0[7].xyzw
-add r0.xyzw, r0.xyzw, r7.xyzw  // r0.x <- v3.pos.x; r0.y <- v3.pos.y; r0.z <- v3.pos.z; r0.w <- v3.pos.w
-mov r7.xy, x1[3].xyxx  // r7.x <- v3.uv.x; r7.y <- v3.uv.y
-mov r7.z, v[0][0].w  // r7.z <- v3.life
-
-#line 36
-mov o0.xyzw, r1.xyzw
-mov o1.xyz, r2.xyzx
-emit 
-
-#line 37
+mad r0.x, v[0][0].w, l(0.600000), l(0.200000)
+mov r1.x, cb0[0].x
+mov r1.y, cb0[1].x
+mov r1.z, cb0[2].x
+mov r2.x, cb0[0].y
+mov r2.y, cb0[1].y
+mov r2.z, cb0[2].y
+add r0.yzw, -r1.xxyz, r2.xxyz
+mad r0.yzw, r0.yyzw, r0.xxxx, v[0][0].xxyz
+mul r3.xyzw, r0.zzzz, cb0[5].xyzw
+mad r3.xyzw, r0.yyyy, cb0[4].xyzw, r3.xyzw
+mad r3.xyzw, r0.wwww, cb0[6].xyzw, r3.xyzw
+add r3.xyzw, r3.xyzw, cb0[7].xyzw
 mov o0.xyzw, r3.xyzw
-mov o1.xyz, r4.xyzx
+mov o1.xy, l(0,0,0,0)
+mov o1.z, v[0][0].w
 emit 
-
-#line 38
-mov o0.xyzw, r5.xyzw
-mov o1.xyz, r6.xyzx
-emit 
-
-#line 39
-mov o0.xyzw, r5.xyzw
-mov o1.xyz, r6.xyzx
-emit 
-
-#line 40
+add r0.yzw, r1.xxyz, r2.xxyz
+mad r0.yzw, r0.yyzw, r0.xxxx, v[0][0].xxyz
+mul r3.xyzw, r0.zzzz, cb0[5].xyzw
+mad r3.xyzw, r0.yyyy, cb0[4].xyzw, r3.xyzw
+mad r3.xyzw, r0.wwww, cb0[6].xyzw, r3.xyzw
+add r3.xyzw, r3.xyzw, cb0[7].xyzw
 mov o0.xyzw, r3.xyzw
-mov o1.xyz, r4.xyzx
+mov o1.xy, l(1.000000,0,0,0)
+mov o1.z, v[0][0].w
 emit 
-
-#line 41
+add r0.yzw, -r1.xxyz, -r2.xxyz
+add r1.xyz, r1.xyzx, -r2.xyzx
+mad r1.xyz, r1.xyzx, r0.xxxx, v[0][0].xyzx
+mad r0.xyz, r0.yzwy, r0.xxxx, v[0][0].xyzx
+mul r2.xyzw, r0.yyyy, cb0[5].xyzw
+mad r2.xyzw, r0.xxxx, cb0[4].xyzw, r2.xyzw
+mad r0.xyzw, r0.zzzz, cb0[6].xyzw, r2.xyzw
+add r0.xyzw, r0.xyzw, cb0[7].xyzw
 mov o0.xyzw, r0.xyzw
-mov o1.xyz, r7.xyzx
+mov o1.xy, l(0,1.000000,0,0)
+mov o1.z, v[0][0].w
 emit 
-
-#line 42
+mov o0.xyzw, r0.xyzw
+mov o1.xy, l(0,1.000000,0,0)
+mov o1.z, v[0][0].w
+emit 
+mov o0.xyzw, r3.xyzw
+mov o1.xy, l(1.000000,0,0,0)
+mov o1.z, v[0][0].w
+emit 
+mul r0.xyzw, r1.yyyy, cb0[5].xyzw
+mad r0.xyzw, r1.xxxx, cb0[4].xyzw, r0.xyzw
+mad r0.xyzw, r1.zzzz, cb0[6].xyzw, r0.xyzw
+add r0.xyzw, r0.xyzw, cb0[7].xyzw
+mov o0.xyzw, r0.xyzw
+mov o1.xy, l(1.000000,1.000000,0,0)
+mov o1.z, v[0][0].w
+emit 
 cut 
-
-#line 43
 ret 
-// Approximately 103 instruction slots used
+// Approximately 57 instruction slots used

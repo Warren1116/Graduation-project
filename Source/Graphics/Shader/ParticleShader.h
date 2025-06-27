@@ -22,7 +22,7 @@ public:
     void Draw(const RenderContext& rc);
     void End(const RenderContext& rc);
     void UpdateParticles(float elapsedTime);
-    void EmitRandomParticles(int count, const DirectX::XMFLOAT3& viewPosition);
+    void EmitRandomParticles(int count);
 
 
 private:

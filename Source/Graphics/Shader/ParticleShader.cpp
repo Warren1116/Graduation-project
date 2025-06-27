@@ -4,6 +4,7 @@
 #include <memory>
 #include "Camera.h"
 #include <WICTextureLoader.h>
+#include "StageMain.h"
 
 ParticleShader::ParticleShader(ID3D11Device* device)
 {
@@ -149,48 +150,36 @@ void ParticleShader::UpdateParticles(float elapsedTime)
             p.life -= elapsedTime;
         }
     }
-    //DirectX::XMFLOAT3 viewPosition = Camera::Instance().GetEye();
-    //for (int i = 0; i < (int)particles.size(); ++i)
-    //{
-    //    float offsetX = ((rand() % 2000) - 100) * 0.1f;
-    //    float offsetY = ((rand() % 2000) - 100) * 0.1f;
-    //    float offsetZ = ((rand() % 2000) - 100) * 0.1f;
 
-    //    particles[i].position = {
-    //        viewPosition.x + offsetX,
-    //        viewPosition.y + offsetY,
-    //        viewPosition.z - offsetZ
-    //    };
-    //    particles[i].life = 1.0f;
-    //}
 
 }
 
-void ParticleShader::EmitRandomParticles(int count, const DirectX::XMFLOAT3& viewPosition)
+void ParticleShader::EmitRandomParticles(int count)
 {
+    auto min = StageMain::Instance().GetVolumeMin();
+    auto max = StageMain::Instance().GetVolumeMax();
+
     for (int i = 0; i < count; ++i)
     {
         for (auto& p : particles)
         {
             if (p.life <= 0.0f)
             {
-                float offsetX = ((rand() % 2000) - 100) * 0.1f;
-                float offsetY = ((rand() % 2000) - 100) * 0.1f;
-                float offsetZ = ((rand() % 2000) - 100) * 0.1f;
-
-                p.position = {
-                    viewPosition.x + offsetX,
-                    viewPosition.y + offsetY,
-                    viewPosition.z - offsetZ
-                };
+                float randX = min.x + ((rand() / (float)RAND_MAX) * (max.x - min.x));
+                //float randY = min.y + ((rand() / (float)RAND_MAX) * (max.y - min.y));
+                float randY = ((rand() % 2000) - 100) * 0.1f;
+                float randZ = min.z + ((rand() / (float)RAND_MAX) * (max.z - min.z));
+                
+                p.position = { randX, randY, randZ };
 
                 p.velocity = {
                     ((rand() % 200) - 100) * 0.001f,
-                    ((rand() % 200) - 100) * 0.001f,
+                    //((rand() % 200) - 100) * 0.001f,
+                    -1.2f,
                     ((rand() % 200) - 100) * 0.001f
                 };
 
-                p.life = 2.0f; // èûŽ¦ŽžŠÔ
+                p.life = 2.0f;
                 break;
             }
         }
@@ -203,7 +192,7 @@ void ParticleShader::Begin(const RenderContext& rc)
     rc.deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
     rc.deviceContext->GSSetShader(geometryShader.Get(), nullptr, 0);
     rc.deviceContext->IASetInputLayout(inputLayout.Get());
-    rc.deviceContext->OMSetDepthStencilState(nullptr, 0);
+    rc.deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 

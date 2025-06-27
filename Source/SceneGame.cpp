@@ -24,8 +24,8 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-//#define TUTORIAL
-#define DEBUG
+#define TUTORIAL
+//#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -45,6 +45,7 @@ void SceneGame::Initialize()
         }
     }
 
+    // パーティクルシェーダー
     particleShader = std::make_unique<ParticleShader>(graphics.GetDevice());
 
     //	各種レンダラー生成
@@ -83,6 +84,8 @@ void SceneGame::Initialize()
 
     StageMain* stageMain = new StageMain();
     stageManager.Register(stageMain);
+
+
 
     //　プレイヤー生成
     player = std::make_unique<Player>(true);
@@ -191,7 +194,8 @@ void SceneGame::Update(float elapsedTime)
     RenderContext rc;
     Camera& camera = Camera::Instance();
 
-    particleShader->EmitRandomParticles(100, camera.GetEye());
+    //パーティクルを生成・Update
+    particleShader->EmitRandomParticles(1000);
     particleShader->UpdateParticles(elapsedTime);
 
     UpdateCameraState(elapsedTime);
@@ -443,7 +447,7 @@ void SceneGame::Render()
 
     postprocessingRenderer->Render(rc.deviceContext);
 
-
+    // パーティクル描画
     particleShader->Begin(rc);
     particleShader->Draw(rc);
     particleShader->End(rc);
@@ -581,7 +585,7 @@ void SceneGame::Render()
     {
         player->DrawDebugGUI();
         EnemyManager::Instance().DrawDebugGUI();
-
+        
         ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
 

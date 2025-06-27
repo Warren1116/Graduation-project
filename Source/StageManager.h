@@ -36,6 +36,8 @@ public:
 
 	void DrawDebugPrimitive(ID3D11DeviceContext* dc, const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& projection);
 
+	void GetStageAABB();
+
 private:
 	std::vector<Stage*> stages;
 };

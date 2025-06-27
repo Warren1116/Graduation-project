@@ -11,8 +11,8 @@ ImGuiRenderer::ImGuiRenderer(HWND hWnd, ID3D11Device* device)
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	ImFont* font = io.Fonts->AddFontFromFileTTF("Data\\Font\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-	//io.Fonts->AddFontDefault();
-	//io.Fonts->Build();
+	io.Fonts->AddFontDefault();
+	io.Fonts->Build();
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
