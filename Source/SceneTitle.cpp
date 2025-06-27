@@ -142,7 +142,7 @@ void SceneTitle::Update(float elapsedTime)
     rc.viewPosition = { camera.GetEye().x, camera.GetEye().y, camera.GetEye().z, 1.0f };
 
 
-
+    particleShader->EmitRandomParticles(100, camera.GetEye());
     particleShader->UpdateParticles(elapsedTime);
 
 

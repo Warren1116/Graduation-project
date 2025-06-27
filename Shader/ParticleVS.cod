@@ -27,6 +27,7 @@
 // -------------------- ----- ------ -------- -------- ------- ------
 // POSITION                 0   xyz         0     NONE   float   xyz 
 // LIFE                     0   x           1     NONE   float   x   
+// VELOCITY                 0   xyz         2     NONE   float       
 //
 //
 // Output signature:
@@ -48,6 +49,7 @@ dcl_temps 2
 // Initial variable locations:
 //   v0.x <- p.position.x; v0.y <- p.position.y; v0.z <- p.position.z; 
 //   v1.x <- p.life; 
+//   v2.x <- p.velocity.x; v2.y <- p.velocity.y; v2.z <- p.velocity.z; 
 //   o0.x <- <main return value>.worldPos.x; o0.y <- <main return value>.worldPos.y; o0.z <- <main return value>.worldPos.z; o0.w <- <main return value>.life
 //
 #line 8 "C:\Users\2220012\Desktop\Graduation-project\HLSL\ParticleVS.hlsl"

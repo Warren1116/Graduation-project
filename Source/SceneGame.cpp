@@ -45,6 +45,8 @@ void SceneGame::Initialize()
         }
     }
 
+    particleShader = std::make_unique<ParticleShader>(graphics.GetDevice());
+
     //	各種レンダラー生成
     {
         UINT width = static_cast<UINT>(graphics.GetScreenWidth());
@@ -186,6 +188,12 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(float elapsedTime)
 {
+    RenderContext rc;
+    Camera& camera = Camera::Instance();
+
+    particleShader->EmitRandomParticles(100, camera.GetEye());
+    particleShader->UpdateParticles(elapsedTime);
+
     UpdateCameraState(elapsedTime);
 
     //　背景音楽
@@ -368,8 +376,8 @@ void SceneGame::Update(float elapsedTime)
     CharacterManager::Instance().Update(elapsedTime);
 
     // カメラコントローラー更新処理
-    Camera& camera = Camera::Instance();
     cameraController->Update(elapsedTime);
+
 
     if (currentWave == 5 && EnemyManager::Instance().GetEnemyCount() == 0)
     {
@@ -409,9 +417,21 @@ void SceneGame::Render()
 
     // 描画処理
     RenderContext rc;
+
+    // カメラパラメータ設定
+    Camera& camera = Camera::Instance();
+    rc.viewPosition.x = camera.GetEye().x;
+    rc.viewPosition.y = camera.GetEye().y;
+    rc.viewPosition.z = camera.GetEye().z;
+    rc.viewPosition.w = 1;
+    rc.view = camera.GetView();
+    rc.projection = camera.GetProjection();
     rc.deviceContext = dc;
     rc.shadowMapData = shadowmapRenderer->GetShadowMapData();
-
+    rc.viewPosition = DirectX::XMFLOAT4(Camera::Instance().GetEye().x,
+        Camera::Instance().GetEye().y,
+        Camera::Instance().GetEye().z,
+        1.0f);
 
     // シャドウマップの描画
     shadowmapRenderer->Render(rc.deviceContext);
@@ -423,14 +443,11 @@ void SceneGame::Render()
 
     postprocessingRenderer->Render(rc.deviceContext);
 
-    // カメラパラメータ設定
-    Camera& camera = Camera::Instance();
-    rc.viewPosition.x = camera.GetEye().x;
-    rc.viewPosition.y = camera.GetEye().y;
-    rc.viewPosition.z = camera.GetEye().z;
-    rc.viewPosition.w = 1;
-    rc.view = camera.GetView();
-    rc.projection = camera.GetProjection();
+
+    particleShader->Begin(rc);
+    particleShader->Draw(rc);
+    particleShader->End(rc);
+
 
     //2Dスプライト描画
     {

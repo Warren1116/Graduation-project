@@ -30,6 +30,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
         {
             { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
             { "LIFE",     0, DXGI_FORMAT_R32_FLOAT,       0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "VELOCITY", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
         };
         hr = device->CreateInputLayout(inputElementDesc, ARRAYSIZE(inputElementDesc), csoData.get(),
@@ -137,32 +138,31 @@ ParticleShader::ParticleShader(ID3D11Device* device)
 
 void ParticleShader::UpdateParticles(float elapsedTime)
 {
-    //particles.resize(100);
+    particles.resize(100);
+    for (auto& p : particles)
+    {
+        if (p.life > 0.0f)
+        {
+            p.position.x += p.velocity.x * elapsedTime;
+            p.position.y += p.velocity.y * elapsedTime;
+            p.position.z += p.velocity.z * elapsedTime;
+            p.life -= elapsedTime;
+        }
+    }
+    //DirectX::XMFLOAT3 viewPosition = Camera::Instance().GetEye();
     //for (int i = 0; i < (int)particles.size(); ++i)
     //{
-    //    float x = ((rand() % 100) - 50) / 10.0f;
-    //    float y = ((rand() % 100)) / 10.0f;
-    //    float z = ((rand() % 100) - 50) / 10.0f;
-    //    particles[i].position = { x, y, z };
+    //    float offsetX = ((rand() % 2000) - 100) * 0.1f;
+    //    float offsetY = ((rand() % 2000) - 100) * 0.1f;
+    //    float offsetZ = ((rand() % 2000) - 100) * 0.1f;
+
+    //    particles[i].position = {
+    //        viewPosition.x + offsetX,
+    //        viewPosition.y + offsetY,
+    //        viewPosition.z - offsetZ
+    //    };
     //    particles[i].life = 1.0f;
     //}
-
-    DirectX::XMFLOAT3 viewPosition = Camera::Instance().GetEye();
-    particles.resize(100);
-
-    for (int i = 0; i < (int)particles.size(); ++i)
-    {
-        float offsetX = ((rand() % 2000) - 100) * 0.1f;
-        float offsetY = ((rand() % 2000) - 100) * 0.1f;
-        float offsetZ = ((rand() % 2000) - 100) * 0.1f;
-
-        particles[i].position = {
-            viewPosition.x + offsetX,
-            viewPosition.y + offsetY,
-            viewPosition.z - offsetZ
-        };
-        particles[i].life = 1.0f;
-    }
 
 }
 
@@ -184,8 +184,13 @@ void ParticleShader::EmitRandomParticles(int count, const DirectX::XMFLOAT3& vie
                     viewPosition.z - offsetZ
                 };
 
-                p.velocity = { 0.0f, -1.0f, 0.0f };  // —á”@F‰‰ºéG
-                p.life = 2.0f;
+                p.velocity = {
+                    ((rand() % 200) - 100) * 0.001f,
+                    ((rand() % 200) - 100) * 0.001f,
+                    ((rand() % 200) - 100) * 0.001f
+                };
+
+                p.life = 2.0f; // èûŽ¦ŽžŠÔ
                 break;
             }
         }

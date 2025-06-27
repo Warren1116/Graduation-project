@@ -9,6 +9,8 @@ struct Particle
 {
     DirectX::XMFLOAT3 position;
     float life;
+    DirectX::XMFLOAT3 velocity;
+    float padding; 
 };
 
 

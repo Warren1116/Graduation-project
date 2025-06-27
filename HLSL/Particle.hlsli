@@ -2,6 +2,7 @@ struct Particle
 {
     float3 position : POSITION;
     float life : LIFE;
+    float3 velocity : VELOCITY;
 };
 
 struct VS_OUT
