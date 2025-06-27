@@ -8,6 +8,7 @@
 
 ParticleShader::ParticleShader(ID3D11Device* device)
 {
+    //頂点シェーダー
     {
         FILE* fp = nullptr;
         fopen_s(&fp, "Shader\\ParticleVS.cso", "rb");
@@ -40,6 +41,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
     }
 
 
+    //ピクセルシェーダー
     {
         FILE* fp = nullptr;
         fopen_s(&fp, "Shader\\ParticlePS.cso", "rb");
@@ -59,6 +61,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 
+    //ジオメトリシェーダー
     {
         FILE* fp = nullptr;
         fopen_s(&fp, "Shader\\ParticleGS.cso", "rb");
@@ -112,6 +115,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
     rastDesc.DepthClipEnable = true;
     device->CreateRasterizerState(&rastDesc, rasterizerState.GetAddressOf());
 
+    //テクスチャを読み込む
     {
         std::string pathStr = "./Data/Texture/particle.png";
         HRESULT hr = DirectX::CreateWICTextureFromFile(
@@ -138,7 +142,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
 
 void ParticleShader::UpdateParticles(float elapsedTime)
 {
-    particles.resize(1000);
+    particles.resize(600);
     for (auto& p : particles)
     {
         if (p.life > 0.0f)
@@ -154,6 +158,7 @@ void ParticleShader::UpdateParticles(float elapsedTime)
 
 void ParticleShader::EmitRandomParticles(int count)
 {
+    //ステージのAABBを取得し、パーティクル生成できるの範囲を設定する
     auto min = StageMain::Instance().GetVolumeMin();
     auto max = StageMain::Instance().GetVolumeMax();
 
@@ -164,19 +169,18 @@ void ParticleShader::EmitRandomParticles(int count)
             if (p.life <= 0.0f)
             {
                 float randX = min.x + ((rand() / (float)RAND_MAX) * (max.x - min.x));
-                //float randY = min.y + ((rand() / (float)RAND_MAX) * (max.y - min.y));
                 float randY = ((rand() % 2480) - 100) * 0.1f;
                 float randZ = min.z + ((rand() / (float)RAND_MAX) * (max.z - min.z));
                 
                 p.position = { randX, randY, randZ };
 
+                // ランダムな速度を設定
                 p.velocity = {
                     ((rand() % 200) - 100) * 0.01f,  
                     -0.8f + ((rand() % 20) * 0.01f), 
                     ((rand() % 200) - 100) * 0.01f  
                 };
-
-
+                // 生存時間をランダムに設定
                 p.life = 1.0f + ((rand() % 100) * 0.02f);
 
                 break;
@@ -194,7 +198,6 @@ void ParticleShader::Begin(const RenderContext& rc)
     rc.deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     rc.deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 
-
     CbScene cbScene; 
     cbScene.view = rc.view;
     DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.view);
@@ -209,12 +212,9 @@ void ParticleShader::Begin(const RenderContext& rc)
     rc.deviceContext->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
     rc.deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
-
     rc.deviceContext->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
     rc.deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     rc.deviceContext->RSSetState(rasterizerState.Get());
-
-
 }
 
 void ParticleShader::Draw(const RenderContext& rc)

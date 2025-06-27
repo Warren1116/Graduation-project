@@ -1276,7 +1276,6 @@ void SceneGame::SpawnEnemiesForWave(int wave)
         RegisterRenderModel(thief9->GetModel());
         RegisterRenderModel(thief10->GetModel());
 
-
         // キャラクター生成処理
         CharacterManager& characterManager = CharacterManager::Instance();
         {
