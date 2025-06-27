@@ -5,12 +5,9 @@
 void main(point VS_OUT input[1], inout TriangleStream<PS_IN> triStream)
 {
     float3 pos = input[0].worldPos;
-    if (abs(pos.x) < 0.01 && abs(pos.y) < 0.01)
-    {
-        pos.x += 1.0;
-    }
-    float size = 50.5f;
-    //float size = lerp(0.2f, 1.0f, input[0].life);
+
+    //float size = 1.0f;
+    float size = lerp(0.2f, 1.0f, input[0].life);
     
     float3 right = float3(view._11, view._21, view._31);
     float3 up = float3(view._12, view._22, view._32);

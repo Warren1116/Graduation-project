@@ -146,22 +146,50 @@ void ParticleShader::UpdateParticles(float elapsedTime)
     //    particles[i].position = { x, y, z };
     //    particles[i].life = 1.0f;
     //}
+
     DirectX::XMFLOAT3 viewPosition = Camera::Instance().GetEye();
     particles.resize(100);
 
     for (int i = 0; i < (int)particles.size(); ++i)
     {
-        float offsetX = ((rand() % 200) - 100) * 0.01f;
-        float offsetY = ((rand() % 200) - 100) * 0.01f;
+        float offsetX = ((rand() % 2000) - 100) * 0.1f;
+        float offsetY = ((rand() % 2000) - 100) * 0.1f;
+        float offsetZ = ((rand() % 2000) - 100) * 0.1f;
 
         particles[i].position = {
             viewPosition.x + offsetX,
             viewPosition.y + offsetY,
-            viewPosition.z - 5.0f
+            viewPosition.z - offsetZ
         };
         particles[i].life = 1.0f;
     }
 
+}
+
+void ParticleShader::EmitRandomParticles(int count, const DirectX::XMFLOAT3& viewPosition)
+{
+    for (int i = 0; i < count; ++i)
+    {
+        for (auto& p : particles)
+        {
+            if (p.life <= 0.0f)
+            {
+                float offsetX = ((rand() % 2000) - 100) * 0.1f;
+                float offsetY = ((rand() % 2000) - 100) * 0.1f;
+                float offsetZ = ((rand() % 2000) - 100) * 0.1f;
+
+                p.position = {
+                    viewPosition.x + offsetX,
+                    viewPosition.y + offsetY,
+                    viewPosition.z - offsetZ
+                };
+
+                p.velocity = { 0.0f, -1.0f, 0.0f };  // —á”@F‰‰ºéG
+                p.life = 2.0f;
+                break;
+            }
+        }
+    }
 }
 
 void ParticleShader::Begin(const RenderContext& rc)
