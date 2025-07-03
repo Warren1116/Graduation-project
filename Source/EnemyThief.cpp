@@ -87,47 +87,36 @@ void EnemyThief::Update(float elapsedTime)
         if (webTimer > 3.0f)
         {
             IsLockedOn = false;
-            DirectX::XMVECTOR pointA, pointB;
 
-            //  プレイヤーの方向に投げ技される
-            DirectX::XMVECTOR DirectionVec;
-            DirectX::XMVECTOR playerBack = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&Player::Instance().GetFront()), -1.0f);
-            DirectX::XMVECTOR playerUp = DirectX::XMLoadFloat3(&Player::Instance().GetUp());
-            playerBack = DirectX::XMVector3Normalize(playerBack);
-            playerUp = DirectX::XMVector3Normalize(playerUp);
+            // 速力を初期化
+            DirectX::XMVECTOR start = DirectX::XMLoadFloat3(&position);
 
-            playerBack = DirectX::XMVectorScale(playerBack, 22.0f);
-            playerUp = DirectX::XMVectorScale(playerUp, 22.0f);
-            DirectionVec = DirectX::XMVectorAdd(playerBack, playerUp);
+            // 速力を計算する
+            DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&Player::Instance().GetPosition());
+            // プレイヤーの後ろ方向を計算
+            DirectX::XMVECTOR back = DirectX::XMLoadFloat3(&Player::Instance().GetFront());
+            back = DirectX::XMVector3Normalize(back);
+            back = DirectX::XMVectorScale(back, -20.0f); 
+            // プレイヤーの上方向を計算
+            DirectX::XMVECTOR up = DirectX::XMLoadFloat3(&Player::Instance().GetUp());
+            up = DirectX::XMVector3Normalize(up);
+            up = DirectX::XMVectorScale(up, 20.0f); 
 
-            //  投げ技される位置
-            pointA = DirectX::XMLoadFloat3(&position);
-            pointB = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&Player::Instance().GetPosition()), DirectionVec);
+            DirectX::XMVECTOR target = DirectX::XMVectorAdd(playerPos, DirectX::XMVectorAdd(back, up));
 
-            //  投げ技される方向
-            DirectX::XMFLOAT3 directionVec;
-            DirectX::XMStoreFloat3(&directionVec, DirectionVec);
+            // 飛ばされる時間
+            float flightTime = 1.2f;
 
-            velocity = directionVec;
+            // 重力ベクトル
+            DirectX::XMVECTOR g = DirectX::XMVectorSet(0, -9.8f, 0, 0);
 
-            float distance = DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectionVec));
+            // 投げる方向のベクトルを計算
+            DirectX::XMVECTOR delta = DirectX::XMVectorSubtract(target, start);
+            DirectX::XMVECTOR halfGT2 = DirectX::XMVectorScale(g, 0.5f * flightTime * flightTime);
+            DirectX::XMVECTOR v0 = DirectX::XMVectorDivide(DirectX::XMVectorSubtract(delta, halfGT2), DirectX::XMVectorReplicate(flightTime));
 
-            //  投げ技される速度
-            float speed = 10.0f;
-            DirectX::XMVECTOR Velocity = DirectX::XMLoadFloat3(&velocity);
-
-            //  仮の重力
-            float gravity = 1.0f;
-
-            static float timeElapsed = 0.0f;
-            timeElapsed += elapsedTime;
-
-            //  投げ技される位置の更新
-            DirectX::XMVECTOR newPosition = pointA;
-            newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorScale(Velocity, timeElapsed));
-            newPosition = DirectX::XMVectorAdd(newPosition, DirectX::XMVectorSet(0.0f, -0.5f * gravity * timeElapsed * timeElapsed, 0.0f, 0.0f));
-
-            position = DirectX::XMFLOAT3(DirectX::XMVectorGetX(newPosition), DirectX::XMVectorGetY(newPosition), DirectX::XMVectorGetZ(newPosition));
+            // 速力を更新
+            DirectX::XMStoreFloat3(&velocity, v0);
 
             GetThrowFlag = false;
         }

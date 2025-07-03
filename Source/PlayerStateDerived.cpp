@@ -86,6 +86,12 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
         {
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
         }
+
+        Mouse& mouse = Input::Instance().GetMouse();
+        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+        {
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+        }
     }
 
     // 回復入力処理
@@ -98,7 +104,7 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
     if (owner->lockonEnemy && owner->skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
-        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+        if ((mouse.GetButtonDown() & Mouse::BTN_RIGHT  && mouse.GetButtonDown() & Mouse::BTN_LEFT) || (gamePad.GetButtonDown() & GamePad::BTN_Y && gamePad.GetButtonDown() & GamePad::BTN_X))
         {
             owner->IsUseGrab = true;
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Grab));
@@ -198,6 +204,11 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
     }
+    Mouse& mouse = Input::Instance().GetMouse();
+    if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+    {
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+    }
 
     // 回復入力処理
     if (owner->skillTime > 1.0f)
@@ -218,8 +229,7 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
     if (owner->lockonEnemy && owner->skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
-        GamePad& gamePad = Input::Instance().GetGamePad();
-        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+        if ((mouse.GetButtonDown() & Mouse::BTN_RIGHT && mouse.GetButtonDown() & Mouse::BTN_LEFT) || (gamePad.GetButtonDown() & GamePad::BTN_Y && gamePad.GetButtonDown() & GamePad::BTN_X))
         {
             owner->IsUseGrab = true;
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Grab));
@@ -490,11 +500,11 @@ void PlayerStates::ClimbState::Enter()
     owner->state = Player::State::Climb;
     if (owner->velocity.y >= 0)
     {
-        owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Climb), true);
+        owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Climb), true, 0.2f, 2.5f);
     }
     else
     {
-        owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_ClimbDown), true);
+        owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_ClimbDown), true, 0.2f, 1.5f);
     }
     owner->onSwing = false;
 }
@@ -1004,13 +1014,13 @@ void PlayerStates::BounceState::Execute(float elapsedTime)
     //スイングの当たり判定
     owner->SwingCollision(elapsedTime);
     //boostの処理
-    if (owner->boostActive) 
+    if (owner->boostActive)
     {
         DirectX::XMVECTOR forwardVec = DirectX::XMLoadFloat3(&owner->GetFront());
         DirectX::XMVECTOR upVec = DirectX::XMLoadFloat3(&owner->GetUp());
         forwardVec = DirectX::XMVector3Normalize(forwardVec);
         upVec = DirectX::XMVector3Normalize(upVec);
- 
+
         // boostの進行度に応じて力を調整
         float progress = owner->boostElapsed / owner->bounceBoostTime; // 0～1
         float forwardPower = (1.0f - progress) * 3.0f * elapsedTime / owner->bounceBoostTime;
@@ -1060,12 +1070,99 @@ void PlayerStates::BounceState::Exit()
 
 void PlayerStates::FlyPunchState::Enter()
 {
+    owner->state = Player::State::FlyPunch;
+    owner->velocity = { 0, 0, 0 };
+    owner->attacking = true;
+    owner->attackTimer = 0;
+
+    // アニメーション再生
+    owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_FlyPunch), false, 0.1f, 1.2f);
+
+    // 突進方向は先に保存しておく（0.5秒後に使う）
+    if (owner->lockonEnemy)
+    {
+        DirectX::XMVECTOR toEnemy = DirectX::XMVectorSubtract(
+            DirectX::XMLoadFloat3(&owner->lockonEnemy->GetPosition()),
+            DirectX::XMLoadFloat3(&owner->position));
+        toEnemy = DirectX::XMVector3Normalize(toEnemy);
+        DirectX::XMStoreFloat3(&dashDirection, toEnemy);
+
+        owner->angle.y = atan2f(dashDirection.x, dashDirection.z);
+        owner->Turn(0.0f, dashDirection.x, dashDirection.z, owner->turnSpeed);
+    }
+    else
+    {
+        dashDirection.x = sinf(owner->angle.y);
+        dashDirection.y = 0;
+        dashDirection.z = cosf(owner->angle.y);
+    }
+
+    hasDashed = false;
 }
 
 void PlayerStates::FlyPunchState::Execute(float elapsedTime)
 {
+    float animationTime = owner->model->GetCurrentAnimationSeconds();
+
+    // 0.5秒後に突進（距離に応じて速度設定）
+    if (!hasDashed && animationTime > 0.5f)
+    {
+        float dashPower = 20.0f;
+
+        if (owner->lockonEnemy)
+        {
+            DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&owner->position);
+            DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&owner->lockonEnemy->GetPosition());
+
+            DirectX::XMVECTOR dirVec = DirectX::XMVectorSubtract(enemyPos, playerPos);
+            float dist = DirectX::XMVectorGetX(DirectX::XMVector3Length(dirVec));
+
+            dirVec = DirectX::XMVector3Normalize(dirVec);
+            DirectX::XMStoreFloat3(&dashDirection, dirVec);
+
+            // タイム分配（突進を約0.3秒で完了させる）
+            float flyDuration = 0.3f;
+            float speed = dist / flyDuration;
+
+            owner->velocity.x = dashDirection.x * speed;
+            owner->velocity.z = dashDirection.z * speed;
+
+            // 向き補正
+            owner->angle.y = atan2f(dashDirection.x, dashDirection.z);
+            owner->Turn(0.0f, dashDirection.x, dashDirection.z, owner->turnSpeed);
+        }
+        else
+        {
+            // 通常前方突進
+            float dx = sinf(owner->angle.y);
+            float dz = cosf(owner->angle.y);
+            owner->velocity.x = dx * dashPower;
+            owner->velocity.z = dz * dashPower;
+        }
+
+        hasDashed = true;
+    }
+
+    // 突進後は減速
+    if (animationTime > 0.8f)
+    {
+        owner->velocity.x *= 0.85f;
+        owner->velocity.z *= 0.85f;
+    }
+
+    // 攻撃判定
+    owner->CollisionNodeVsEnemies("mixamorig:LeftHand", owner->attackRadius);
+
+
+    // 終了処理
+    if (!owner->model->IsPlayAnimation())
+    {
+        owner->attacking = false;
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
+    }
 }
 
 void PlayerStates::FlyPunchState::Exit()
 {
+    owner->attacking = false;
 }

@@ -231,7 +231,7 @@ void Character::UpdateHorizontalVelocity(float elapsedFrame)
             float acceleration = this->acceleration * elapsedFrame;
             if (onClimb) 
             {
-                acceleration = 3.0f;
+                acceleration = 1.8f;
             }
 
             // ‹ó’†‚É‚¢‚é‚Æ‚«‰Á‘¬—Í‚ðŒ¸‚ç‚·

@@ -7,7 +7,11 @@ SamplerState particleSampler : register(s0);
 float4 main(PS_IN input) : SV_TARGET
 {
     float4 texColor = particleTexture.Sample(particleSampler, input.uv);
-    texColor.a *= input.life;
+    float alpha = saturate(input.life);
+    texColor.rgb *= texColor.a;
+    texColor.rgb *= alpha;
+    texColor.a *= alpha;   
     return texColor;
     
+   
 }

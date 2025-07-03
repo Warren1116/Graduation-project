@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderer/ModelRenderer.h"
+#include "Graphics\Shader\ParticleShader.h"
 
 // シーンレンダラー
 class SceneRenderer : public ModelRenderer
@@ -21,6 +22,8 @@ public:
 public:
 	//	描画実行
 	void Render(ID3D11DeviceContext* dc) override;
+
+	void SetParticleShader(ParticleShader* shader) { this->particleShader = shader; }
 
 	//	デバッグGUI描画
 	void DrawDebugGUI() override;
@@ -49,6 +52,8 @@ private:
 	float shadowBias= { 0.001f};
 	//	影の色
 	DirectX::XMFLOAT3 shadowColor = { 0.2f,0.2f,0.2f };
+
+    ParticleShader* particleShader = nullptr;	//	パーティクルシェーダー
 
 //private:
 //    // MiniMap用

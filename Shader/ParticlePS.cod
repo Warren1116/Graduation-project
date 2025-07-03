@@ -33,9 +33,10 @@ dcl_resource_texture2d (float,float,float,float) t0
 dcl_input_ps linear v1.xy
 dcl_input_ps linear v1.z
 dcl_output o0.xyzw
-dcl_temps 1
+dcl_temps 2
 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v1.xyxx, t0.xyzw, s0
-mul o0.w, r0.w, v1.z
-mov o0.xyz, r0.xyzx
+mul r0.xyz, r0.wwww, r0.xyzx
+mov_sat r1.x, v1.z
+mul o0.xyzw, r0.xyzw, r1.xxxx
 ret 
-// Approximately 4 instruction slots used
+// Approximately 5 instruction slots used

@@ -38,6 +38,8 @@ void main(point VS_OUT input[1], inout TriangleStream<PS_IN> triStream)
     triStream.Append(v1);
     triStream.Append(v2);
 
+    triStream.RestartStrip();
+    
     PS_IN v3, v4, v5;
     v3.pos = mul(float4(pos + offset[2] * size, 1.0f), viewProjection);
     v4.pos = mul(float4(pos + offset[1] * size, 1.0f), viewProjection);
@@ -50,5 +52,5 @@ void main(point VS_OUT input[1], inout TriangleStream<PS_IN> triStream)
     triStream.Append(v4);
     triStream.Append(v5);
 
-    triStream.RestartStrip();
+
 }

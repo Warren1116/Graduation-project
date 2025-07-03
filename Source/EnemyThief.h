@@ -97,8 +97,6 @@ private:
     float				punchRange = 1.5f;
 
     //“Š‚°‚³‚ê‚éŽž—p
-    float timeElapsed = 0.0f;
-    float totalFlightTime;
     float webTimer;
     bool GetThrowFlag;
 

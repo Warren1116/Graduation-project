@@ -212,5 +212,8 @@ namespace PlayerStates
         void Enter() override;
         void Execute(float elapsedTime)override;
         void Exit()override;
+    private:
+        DirectX::XMFLOAT3 dashDirection = { 0.0f, 0.0f, 0.0f };
+        bool hasDashed = false; 
     };
 }

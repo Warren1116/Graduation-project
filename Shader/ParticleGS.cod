@@ -86,6 +86,7 @@ mov o0.xyzw, r1.xyzw
 mov o1.xy, l(0,1.000000,0,0)
 mov o1.z, v[0][0].w
 emit 
+cut 
 mov o0.xyzw, r1.xyzw
 mov o1.xy, l(0,1.000000,0,0)
 mov o1.z, v[0][0].w
@@ -102,6 +103,5 @@ mov o0.xyzw, r0.xyzw
 mov o1.xy, l(1.000000,1.000000,0,0)
 mov o1.z, v[0][0].w
 emit 
-cut 
 ret 
 // Approximately 56 instruction slots used

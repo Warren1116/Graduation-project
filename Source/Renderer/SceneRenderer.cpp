@@ -149,6 +149,14 @@ void SceneRenderer::Render(ID3D11DeviceContext* dc)
 		}
 	}
 
+	// パーティクル描画
+	if (particleShader)
+	{
+		particleShader->Begin(rc);
+		particleShader->Draw(rc);
+		particleShader->End(rc);
+	}
+
 	//	シェーダーがあれば終了処理
 	if (shader) shader->End(rc);
 

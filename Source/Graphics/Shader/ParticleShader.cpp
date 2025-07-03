@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include <WICTextureLoader.h>
 #include "StageMain.h"
+#include "Player.h"
 
 ParticleShader::ParticleShader(ID3D11Device* device)
 {
@@ -80,41 +81,6 @@ ParticleShader::ParticleShader(ID3D11Device* device)
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 
-    D3D11_BUFFER_DESC desc = {};
-    desc.ByteWidth = sizeof(CbScene);
-    desc.Usage = D3D11_USAGE_DEFAULT;
-    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    device->CreateBuffer(&desc, nullptr, constantBuffer.GetAddressOf());
-
-    desc.ByteWidth = sizeof(Particle) * 1000;
-    desc.Usage = D3D11_USAGE_DYNAMIC;
-    desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    device->CreateBuffer(&desc, nullptr, vertexBuffer.GetAddressOf());
-
-    D3D11_BLEND_DESC blendDesc = {};
-    blendDesc.RenderTarget[0].BlendEnable = true;
-    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-    device->CreateBlendState(&blendDesc, blendState.GetAddressOf());
-
-    D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-    dsDesc.DepthEnable = false;
-    dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-    dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-    device->CreateDepthStencilState(&dsDesc, depthStencilState.GetAddressOf());
-
-    D3D11_RASTERIZER_DESC rastDesc = {};
-    rastDesc.FillMode = D3D11_FILL_SOLID;
-    rastDesc.CullMode = D3D11_CULL_NONE;
-    rastDesc.DepthClipEnable = true;
-    device->CreateRasterizerState(&rastDesc, rasterizerState.GetAddressOf());
-
     //テクスチャを読み込む
     {
         std::string pathStr = "./Data/Texture/particle.png";
@@ -127,22 +93,68 @@ ParticleShader::ParticleShader(ID3D11Device* device)
         _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
     }
 
-    D3D11_SAMPLER_DESC sampDesc = {};
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-    sampDesc.MinLOD = 0;
-    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-    HRESULT hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+    D3D11_BUFFER_DESC desc = {};
+    desc.ByteWidth = sizeof(CbScene);
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    device->CreateBuffer(&desc, nullptr, constantBuffer.GetAddressOf());
 
+    desc.ByteWidth = sizeof(Particle) * 1000;
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    device->CreateBuffer(&desc, nullptr, vertexBuffer.GetAddressOf());
+
+    //ブレンドステート
+    {
+        D3D11_BLEND_DESC desc = {};
+        desc.RenderTarget[0].BlendEnable = true;
+        desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+        desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+        desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+        desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
+        desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+        desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+        device->CreateBlendState(&desc, blendState.GetAddressOf());
+    }
+
+    //深度ステンシルステート
+    {
+        D3D11_DEPTH_STENCIL_DESC desc = {};
+        desc.DepthEnable = true;
+        desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+        desc.DepthFunc = D3D11_COMPARISON_LESS;
+        device->CreateDepthStencilState(&desc, depthStencilState.GetAddressOf());
+    }
+
+    //ラスタライザステート
+    {
+        D3D11_RASTERIZER_DESC desc = {};
+        desc.FillMode = D3D11_FILL_SOLID;
+        desc.CullMode = D3D11_CULL_NONE;
+        desc.DepthClipEnable = true;
+        device->CreateRasterizerState(&desc, rasterizerState.GetAddressOf());
+    }
+
+    //サンプラステート
+    {
+        D3D11_SAMPLER_DESC desc = {};
+        desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+        desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+        desc.MinLOD = 0;
+        desc.MaxLOD = D3D11_FLOAT32_MAX;
+        HRESULT hr = device->CreateSamplerState(&desc, samplerState.GetAddressOf());
+        _ASSERT_EXPR(SUCCEEDED(hr), HRTrace(hr));
+    }
 }
 
 void ParticleShader::UpdateParticles(float elapsedTime)
 {
-    particles.resize(600);
+    particles.resize(1000);
     for (auto& p : particles)
     {
         if (p.life > 0.0f)
@@ -153,7 +165,7 @@ void ParticleShader::UpdateParticles(float elapsedTime)
             p.life -= elapsedTime;
         }
     }
-    EmitRandomParticles(100);
+    EmitRandomParticles(10);
 }
 
 void ParticleShader::EmitRandomParticles(int count)
@@ -181,7 +193,7 @@ void ParticleShader::EmitRandomParticles(int count)
                     ((rand() % 200) - 100) * 0.01f  
                 };
                 // 生存時間をランダムに設定
-                p.life = 1.0f + ((rand() % 100) * 0.02f);
+                p.life = 2.0f + ((rand() % 100) * 0.02f);
 
                 break;
             }

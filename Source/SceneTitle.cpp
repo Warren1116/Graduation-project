@@ -24,7 +24,7 @@ void SceneTitle::Initialize()
     cameraController = std::make_unique<CameraController>();
 
 
-    //パーティクルシェーダー生成
+    ////パーティクルシェーダー生成
     particleShader = std::make_unique<ParticleShader>(graphics.GetDevice());
 
 
@@ -38,6 +38,7 @@ void SceneTitle::Initialize()
 
         //	シーンレンダラー
         sceneRenderer = std::make_unique<SceneRenderer>(width, height);
+        sceneRenderer->SetParticleShader(particleShader.get());
 
         //	ポストプロセスレンダラー
         postprocessingRenderer = std::make_unique<PostprocessingRenderer>(width / 2, height / 2);
@@ -117,6 +118,7 @@ void SceneTitle::Initialize()
 
 }
 
+
 // 終了化
 void SceneTitle::Finalize()
 {
@@ -143,11 +145,15 @@ void SceneTitle::Update(float elapsedTime)
     rc.viewPosition = { camera.GetEye().x, camera.GetEye().y, camera.GetEye().z, 1.0f };
 
 
-    //パーティクルを生成・Update
-    particleShader->EmitRandomParticles(100);
-    particleShader->UpdateParticles(elapsedTime);
+    ////パーティクルを生成・Update
+    if (particleShader)
+    {
+        particleShader->EmitRandomParticles(10);
+        particleShader->UpdateParticles(elapsedTime);
 
+    }
 
+    //　背景音楽
     Bgm->Play(true, 0.1f);
     // カメラコントローラー更新処理
     Camera::Instance().SetLookAt(cameraPos, cameraAngle, DirectX::XMFLOAT3(0, 1, 0));
@@ -229,7 +235,6 @@ void SceneTitle::Update(float elapsedTime)
 }
 
 
-
 //描画処理
 void SceneTitle::Render()
 {
@@ -263,8 +268,6 @@ void SceneTitle::Render()
     float screenHeight = static_cast<float>(graphics.GetScreenHeight());
 
 
-
-
     // 3D
     {
 
@@ -276,11 +279,6 @@ void SceneTitle::Render()
         sceneRenderer->Render(dc);
 
         postprocessingRenderer->Render(dc);
-
-        // パーティクル描画
-        particleShader->Begin(rc);
-        particleShader->Draw(rc);
-        particleShader->End(rc);
 
     }
 

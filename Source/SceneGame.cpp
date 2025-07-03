@@ -24,7 +24,7 @@ SceneGame* SceneGame::instance = nullptr;
 //シャドウマップのサイズ
 static const UINT SHADOWMAP_SIZE = 2048;
 
-#define TUTORIAL
+//#define TUTORIAL
 //#define DEBUG
 
 //	チュートリアルの状態
@@ -57,6 +57,7 @@ void SceneGame::Initialize()
         shadowmapRenderer = std::make_unique<ShadowmapRenderer>(2048);
         //	シーンレンダラー
         sceneRenderer = std::make_unique<SceneRenderer>(width, height);
+        sceneRenderer->SetParticleShader(particleShader.get());
 
         //	ポストプロセスレンダラー
         postprocessingRenderer = std::make_unique<PostprocessingRenderer>(width / 2, height / 2);
@@ -448,10 +449,10 @@ void SceneGame::Render()
 
     postprocessingRenderer->Render(rc.deviceContext);
 
-    // パーティクル描画
-    particleShader->Begin(rc);
-    particleShader->Draw(rc);
-    particleShader->End(rc);
+    //// パーティクル描画
+    //particleShader->Begin(rc);
+    //particleShader->Draw(rc);
+    //particleShader->End(rc);
 
 
     //2Dスプライト描画

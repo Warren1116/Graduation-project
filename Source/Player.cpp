@@ -65,6 +65,7 @@ Player::Player(bool flag)
     stateMachine->RegisterState(new PlayerStates::SwingToKickState(this));
     stateMachine->RegisterState(new PlayerStates::UltimateState(this));
     stateMachine->RegisterState(new PlayerStates::BounceState(this));
+    stateMachine->RegisterState(new PlayerStates::FlyPunchState(this));
 
     // 初期状態設定
     stateMachine->SetState(static_cast<int>(State::CrouchIdle));
@@ -78,6 +79,7 @@ Player::Player(bool flag)
     punch = Audio::Instance().LoadAudioSource("Data/Audio/punch.wav");
     punch2 = Audio::Instance().LoadAudioSource("Data/Audio/punch2.wav");
     kick = Audio::Instance().LoadAudioSource("Data/Audio/kick.wav");
+    FlyPunch = Audio::Instance().LoadAudioSource("Data/Audio/FlyPunch.wav");
     // 落とす音
     Fall = Audio::Instance().LoadAudioSource("Data/Audio/Fall.wav");
     // スパイダーセンス
@@ -153,7 +155,6 @@ void Player::Update(float elapsedTime)
     {
         spiderSensePlayed = false;
     }
-
 }
 
 // 移動入力処理
@@ -318,19 +319,26 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                         enemyPos.y += enemy->GetHeight() * 1.5f;
                         if (enemy->GetHealth() != 0)
                         {
-                            switch (attackCount)
+                            if (state == State::Attack)
                             {
-                            case 1:
-                                punch->Play(false, 0.4f);
-                                break;
-                            case 2:
-                                punch2->Play(false, 0.4f);
-                                break;
-                            case 3:
-                                kick->Play(false, 0.4f);
-                                MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
-                                Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
-                                break;
+                                switch (attackCount)
+                                {
+                                case 1:
+                                    punch->Play(false, 0.4f);
+                                    break;
+                                case 2:
+                                    punch2->Play(false, 0.4f);
+                                    break;
+                                case 3:
+                                    kick->Play(false, 0.4f);
+                                    MessageData::CAMERASHAKEDATA	p = { 0.1f, 1.0f };
+                                    Messenger::Instance().SendData(MessageData::CAMERASHAKE, &p);
+                                    break;
+                                }
+                            }
+                            if (state == State::FlyPunch)
+                            {
+                                FlyPunch->Play(false, 0.4f);
                             }
                             hitEffect->Play(enemyPos);
                             if (skillTime < skillTimeMax)
@@ -456,6 +464,7 @@ void Player::UpdateCameraState(float elapsedTime)
     case State::Dodge:
     case State::SwingToKick:
     case State::Bounce:
+    case State::FlyPunch:
     {
         GamePad& gamePad = Input::Instance().GetGamePad();
         if (gamePad.GetButton() & GamePad::BTN_KEYBOARD_TAB || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
@@ -996,10 +1005,10 @@ void Player::SwingCollision(float elapsedTime)
 
         // レイ分割数を計算（精度向上のため）
         int steps = static_cast<int>(distance / 0.5f);
-        steps = max(steps, 5);
+        steps = max(steps, 6);
         HitResult hit;
 
-        const int raySamples = 3;
+        const int raySamples = 4;
         float angleStep = DirectX::XM_2PI / raySamples;
 
         // 簡易スフィアキャスト
