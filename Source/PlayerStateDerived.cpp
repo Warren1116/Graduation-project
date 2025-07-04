@@ -82,13 +82,13 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
         }
 
         //攻撃入力処理
-        if (owner->InputAttack())
+        Player::AttackType attackType = owner->InputAttack();
+        if (attackType == Player::AttackType::Normal)
         {
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
         }
 
-        Mouse& mouse = Input::Instance().GetMouse();
-        if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+        if (attackType == Player::AttackType::Heavy)
         {
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
         }
@@ -199,13 +199,14 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Shot));
     }
 
-    // 攻撃入力処理
-    if (owner->InputAttack())
+    //攻撃入力処理
+    Player::AttackType attackType = owner->InputAttack();
+    if (attackType == Player::AttackType::Normal)
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
     }
-    Mouse& mouse = Input::Instance().GetMouse();
-    if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+
+    if (attackType == Player::AttackType::Heavy)
     {
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
     }
@@ -253,9 +254,16 @@ void PlayerStates::JumpState::Enter()
 // ジャンプステートで実行するメソッド
 void PlayerStates::JumpState::Execute(float elapsedTime)
 {
-    if (owner->InputAttack())
+    //攻撃入力処理
+    Player::AttackType attackType = owner->InputAttack();
+    if (attackType == Player::AttackType::Normal)
     {
-        owner->stateMachine->ChangeState(static_cast<int>(Player::State::SwingToKick));
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
+    }
+
+    if (attackType == Player::AttackType::Heavy)
+    {
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
     }
 
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -329,6 +337,7 @@ void PlayerStates::AttackState::Enter()
 {
     owner->state = Player::State::Attack;
     owner->attacking = true;
+    owner->attackTimer = 0;
     // 攻撃アニメーション再生
     owner->PlayAttackAnimation();
 }
@@ -353,6 +362,39 @@ void PlayerStates::AttackState::Execute(float elapsedTime)
     // アニメーションの再生時間を取得
     float animationTime = owner->model->GetCurrentAnimationSeconds();
     float animationSpeed = owner->model->GetCurrentAnimationSpeed();
+
+    //  次の攻撃へ移動
+    {
+        float adjustedStartTime = 0.5f / animationSpeed;
+        float adjustedEndTime = 1.0f / animationSpeed;
+        if (owner->attackCount == 2)
+        {
+            adjustedStartTime = 0.3f / animationSpeed;
+        }
+        if (animationTime >= adjustedStartTime && animationTime <= adjustedEndTime)
+        {
+            //攻撃入力処理
+            Player::AttackType attackType = owner->InputAttack();
+            if (attackType == Player::AttackType::Normal)
+            {
+                owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
+            }
+
+            if (attackType == Player::AttackType::Heavy)
+            {
+                owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+            }
+
+            //  連撃のカウントアップ応じて切り替わり時間は調整した方がよい
+            //  連打しないと次につながらないので選考入力の仕組みを入れる（ゲープロVのコマンド履歴を見るとよい）
+            Mouse& mouse = Input::Instance().GetMouse();
+            GamePad& gamePad = Input::Instance().GetGamePad();
+            if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+            {
+                owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+            }
+        }
+    }
 
     // アニメーションの速度に応じて攻撃の当たり判定を調整
     float adjustedStartTime = 0.3f / animationSpeed;
@@ -1075,8 +1117,10 @@ void PlayerStates::FlyPunchState::Enter()
     owner->attacking = true;
     owner->attackTimer = 0;
 
+
     // アニメーション再生
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_FlyPunch), false, 0.1f, 1.2f);
+    owner->model->SetCurrentAnimationSeconds(0.5f);
 
     // 突進方向は先に保存しておく（0.5秒後に使う）
     if (owner->lockonEnemy)

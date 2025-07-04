@@ -83,6 +83,15 @@ public:
         Locked,
     };
 
+
+    enum class AttackType
+    {
+        Normal,    // 通常攻撃
+        Heavy,     // 重攻撃
+        None,     // 攻撃なし
+    };
+    std::vector<AttackType> attackInputHistory;
+
     Player(bool flag);
     ~Player();
     static Player& Instance() { return *instance; }
@@ -98,7 +107,8 @@ public:
     bool InputMove(float elapsedTime);  // 移動入力処理
     bool InputJump();                   // ジャンプ入力処理
     bool InputProjectile();             //　弾丸の入力処理
-    bool InputAttack();                 // 攻撃入力処理
+    //bool InputAttack();                 // 攻撃入力処理
+    AttackType InputAttack();                 // 攻撃入力処理
     bool InputDodge();                  // Dodge入力処理
     bool InputHealing();                //　回復入力処理
     void DrawDebugPrimitive();          // デバッグプリミティブ描画

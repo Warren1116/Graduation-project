@@ -25,7 +25,7 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 //#define TUTORIAL
-//#define DEBUG
+#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -712,7 +712,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         //  攻撃のチュトリアル
     case SceneGame::TutorialState::Attack:
         CheckTutorialTimeout(2.0f);
-        if (Player::Instance().InputAttack() && canAcceptInput)
+        if (Player::Instance().InputAttack() == Player::AttackType::Normal && canAcceptInput)
             AdvanceTutorialState(SceneGame::TutorialState::Shot);
         break;
         //  弾丸のチュトリアル

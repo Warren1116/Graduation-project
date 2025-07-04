@@ -165,6 +165,7 @@ public:
 
 	// 現在のアニメーション再生時間取得
 	float GetCurrentAnimationSeconds() const { return currentAnimationSeconds; }
+	void SetCurrentAnimationSeconds(float time){ currentAnimationSeconds = time; }
 
 	// 現在のアニメーション長さ取得
 	float GetCurrentAnimationLength() const;

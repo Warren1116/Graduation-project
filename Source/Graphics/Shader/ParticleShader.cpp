@@ -99,7 +99,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
     desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     device->CreateBuffer(&desc, nullptr, constantBuffer.GetAddressOf());
 
-    desc.ByteWidth = sizeof(Particle) * 1000;
+    desc.ByteWidth = sizeof(Particle) * 5000;
     desc.Usage = D3D11_USAGE_DYNAMIC;
     desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -154,7 +154,7 @@ ParticleShader::ParticleShader(ID3D11Device* device)
 
 void ParticleShader::UpdateParticles(float elapsedTime)
 {
-    particles.resize(1000);
+    particles.resize(5000);
     for (auto& p : particles)
     {
         if (p.life > 0.0f)
@@ -165,7 +165,7 @@ void ParticleShader::UpdateParticles(float elapsedTime)
             p.life -= elapsedTime;
         }
     }
-    EmitRandomParticles(10);
+    EmitRandomParticles(100);
 }
 
 void ParticleShader::EmitRandomParticles(int count)
@@ -181,16 +181,16 @@ void ParticleShader::EmitRandomParticles(int count)
             if (p.life <= 0.0f)
             {
                 float randX = min.x + ((rand() / (float)RAND_MAX) * (max.x - min.x));
-                float randY = ((rand() % 2480) - 100) * 0.1f;
+                float randY = min.y + ((rand() / (float)RAND_MAX) * (max.y - min.y));
                 float randZ = min.z + ((rand() / (float)RAND_MAX) * (max.z - min.z));
                 
                 p.position = { randX, randY, randZ };
 
                 // ƒ‰ƒ“ƒ_ƒ€‚È‘¬“x‚ðÝ’è
                 p.velocity = {
-                    ((rand() % 200) - 100) * 0.01f,  
-                    -0.8f + ((rand() % 20) * 0.01f), 
-                    ((rand() % 200) - 100) * 0.01f  
+                    ((rand() % 200) - 100) * 0.001f,  
+                    ((rand() % 200) - 100) * 0.001f,
+                    ((rand() % 200) - 100) * 0.001f  
                 };
                 // ¶‘¶ŽžŠÔ‚ðƒ‰ƒ“ƒ_ƒ€‚ÉÝ’è
                 p.life = 2.0f + ((rand() % 100) * 0.02f);
@@ -212,9 +212,7 @@ void ParticleShader::Begin(const RenderContext& rc)
 
     CbScene cbScene; 
     cbScene.view = rc.view;
-    DirectX::XMMATRIX V = DirectX::XMLoadFloat4x4(&rc.view);
-    DirectX::XMMATRIX P = DirectX::XMLoadFloat4x4(&rc.projection);
-    DirectX::XMStoreFloat4x4(&cbScene.viewProjection, V * P);
+    cbScene.projection = rc.projection;
 
     rc.deviceContext->UpdateSubresource(constantBuffer.Get(), 0, nullptr, &cbScene, 0, 0);
 

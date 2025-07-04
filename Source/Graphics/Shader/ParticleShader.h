@@ -29,7 +29,7 @@ private:
     struct CbScene
     {
         DirectX::XMFLOAT4X4 view;
-        DirectX::XMFLOAT4X4 viewProjection;
+        DirectX::XMFLOAT4X4 projection;
     };
 
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;

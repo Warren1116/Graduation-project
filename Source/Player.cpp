@@ -137,7 +137,17 @@ void Player::Update(float elapsedTime)
     model->UpdateTransform(transform);
 
     //　攻撃ウンター・スキルタイム更新
-    if (attacking)  attackTimer++;
+    if (attacking)
+    {
+        attackTimer++;
+
+        if (attackTimer > 60)
+        {
+            attackCount = 0;
+            attackTimer = 0;
+            attacking = false;
+        }
+    }
     if (skillTime < skillTimeMax) skillTime += elapsedTime * 0.01f;
 
     if (EnemyManager::Instance().GetEnemyCount() == 0) getAttacksoon = false;
@@ -293,7 +303,7 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                 outPosition))
             {
                 // ダメージを与える
-                if (enemy->ApplyDamage(15, 0.3f))
+                if (enemy->ApplyDamage(15, 0.1f))
                 {
                     // 吹き飛ばす
                     {
@@ -356,12 +366,12 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
 void Player::PlayAttackAnimation()
 {
     // 連撃のアニメーション
-    float attackAnimationSpeed = 1.5f; // アニメーション速度を速くするための倍率
+    float attackAnimationSpeed = 2.5f; // アニメーション速度を速くするための倍率
     switch (attackCount)
     {
-    case 1: model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Attack), false, 0.1f, attackAnimationSpeed); break;
-    case 2: model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Attack2), false, 0.1f, attackAnimationSpeed); break;
-    case 3: model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Kick), false, 0.1f, attackAnimationSpeed); break;
+    case 1: model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Attack), false, 0.1f, 2.5f); break;
+    case 2: model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Attack2), false, 0.1f, 2.5f); break;
+    case 3: model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_Kick), false, 0.1f, 1.5f); break;
     default: break;
     }
 }
@@ -785,8 +795,8 @@ void Player::CollisionProjectileVsEnemies()
                     enemyPos.y += enemy->GetHeight();
                     //敵がWebで3回受けたら拘束状態にする
                     if (enemy->GetWebCount() == 3)
-                    {   
-                        webEffect->Play(enemyPos,2.0f);
+                    {
+                        webEffect->Play(enemyPos, 2.0f);
                         enemy->SetIsBodage(true);
                     }
                     //エフェクト生成
@@ -804,10 +814,11 @@ void Player::CollisionProjectileVsEnemies()
 }
 
 // 攻撃入力処理
-bool Player::InputAttack()
+Player::AttackType Player::InputAttack()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
     Mouse& mouse = Input::Instance().GetMouse();
+
     if (mouse.GetButtonDown() & Mouse::BTN_LEFT || gamePad.GetButtonDown() & GamePad::BTN_X)
     {
         attacking = true;
@@ -815,7 +826,7 @@ bool Player::InputAttack()
         {
             attackCount++;
             attacking = true;
-            return true;
+            return AttackType::Normal;
         }
         else
         {
@@ -824,7 +835,13 @@ bool Player::InputAttack()
             attacking = false;
         }
     }
-    return false;
+
+    if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+    {
+        return AttackType::Heavy;
+    }
+
+    return AttackType::None;
 
 }
 

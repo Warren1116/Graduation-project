@@ -7,8 +7,8 @@
 // cbuffer CbScene
 // {
 //
-//   row_major float4x4 view;           // Offset:    0 Size:    64 [unused]
-//   row_major float4x4 viewProjection; // Offset:   64 Size:    64
+//   row_major float4x4 view;           // Offset:    0 Size:    64
+//   row_major float4x4 projection;     // Offset:   64 Size:    64 [unused]
 //
 // }
 //
@@ -39,16 +39,16 @@
 //
 vs_5_0
 dcl_globalFlags refactoringAllowed
-dcl_constantbuffer CB0[8], immediateIndexed
+dcl_constantbuffer CB0[4], immediateIndexed
 dcl_input v0.xyz
 dcl_input v1.x
 dcl_output o0.xyz
 dcl_output o0.w
 dcl_temps 1
-mul r0.xyz, v0.yyyy, cb0[5].xyzx
-mad r0.xyz, v0.xxxx, cb0[4].xyzx, r0.xyzx
-mad r0.xyz, v0.zzzz, cb0[6].xyzx, r0.xyzx
-add o0.xyz, r0.xyzx, cb0[7].xyzx
+mul r0.xyz, v0.yyyy, cb0[1].xyzx
+mad r0.xyz, v0.xxxx, cb0[0].xyzx, r0.xyzx
+mad r0.xyz, v0.zzzz, cb0[2].xyzx, r0.xyzx
+add o0.xyz, r0.xyzx, cb0[3].xyzx
 mov o0.w, v1.x
 ret 
 // Approximately 6 instruction slots used
