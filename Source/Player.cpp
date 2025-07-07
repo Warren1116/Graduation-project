@@ -143,6 +143,7 @@ void Player::Update(float elapsedTime)
 
         if (attackTimer > 60)
         {
+            attackInputHistory.clear();
             attackCount = 0;
             attackTimer = 0;
             attacking = false;
@@ -821,26 +822,24 @@ Player::AttackType Player::InputAttack()
 
     if (mouse.GetButtonDown() & Mouse::BTN_LEFT || gamePad.GetButtonDown() & GamePad::BTN_X)
     {
-        attacking = true;
-        if (attackCount < attackLimit)
-        {
-            attackCount++;
-            attacking = true;
-            return AttackType::Normal;
-        }
-        else
-        {
-            attackCount = 0;
-            attackTimer = 0;
-            attacking = false;
-        }
+        attackInputHistory.push_back(AttackType::Normal);
+        attackInputQueue.push(AttackType::Normal);
+        attackCount++;
+        return AttackType::Normal;
+
     }
 
     if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
     {
+        attackInputHistory.push_back(AttackType::Heavy);
+        attackInputQueue.push(AttackType::Heavy);
         return AttackType::Heavy;
     }
 
+    if (attackInputHistory.size() > 3)
+    {
+        attackInputHistory.erase(attackInputHistory.begin());
+    }
     return AttackType::None;
 
 }
@@ -952,6 +951,19 @@ void Player::DrawDebugPrimitive()
                 DirectX::XMFLOAT4(1, 0, 0, 1));
         }
     }
+}
+
+bool Player::MatchCombo(const std::vector<AttackType>& history, const std::vector<AttackType>& pattern)
+{
+    int comboIndex = static_cast<int>(pattern.size()) - 1;
+    for (int i = static_cast<int>(history.size()) - 1; i >= 0 && comboIndex >= 0; --i)
+    {
+        if (history[i] == pattern[comboIndex])
+        {
+            comboIndex--;
+        }
+    }
+    return comboIndex < 0;
 }
 
 // ƒWƒƒƒ“ƒv“ü—Íˆ—
@@ -1280,6 +1292,28 @@ void Player::DrawDebugGUI()
                 break;
             }
             ImGui::Text(u8"State@%s", str.c_str());
+        }
+        if (ImGui::CollapsingHeader("AttackType", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            std::string str = "Input History";
+            for (const auto& attackInput : attackInputHistory)
+            {
+                switch (attackInput)
+                {
+                case AttackType::Normal:
+                    str += " Normal ->";
+                    break;
+                case AttackType::Heavy:
+                    str += " Heavy ->";
+                    break;
+                case AttackType::None:
+                    str += " None";
+                    break;
+                }
+
+                ImGui::Text(u8"%s", str.c_str());
+            }
+
         }
     }
     ImGui::End();

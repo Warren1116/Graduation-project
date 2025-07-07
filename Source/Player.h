@@ -17,6 +17,7 @@
 #include "EnemyThief.h"
 #include "PlayerStateMachine.h"
 #include "PlayerStateDerived.h"
+#include <queue>
 
 //アニメーション
 enum class PlayerAnimation
@@ -90,7 +91,9 @@ public:
         Heavy,     // 重攻撃
         None,     // 攻撃なし
     };
-    std::vector<AttackType> attackInputHistory;
+    std::vector<AttackType> attackInputHistory;   // 攻撃入力履歴
+    std::queue<AttackType> attackInputQueue;   // 攻撃入力キュー
+
 
     Player(bool flag);
     ~Player();
@@ -112,6 +115,8 @@ public:
     bool InputDodge();                  // Dodge入力処理
     bool InputHealing();                //　回復入力処理
     void DrawDebugPrimitive();          // デバッグプリミティブ描画
+    bool Player::MatchCombo(const std::vector<AttackType>& history, const std::vector<AttackType>& pattern);
+
 
     ///////////////////////////////////////////////////////////////////////////////////
     //                              ゲッター・セッター                               //
@@ -195,6 +200,7 @@ private:
     float mixAngleX = DirectX::XMConvertToRadians(-35);
     bool getAttacksoon = false;    //	攻撃予知
     bool getShotsoon = false;    //	攻撃予知
+
 
     // スイング
     DirectX::XMFLOAT3 previousSwingPoint;        //	前回のスイングポイントを記録

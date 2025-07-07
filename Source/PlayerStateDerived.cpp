@@ -9,9 +9,14 @@
 // 待機ステート
 void PlayerStates::IdleState::Enter()
 {
+
     owner->state = Player::State::Idle;
     owner->onSwing = false;
     owner->firstSwing = true;
+    if (!owner->attacking)
+    {
+        owner->attackInputHistory.clear();
+    }
 
     if (owner->lastState == Player::State::Swing)
     {
@@ -104,7 +109,7 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
     if (owner->lockonEnemy && owner->skillTime >= 1)
     {
         Mouse& mouse = Input::Instance().GetMouse();
-        if ((mouse.GetButtonDown() & Mouse::BTN_RIGHT  && mouse.GetButtonDown() & Mouse::BTN_LEFT) || (gamePad.GetButtonDown() & GamePad::BTN_Y && gamePad.GetButtonDown() & GamePad::BTN_X))
+        if ((mouse.GetButtonDown() & Mouse::BTN_RIGHT && mouse.GetButtonDown() & Mouse::BTN_LEFT) || (gamePad.GetButtonDown() & GamePad::BTN_Y && gamePad.GetButtonDown() & GamePad::BTN_X))
         {
             owner->IsUseGrab = true;
             owner->stateMachine->ChangeState(static_cast<int>(Player::State::Grab));
@@ -371,28 +376,46 @@ void PlayerStates::AttackState::Execute(float elapsedTime)
         {
             adjustedStartTime = 0.3f / animationSpeed;
         }
-        if (animationTime >= adjustedStartTime && animationTime <= adjustedEndTime)
+        if (animationTime >= adjustedStartTime && animationTime <= adjustedEndTime )
         {
-            //攻撃入力処理
-            Player::AttackType attackType = owner->InputAttack();
-            if (attackType == Player::AttackType::Normal)
+            if (!owner->attackInputHistory.empty())
             {
-                owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
+                if (owner->MatchCombo(owner->attackInputHistory, { Player::AttackType::Normal, Player::AttackType::Heavy }))
+                {
+                    // 軽 → 重 のコンボ
+                    owner->stateMachine->ChangeState(static_cast<int>(Player::State::Ultimate));
+                    owner->attackInputHistory.clear();
+                    return;
+                }
+                else if (owner->attackInputHistory == std::vector<Player::AttackType>{Player::AttackType::Normal, Player::AttackType::Normal, Player::AttackType::Heavy})
+                {
+                    // 軽 → 軽 → 重 のコンボ
+                    owner->stateMachine->ChangeState(static_cast<int>(Player::State::Ultimate));
+                    owner->attackInputHistory.clear();
+                    return;
+                }
             }
 
-            if (attackType == Player::AttackType::Heavy)
-            {
-                owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
-            }
+            ////攻撃入力処理
+            //Player::AttackType attackType = owner->InputAttack();
+            //if (attackType == Player::AttackType::Normal)
+            //{
+            //    owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
+            //}
 
-            //  連撃のカウントアップ応じて切り替わり時間は調整した方がよい
-            //  連打しないと次につながらないので選考入力の仕組みを入れる（ゲープロVのコマンド履歴を見るとよい）
-            Mouse& mouse = Input::Instance().GetMouse();
-            GamePad& gamePad = Input::Instance().GetGamePad();
-            if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
-            {
-                owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
-            }
+            //if (attackType == Player::AttackType::Heavy)
+            //{
+            //    owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+            //}
+
+            ////  連撃のカウントアップ応じて切り替わり時間は調整した方がよい
+            ////  連打しないと次につながらないので選考入力の仕組みを入れる（ゲープロVのコマンド履歴を見るとよい）
+            //Mouse& mouse = Input::Instance().GetMouse();
+            //GamePad& gamePad = Input::Instance().GetGamePad();
+            //if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
+            //{
+            //    owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+            //}
         }
     }
 
@@ -825,6 +848,7 @@ void PlayerStates::CrouchIdleState::Enter()
 {
     owner->state = Player::State::CrouchIdle;
     owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_CrouchIdle), false);
+
 }
 
 // 待機ステートで実行するメソッド
@@ -1208,5 +1232,5 @@ void PlayerStates::FlyPunchState::Execute(float elapsedTime)
 
 void PlayerStates::FlyPunchState::Exit()
 {
-    owner->attacking = false;
+
 }
