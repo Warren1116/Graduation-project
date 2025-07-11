@@ -66,6 +66,9 @@ Player::Player(bool flag)
     stateMachine->RegisterState(new PlayerStates::UltimateState(this));
     stateMachine->RegisterState(new PlayerStates::BounceState(this));
     stateMachine->RegisterState(new PlayerStates::FlyPunchState(this));
+    stateMachine->RegisterState(new PlayerStates::UpperPunchState(this));
+    stateMachine->RegisterState(new PlayerStates::TornadoKickState(this));
+    stateMachine->RegisterState(new PlayerStates::SideKickState(this));
 
     // ‰Šúó‘ÔÝ’è
     stateMachine->SetState(static_cast<int>(State::CrouchIdle));
@@ -351,6 +354,18 @@ void Player::CollisionNodeVsEnemies(const char* nodeName, float nodeRadius)
                             {
                                 FlyPunch->Play(false, 0.4f);
                             }
+                            if (state == State::UpperPunch)
+                            {
+                                FlyPunch->Play(false, 0.4f);
+                            }
+                            if (state == State::SideKick)
+                            {
+                                kick->Play(false, 0.4f);
+                            }
+                            if (state == State::TornadoKick)
+                            {
+                                kick->Play(false, 0.4f);
+                            }
                             hitEffect->Play(enemyPos);
                             if (skillTime < skillTimeMax)
                             {
@@ -476,6 +491,9 @@ void Player::UpdateCameraState(float elapsedTime)
     case State::SwingToKick:
     case State::Bounce:
     case State::FlyPunch:
+    case State::UpperPunch:
+    case State::TornadoKick:
+    case State::SideKick:
     {
         GamePad& gamePad = Input::Instance().GetGamePad();
         if (gamePad.GetButton() & GamePad::BTN_KEYBOARD_TAB || gamePad.GetButtonDown() & GamePad::BTN_RIGHT_THUMB)
@@ -819,11 +837,9 @@ Player::AttackType Player::InputAttack()
 {
     GamePad& gamePad = Input::Instance().GetGamePad();
     Mouse& mouse = Input::Instance().GetMouse();
-
     if (mouse.GetButtonDown() & Mouse::BTN_LEFT || gamePad.GetButtonDown() & GamePad::BTN_X)
     {
         attackInputHistory.push_back(AttackType::Normal);
-        attackInputQueue.push(AttackType::Normal);
         attackCount++;
         return AttackType::Normal;
 
@@ -832,7 +848,6 @@ Player::AttackType Player::InputAttack()
     if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
     {
         attackInputHistory.push_back(AttackType::Heavy);
-        attackInputQueue.push(AttackType::Heavy);
         return AttackType::Heavy;
     }
 
@@ -906,20 +921,20 @@ void Player::DrawDebugPrimitive()
 
     projectileManager.DrawDebugPrimitive();
 
-    //  SwingToKickUŒ‚”ÍˆÍ
-    {
-        Model::Node* RightToeBase = model->FindNode("mixamorig:RightToeBase");
-        debugRender->DrawSphere(DirectX::XMFLOAT3(
-            RightToeBase->worldTransform._41,
-            RightToeBase->worldTransform._42,
-            RightToeBase->worldTransform._43),
-            attackRadius,
-            DirectX::XMFLOAT4(1, 0, 0, 1));
-    }
-
     //  ŒyUŒ‚”ÍˆÍ
     if (attackCollisionFlag)
     {
+        if (state == State::UpperPunch)
+        {
+            Model::Node* rightHandBone = model->FindNode("mixamorig:RightHand");
+            debugRender->DrawSphere(DirectX::XMFLOAT3(
+                rightHandBone->worldTransform._41,
+                rightHandBone->worldTransform._42,
+                rightHandBone->worldTransform._43),
+                attackRadius,
+                DirectX::XMFLOAT4(1, 0, 0, 1));
+        }
+
         if (attackCount == 1)
         {
             Model::Node* leftHandBone = model->FindNode("mixamorig:LeftHand");
@@ -952,20 +967,6 @@ void Player::DrawDebugPrimitive()
         }
     }
 }
-
-bool Player::MatchCombo(const std::vector<AttackType>& history, const std::vector<AttackType>& pattern)
-{
-    int comboIndex = static_cast<int>(pattern.size()) - 1;
-    for (int i = static_cast<int>(history.size()) - 1; i >= 0 && comboIndex >= 0; --i)
-    {
-        if (history[i] == pattern[comboIndex])
-        {
-            comboIndex--;
-        }
-    }
-    return comboIndex < 0;
-}
-
 // ƒWƒƒƒ“ƒv“ü—Íˆ—
 bool Player::InputJump()
 {

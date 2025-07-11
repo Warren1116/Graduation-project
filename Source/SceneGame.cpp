@@ -25,7 +25,7 @@ SceneGame* SceneGame::instance = nullptr;
 static const UINT SHADOWMAP_SIZE = 2048;
 
 //#define TUTORIAL
-#define DEBUG
+//#define DEBUG
 
 //	チュートリアルの状態
 bool SceneGame::tutorialCompleted = false;
@@ -732,7 +732,7 @@ void SceneGame::UpdateTutorialState(float elapsedTime)
         if (Player::Instance().GetLockonEnemy() != nullptr)
         {
             CheckTutorialTimeout(2.0f);
-            if (gamePad.GetButtonDown() & GamePad::BTN_Y || mouse.GetButtonDown() & Mouse::BTN_RIGHT && canAcceptInput)
+            if ((mouse.GetButtonDown() & Mouse::BTN_RIGHT && mouse.GetButtonDown() & Mouse::BTN_LEFT) || (gamePad.GetButtonDown() & GamePad::BTN_Y && gamePad.GetButtonDown() & GamePad::BTN_X) && canAcceptInput)
                 AdvanceTutorialState(SceneGame::TutorialState::Swing);
         }
         break;

@@ -27,7 +27,8 @@ enum class PlayerAnimation
     Anim_Attack2, Anim_Kick, Anim_StartSwing, Anim_Swinging, Anim_Swinging2,
     Anim_Shoting, Anim_Dodge, Anim_ClimbUpWall, Anim_ClimbDown, Anim_GrabAndDrop,
     Anim_CrouchIdle, Anim_TitleIdle, Anim_Crouch, Anim_SwingToKick,
-    Anim_Ultimate, Anim_SwingFilp, Anim_FlyPunch
+    Anim_Ultimate, Anim_SwingFilp, Anim_FlyPunch, Anim_UpperPunch,
+    Anim_TornadoKick, Anim_SideKick
 };
 
 //　ステートマシン
@@ -40,7 +41,8 @@ namespace PlayerStates
     class AttackState; class DamageState; class SwingState; class SwingToKickState;
     class LandState; class ShotState; class GrabState; class DodgeState;
     class ClimbTopState; class UltimateState; class DeathState; class CrouchIdleState;
-    class TitleIdleState; class BounceState; class FlyPunchState;
+    class TitleIdleState; class BounceState; class FlyPunchState; class UpperPunchState;
+    class TornadoKickState; class SideKickState;
 }
 
 
@@ -67,6 +69,9 @@ class Player : public Character
     friend class PlayerStates::TitleIdleState;
     friend class PlayerStates::BounceState;
     friend class PlayerStates::FlyPunchState;
+    friend class PlayerStates::UpperPunchState;
+    friend class PlayerStates::TornadoKickState;
+    friend class PlayerStates::SideKickState;
 
 public:
     // ステート
@@ -74,7 +79,8 @@ public:
     {
         Idle, Move, Jump, Land, Attack, Damage, Death, Dodge,
         Climb, Swing, Shot, ClimbTop, Grab, CrouchIdle, TitleIdle,
-        SwingToKick, Ultimate, Bounce, FlyPunch, EventMode
+        SwingToKick, Ultimate, Bounce, FlyPunch, UpperPunch,
+        TornadoKick, SideKick, EventMode
     };
 
     // ロックオンステート
@@ -92,7 +98,6 @@ public:
         None,     // 攻撃なし
     };
     std::vector<AttackType> attackInputHistory;   // 攻撃入力履歴
-    std::queue<AttackType> attackInputQueue;   // 攻撃入力キュー
 
 
     Player(bool flag);
@@ -110,12 +115,10 @@ public:
     bool InputMove(float elapsedTime);  // 移動入力処理
     bool InputJump();                   // ジャンプ入力処理
     bool InputProjectile();             //　弾丸の入力処理
-    //bool InputAttack();                 // 攻撃入力処理
-    AttackType InputAttack();                 // 攻撃入力処理
+    AttackType InputAttack();           // 攻撃入力処理
     bool InputDodge();                  // Dodge入力処理
     bool InputHealing();                //　回復入力処理
     void DrawDebugPrimitive();          // デバッグプリミティブ描画
-    bool Player::MatchCombo(const std::vector<AttackType>& history, const std::vector<AttackType>& pattern);
 
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +245,7 @@ private:
     std::unique_ptr<AudioSource> punch = nullptr;       //	攻撃音
     std::unique_ptr<AudioSource> punch2 = nullptr;      //	攻撃音
     std::unique_ptr<AudioSource> kick = nullptr;        //	攻撃音
-    std::unique_ptr<AudioSource> FlyPunch = nullptr;       //  回避音
+    std::unique_ptr<AudioSource> FlyPunch = nullptr;    //  攻撃音
     std::unique_ptr<AudioSource> Fall = nullptr;        //  落とす音
     bool fallSoundPlayed = false;
     std::unique_ptr<AudioSource> spiderSense = nullptr; //  スパイダーセンス

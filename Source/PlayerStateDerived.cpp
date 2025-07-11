@@ -95,7 +95,31 @@ void PlayerStates::IdleState::Execute(float elapsedTime)
 
         if (attackType == Player::AttackType::Heavy)
         {
-            owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+
+            if (owner->attackInputHistory.size() == 1 && owner->attackInputHistory[0] == Player::AttackType::Heavy)
+            {
+                if (owner->lockonEnemy)
+                {
+                    owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+                }
+                else
+                {
+                    owner->stateMachine->ChangeState(static_cast<int>(Player::State::UpperPunch));
+                }
+            }
+            else if (owner->attackInputHistory.size() == 2 && owner->attackInputHistory[1] == Player::AttackType::Heavy)
+            {
+                owner->stateMachine->ChangeState(static_cast<int>(Player::State::SideKick));
+            }
+            else if (owner->attackInputHistory.size() == 3 && owner->attackInputHistory[2] == Player::AttackType::Heavy)
+            {
+                owner->stateMachine->ChangeState(static_cast<int>(Player::State::TornadoKick));
+            }
+            else
+            {
+                owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+            }
+
         }
     }
 
@@ -213,7 +237,23 @@ void PlayerStates::MoveState::Execute(float elapsedTime)
 
     if (attackType == Player::AttackType::Heavy)
     {
-        owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+        if (owner->attackInputHistory.size() == 1 && owner->attackInputHistory[0] == Player::AttackType::Heavy)
+        {
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::UpperPunch));
+        }
+        else if (owner->attackInputHistory.size() == 2 && owner->attackInputHistory[1] == Player::AttackType::Heavy)
+        {
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::SideKick));
+        }
+        else if (owner->attackInputHistory.size() == 3 && owner->attackInputHistory[2] == Player::AttackType::Heavy)
+        {
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::TornadoKick));
+        }
+        else
+        {
+            owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+        }
+
     }
 
     // 回復入力処理
@@ -263,12 +303,7 @@ void PlayerStates::JumpState::Execute(float elapsedTime)
     Player::AttackType attackType = owner->InputAttack();
     if (attackType == Player::AttackType::Normal)
     {
-        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
-    }
-
-    if (attackType == Player::AttackType::Heavy)
-    {
-        owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::SwingToKick));
     }
 
     GamePad& gamePad = Input::Instance().GetGamePad();
@@ -337,7 +372,7 @@ void PlayerStates::LandState::Exit()
 {
 }
 
-// スイングステート
+// 攻撃ステート
 void PlayerStates::AttackState::Enter()
 {
     owner->state = Player::State::Attack;
@@ -346,6 +381,7 @@ void PlayerStates::AttackState::Enter()
     // 攻撃アニメーション再生
     owner->PlayAttackAnimation();
 }
+
 void PlayerStates::AttackState::Execute(float elapsedTime)
 {
     //　モーションが終わったら待機ステートへ遷移
@@ -376,47 +412,7 @@ void PlayerStates::AttackState::Execute(float elapsedTime)
         {
             adjustedStartTime = 0.3f / animationSpeed;
         }
-        if (animationTime >= adjustedStartTime && animationTime <= adjustedEndTime )
-        {
-            if (!owner->attackInputHistory.empty())
-            {
-                if (owner->MatchCombo(owner->attackInputHistory, { Player::AttackType::Normal, Player::AttackType::Heavy }))
-                {
-                    // 軽 → 重 のコンボ
-                    owner->stateMachine->ChangeState(static_cast<int>(Player::State::Ultimate));
-                    owner->attackInputHistory.clear();
-                    return;
-                }
-                else if (owner->attackInputHistory == std::vector<Player::AttackType>{Player::AttackType::Normal, Player::AttackType::Normal, Player::AttackType::Heavy})
-                {
-                    // 軽 → 軽 → 重 のコンボ
-                    owner->stateMachine->ChangeState(static_cast<int>(Player::State::Ultimate));
-                    owner->attackInputHistory.clear();
-                    return;
-                }
-            }
 
-            ////攻撃入力処理
-            //Player::AttackType attackType = owner->InputAttack();
-            //if (attackType == Player::AttackType::Normal)
-            //{
-            //    owner->stateMachine->ChangeState(static_cast<int>(Player::State::Attack));
-            //}
-
-            //if (attackType == Player::AttackType::Heavy)
-            //{
-            //    owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
-            //}
-
-            ////  連撃のカウントアップ応じて切り替わり時間は調整した方がよい
-            ////  連打しないと次につながらないので選考入力の仕組みを入れる（ゲープロVのコマンド履歴を見るとよい）
-            //Mouse& mouse = Input::Instance().GetMouse();
-            //GamePad& gamePad = Input::Instance().GetGamePad();
-            //if (mouse.GetButtonDown() & Mouse::BTN_RIGHT || gamePad.GetButtonDown() & GamePad::BTN_Y)
-            //{
-            //    owner->stateMachine->ChangeState(static_cast<int>(Player::State::FlyPunch));
-            //}
-        }
     }
 
     // アニメーションの速度に応じて攻撃の当たり判定を調整
@@ -1170,7 +1166,14 @@ void PlayerStates::FlyPunchState::Enter()
 
 void PlayerStates::FlyPunchState::Execute(float elapsedTime)
 {
+    // アニメーションの再生時間を取得
     float animationTime = owner->model->GetCurrentAnimationSeconds();
+    float animationSpeed = owner->model->GetCurrentAnimationSpeed();
+
+    // アニメーションの速度に応じて攻撃の当たり判定を調整
+    float adjustedStartTime = 1.1f / animationSpeed;
+    float adjustedEndTime = 1.5f / animationSpeed;
+    owner->attackCollisionFlag = animationTime >= adjustedStartTime && animationTime <= adjustedEndTime;
 
     // 0.5秒後に突進（距離に応じて速度設定）
     if (!hasDashed && animationTime > 0.5f)
@@ -1221,10 +1224,10 @@ void PlayerStates::FlyPunchState::Execute(float elapsedTime)
     // 攻撃判定
     owner->CollisionNodeVsEnemies("mixamorig:LeftHand", owner->attackRadius);
 
-
     // 終了処理
     if (!owner->model->IsPlayAnimation())
     {
+
         owner->attacking = false;
         owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
     }
@@ -1233,4 +1236,152 @@ void PlayerStates::FlyPunchState::Execute(float elapsedTime)
 void PlayerStates::FlyPunchState::Exit()
 {
 
+}
+
+void PlayerStates::UpperPunchState::Enter()
+{
+    owner->state = Player::State::UpperPunch;
+    owner->attacking = true;
+    owner->attackTimer = 0;
+
+    // アニメーション再生
+    owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_UpperPunch), false, 0.1f, 1.2f);
+}
+
+void PlayerStates::UpperPunchState::Execute(float elapsedTime)
+{
+    // アニメーションの再生時間を取得
+    float animationTime = owner->model->GetCurrentAnimationSeconds();
+    float animationSpeed = owner->model->GetCurrentAnimationSpeed();
+
+    // アニメーションの速度に応じて攻撃の当たり判定を調整
+    float adjustedStartTime = 0.3f / animationSpeed;
+    float adjustedEndTime = 0.6f / animationSpeed;
+    owner->attackCollisionFlag = animationTime >= adjustedStartTime && animationTime <= adjustedEndTime;
+
+    //  カメラロック中攻撃すると
+    if (owner->lockonState == Player::LockonState::Locked && owner->lockonEnemy != nullptr)
+    {
+        //  ちょっとだけ敵の方向移動する
+        DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&owner->position);
+        DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&owner->lockonEnemy->GetPosition());
+        DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
+
+        float moveDistance = 0.02f;
+        DirectX::XMVECTOR moveVector = DirectX::XMVectorScale(directionToEnemy, moveDistance);
+
+        DirectX::XMStoreFloat3(&owner->lockDirection, directionToEnemy);
+        owner->Turn(elapsedTime, owner->lockDirection.x, owner->lockDirection.z, owner->turnSpeed);
+        playerPos = DirectX::XMVectorAdd(playerPos, moveVector);
+        DirectX::XMStoreFloat3(&owner->position, playerPos);
+
+    }
+
+    // 攻撃判定
+    owner->CollisionNodeVsEnemies("mixamorig:RightHand", owner->attackRadius);
+
+    // 終了処理
+    if (!owner->model->IsPlayAnimation())
+    {
+
+        owner->attacking = false;
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
+    }
+
+}
+
+void PlayerStates::UpperPunchState::Exit()
+{
+}
+
+void PlayerStates::TornadoKickState::Enter()
+{
+    owner->state = Player::State::TornadoKick;
+    owner->attacking = true;
+    owner->attackTimer = 0;
+    // アニメーション再生
+    owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_TornadoKick), false, 0.1f, 1.8f);
+}
+
+void PlayerStates::TornadoKickState::Execute(float elapsedTime)
+{
+    DirectX::XMFLOAT3 moveVec = owner->GetMoveVec();
+    if (moveVec.x != 0.0f || moveVec.y != 0.0f || moveVec.z != 0.0f)
+    {
+        owner->Move(moveVec.x, moveVec.y, moveVec.z, owner->moveSpeed * 0.8f);
+    }
+    // アニメーションの再生時間を取得
+    float animationTime = owner->model->GetCurrentAnimationSeconds();
+    float animationSpeed = owner->model->GetCurrentAnimationSpeed();
+
+    // アニメーションの速度に応じて攻撃の当たり判定を調整
+    float adjustedStartTime = 0.1f / animationSpeed;
+    float adjustedEndTime = 1.8f / animationSpeed;
+    owner->attackCollisionFlag = animationTime >= adjustedStartTime && animationTime <= adjustedEndTime;
+
+
+    // 攻撃判定
+    owner->CollisionNodeVsEnemies("mixamorig:LeftToeBase", owner->attackRadius);
+
+    if (!owner->model->IsPlayAnimation())
+    {
+        owner->attacking = false;
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
+        return;
+    }
+}
+
+void PlayerStates::TornadoKickState::Exit()
+{
+}
+
+void PlayerStates::SideKickState::Enter()
+{
+    owner->state = Player::State::SideKick;
+    owner->attacking = true;
+    owner->attackTimer = 0;
+    // アニメーション再生
+    owner->model->PlayAnimation(static_cast<int>(PlayerAnimation::Anim_SideKick), false, 0.1f, 1.8f);
+}
+
+void PlayerStates::SideKickState::Execute(float elapsedTime)
+{
+    // アニメーションの再生時間を取得
+    float animationTime = owner->model->GetCurrentAnimationSeconds();
+    float animationSpeed = owner->model->GetCurrentAnimationSpeed();
+
+    // アニメーションの速度に応じて攻撃の当たり判定を調整
+    float adjustedStartTime = 0.3f / animationSpeed;
+    float adjustedEndTime = 0.6f / animationSpeed;
+    owner->attackCollisionFlag = animationTime >= adjustedStartTime && animationTime <= adjustedEndTime;
+
+    //  カメラロック中攻撃すると
+    if (owner->lockonState == Player::LockonState::Locked && owner->lockonEnemy != nullptr)
+    {
+        //  ちょっとだけ敵の方向移動する
+        DirectX::XMVECTOR playerPos = DirectX::XMLoadFloat3(&owner->position);
+        DirectX::XMVECTOR enemyPos = DirectX::XMLoadFloat3(&owner->lockonEnemy->GetPosition());
+        DirectX::XMVECTOR directionToEnemy = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(enemyPos, playerPos));
+
+        float moveDistance = 0.02f;
+        DirectX::XMVECTOR moveVector = DirectX::XMVectorScale(directionToEnemy, moveDistance);
+
+        DirectX::XMStoreFloat3(&owner->lockDirection, directionToEnemy);
+        owner->Turn(elapsedTime, owner->lockDirection.x, owner->lockDirection.z, owner->turnSpeed);
+        playerPos = DirectX::XMVectorAdd(playerPos, moveVector);
+        DirectX::XMStoreFloat3(&owner->position, playerPos);
+
+    }
+    // 攻撃判定
+    owner->CollisionNodeVsEnemies("mixamorig:RightToeBase", owner->attackRadius);
+    if (!owner->model->IsPlayAnimation())
+    {
+        owner->attacking = false;
+        owner->stateMachine->ChangeState(static_cast<int>(Player::State::Idle));
+        return;
+    }
+}
+
+void PlayerStates::SideKickState::Exit()
+{
 }

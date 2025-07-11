@@ -216,4 +216,35 @@ namespace PlayerStates
         DirectX::XMFLOAT3 dashDirection = { 0.0f, 0.0f, 0.0f };
         bool hasDashed = false; 
     };
+
+    class UpperPunchState : public PlayerState
+    {
+    public:
+        UpperPunchState(Player* player) : PlayerState(player) {};
+        ~UpperPunchState() {}
+        void Enter() override;
+        void Execute(float elapsedTime)override;
+        void Exit()override;
+    };
+
+    class TornadoKickState : public PlayerState
+    {
+    public:
+        TornadoKickState(Player* player) : PlayerState(player) {};
+        ~TornadoKickState() {}
+        void Enter() override;
+        void Execute(float elapsedTime)override;
+        void Exit()override;
+    };
+
+    class SideKickState : public PlayerState
+    {
+    public:
+        SideKickState(Player* player) : PlayerState(player) {};
+        ~SideKickState() {}
+        void Enter() override;
+        void Execute(float elapsedTime)override;
+        void Exit()override;
+    };
+
 }
